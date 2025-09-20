@@ -49,7 +49,7 @@ const CheckoutForm = () => {
         disabled={!stripe || loading}
         className="w-full bg-blue-500 text-white py-2 mt-4"
       >
-        {loading ? "Paiement en cours..." : `Payer ${totalAmount} €`}
+        {loading ? "Paiement en cours..." : `Payer ${totalAmount} CFA`}
       </button>
       {message && <p className="text-center text-red-500 mt-2">{message}</p>}
     </form>

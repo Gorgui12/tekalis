@@ -1,61 +1,68 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import { createOrder } from "../../slices/orderSlice";
-import MobileMoneyPayment from "../../components/client/MobileMoneyPayment";
+import { clearCart } from "../../slices/cartSlice"; // ✅ importer clearCart
 
 const Checkout = () => {
   const dispatch = useDispatch();
-  const { order, loading, error } = useSelector((state) => state.orders);
+  const { loading, error } = useSelector((state) => state.orders);
   const cart = useSelector((state) => state.cart.items);
   const totalPrice = useSelector((state) => state.cart.totalAmount);
-  const orderId = order?._id;
 
-  // Champs du formulaire
+  // Champs de livraison
   const [deliveryName, setDeliveryName] = useState("");
   const [deliveryPhone, setDeliveryPhone] = useState("");
   const [deliveryAddress, setDeliveryAddress] = useState("");
-  const [showMobileMoney, setShowMobileMoney] = useState(false);
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  // Gestion modal
+  const [selectedPayment, setSelectedPayment] = useState(null);
+  const [showConfirm, setShowConfirm] = useState(false);
 
+  // ✅ Fonction pour afficher la confirmation
+  const handleChoosePayment = (method) => {
     if (!deliveryName || !deliveryPhone || !deliveryAddress) {
       alert("Tous les champs de livraison sont obligatoires.");
       return;
     }
+    setSelectedPayment(method);
+    setShowConfirm(true);
+  };
 
-    dispatch(
+  // ✅ Validation finale
+  const confirmOrder = async () => {
+    setShowConfirm(false);
+
+    const action = await dispatch(
       createOrder({
-        products: cart.map((item) => ({ product: item._id, quantity: item.quantity })),
+        products: cart.map((item) => ({
+          product: item._id,
+          quantity: item.quantity,
+        })),
         totalPrice,
-        paymentMethod: "cash", // temporaire, on peut le changer au clic
+        paymentMethod: selectedPayment,
         deliveryName,
         deliveryPhone,
         deliveryAddress,
       })
     );
-  };
 
-  const handleCashOnDelivery = async () => {
-    try {
-      await fetch("http://localhost:5000/api/payment/cash-on-delivery", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({ orderId }),
-      });
+    const createdOrder = action?.payload;
+    if (!createdOrder?._id) {
+      alert("Erreur lors de la création de la commande.");
+      return;
+    }
 
-      alert("Commande enregistrée avec paiement à la livraison !");
-    } catch (err) {
-      alert("Erreur lors de la validation : " + err.message);
+    if (selectedPayment === "cash") {
+      alert("✅ Commande enregistrée, vous paierez à la livraison.");
+      dispatch(clearCart()); // ✅ vider panier
     }
   };
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold text-center mb-6">🧾 Résumé de la commande</h1>
+      <h1 className="text-2xl font-bold text-center mb-6">
+        🧾 Résumé de la commande
+      </h1>
 
       {/* Produits */}
       <div className="bg-white rounded shadow-md p-4 mb-6">
@@ -65,17 +72,21 @@ const Checkout = () => {
               <p className="font-semibold">{item.name}</p>
               <p className="text-sm text-gray-600">Quantité : {item.quantity}</p>
             </div>
-            <p className="text-blue-600 font-semibold">{item.price * item.quantity} €</p>
+            <p className="text-blue-600 font-semibold">
+              {item.price * item.quantity} CFA
+            </p>
           </div>
         ))}
         <div className="text-right font-bold mt-4 text-lg">
-          Total : <span className="text-blue-600">{totalPrice} €</span>
+          Total : <span className="text-blue-600">{totalPrice} CFA</span>
         </div>
       </div>
 
       {/* Formulaire livraison */}
-      <form onSubmit={handleSubmit} className="bg-white rounded shadow p-4 mb-6">
-        <h2 className="text-lg font-semibold text-blue-600 mb-4">📦 Informations de livraison</h2>
+      <div className="bg-white rounded shadow p-4 mb-6">
+        <h2 className="text-lg font-semibold text-blue-600 mb-4">
+          📦 Informations de livraison
+        </h2>
         <input
           type="text"
           placeholder="Nom complet"
@@ -97,50 +108,72 @@ const Checkout = () => {
           value={deliveryAddress}
           onChange={(e) => setDeliveryAddress(e.target.value)}
         />
-        <button type="submit" className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded w-full">
-          Valider les infos de livraison
-        </button>
-      </form>
+      </div>
 
-      {/* Paiement */}
-      {orderId && (
-        <>
-          <h2 className="text-xl font-semibold text-center mb-4 text-blue-600">💳 Mode de paiement</h2>
+      {/* Choix paiement */}
+      <h2 className="text-xl font-semibold text-center mb-4 text-blue-600">
+        💳 Choisissez un mode de paiement
+      </h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="border p-4 rounded shadow-md">
-              <h3 className="text-lg font-semibold mb-2 text-blue-600">Paiement à la livraison</h3>
-              <p className="text-gray-600 mb-4">Payez en espèces à la réception de votre commande.</p>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Cash */}
+        <div className="border p-4 rounded shadow-md text-center">
+          <h3 className="text-lg font-semibold mb-2 text-blue-600">
+            Paiement à la livraison
+          </h3>
+          <p className="text-gray-600 mb-4">Payez en espèces à la réception.</p>
+          <button
+            onClick={() => handleChoosePayment("cash")}
+            className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded w-full"
+          >
+            Choisir
+          </button>
+        </div>
+      </div>
+
+      {loading && (
+        <p className="text-center mt-4">Création de la commande en cours...</p>
+      )}
+      {error && (
+        <p className="text-center text-red-500 mt-4">Erreur : {error}</p>
+      )}
+
+      {/* 🔹 Modal de confirmation */}
+      {showConfirm && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 w-96">
+            <h2 className="text-xl font-bold mb-4">Confirmer la commande</h2>
+            <p>
+              Mode de paiement : <strong>{selectedPayment}</strong>
+            </p>
+            <p>
+              Total : <strong>{totalPrice} CFA</strong>
+            </p>
+            <ul className="mt-2 mb-4 text-sm text-gray-600">
+              {cart.map((item) => (
+                <li key={item._id}>
+                  {item.name} × {item.quantity}
+                </li>
+              ))}
+            </ul>
+
+            <div className="flex justify-between gap-4">
               <button
-                onClick={handleCashOnDelivery}
-                className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded w-full"
+                onClick={() => setShowConfirm(false)}
+                className="w-1/2 bg-gray-300 py-2 rounded"
+              >
+                Annuler
+              </button>
+              <button
+                onClick={confirmOrder}
+                className="w-1/2 bg-green-600 hover:bg-green-700 text-white py-2 rounded"
               >
                 Confirmer
               </button>
             </div>
-
-            <div className="border p-4 rounded shadow-md">
-              <h3 className="text-lg font-semibold mb-2 text-blue-600">Payer avec Wave</h3>
-              <p className="text-gray-600 mb-4">Payer directement via Wave.</p>
-              <button
-                onClick={() => setShowMobileMoney(true)}
-                className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded w-full"
-              >
-                Payer avec Wave
-              </button>
-
-              {showMobileMoney && (
-                <div className="mt-4">
-                  <MobileMoneyPayment orderId={orderId} />
-                </div>
-              )}
-            </div>
           </div>
-        </>
+        </div>
       )}
-
-      {loading && <p className="text-center mt-4">Création de la commande en cours...</p>}
-      {error && <p className="text-center text-red-500 mt-4">Erreur : {error}</p>}
     </div>
   );
 };

@@ -13,7 +13,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await api.get("/stats");
+        const response = await api.get("/api/stats");
         setStats(response.data);
       } catch (error) {
         console.error("Erreur lors de la récupération des stats :", error);
@@ -39,7 +39,7 @@ const Dashboard = () => {
 
         <div className="bg-white shadow-md p-6 rounded-lg border border-green-100">
           <h2 className="text-xl font-semibold text-gray-700 mb-2">💰 Total Revenus</h2>
-          <p className="text-3xl font-bold text-green-600">{stats.totalRevenue} €</p>
+          <p className="text-3xl font-bold text-green-600">{stats.totalRevenue} CFA</p>
         </div>
 
         <div className="bg-white shadow-md p-6 rounded-lg border border-purple-100">

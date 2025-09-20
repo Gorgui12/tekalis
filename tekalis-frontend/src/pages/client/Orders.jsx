@@ -35,7 +35,7 @@ const Orders = () => {
               {order.products.map((item, index) => (
                 <li key={index} className="flex justify-between border-b py-1">
                   <span>{item.product?.name || "Produit supprimé"} × {item.quantity}</span>
-                  <span>{item.product?.price * item.quantity} €</span>
+                  <span>{item.product?.price * item.quantity} CFA</span>
                 </li>
               ))}
             </ul>
@@ -49,7 +49,7 @@ const Orders = () => {
 
             {/* Statuts */}
             <div className="flex justify-between items-center text-sm text-gray-700">
-              <span>Total : <strong className="text-black">{order.totalPrice} €</strong></span>
+              <span>Total : <strong className="text-black">{order.totalPrice} CFA</strong></span>
               <span>Status :
                 <span className={`ml-2 px-2 py-1 rounded text-white ${order.status === "pending" ? "bg-yellow-500" : "bg-green-600"}`}>
                   {order.status}

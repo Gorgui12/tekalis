@@ -43,7 +43,7 @@ const ProductDetails = () => {
         <div>
           <h1 className="text-3xl font-bold mb-2">{product.name}</h1>
           <p className="text-gray-600 mb-4">{product.description}</p>
-          <p className="text-2xl font-semibold text-blue-600 mb-4">{product.price} €</p>
+          <p className="text-2xl font-semibold text-blue-600 mb-4">{product.price} CFA</p>
 
           <div className="flex items-center space-x-4 mb-6">
             <label>Quantité:</label>

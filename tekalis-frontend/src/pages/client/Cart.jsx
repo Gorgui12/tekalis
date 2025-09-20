@@ -16,7 +16,7 @@ const Cart = () => {
         <div key={item._id} className="flex justify-between p-4 border-b">
           <div>
             <h2 className="font-bold">{item.name}</h2>
-            <p>{item.price} €</p>
+            <p>{item.price} CFA</p>
             <div className="flex items-center space-x-2">
               <button onClick={() => dispatch(decreaseQuantity(item._id))} className="px-2 py-1 bg-gray-200">-</button>
               <span>{item.quantity}</span>
@@ -26,7 +26,7 @@ const Cart = () => {
           <button onClick={() => dispatch(removeFromCart(item._id))} className="text-red-500">Supprimer</button>
         </div>
       ))}
-      <h3 className="text-right text-lg font-bold mt-4">Total : {totalAmount} €</h3>
+      <h3 className="text-right text-lg font-bold mt-4">Total : {totalAmount} CFA</h3>
 
 <div className="flex flex-col sm:flex-row gap-4 mt-6">
   <button

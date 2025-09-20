@@ -10,9 +10,10 @@ const verifyToken = (req, res, next) => {
     
     // ✅ Correction ici :
     req.user = {
-      _id: decoded.id,           // ou decoded._id si tu l’as stocké comme ça dans le token
-      isAdmin: decoded.isAdmin,
-    };
+  id: decoded.id,   // ⚡ garde "id" pour correspondre au userRoutes
+  isAdmin: decoded.isAdmin,
+};
+
 
     console.log("Utilisateur authentifié:", req.user);
     next();

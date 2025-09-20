@@ -9,7 +9,7 @@ const orderSchema = new mongoose.Schema({
     }
   ],
   totalPrice: { type: Number, required: true },
-  paymentMethod: { type: String, enum: ["cash", "card", "mobile_money"], required: true },
+  paymentMethod: { type: String, enum: ["cash", "wave", "om"], required: true },
   status: { type: String, enum: ["pending", "processing", "shipped", "delivered", "cancelled"], default: "pending" },
   isPaid: { type: Boolean, default: false },
   paidAt: { type: Date },

@@ -6,7 +6,7 @@ import orderReducer from "./slices/orderSlice";
 
 import storage from "redux-persist/lib/storage";
 import { persistReducer, persistStore } from "redux-persist";
-import { thunk } from 'redux-thunk';
+import { thunk } from "redux-thunk"; // ✅ export nommé
 
 const rootReducer = combineReducers({
   auth: authReducer,

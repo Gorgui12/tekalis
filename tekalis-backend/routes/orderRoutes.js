@@ -22,7 +22,7 @@ router.post("/", verifyToken, async (req, res) => {
     }
 
     const newOrder = new Order({
-      user: req.user._id,
+      user: req.user.id,
       products,
       totalPrice,
       paymentMethod,
