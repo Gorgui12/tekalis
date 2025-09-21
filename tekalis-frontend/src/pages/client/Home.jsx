@@ -1,3 +1,4 @@
+import { Link} from "react-router-dom";
 import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import ProductCard from "../../components/client/ProductCard";
@@ -20,7 +21,8 @@ const Home = () => {
         <h1 className="text-4xl md:text-5xl font-bold mb-4">Bienvenue sur Tekalis</h1>
         <p className="text-lg md:text-xl">Produits de qualité. Prix imbattables. Livraison rapide.</p>
         <button className="mt-6 px-6 py-2 bg-white text-blue-600 font-semibold rounded hover:bg-gray-200 transition">
-          Explorer les produits
+          
+          <Link to="/products" className="block hover:underline">Explorer les produits</Link>
         </button>
       </div>
 
