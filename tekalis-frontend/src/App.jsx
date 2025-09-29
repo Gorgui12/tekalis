@@ -40,7 +40,7 @@ function App() {
   }, [location]);
 
   return (
-    <>
+    <div style={{ paddingTop: '100px' }}>
       <Navbar />
 
       <Routes>
@@ -74,7 +74,7 @@ function App() {
       <Footer />
       {/* Bouton WhatsApp flottant */}
       <WhatsAppButton />
-    </>
+    </div>
   );
 }
 

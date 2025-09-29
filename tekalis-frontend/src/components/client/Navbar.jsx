@@ -4,7 +4,7 @@ import { useState } from "react";
 
 const Navbar = () => {
   const { user } = useSelector((state) => state.auth);
-  const cartItems = useSelector((state) => state.cart.items); // ✅ récupérer le panier
+  const cartItems = useSelector((state) => state.cart.items);
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -27,38 +27,21 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-blue-600 text-white shadow-md">
+    <nav className="fixed top-0 w-full z-50 bg-white text-blue-600 shadow-md"  >
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
-        {/* Logo */}
-        <Link to="/" className="text-xl font-bold">Tekalis</Link>
-
-        {/* Champ de recherche (desktop) */}
-        <form
-          onSubmit={handleSearch}
-          className="hidden sm:flex flex-1 mx-4"
-        >
-          <input
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Rechercher un produit..."
-            className="w-full rounded px-3 py-1 text-black text-sm"
-          />
-        </form>
+        {/* Menu Burger + Logo */}
+        <div className="flex items-center space-x-3">
+          <button
+            className="sm:hidden text-2xl"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            ☰
+          </button>
+          <Link to="/" className="text-xl font-bold">Tekalis</Link>
+        </div>
 
         {/* Icônes à droite */}
         <div className="flex items-center space-x-4">
-          {/* Recherche (mobile seulement) */}
-          <form onSubmit={handleSearch} className="sm:hidden">
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="🔍"
-              className="w-20 rounded px-2 py-1 text-black text-sm"
-            />
-          </form>
-
           {/* Panier avec badge */}
           <Link to="/cart" className="relative text-lg">
             🛒
@@ -77,20 +60,31 @@ const Navbar = () => {
               👤
             </button>
           )}
-
-          {/* Menu Burger (mobile seulement) */}
-          <button
-            className="sm:hidden text-2xl"
-            onClick={() => setMenuOpen(!menuOpen)}
-          >
-            ☰
-          </button>
         </div>
+      </div>
+
+      {/* Barre de recherche toujours en bas */}
+      <div className="bg-gray-100 px-4 py-2">
+        <form onSubmit={handleSearch} className="flex">
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Rechercher un produit..."
+            className="flex-1 rounded-l px-3 py-2 border text-sm text-gray-700"
+          />
+          <button
+            type="submit"
+            className="bg-blue-600 text-white px-4 rounded-r"
+          >
+            🔍
+          </button>
+        </form>
       </div>
 
       {/* Menu mobile déroulant */}
       {menuOpen && (
-        <div className="sm:hidden bg-blue-700 px-4 py-3 space-y-2">
+        <div className="sm:hidden bg-blue-50 px-4 py-3 space-y-2 text-blue-700">
           <Link to="/" className="block hover:underline">Accueil</Link>
           <Link to="/products" className="block hover:underline">Produits</Link>
         </div>

@@ -9,6 +9,7 @@ const productRoutes = require("./routes/productRoutes.js");
 const orderRoutes = require("./routes/orderRoutes.js");
 const paymentRoutes = require("./routes/paymentRoutes.js");
 const statRoutes = require("./routes/stats.js");
+require("./cron"); // <- Importer le cron
 
 dotenv.config();
 const app = express();
