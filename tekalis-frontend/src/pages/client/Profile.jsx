@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import API from "../api/api";
+
 
 const Profile = () => {
   const [user, setUser] = useState(null);
@@ -15,13 +15,19 @@ const Profile = () => {
 
   const fetchUser = async () => {
     try {
-      const res = await API.get("/users/me", {
+      const baseURL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+      const res = await fetch(`${baseURL}/users/me`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      setUser(res.data);
+      if (res.ok) {
+        const data = await res.json();
+        setUser(data);
+      } else {
+        navigate("/login");
+      }
     } catch (error) {
       console.error("Erreur:", error);
       navigate("/login");
