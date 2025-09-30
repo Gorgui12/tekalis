@@ -1,39 +1,35 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import API from "../api/api";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    navigate("/login");
+    return;
+  }
+
+  const fetchUser = async () => {
+    try {
+      const res = await API.get("/users/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      setUser(res.data);
+    } catch (error) {
+      console.error("Erreur:", error);
       navigate("/login");
-      return;
     }
+  };
 
-    const fetchUser = async () => {
-      try {
-        const res = await fetch("http://localhost:5000/api/users/me", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (res.ok) {
-          const data = await res.json();
-          setUser(data);
-        } else {
-          navigate("/login");
-        }
-      } catch (error) {
-        console.error("Erreur:", error);
-        navigate("/login");
-      }
-    };
-
-    fetchUser();
-  }, [navigate]);
+  fetchUser();
+}, [navigate]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
