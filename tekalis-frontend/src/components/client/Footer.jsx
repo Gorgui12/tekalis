@@ -8,7 +8,7 @@ const Footer = () => {
         
         {/* À propos */}
         <div>
-          <h3 className="text-lg font-bold mb-2">À propos</h3>
+          <h3 className="text-lg font-bold mb-2"><Link to="/apropos" className="hover:underline">À propos</Link></h3>
           <p className="text-sm">
             Tekalis est une boutique en ligne offrant des produits de qualité,
             avec un service rapide et sécurisé.

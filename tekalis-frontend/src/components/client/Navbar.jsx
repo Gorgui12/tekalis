@@ -87,6 +87,7 @@ const Navbar = () => {
         <div className="sm:hidden bg-blue-50 px-4 py-3 space-y-2 text-blue-700">
           <Link to="/" className="block hover:underline">Accueil</Link>
           <Link to="/products" className="block hover:underline">Produits</Link>
+          <Link to="/apropos" className="block hover:underline">A propos</Link>
         </div>
       )}
     </nav>

@@ -13,6 +13,7 @@ import UserOrders from "./pages/client/Orders";
 import Profile from "./pages/client/Profile";
 import Navbar from "./components/client/Navbar";
 import Footer from "./components/client/Footer";
+import Apropos from "./pages/client/apropos";
 
 // Auth
 import Login from "./pages/client/Login";
@@ -54,6 +55,7 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/apropos" element={<Apropos />} />
 
         {/* 🔐 Admin Routes */}
         <Route path="/admin" element={<Dashboard />} />
