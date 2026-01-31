@@ -13,14 +13,20 @@
   "description": "",
   "dependencies": {
     "bcrypt": "^5.1.1",
-    "bcryptjs": "^3.0.2",
+    "bcryptjs": "^3.0.3",
+    "body-parser": "^2.2.1",
     "cors": "^2.8.5",
     "dotenv": "^16.6.1",
-    "express": "^4.21.2",
-    "jsonwebtoken": "^9.0.2",
+    "express": "^4.22.1",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^8.2.1",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.3",
     "moment-timezone": "^0.6.0",
-    "mongoose": "^8.13.1",
+    "mongoose": "^8.20.2",
+    "morgan": "^1.10.1",
     "node-cron": "^4.2.1",
-    "nodemailer": "^6.10.1"
+    "nodemailer": "^6.10.1",
+    "paydunya": "^1.0.12"
   }
 }

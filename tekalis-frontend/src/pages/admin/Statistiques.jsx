@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import Navbar from "../../components/admin/Navbar";
+import Navbar from "../../components/admin/layout/Navbar";
 
 
 const Statistique = () => {
