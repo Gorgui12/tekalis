@@ -13,7 +13,7 @@ import orderReducer from "./slices/orderSlice";
 import reviewReducer from "./slices/reviewSlice";
 import warrantyReducer from "./slices/warrantySlice";
 import rmaReducer from "./slices/rmaSlice";
-import wishlistReducer from "./slices/wishlistSlice";
+import wishlistReducer from "./slices/wishListSlice";
 import categoryReducer from "./slices/categorySlice";
 import articleReducer from "./slices/articleSlice";
 import uiReducer from "./slices/uiSlice";
