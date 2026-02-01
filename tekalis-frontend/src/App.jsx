@@ -22,7 +22,11 @@ import MyOrders from "./pages/client/MyOrders";
 import MyWarranties from "./pages/client/MyWarranties";
 import MyRMA from "./pages/client/MyRMA";
 import CreateRMA from "./pages/client/CreateRMA";
+
+// ⚠️ Correct car fichier = WishList.jsx
 import Wishlist from "./pages/client/WishList";
+
+// OK
 import Addresses from "./pages/client/Addresses";
 import Blog from "./pages/client/Blog";
 import ArticleDetails from "./pages/client/ArticleDetails";
@@ -30,13 +34,14 @@ import Configurator from "./pages/client/Configurator";
 
 import PaymentSuccess from "./pages/client/PaymentSuccess";
 import PaymentCancel from "./pages/client/PaymentCancel";
-//import SearchResults from "./pages/client/SearchResults";
-import Apropos from "./pages/client/Apropos";
-//import Politique from "./pages/client/Politique";
 
-// Auth Pages
+// ⚠️ Correct car fichier = apropos.jsx (minuscule)
+import Apropos from "./pages/client/apropos";
+
+// Login/Register
 import Login from "./pages/client/Login";
 import Register from "./pages/client/Register";
+
 
 // Admin Pages
 import AdminDashboard from "./pages/admin/Dashboard";
