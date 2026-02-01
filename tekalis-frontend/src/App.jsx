@@ -22,7 +22,7 @@ import MyOrders from "./pages/client/MyOrders";
 import MyWarranties from "./pages/client/MyWarranties";
 import MyRMA from "./pages/client/MyRMA";
 import CreateRMA from "./pages/client/CreateRMA";
-import Wishlist from "./pages/client/Wishlist";
+import Wishlist from "./pages/client/WishList";
 import Addresses from "./pages/client/Addresses";
 import Blog from "./pages/client/Blog";
 import ArticleDetails from "./pages/client/ArticleDetails";
