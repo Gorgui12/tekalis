@@ -28,8 +28,8 @@ import Blog from "./pages/client/Blog";
 import ArticleDetails from "./pages/client/ArticleDetails";
 import Configurator from "./pages/client/Configurator";
 
-import PaymentSuccess from "./pages/client/paymentSuccess";
-import PaymentCancel from "./pages/client/paymentCancel";
+import PaymentSuccess from "./pages/client/PaymentSuccess";
+import PaymentCancel from "./pages/client/PaymentCancel";
 //import SearchResults from "./pages/client/SearchResults";
 import Apropos from "./pages/client/Apropos";
 //import Politique from "./pages/client/Politique";
