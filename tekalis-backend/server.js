@@ -18,7 +18,7 @@ const PORT = process.env.PORT || 5000;
 const API_PREFIX = "/api/v1";
 
 // ===== CONNEXION MONGODB =====
-connectDB().catch(err => {
+connectDB().catch((err) => {
   console.error("❌ Erreur fatale de connexion MongoDB:", err.message);
   if (process.env.NODE_ENV === "production") {
     process.exit(1);
@@ -26,40 +26,63 @@ connectDB().catch(err => {
 });
 
 // ===== MIDDLEWARES DE SÉCURITÉ =====
-app.use(helmet({
-  crossOriginResourcePolicy: { policy: "cross-origin" }
-}));
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  })
+);
 
-// CORS Configuration
-const corsOptions = {
-  origin: function (origin, callback) {
-    const allowedOrigins = process.env.CORS_ORIGIN 
-      ? process.env.CORS_ORIGIN.split(",")
-      : ["http://localhost:3000", "http://localhost:5173"];
-    
-    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error("Non autorisé par CORS"));
-    }
-  },
-  credentials: true,
-  optionsSuccessStatus: 200
-};
+// ======================================================
+// ✅ CORS FIX PRODUCTION + LOCAL
+// ======================================================
+const allowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:5173",
 
-app.use(cors(corsOptions));
+  // ✅ Ton domaine en production
+  "https://tekalis.com",
+  "https://www.tekalis.com",
 
-// Body parsing standard
+  // ✅ Ton backend Render (optionnel)
+  "https://tekalis.onrender.com",
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Autoriser Postman / requêtes serveur sans origin
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        console.error("🚫 CORS bloqué pour:", origin);
+        callback(new Error("Non autorisé par CORS"));
+      }
+    },
+
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    credentials: true,
+  })
+);
+
+// ⚠️ Important : Répondre aux preflight requests
+app.options("*", cors());
+
+// ======================================================
+// BODY PARSING
+// ======================================================
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
-// Protection contre les injections NoSQL
+// Protection contre injections NoSQL
 app.use(mongoSanitize());
 
 // Logging en développement
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
+
 
 // ===== RATE LIMITING =====
 const apiLimiter = rateLimit({
