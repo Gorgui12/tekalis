@@ -1,56 +1,71 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import api from "../../api/api";
 
-// Action asynchrone pour charger les produits
+/**
+ * ✅ Thunk : Charger tous les produits
+ */
 export const fetchProducts = createAsyncThunk(
   "products/fetchProducts",
-  async (_, { rejectWithValue }) => {
+  async (_, thunkAPI) => {
     try {
-      const { data } = await api.get("/products");
-      
-      // 🔥 FIX CRITIQUE: S'assurer que products est toujours un tableau
-      const products = Array.isArray(data) 
-        ? data 
-        : Array.isArray(data.products) 
-          ? data.products 
-          : [];
-      
-      return products;
+      const response = await api.get("/products");
+
+      const data = response.data;
+
+      // ✅ Support des deux formats API
+      if (Array.isArray(data)) {
+        return data;
+      } else if (data && Array.isArray(data.products)) {
+        return data.products;
+      }
+
+      console.warn("⚠️ Format inattendu:", data);
+      return [];
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Erreur de chargement");
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Erreur de chargement"
+      );
     }
   }
 );
 
-// Action asynchrone pour charger un produit par ID
+/**
+ * ✅ Thunk : Charger un produit par ID
+ */
 export const fetchProductById = createAsyncThunk(
   "products/fetchProductById",
-  async (id, { rejectWithValue }) => {
+  async (id, thunkAPI) => {
     try {
-      const { data } = await api.get(`/products/${id}`);
+      const response = await api.get(`/products/${id}`);
+      const data = response.data;
+
       return data.product || data;
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Produit introuvable");
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Produit introuvable"
+      );
     }
   }
 );
 
-// Action asynchrone pour rechercher des produits
+/**
+ * ✅ Thunk : Recherche produits
+ */
 export const searchProducts = createAsyncThunk(
   "products/searchProducts",
-  async (query, { rejectWithValue }) => {
+  async (query, thunkAPI) => {
     try {
-      const { data } = await api.get(`/products/search?q=${query}`);
-      
-      const products = Array.isArray(data) 
-        ? data 
-        : Array.isArray(data.products) 
-          ? data.products 
-          : [];
-      
-      return products;
+      const response = await api.get(`/products/search?q=${query}`);
+      const data = response.data;
+
+      if (Array.isArray(data)) return data;
+      if (data && Array.isArray(data.products)) return data.products;
+
+      return [];
     } catch (error) {
-      return rejectWithValue(error.response?.data?.message || "Erreur de recherche");
+      return thunkAPI.rejectWithValue(
+        error.response?.data?.message || "Erreur de recherche"
+      );
     }
   }
 );
@@ -58,43 +73,52 @@ export const searchProducts = createAsyncThunk(
 const productSlice = createSlice({
   name: "products",
   initialState: {
-    items: [], // 🔥 TOUJOURS un tableau
+    items: [], // ✅ toujours tableau
     currentProduct: null,
+    searchResults: [],
     isLoading: false,
-    error: null,
-    searchResults: []
+    error: null
   },
+
   reducers: {
     clearError: (state) => {
       state.error = null;
     },
+
     clearCurrentProduct: (state) => {
       state.currentProduct = null;
     },
+
     clearSearchResults: (state) => {
       state.searchResults = [];
+    },
+
+    resetProducts: (state) => {
+      state.items = [];
+      state.currentProduct = null;
+      state.searchResults = [];
+      state.error = null;
     }
   },
+
   extraReducers: (builder) => {
-    // Fetch all products
     builder
+      // ✅ Fetch Products
       .addCase(fetchProducts.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.isLoading = false;
-        // 🔥 S'assurer que items est toujours un tableau
         state.items = Array.isArray(action.payload) ? action.payload : [];
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
-        state.items = []; // Tableau vide en cas d'erreur
-      });
+        state.items = [];
+      })
 
-    // Fetch product by ID
-    builder
+      // ✅ Fetch Product By ID
       .addCase(fetchProductById.pending, (state) => {
         state.isLoading = true;
         state.error = null;
@@ -107,17 +131,18 @@ const productSlice = createSlice({
         state.isLoading = false;
         state.error = action.payload;
         state.currentProduct = null;
-      });
+      })
 
-    // Search products
-    builder
+      // ✅ Search Products
       .addCase(searchProducts.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
       .addCase(searchProducts.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.searchResults = Array.isArray(action.payload) ? action.payload : [];
+        state.searchResults = Array.isArray(action.payload)
+          ? action.payload
+          : [];
       })
       .addCase(searchProducts.rejected, (state, action) => {
         state.isLoading = false;
@@ -127,6 +152,11 @@ const productSlice = createSlice({
   }
 });
 
-export const { clearError, clearCurrentProduct, clearSearchResults } = productSlice.actions;
+export const {
+  clearError,
+  clearCurrentProduct,
+  clearSearchResults,
+  resetProducts
+} = productSlice.actions;
 
 export default productSlice.reducer;
