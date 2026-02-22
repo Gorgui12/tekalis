@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../../../../../packages/shared/redux/slices/cartSlice";
-import { addToWishlist, removeFromWishlist } from "../../../../../packages/shared/redux/slices/wishlistSlice";
+import { addToWishlist, removeFromWishlist } from "../../../../../packages/shared/redux/slices/wishListSlice";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { 
