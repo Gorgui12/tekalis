@@ -1,44 +1,21 @@
 {
-  "name": "tekalis-frontend",
+  "name": "tekalis",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "@reduxjs/toolkit": "^2.6.1",
-    "@stripe/react-stripe-js": "^3.5.1",
-    "@stripe/stripe-js": "^6.1.0",
-    "axios": "^1.8.4",
-    "framer-motion": "^12.23.22",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-ga4": "^2.1.0",
-    "react-icons": "^5.5.0",
-    "react-redux": "^9.2.0",
-    "react-router-dom": "^7.4.1",
-    "recharts": "^3.6.0",
-    "redux-persist": "^6.0.0",
-    "swiper": "^12.0.2",
-    "xlsx": "^0.18.5"
+    "dev:client": "npm run dev --workspace=apps/client",
+    "dev:admin":  "npm run dev --workspace=apps/admin",
+    "dev":        "concurrently \"npm run dev:client\" \"npm run dev:admin\"",
+    "build:client": "npm run build --workspace=apps/client",
+    "build:admin":  "npm run build --workspace=apps/admin",
+    "build": "npm run build:client && npm run build:admin"
   },
   "devDependencies": {
-    "@eslint/js": "^9.21.0",
-    "@tailwindcss/postcss": "^4.1.0",
-    "@types/react": "^19.0.10",
-    "@types/react-dom": "^19.0.4",
-    "@vitejs/plugin-react": "^4.3.4",
-    "autoprefixer": "^10.4.21",
-    "eslint": "^9.21.0",
-    "eslint-plugin-react-hooks": "^5.1.0",
-    "eslint-plugin-react-refresh": "^0.4.19",
-    "globals": "^15.15.0",
-    "postcss": "^8.5.3",
-    "tailwindcss": "^3.3.5",
-    "vite": "^6.2.0"
+    "concurrently": "^8.2.2"
   }
 }

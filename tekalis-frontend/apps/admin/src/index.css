@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─────────────────────────────────────
+   Variables globales - App Admin
+───────────────────────────────────── */
+:root {
+  --sidebar-width: 260px;
+  --sidebar-collapsed-width: 72px;
+  --header-height: 64px;
+  --color-admin-primary: #6366f1;
+  --color-admin-primary-hover: #4f46e5;
+}
+
+/* ─────────────────────────────────────
+   Layout de base admin
+   Le padding-left est géré par AdminLayout.jsx
+───────────────────────────────────── */
+body {
+  background-color: #f8fafc;
+}
+
+.dark body {
+  background-color: #0f172a;
+}
+
+/* ─────────────────────────────────────
+   Scrollbar admin (discrète)
+───────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* ─────────────────────────────────────
+   Scrollbar hide utility
+───────────────────────────────────── */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ─────────────────────────────────────
+   Tables admin
+───────────────────────────────────── */
+.admin-table th {
+  @apply bg-gray-50 dark:bg-gray-800 text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider px-4 py-3;
+}
+.admin-table td {
+  @apply px-4 py-3 text-sm text-gray-900 dark:text-gray-100 border-b border-gray-100 dark:border-gray-700;
+}
+.admin-table tr:hover td {
+  @apply bg-gray-50 dark:bg-gray-800/50;
+}
+
+/* ─────────────────────────────────────
+   Cards admin
+───────────────────────────────────── */
+.admin-card {
+  @apply bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700;
+}
+
+/* ─────────────────────────────────────
+   Transitions globales
+───────────────────────────────────── */
+*, *::before, *::after {
+  transition-property: background-color, border-color, color;
+  transition-duration: 150ms;
+  transition-timing-function: ease;
+}
