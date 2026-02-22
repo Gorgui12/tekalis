@@ -18,7 +18,7 @@ import CategoryPage from "./pages/CategoryPage";
 import Blog from "./pages/Blog";
 import ArticleDetails from "./pages/ArticleDetails";
 import Configurator from "./pages/Configurator";
-import Apropos from "./pages/Apropos";
+import Apropos from "./pages/apropos";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import PaymentSuccess from "./pages/PaymentSuccess";
