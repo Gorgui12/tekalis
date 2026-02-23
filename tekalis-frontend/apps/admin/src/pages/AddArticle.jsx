@@ -1,327 +1,230 @@
-import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import { FaSave, FaTimes, FaImage, FaUpload } from "react-icons/fa";
-import api from "../../../../packages/shared/api/api";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { ArrowLeft, Save, Eye } from 'lucide-react';
+
+// ✅ Fix : import useToast depuis ToastContext (et non manquant comme avant)
+import { useToast } from '../../../../packages/shared/context/ToastContext';
+import { createArticle } from '../../../../packages/shared/redux/slices/articleSlice';
+import { validateProduct } from '../../../../packages/shared/outils/validators';
+import { ARTICLE_CATEGORIES, ARTICLE_CATEGORY_LABELS } from '../../../../packages/shared/outils/constants';
 
 const AddArticle = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  // ✅ Fix : utilisation correcte de useToast()
+  const toast = useToast();
+
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
-    title: "",
-    slug: "",
-    excerpt: "",
-    content: "",
-    category: "test",
-    tags: [],
-    featuredImage: "",
-    status: "draft",
-    featured: false,
-    relatedProducts: []
+  const [form, setForm] = useState({
+    title: '',
+    slug: '',
+    excerpt: '',
+    content: '',
+    category: '',
+    tags: '',
+    image: '',
+    published: false,
   });
-  const [tagInput, setTagInput] = useState("");
+  const [errors, setErrors] = useState({});
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setForm((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+      // Auto-slug depuis le titre
+      ...(name === 'title' ? { slug: value.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '') } : {}),
+    }));
+    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: null }));
+  };
+
+  const validate = () => {
+    const errs = {};
+    if (!form.title.trim()) errs.title = 'Le titre est requis';
+    if (!form.content.trim() || form.content.length < 50) errs.content = 'Le contenu doit faire au moins 50 caractères';
+    if (!form.category) errs.category = 'La catégorie est requise';
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
+
+  const handleSubmit = async (published = false) => {
+    if (!validate()) {
+      toast.error('Veuillez corriger les erreurs du formulaire');
+      return;
+    }
+
     setLoading(true);
-
     try {
-      await api.post("/articles", formData);
-      toast.success("Article créé avec succès !");
-      navigate("/admin/articles");
-    } catch (error) {
-      console.error("Erreur création article:", error);
-      toast.success("Erreur lors de la création de l'article");
+      const articleData = {
+        ...form,
+        published,
+        tags: form.tags.split(',').map((t) => t.trim()).filter(Boolean),
+      };
+
+      await dispatch(createArticle(articleData)).unwrap();
+      toast.success(published ? 'Article publié avec succès !' : 'Brouillon enregistré');
+      navigate('/admin/blog');
+    } catch (err) {
+      toast.error(err?.message || "Erreur lors de l'enregistrement");
     } finally {
       setLoading(false);
     }
   };
 
-  const generateSlug = (title) => {
-    return title
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "");
-  };
-
-  const handleTitleChange = (title) => {
-    setFormData(prev => ({
-      ...prev,
-      title,
-      slug: prev.slug || generateSlug(title)
-    }));
-  };
-
-  const addTag = () => {
-    if (tagInput.trim() && !formData.tags.includes(tagInput.trim())) {
-      setFormData(prev => ({
-        ...prev,
-        tags: [...prev.tags, tagInput.trim()]
-      }));
-      setTagInput("");
-    }
-  };
-
-  const removeTag = (tagToRemove) => {
-    setFormData(prev => ({
-      ...prev,
-      tags: prev.tags.filter(tag => tag !== tagToRemove)
-    }));
-  };
-
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="container mx-auto px-4 max-w-5xl">
-        {/* Header */}
-        <div className="mb-8">
-          <Link
-            to="/admin/articles"
-            className="text-blue-600 hover:text-blue-700 font-semibold mb-4 inline-block"
-          >
-            ← Retour aux articles
-          </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            ✍️ Nouvel article
-          </h1>
-          <p className="text-gray-600">
-            Créez un nouvel article pour le blog
-          </p>
+    <div className="space-y-6 max-w-4xl">
+      {/* Header */}
+      <div className="flex items-center gap-4">
+        <button
+          onClick={() => navigate('/admin/blog')}
+          className="p-2 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition"
+        >
+          <ArrowLeft size={18} />
+        </button>
+        <div>
+          <h1 className="text-xl font-bold text-white">Nouvel article</h1>
+          <p className="text-sm text-gray-500 mt-0.5">Créer un article de blog</p>
+        </div>
+      </div>
+
+      {/* Formulaire */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Colonne principale */}
+        <div className="lg:col-span-2 space-y-4">
+          {/* Titre */}
+          <Field label="Titre" error={errors.title}>
+            <input
+              name="title"
+              value={form.title}
+              onChange={handleChange}
+              placeholder="Titre de l'article"
+              className={inputCls(errors.title)}
+            />
+          </Field>
+
+          {/* Slug */}
+          <Field label="Slug URL">
+            <input
+              name="slug"
+              value={form.slug}
+              onChange={handleChange}
+              placeholder="slug-de-l-article"
+              className={inputCls()}
+            />
+          </Field>
+
+          {/* Extrait */}
+          <Field label="Extrait / sous-titre">
+            <textarea
+              name="excerpt"
+              value={form.excerpt}
+              onChange={handleChange}
+              rows={2}
+              placeholder="Résumé court affiché dans les listings"
+              className={inputCls()}
+            />
+          </Field>
+
+          {/* Contenu */}
+          <Field label="Contenu" error={errors.content}>
+            <textarea
+              name="content"
+              value={form.content}
+              onChange={handleChange}
+              rows={12}
+              placeholder="Contenu de l'article (Markdown supporté)"
+              className={`${inputCls(errors.content)} resize-y font-mono text-xs`}
+            />
+          </Field>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="grid lg:grid-cols-3 gap-6">
-            {/* Main Content */}
-            <div className="lg:col-span-2 space-y-6">
-              {/* Title */}
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Titre de l'article *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.title}
-                  onChange={(e) => handleTitleChange(e.target.value)}
-                  className="w-full border rounded-lg px-4 py-3 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Ex: Test complet du HP Pavilion Gaming 15"
-                />
-              </div>
+        {/* Sidebar droite */}
+        <div className="space-y-4">
+          {/* Catégorie */}
+          <Field label="Catégorie" error={errors.category}>
+            <select
+              name="category"
+              value={form.category}
+              onChange={handleChange}
+              className={inputCls(errors.category)}
+            >
+              <option value="">Choisir…</option>
+              {Object.entries(ARTICLE_CATEGORY_LABELS).map(([k, v]) => (
+                <option key={k} value={k}>{v}</option>
+              ))}
+            </select>
+          </Field>
 
-              {/* Slug */}
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  URL (slug) *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.slug}
-                  onChange={(e) => setFormData({ ...formData, slug: e.target.value })}
-                  className="w-full border rounded-lg px-4 py-2 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="test-hp-pavilion-gaming-15"
-                />
-                <p className="text-xs text-gray-500 mt-2">
-                  URL de l'article: /blog/{formData.slug || "votre-slug"}
-                </p>
-              </div>
+          {/* Tags */}
+          <Field label="Tags" hint="Séparés par des virgules">
+            <input
+              name="tags"
+              value={form.tags}
+              onChange={handleChange}
+              placeholder="ryzen, pc, gaming"
+              className={inputCls()}
+            />
+          </Field>
 
-              {/* Excerpt */}
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Extrait *
-                </label>
-                <textarea
-                  required
-                  rows={3}
-                  value={formData.excerpt}
-                  onChange={(e) => setFormData({ ...formData, excerpt: e.target.value })}
-                  className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Courte description de l'article (150-200 caractères)..."
-                ></textarea>
-                <p className="text-xs text-gray-500 mt-2">
-                  {formData.excerpt.length} caractères
-                </p>
-              </div>
+          {/* Image */}
+          <Field label="URL Image de couverture">
+            <input
+              name="image"
+              value={form.image}
+              onChange={handleChange}
+              placeholder="https://…"
+              className={inputCls()}
+            />
+          </Field>
 
-              {/* Content */}
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Contenu de l'article *
-                </label>
-                <textarea
-                  required
-                  rows={15}
-                  value={formData.content}
-                  onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                  className="w-full border rounded-lg px-4 py-2 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Écrivez votre article ici (HTML supporté)..."
-                ></textarea>
-                <p className="text-xs text-gray-500 mt-2">
-                  Supporte le HTML. Vous pouvez utiliser des balises &lt;p&gt;, &lt;h2&gt;, &lt;ul&gt;, etc.
-                </p>
-              </div>
-
-              {/* Featured Image */}
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Image à la une
-                </label>
-                <div className="flex gap-3">
-                  <input
-                    type="text"
-                    value={formData.featuredImage}
-                    onChange={(e) => setFormData({ ...formData, featuredImage: e.target.value })}
-                    className="flex-1 border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="URL de l'image..."
-                  />
-                  <button
-                    type="button"
-                    className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-semibold flex items-center gap-2"
-                  >
-                    <FaUpload /> Upload
-                  </button>
-                </div>
-                {formData.featuredImage && (
-                  <div className="mt-4">
-                    <img
-                      src={formData.featuredImage}
-                      alt="Preview"
-                      className="w-full h-48 object-cover rounded-lg"
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-
-            {/* Sidebar */}
-            <div className="space-y-6">
-              {/* Publish */}
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="font-bold text-gray-900 mb-4">Publication</h3>
-                
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Statut
-                    </label>
-                    <select
-                      value={formData.status}
-                      onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                      className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      <option value="draft">Brouillon</option>
-                      <option value="published">Publié</option>
-                      <option value="scheduled">Programmé</option>
-                    </select>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id="featured"
-                      checked={formData.featured}
-                      onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-                      className="w-5 h-5 text-blue-600 rounded"
-                    />
-                    <label htmlFor="featured" className="text-sm font-semibold text-gray-700">
-                      Article en vedette ⭐
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              {/* Category */}
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="font-bold text-gray-900 mb-4">Catégorie</h3>
-                
-                <select
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="test">Test</option>
-                  <option value="guide">Guide</option>
-                  <option value="tutorial">Tutoriel</option>
-                  <option value="news">Actualités</option>
-                  <option value="comparison">Comparatif</option>
-                </select>
-              </div>
-
-              {/* Tags */}
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h3 className="font-bold text-gray-900 mb-4">Tags</h3>
-                
-                <div className="flex gap-2 mb-3">
-                  <input
-                    type="text"
-                    value={tagInput}
-                    onChange={(e) => setTagInput(e.target.value)}
-                    onKeyPress={(e) => e.key === "Enter" && (e.preventDefault(), addTag())}
-                    className="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Ajouter un tag..."
-                  />
-                  <button
-                    type="button"
-                    onClick={addTag}
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold text-sm"
-                  >
-                    +
-                  </button>
-                </div>
-
-                <div className="flex flex-wrap gap-2">
-                  {formData.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="bg-gray-100 text-gray-700 px-3 py-1 rounded-full text-xs font-semibold flex items-center gap-2"
-                    >
-                      {tag}
-                      <button
-                        type="button"
-                        onClick={() => removeTag(tag)}
-                        className="text-gray-500 hover:text-gray-700"
-                      >
-                        <FaTimes size={10} />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
+          {form.image && (
+            <img src={form.image} alt="cover" className="w-full h-32 object-cover rounded-xl bg-white/5" />
+          )}
 
           {/* Actions */}
-          <div className="flex gap-3 justify-end bg-white rounded-lg shadow-md p-6">
-            <Link
-              to="/admin/articles"
-              className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold flex items-center gap-2"
-            >
-              <FaTimes /> Annuler
-            </Link>
+          <div className="space-y-2 pt-2">
             <button
-              type="submit"
+              onClick={() => handleSubmit(true)}
               disabled={loading}
-              className={`bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 ${
-                loading ? "opacity-50 cursor-not-allowed" : ""
-              }`}
+              className="w-full flex items-center justify-center gap-2 h-10 bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white text-sm font-medium rounded-xl transition"
             >
-              {loading ? (
-                <>
-                  <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-white"></div>
-                  Enregistrement...
-                </>
-              ) : (
-                <>
-                  <FaSave /> Publier
-                </>
-              )}
+              <Eye size={15} />
+              Publier
+            </button>
+            <button
+              onClick={() => handleSubmit(false)}
+              disabled={loading}
+              className="w-full flex items-center justify-center gap-2 h-10 bg-white/5 hover:bg-white/10 disabled:opacity-50 text-gray-300 text-sm font-medium rounded-xl transition"
+            >
+              <Save size={15} />
+              Enregistrer brouillon
             </button>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );
 };
+
+/* ── Helpers UI ─────────────────────────────────────────────────────────── */
+const Field = ({ label, children, error, hint }) => (
+  <div>
+    <label className="block text-xs font-medium text-gray-400 mb-1.5">
+      {label}
+      {hint && <span className="text-gray-600 ml-1">— {hint}</span>}
+    </label>
+    {children}
+    {error && <p className="text-xs text-red-400 mt-1">{error}</p>}
+  </div>
+);
+
+const inputCls = (error) => `
+  w-full px-3 py-2.5 rounded-xl text-sm text-white
+  bg-white/5 border ${error ? 'border-red-500/50' : 'border-white/8'}
+  placeholder:text-gray-600
+  focus:outline-none focus:border-blue-500/50 focus:bg-white/[0.07]
+  transition-all duration-150
+`;
 
 export default AddArticle;

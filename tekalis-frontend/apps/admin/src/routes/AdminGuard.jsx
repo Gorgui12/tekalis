@@ -18,7 +18,7 @@ const AdminGuard = () => {
   }
 
   // Connecté mais pas admin
-  if (user.role !== "admin") {
+  if (user.role !== 'admin' && user.isAdmin !== true) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
         <div className="text-center p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-xl max-w-md">

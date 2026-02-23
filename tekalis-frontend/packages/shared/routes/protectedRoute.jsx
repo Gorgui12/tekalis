@@ -1,21 +1,23 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import PropTypes from 'prop-types';
 
-/**
- * Route protégée - Nécessite authentification
- */
 const ProtectedRoute = ({ children, requireAdmin = false, redirectTo = '/login' }) => {
-  const { user, isAuthenticated } = useSelector((state) => state.auth);
+  const { user, token } = useSelector((state) => state.auth);
+  const location = useLocation();
 
-  // Pas authentifié → rediriger vers login
-  if (!isAuthenticated || !user) {
-    return <Navigate to={redirectTo} replace />;
+  const isAuthenticated = !!(user && token);
+
+  if (!isAuthenticated) {
+    return <Navigate to={redirectTo} state={{ from: location }} replace />;
   }
 
-  // Besoin admin mais user n'est pas admin
-  if (requireAdmin && user.role !== 'admin') {
+  // ✅ Fix : gère les deux formats backend
+  //    { role: 'admin' }  OU  { isAdmin: true }
+  const isAdmin = user?.role === 'admin' || user?.isAdmin === true;
+
+  if (requireAdmin && !isAdmin) {
     return <Navigate to="/" replace />;
   }
 
@@ -25,42 +27,7 @@ const ProtectedRoute = ({ children, requireAdmin = false, redirectTo = '/login' 
 ProtectedRoute.propTypes = {
   children: PropTypes.node.isRequired,
   requireAdmin: PropTypes.bool,
-  redirectTo: PropTypes.string
+  redirectTo: PropTypes.string,
 };
 
 export default ProtectedRoute;
-
-/**
- * UTILISATION :
- * 
- * // Dans App.jsx ou routes
- * import ProtectedRoute from './routes/ProtectedRoute';
- * 
- * <Route 
- *   path="/profile" 
- *   element={
- *     <ProtectedRoute>
- *       <Profile />
- *     </ProtectedRoute>
- *   } 
- * />
- * 
- * <Route 
- *   path="/admin/*" 
- *   element={
- *     <ProtectedRoute requireAdmin>
- *       <AdminLayout />
- *     </ProtectedRoute>
- *   } 
- * />
- * 
- * // Avec redirection custom
- * <Route 
- *   path="/checkout" 
- *   element={
- *     <ProtectedRoute redirectTo="/login?redirect=checkout">
- *       <Checkout />
- *     </ProtectedRoute>
- *   } 
- * />
- */

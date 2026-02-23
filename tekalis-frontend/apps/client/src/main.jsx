@@ -6,7 +6,7 @@ import { BrowserRouter } from "react-router-dom";
 
 // Shared depuis packages/shared (ou adapter le chemin selon ta config)
 import { store, persistor } from "../../../packages/shared/redux/store";
-import ErrorBoundary from "../src/components/shared/ErrorBoundary";
+import ErrorBoundary from "../../../packages/shared/ErrorBoundary";
 import {ThemeProvider} from "../../../packages/shared/context/ThemeContext";
 import { ToastProvider } from "../../../packages/shared/context/ToastContext";
 
