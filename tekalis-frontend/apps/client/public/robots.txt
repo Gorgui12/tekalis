@@ -1,0 +1,16 @@
+# Tekalis - robots.txt
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+Disallow: /cart
+Disallow: /checkout
+Disallow: /dashboard
+Disallow: /login
+Disallow: /register
+
+# Sitemap
+Sitemap: https://tekalis.com/sitemap.xml
+
+# Crawl-delay (optionnel, pour éviter surcharge)
+Crawl-delay: 1

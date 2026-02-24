@@ -24,4 +24,33 @@ export default defineConfig({
       "@shared": path.resolve(__dirname, "../../packages/shared/src"),
     },
   },
+
+  build: {
+    // Optimisations SEO/Performance
+    rollupOptions: {
+      output: {
+        // Code splitting pour réduire bundle size
+        manualChunks: {
+          'react-vendor': ['react', 'react-dom', 'react-router-dom'],
+          'redux-vendor': ['react-redux', '@reduxjs/toolkit', 'redux-persist'],
+          'ui-vendor': ['react-icons', 'framer-motion'],
+        },
+      },
+    },
+    // Compression
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true, // Supprimer console.log en prod
+        drop_debugger: true,
+      },
+    },
+    // Taille chunks
+    chunkSizeWarningLimit: 500,
+  },
+
+  // Preload des assets critiques
+  optimizeDeps: {
+    include: ['react', 'react-dom', 'react-router-dom'],
+  },
 });
