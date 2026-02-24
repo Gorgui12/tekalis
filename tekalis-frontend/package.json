@@ -16,7 +16,8 @@
     "build": "npm run build:client && npm run build:admin"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "terser": "^5.46.0"
   },
   "dependencies": {
     "lucide-react": "^0.575.0"
