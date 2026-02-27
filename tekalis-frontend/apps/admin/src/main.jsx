@@ -17,15 +17,15 @@ ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
-        <ErrorBoundary>
-          <ToastProvider>
-            <ThemeProvider>
-              <BrowserRouter>
+        <BrowserRouter>
+          <ErrorBoundary>
+            <ToastProvider>
+              <ThemeProvider>
                 <App />
-              </BrowserRouter>
-            </ThemeProvider>
-          </ToastProvider>
-        </ErrorBoundary>
+              </ThemeProvider>
+            </ToastProvider>
+          </ErrorBoundary>
+        </BrowserRouter>
       </PersistGate>
     </Provider>
   </React.StrictMode>

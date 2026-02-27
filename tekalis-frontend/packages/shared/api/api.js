@@ -15,7 +15,20 @@ const api = axios.create({
 // 🔐 Ajoute automatiquement le token à chaque requête
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem("token");
+    // ✅ Lire le token depuis localStorage direct OU Redux Persist
+    let token = localStorage.getItem("token");
+
+    // Fallback : Redux Persist stocke sous persist:auth -> JSON.user.token
+    if (!token) {
+      try {
+        const persistedAuth = localStorage.getItem("persist:auth");
+        if (persistedAuth) {
+          const parsed = JSON.parse(persistedAuth);
+          const user = parsed.user ? JSON.parse(parsed.user) : null;
+          token = user?.token || null;
+        }
+      } catch (_) { /* silencieux */ }
+    }
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -78,7 +91,3 @@ api.interceptors.response.use(
 );
 
 export default api;
-
-
-
-

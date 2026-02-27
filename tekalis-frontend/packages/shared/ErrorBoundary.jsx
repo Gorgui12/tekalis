@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+// Pas de Link ici — ErrorBoundary peut s'afficher sans Router
 import PropTypes from 'prop-types';
 
 /**
@@ -90,12 +90,12 @@ class ErrorBoundary extends React.Component {
                 Recharger la page
               </button>
               
-              <Link
-                to="/"
+              <a
+                href="/"
                 className="block w-full bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold py-4 px-6 rounded-lg transition text-center"
               >
                 Retour à l'accueil
-              </Link>
+              </a>
 
               <button
                 onClick={this.handleReset}

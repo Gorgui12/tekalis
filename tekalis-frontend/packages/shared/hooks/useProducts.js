@@ -47,7 +47,12 @@ const useProducts = (options = {}) => {
       const queryString = new URLSearchParams(queryParams).toString();
       const { data } = await api.get(`/products?${queryString}`);
 
-      setProducts(data.products || data);
+      // ✅ Support { success, data: [], pagination } ET { products: [] } ET tableau direct
+      const items = Array.isArray(data) ? data
+        : Array.isArray(data.data) ? data.data
+        : Array.isArray(data.products) ? data.products
+        : [];
+      setProducts(items);
       
       if (data.pagination) {
         setPagination(prev => ({ ...prev, ...data.pagination }));
@@ -85,7 +90,11 @@ const useProducts = (options = {}) => {
 
     try {
       const { data } = await api.get(`/products?category=${categorySlug}`);
-      setProducts(data.products || data);
+      const items = Array.isArray(data) ? data
+        : Array.isArray(data.data) ? data.data
+        : Array.isArray(data.products) ? data.products
+        : [];
+      setProducts(items);
     } catch (err) {
       setError(err.response?.data?.message || "Erreur");
       console.error("Erreur:", err);
@@ -109,7 +118,11 @@ const useProducts = (options = {}) => {
 
     try {
       const { data } = await api.get(`/products?search=${query}`);
-      setProducts(data.products || data);
+      const items = Array.isArray(data) ? data
+        : Array.isArray(data.data) ? data.data
+        : Array.isArray(data.products) ? data.products
+        : [];
+      setProducts(items);
     } catch (err) {
       setError(err.response?.data?.message || "Erreur de recherche");
       console.error("Erreur recherche:", err);

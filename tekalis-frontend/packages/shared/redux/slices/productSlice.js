@@ -12,12 +12,10 @@ export const fetchProducts = createAsyncThunk(
 
       const data = response.data;
 
-      // ✅ Support des deux formats API
-      if (Array.isArray(data)) {
-        return data;
-      } else if (data && Array.isArray(data.products)) {
-        return data.products;
-      }
+      // ✅ Support de tous les formats API
+      if (Array.isArray(data)) return data;                         // [...]
+      if (data && Array.isArray(data.data)) return data.data;       // { success, data: [], pagination }
+      if (data && Array.isArray(data.products)) return data.products; // { products: [] }
 
       console.warn("⚠️ Format inattendu:", data);
       return [];

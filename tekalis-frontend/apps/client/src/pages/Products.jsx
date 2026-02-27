@@ -30,9 +30,15 @@ const Products = () => {
 
   const debouncedSearch = useDebounce(searchTerm, 500);
 
-  const { products, loading, sortProducts } = useProducts({
+  const { products: rawProducts, loading, sortProducts } = useProducts({
     autoFetch: true,
   });
+
+  // ✅ Garantir que products est toujours un tableau
+  const products = Array.isArray(rawProducts) ? rawProducts
+    : rawProducts?.data ? rawProducts.data
+    : rawProducts?.products ? rawProducts.products
+    : [];
 
   // Mettre à jour l'URL quand recherche change
   useEffect(() => {

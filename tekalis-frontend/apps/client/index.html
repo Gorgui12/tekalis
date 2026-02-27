@@ -4,34 +4,34 @@
     <meta charset="UTF-8" />
     
     <!-- Favicon -->
-    <link rel="icon" type="image/jpg" href="/assets/logo-tekalis.jpg" />
+    <link rel="icon" type="image/png" href="og-image.png" />
     
     <!-- Viewport -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     
     <!-- Primary Meta Tags -->
-    <title>Tekalis - Boutique Tech au Sénégal | Ordinateurs, Accessoires</title>
-    <meta name="title" content="Tekalis - Boutique Tech au Sénégal | Ordinateurs, Accessoires" />
-    <meta name="description" content="Achetez les meilleurs ordinateurs, smartphones et accessoires tech au Sénégal. Livraison rapide, prix compétitifs, service client de qualité. Découvrez Tekalis !" />
-    <meta name="keywords" content="ordinateur Sénégal, laptop Dakar, boutique tech, accessoires informatique, Tekalis" />
+    <title>Tekalis - Boutique Électronique & High-Tech au Sénégal | Dakar</title>
+    <meta name="title" content="Tekalis - Boutique Électronique & High-Tech au Sénégal" />
+    <meta name="description" content="Tekalis, votre spécialiste en électronique et high-tech à Dakar. Ordinateurs, smartphones, TV, électroménager, accessoires tech. Livraison rapide au Sénégal. Prix compétitifs, garantie et SAV." />
+    <meta name="keywords" content="électronique Sénégal, high-tech Dakar, ordinateur portable, smartphone, TV, électroménager, accessoires tech, boutique électronique Dakar, Tekalis" />
     <meta name="author" content="Tekalis" />
     <meta name="robots" content="index, follow" />
     
-    <!-- Open Graph / Facebook -->
+    <!-- Open Graph / Facebook / WhatsApp -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://tekalis.com/" />
-    <meta property="og:title" content="Tekalis - Boutique Tech au Sénégal" />
-    <meta property="og:description" content="Achetez les meilleurs ordinateurs, smartphones et accessoires tech au Sénégal. Livraison rapide !" />
-    <meta property="og:image" content="https://tekalis.com/og-image.jpg" />
+    <meta property="og:title" content="Tekalis - Électronique & High-Tech au Sénégal" />
+    <meta property="og:description" content="Spécialiste en électronique à Dakar : ordinateurs, smartphones, TV, électroménager, accessoires tech. Livraison rapide, garantie incluse." />
+    <meta property="og:image" content="https://tekalis.com/og-image.png" />
     <meta property="og:locale" content="fr_FR" />
     <meta property="og:site_name" content="Tekalis" />
     
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content="https://tekalis.com/" />
-    <meta property="twitter:title" content="Tekalis - Boutique Tech au Sénégal" />
-    <meta property="twitter:description" content="Achetez les meilleurs ordinateurs, smartphones et accessoires tech au Sénégal." />
-    <meta property="twitter:image" content="https://tekalis.com/og-image.jpg" />
+    <meta property="twitter:title" content="Tekalis - Électronique & High-Tech Sénégal" />
+    <meta property="twitter:description" content="Ordinateurs, smartphones, TV, électroménager et accessoires tech à Dakar. Prix compétitifs, livraison rapide." />
+    <meta property="twitter:image" content="https://tekalis.com/og-image.png" />
     
     <!-- Canonical -->
     <link rel="canonical" href="https://tekalis.com/" />
@@ -51,17 +51,44 @@
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     
-    <!-- Google Site Verification (à ajouter après création property) -->
+    <!-- Google Site Verification (à ajouter après création Google Search Console) -->
     <!-- <meta name="google-site-verification" content="YOUR_CODE_HERE" /> -->
     
     <!-- Schema.org Organization -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "Organization",
+      "@type": "Store",
       "name": "Tekalis",
+      "description": "Boutique spécialisée en électronique et high-tech à Dakar, Sénégal",
       "url": "https://tekalis.com",
-      "logo": "https://tekalis.com/logo.png",
+      "logo": "https://tekalis.com/og-image.png",
+      "image": "https://tekalis.com/og-image.png",
+      "priceRange": "$$",
+      "currenciesAccepted": "XOF",
+      "paymentAccepted": "Cash, Credit Card, Mobile Money",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "dakar, senegal",
+        "addressLocality": "Dakar",
+        "addressRegion": "Dakar",
+        "addressCountry": "SN"
+      },
+      "geo": {
+        "@type": "GeoCoordinates",
+        "latitude": "14.6928",
+        "longitude": "-17.4467"
+      },
+      "telephone": "+221 78 634 69 46",
+      "email": "company@tekalis.com",
+      "openingHoursSpecification": [
+        {
+          "@type": "OpeningHoursSpecification",
+          "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+          "opens": "08:00",
+          "closes": "19:00"
+        }
+      ],
       "sameAs": [
         "https://facebook.com/tekalis",
         "https://twitter.com/tekalis",
@@ -86,7 +113,10 @@
       "url": "https://tekalis.com",
       "potentialAction": {
         "@type": "SearchAction",
-        "target": "https://tekalis.com/products?search={search_term_string}",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://tekalis.com/products?search={search_term_string}"
+        },
         "query-input": "required name=search_term_string"
       }
     }
@@ -97,4 +127,3 @@
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
-
