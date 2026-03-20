@@ -11,10 +11,16 @@ import {
 import ProductCard from "../../src/components/product/ProductCard";
 import useProducts from "../../../../packages/shared/hooks/useProducts";
 import useDebounce from "../../../../packages/shared/hooks/useDebounce";
-import usePagination from '../../../../packages/shared/hooks/usePagination';
-import Pagination from '../../src/components/shared/Pagination';
+import usePagination from "../../../../packages/shared/hooks/usePagination";
+import Pagination from "../../src/components/shared/Pagination";
 
-
+// ─── Helper : normalise une catégorie (objet OU string) en string ─────────────
+const getCatName = (cat) => {
+  if (!cat) return null;
+  if (typeof cat === "string") return cat;
+  if (typeof cat === "object") return cat.name || cat._id?.toString() || null;
+  return String(cat);
+};
 
 const Products = () => {
   const location = useLocation();
@@ -35,9 +41,12 @@ const Products = () => {
   });
 
   // ✅ Garantir que products est toujours un tableau
-  const products = Array.isArray(rawProducts) ? rawProducts
-    : rawProducts?.data ? rawProducts.data
-    : rawProducts?.products ? rawProducts.products
+  const products = Array.isArray(rawProducts)
+    ? rawProducts
+    : rawProducts?.data
+    ? rawProducts.data
+    : rawProducts?.products
+    ? rawProducts.products
     : [];
 
   // Mettre à jour l'URL quand recherche change
@@ -49,7 +58,7 @@ const Products = () => {
     }
   }, [debouncedSearch, navigate]);
 
-  // Extraire catégories uniques
+  // ─── Extraire catégories uniques en STRINGS ───────────────────────────────
   const allCategories = useMemo(() => {
     const categoriesSet = new Set();
 
@@ -60,13 +69,16 @@ const Products = () => {
         ? [item.category]
         : [];
 
-      categories.forEach((cat) => categoriesSet.add(cat));
+      categories.forEach((cat) => {
+        const name = getCatName(cat);      // ✅ toujours une string
+        if (name) categoriesSet.add(name);
+      });
     });
 
     return ["all", ...Array.from(categoriesSet)];
   }, [products]);
 
-  // Filtrer produits
+  // ─── Filtrer produits ─────────────────────────────────────────────────────
   const filteredProducts = useMemo(() => {
     let filtered = [...products];
 
@@ -74,7 +86,6 @@ const Products = () => {
     if (debouncedSearch) {
       filtered = filtered.filter((item) => {
         const query = debouncedSearch.toLowerCase();
-
         return (
           item.name?.toLowerCase().includes(query) ||
           item.description?.toLowerCase().includes(query) ||
@@ -83,7 +94,7 @@ const Products = () => {
       });
     }
 
-    // Catégorie
+    // Catégorie — compare des strings des deux côtés
     if (selectedCategory !== "all") {
       filtered = filtered.filter((item) => {
         const categories = Array.isArray(item.category)
@@ -92,47 +103,45 @@ const Products = () => {
           ? [item.category]
           : [];
 
-        return categories.includes(selectedCategory);
+        return categories.some(
+          (cat) => getCatName(cat) === selectedCategory  // ✅ comparaison string
+        );
       });
     }
 
-    // Tri
     return sortProducts(filtered, sortBy);
   }, [products, debouncedSearch, selectedCategory, sortBy, sortProducts]);
 
-  const {
-  paginatedItems,
-  currentPage,
-  totalPages,
-  goToPage
-} = usePagination(filteredProducts, 12);
+  const { paginatedItems, currentPage, totalPages, goToPage } = usePagination(
+    filteredProducts,
+    12
+  );
 
-
-  // ✅ Grouper par catégorie
+  // ─── Grouper par catégorie (strings uniquement) ───────────────────────────
   const productsByCategory = useMemo(() => {
     const grouped = {};
 
     filteredProducts.forEach((product) => {
-      const category = product.category || "Autres";
-      const catName = Array.isArray(category) ? category[0] : category;
+      const categories = Array.isArray(product.category)
+        ? product.category
+        : product.category
+        ? [product.category]
+        : [];
 
-      if (!grouped[catName]) {
-        grouped[catName] = [];
-      }
+      // ✅ On prend le nom de la première catégorie (string)
+      const catName = getCatName(categories[0]) || "Autres";
 
+      if (!grouped[catName]) grouped[catName] = [];
       grouped[catName].push(product);
     });
 
     return grouped;
   }, [filteredProducts]);
 
-  // Loading
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-600 text-lg">
-          Chargement des produits...
-        </p>
+        <p className="text-gray-600 text-lg">Chargement des produits...</p>
       </div>
     );
   }
@@ -155,7 +164,6 @@ const Products = () => {
             placeholder="Rechercher un produit..."
             className="w-full pl-12 pr-12 py-4 border-2 rounded-xl"
           />
-
           {searchTerm && (
             <button
               onClick={() => setSearchTerm("")}
@@ -168,7 +176,7 @@ const Products = () => {
 
         {/* Filters */}
         <div className="flex flex-wrap justify-between gap-4 mb-8">
-          {/* Category */}
+          {/* Category select — ✅ key et value sont des strings */}
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
@@ -196,66 +204,65 @@ const Products = () => {
         </div>
 
         {/* Display */}
-       {filteredProducts.length === 0 ? (
-  <div className="text-center py-12">
-    <p className="text-gray-600 dark:text-gray-400">
-      Aucun produit trouvé.
-    </p>
-  </div>
-) : selectedCategory === "all" ? (
-  Object.entries(productsByCategory).map(
-    ([category, categoryProducts]) => (
-      <div key={category} className="mb-8 md:mb-12">
-        <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 px-1">
-          {category}
-        </h2>
+        {filteredProducts.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-600 dark:text-gray-400">
+              Aucun produit trouvé.
+            </p>
+          </div>
+        ) : selectedCategory === "all" ? (
+          Object.entries(productsByCategory).map(
+            ([category, categoryProducts]) => (
+              <div key={category} className="mb-8 md:mb-12">
+                <h2 className="text-xl md:text-2xl font-bold mb-3 md:mb-4 px-1">
+                  {category}
+                </h2>
+                <div
+                  className={`grid gap-3 sm:gap-4 md:gap-5 lg:gap-6 ${
+                    viewMode === "list"
+                      ? "grid-cols-1"
+                      : viewMode === "compact"
+                      ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+                      : "grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+                  }`}
+                >
+                  {categoryProducts.map((product) => (
+                    <ProductCard key={product._id} product={product} />
+                  ))}
+                </div>
+              </div>
+            )
+          )
+        ) : (
+          <>
+            <div
+              className={`grid gap-3 sm:gap-4 md:gap-5 lg:gap-6 ${
+                viewMode === "list"
+                  ? "grid-cols-1"
+                  : viewMode === "compact"
+                  ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
+                  : "grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
+              }`}
+            >
+              {paginatedItems.map((product) => (
+                <ProductCard key={product._id} product={product} />
+              ))}
+            </div>
 
-        <div
-          className={`grid gap-3 sm:gap-4 md:gap-5 lg:gap-6 ${
-            viewMode === "list"
-              ? "grid-cols-1"
-              : viewMode === "compact"
-              ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
-              : "grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
-          }`}
-        >
-          {categoryProducts.map((product) => (
-            <ProductCard key={product._id} product={product} />
-          ))}
-        </div>
-      </div>
-    )
-  )
-) : (
-  <>
-    <div
-      className={`grid gap-3 sm:gap-4 md:gap-5 lg:gap-6 ${
-        viewMode === "list"
-          ? "grid-cols-1"
-          : viewMode === "compact"
-          ? "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5"
-          : "grid-cols-2 md:grid-cols-3 lg:grid-cols-4"
-      }`}
-    >
-      {paginatedItems.map(product => (
-        <ProductCard key={product._id} product={product} />
-      ))}
-    </div>
-
-    {/* Pagination HORS de la grid */}
-    {totalPages > 1 && (
-      <div className="mt-8 md:mt-12">
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={goToPage}
-        />
-      </div>
-    )}
-  </>
-)}
+            {totalPages > 1 && (
+              <div className="mt-8 md:mt-12">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={goToPage}
+                />
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
-  )};  
+  );
+};
 
 export default Products;

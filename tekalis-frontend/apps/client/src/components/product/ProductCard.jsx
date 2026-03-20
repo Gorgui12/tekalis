@@ -2,21 +2,28 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../../../../../packages/shared/redux/slices/cartSlice";
-import { addToWishlist, removeFromWishlist } from "../../../../../packages/shared/redux/slices/wishListSlice";
+import {
+  addToWishlist,
+  removeFromWishlist,
+  addToWishlistLocal,
+  removeFromWishlistLocal,
+} from "../../../../../packages/shared/redux/slices/wishListSlice";
 import { useToast } from "../../../../../packages/shared/context/ToastContext";
 import {
-  FaStar, FaShoppingCart, FaHeart, FaRegHeart, FaTag, FaEye
+  FaStar,
+  FaShoppingCart,
+  FaHeart,
+  FaRegHeart,
+  FaTag,
+  FaEye,
 } from "react-icons/fa";
 
 /**
  * ProductCard — Carte produit unifiée
  *
- * Fusionne CartItem.jsx (specs rapides, overlay hover desktop, bouton Eye)
- * et ProductCard.jsx (wishlist, dark mode, lazy loading, mobile optimisé).
- *
  * Props:
- *   product : Object
- *   showSpecs : boolean  — affiche RAM/Stockage si disponibles (défaut: false)
+ *   product   : Object
+ *   showSpecs : boolean — affiche RAM/Stockage si disponibles (défaut: false)
  */
 const ProductCard = ({ product, showSpecs = false }) => {
   const toast = useToast();
@@ -28,26 +35,40 @@ const ProductCard = ({ product, showSpecs = false }) => {
   if (!product) return null;
 
   // ─── Image ────────────────────────────────────────────────────────────────
-  const primaryImage = product.images?.find(img => img.isPrimary);
-  const imageUrl = primaryImage?.url || product.image || "/images/no-image.webp";
+  const primaryImage = product.images?.find((img) => img.isPrimary);
+  const imageUrl =
+    primaryImage?.url || product.image || "/images/no-image.webp";
 
   // ─── Calculs ──────────────────────────────────────────────────────────────
   const discount = product.comparePrice
-    ? Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)
+    ? Math.round(
+        ((product.comparePrice - product.price) / product.comparePrice) * 100
+      )
     : 0;
 
   const isOutOfStock = product.stock === 0;
-  const isLowStock   = product.stock > 0 && product.stock < 5;
-  const isInWishlist = wishlistItems.some(item => item._id === product._id);
+  const isLowStock = product.stock > 0 && product.stock < 5;
+  const isInWishlist = wishlistItems.some((item) => item._id === product._id);
 
-  const avgRating   = product.rating?.average || 0;
+  const avgRating = product.rating?.average || 0;
   const reviewCount = product.rating?.count || 0;
+
+  // ─── Helpers category ─────────────────────────────────────────────────────
+  // Normalise category en tableau de strings (même si ce sont des objets)
+  const categoryNames = Array.isArray(product.category)
+    ? product.category.map((c) => (typeof c === "object" ? c.name : c))
+    : product.category
+    ? [typeof product.category === "object" ? product.category.name : product.category]
+    : [];
 
   // ─── Handlers ─────────────────────────────────────────────────────────────
   const handleAddToCart = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (isOutOfStock) { toast.error("Produit en rupture de stock"); return; }
+    if (isOutOfStock) {
+      toast.error("Produit en rupture de stock");
+      return;
+    }
     dispatch(addToCart(product));
     toast.success(`${product.name} ajouté au panier !`);
   };
@@ -56,10 +77,15 @@ const ProductCard = ({ product, showSpecs = false }) => {
     e.preventDefault();
     e.stopPropagation();
     if (isInWishlist) {
+      // Optimistic local update
+      dispatch(removeFromWishlistLocal(product._id));
       dispatch(removeFromWishlist(product._id));
       toast.info("Retiré des favoris");
     } else {
-      dispatch(addToWishlist(product));
+      // Optimistic local update (stocke produit sanitisé)
+      dispatch(addToWishlistLocal(product));
+      // Appel API avec juste l'ID
+      dispatch(addToWishlist(product._id));
       toast.success("Ajouté aux favoris ❤️");
     }
   };
@@ -106,7 +132,7 @@ const ProductCard = ({ product, showSpecs = false }) => {
           )}
         </div>
 
-        {/* Wishlist — bouton haut droite (visible en permanence) */}
+        {/* Wishlist — bouton haut droite */}
         <button
           onClick={handleToggleWishlist}
           aria-label={isInWishlist ? "Retirer des favoris" : "Ajouter aux favoris"}
@@ -116,13 +142,10 @@ const ProductCard = ({ product, showSpecs = false }) => {
               : "bg-white/90 dark:bg-gray-800/90 text-gray-700 dark:text-gray-300 hover:bg-red-50 hover:text-red-500"
           }`}
         >
-          {isInWishlist
-            ? <FaHeart size={14} />
-            : <FaRegHeart size={14} />
-          }
+          {isInWishlist ? <FaHeart size={14} /> : <FaRegHeart size={14} />}
         </button>
 
-        {/* Overlay hover desktop — Panier + Voir détails */}
+        {/* Overlay hover desktop */}
         <div className="hidden md:flex absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 items-center justify-center opacity-0 group-hover:opacity-100 gap-2">
           <button
             onClick={handleAddToCart}
@@ -155,7 +178,14 @@ const ProductCard = ({ product, showSpecs = false }) => {
           {product.name}
         </h3>
 
-        {/* Note — desktop uniquement */}
+        {/* Catégories — ✅ affiché en string, plus de crash */}
+        {categoryNames.length > 0 && (
+          <span className="text-[10px] md:text-xs text-gray-400 dark:text-gray-500 mb-1">
+            {categoryNames.join(", ")}
+          </span>
+        )}
+
+        {/* Note */}
         {avgRating > 0 && reviewCount > 0 && (
           <div className="hidden md:flex items-center gap-1.5 mb-2">
             <div className="flex">
@@ -163,7 +193,11 @@ const ProductCard = ({ product, showSpecs = false }) => {
                 <FaStar
                   key={i}
                   size={11}
-                  className={i < Math.floor(avgRating) ? "text-yellow-400" : "text-gray-300 dark:text-gray-600"}
+                  className={
+                    i < Math.floor(avgRating)
+                      ? "text-yellow-400"
+                      : "text-gray-300 dark:text-gray-600"
+                  }
                 />
               ))}
             </div>
@@ -200,7 +234,9 @@ const ProductCard = ({ product, showSpecs = false }) => {
             <span className="text-base md:text-lg font-bold text-blue-600 dark:text-blue-400">
               {product.price.toLocaleString()}
             </span>
-            <span className="text-[10px] md:text-xs text-gray-600 dark:text-gray-400">FCFA</span>
+            <span className="text-[10px] md:text-xs text-gray-600 dark:text-gray-400">
+              FCFA
+            </span>
           </div>
           {product.comparePrice && discount > 0 && (
             <div className="flex flex-col md:flex-row md:items-center md:gap-2">
@@ -208,7 +244,8 @@ const ProductCard = ({ product, showSpecs = false }) => {
                 {product.comparePrice.toLocaleString()} FCFA
               </span>
               <span className="text-[10px] md:text-xs text-red-500 dark:text-red-400 font-semibold">
-                Économisez {(product.comparePrice - product.price).toLocaleString()} FCFA
+                Économisez{" "}
+                {(product.comparePrice - product.price).toLocaleString()} FCFA
               </span>
             </div>
           )}
