@@ -3,6 +3,8 @@ import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { FaTools, FaUpload, FaTimes } from "react-icons/fa";
 import api from "../../../../packages/shared/api/api";
+import { useToast } from '../../../../packages/shared/context/ToastContext';
+
 
 const CreateRMA = () => {
   const navigate = useNavigate();
@@ -107,11 +109,11 @@ const CreateRMA = () => {
 
       const { data } = await api.post("/rma", rmaData);
       
-      alert("✅ Demande SAV créée avec succès !");
+      useToast().success("✅ Demande SAV créée avec succès !");
       navigate(`/rma/${data.rma._id}`);
     } catch (error) {
       console.error("Erreur création RMA:", error);
-      alert(error.response?.data?.message || "Erreur lors de la création de la demande");
+      useToast().error(error.response?.data?.message || "Erreur lors de la création de la demande");
     } finally {
       setLoading(false);
     }

@@ -5,9 +5,10 @@ import { createOrder } from "../../../../packages/shared/redux/slices/orderSlice
 import { clearCart } from "../../../../packages/shared/redux/slices/cartSlice";
 import { FaCheckCircle, FaLock, FaTruck } from "react-icons/fa";
 import { useToast } from '../../../../packages/shared/context/ToastContext'; // ✅ CORRECT
-import useErrorHandler from '../../../../packages/shared/hooks/useAuth'; // ✅ AJOUTÉ
+import useErrorHandler from '../../../../packages/shared/hooks/useErrorHandler'; // ✅ AJOUTÉ
 import Button from '../../src/components/shared/Button'; // ✅ AJOUTÉ
-import LoadingSpinner from '../../../../packages/shared/hooks/useErrorHandler'; // ✅ AJOUTÉ
+import LoadingSpinner from '../../src/components/shared/LoadingSpinner'; // ✅ AJOUTÉ
+import  useAuth  from '../../../../packages/shared/hooks/useAuth'; 
 import EmptyState from '../../src/components/shared/EmptyState'; // ✅ AJOUTÉ
 import { validatePhone } from '../../../../packages/shared/outils/validators'; // ✅ AJOUTÉ
 

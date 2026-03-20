@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../../../../../packages/shared/redux/slices/cartSlice";
-import { toggleWishlist } from "../../../../../packages/shared/redux/slices/wishlistSlice";
+import { toggleWishlist } from "../../../../../packages/shared/redux/slices/wishListSlice";
 import { Link } from "react-router-dom";
 import { 
   FaTimes, FaShoppingCart, FaHeart, FaStar, FaMinus, FaPlus,

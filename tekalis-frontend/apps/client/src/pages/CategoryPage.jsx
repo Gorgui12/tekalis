@@ -2,7 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProducts } from "../../../../packages/shared/redux/slices/productSlice";
-import ProductCard from "../../src/components/cart/CartItem";
+import ProductCard from "../../src/components/product/ProductCard";
 import { FaFilter, FaTimes, FaThLarge, FaList, FaChevronDown } from "react-icons/fa";
 
 const CategoryPage = () => {

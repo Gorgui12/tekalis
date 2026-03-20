@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { FaSearch, FaFilter, FaTimes, FaThLarge, FaList } from "react-icons/fa";
 import ProductCard from "../../src/components/ProductCard";
-import useProducts from "../../../../packages/hooks/useProducts";
-import useFilters from "../../../../packages/hooks/useFilters";
-import useDebounce from "../../../../packages/hooks/useDebounce";
+import useProducts from "../../../../packages/shared/hooks/useProducts";
+import useFilters from "../../../../packages/shared/hooks/useFilters";
+import useDebounce from "../../../../packages/shared/hooks/useDebounce";
 
 const SearchResults = () => {
   const [searchParams] = useSearchParams();

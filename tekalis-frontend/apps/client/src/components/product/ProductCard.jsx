@@ -1,61 +1,60 @@
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { addToCart } from "../../../../../packages/shared/redux/slices/cartSlice";
 import { addToWishlist, removeFromWishlist } from "../../../../../packages/shared/redux/slices/wishListSlice";
-import { Link } from "react-router-dom";
-import { useState } from "react";
-import { 
-  FaStar, FaShoppingCart, FaHeart, FaRegHeart, FaTag
+import { useToast } from "../../../../../packages/shared/context/ToastContext";
+import {
+  FaStar, FaShoppingCart, FaHeart, FaRegHeart, FaTag, FaEye
 } from "react-icons/fa";
-import { useToast } from '../../../../../packages/shared/context/ToastContext';
 
 /**
- * ProductCard MOBILE OPTIMIZED - Score 9.5/10
- * 
- * Optimisations mobile spécifiques :
- * - Textes plus grands sur petit écran
- * - Padding adaptatif
- * - Boutons tactiles (44px min)
- * - Image padding réduit sur mobile
- * - Prix plus visible
- * - Bouton wishlist simplifié sur mobile
+ * ProductCard — Carte produit unifiée
+ *
+ * Fusionne CartItem.jsx (specs rapides, overlay hover desktop, bouton Eye)
+ * et ProductCard.jsx (wishlist, dark mode, lazy loading, mobile optimisé).
+ *
+ * Props:
+ *   product : Object
+ *   showSpecs : boolean  — affiche RAM/Stockage si disponibles (défaut: false)
  */
-const ProductCard = ({ product, layout = "grid" }) => {
+const ProductCard = ({ product, showSpecs = false }) => {
   const toast = useToast();
   const dispatch = useDispatch();
   const wishlistItems = useSelector((state) => state.wishlist?.items || []);
-  
+
   const [imageLoaded, setImageLoaded] = useState(false);
 
   if (!product) return null;
 
+  // ─── Image ────────────────────────────────────────────────────────────────
   const primaryImage = product.images?.find(img => img.isPrimary);
   const imageUrl = primaryImage?.url || product.image || "/images/no-image.webp";
 
+  // ─── Calculs ──────────────────────────────────────────────────────────────
   const discount = product.comparePrice
     ? Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)
     : 0;
 
-  const isLowStock = product.stock > 0 && product.stock < 5;
   const isOutOfStock = product.stock === 0;
+  const isLowStock   = product.stock > 0 && product.stock < 5;
   const isInWishlist = wishlistItems.some(item => item._id === product._id);
 
+  const avgRating   = product.rating?.average || 0;
+  const reviewCount = product.rating?.count || 0;
+
+  // ─── Handlers ─────────────────────────────────────────────────────────────
   const handleAddToCart = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
-    if (isOutOfStock) {
-      toast.error("Produit en rupture de stock");
-      return;
-    }
-    
+    if (isOutOfStock) { toast.error("Produit en rupture de stock"); return; }
     dispatch(addToCart(product));
-    toast.success(`Ajouté au panier !`);
+    toast.success(`${product.name} ajouté au panier !`);
   };
 
   const handleToggleWishlist = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
     if (isInWishlist) {
       dispatch(removeFromWishlist(product._id));
       toast.info("Retiré des favoris");
@@ -70,8 +69,9 @@ const ProductCard = ({ product, layout = "grid" }) => {
       to={`/products/${product._id}`}
       className="group bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col h-full"
     >
-      {/* Image Container - Padding réduit sur mobile */}
+      {/* ─── Image ─────────────────────────────────────────────────────────── */}
       <div className="relative overflow-hidden bg-gray-50 dark:bg-gray-900 aspect-square">
+        {/* Skeleton */}
         {!imageLoaded && (
           <div className="absolute inset-0 bg-gray-200 dark:bg-gray-700 animate-pulse" />
         )}
@@ -79,20 +79,22 @@ const ProductCard = ({ product, layout = "grid" }) => {
         <img
           src={imageUrl}
           alt={product.name}
-          className={`w-full h-full object-contain p-2 md:p-4 group-hover:scale-105 transition-transform duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
-          onLoad={() => setImageLoaded(true)}
           loading="lazy"
+          onLoad={() => setImageLoaded(true)}
+          className={`w-full h-full object-contain p-2 md:p-4 group-hover:scale-105 transition-transform duration-300 ${
+            imageLoaded ? "opacity-100" : "opacity-0"
+          }`}
         />
-        
-        {/* Badges - Taille adaptative */}
+
+        {/* Badges gauche */}
         <div className="absolute top-1.5 left-1.5 md:top-2 md:left-2 flex flex-col gap-1 z-10">
           {discount > 0 && (
-            <div className="bg-red-500 text-white px-1.5 py-0.5 md:px-2 md:py-1 rounded text-[10px] md:text-xs font-bold shadow-md flex items-center gap-0.5 md:gap-1">
-              <FaTag size={8} className="md:w-[10px]" />
+            <div className="bg-red-500 text-white px-1.5 py-0.5 md:px-2 md:py-1 rounded text-[10px] md:text-xs font-bold shadow-md flex items-center gap-0.5">
+              <FaTag size={8} />
               -{discount}%
             </div>
           )}
-          {isLowStock && !isOutOfStock && (
+          {isLowStock && (
             <div className="bg-orange-500 text-white px-1.5 py-0.5 md:px-2 md:py-1 rounded text-[10px] md:text-xs font-bold shadow-md">
               Stock limité
             </div>
@@ -104,64 +106,101 @@ const ProductCard = ({ product, layout = "grid" }) => {
           )}
         </div>
 
-        {/* Wishlist button - Plus grand sur mobile (tactile 44px) */}
+        {/* Wishlist — bouton haut droite (visible en permanence) */}
         <button
           onClick={handleToggleWishlist}
-          className={`absolute top-1.5 right-1.5 md:top-2 md:right-2 w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-lg transition-all z-10 ${
-            isInWishlist 
-              ? 'bg-red-500 text-white' 
-              : 'bg-white/90 dark:bg-gray-800/90 text-gray-700 dark:text-gray-300'
-          }`}
           aria-label={isInWishlist ? "Retirer des favoris" : "Ajouter aux favoris"}
+          className={`absolute top-1.5 right-1.5 md:top-2 md:right-2 w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-lg transition-all z-10 ${
+            isInWishlist
+              ? "bg-red-500 text-white"
+              : "bg-white/90 dark:bg-gray-800/90 text-gray-700 dark:text-gray-300 hover:bg-red-50 hover:text-red-500"
+          }`}
         >
-          {isInWishlist ? <FaHeart size={14} className="md:w-4 md:h-4" /> : <FaRegHeart size={14} className="md:w-4 md:h-4" />}
+          {isInWishlist
+            ? <FaHeart size={14} />
+            : <FaRegHeart size={14} />
+          }
         </button>
+
+        {/* Overlay hover desktop — Panier + Voir détails */}
+        <div className="hidden md:flex absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 items-center justify-center opacity-0 group-hover:opacity-100 gap-2">
+          <button
+            onClick={handleAddToCart}
+            disabled={isOutOfStock}
+            aria-label="Ajouter au panier"
+            className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full transition disabled:bg-gray-400 disabled:cursor-not-allowed shadow-lg"
+          >
+            <FaShoppingCart size={18} />
+          </button>
+          <span
+            className="bg-white hover:bg-gray-100 text-gray-800 p-3 rounded-full transition shadow-lg"
+            title="Voir détails"
+          >
+            <FaEye size={18} />
+          </span>
+        </div>
       </div>
 
-      {/* Content - Padding adaptatif */}
+      {/* ─── Infos ─────────────────────────────────────────────────────────── */}
       <div className="p-2.5 md:p-4 flex flex-col flex-grow">
-        {/* Brand - Plus petit sur mobile */}
+        {/* Marque */}
         {product.brand && (
           <span className="text-[10px] md:text-xs text-gray-500 dark:text-gray-400 uppercase font-semibold mb-1">
             {product.brand}
           </span>
         )}
-        
-        {/* Title - Taille adaptative */}
+
+        {/* Nom */}
         <h3 className="text-xs md:text-sm font-semibold text-gray-900 dark:text-white mb-1.5 md:mb-2 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition min-h-[2rem] md:min-h-[2.5rem]">
           {product.name}
         </h3>
 
-        {/* Rating - Visible seulement sur desktop pour gagner de la place */}
-        {product.rating?.average > 0 && (
-          <div className="hidden md:flex items-center gap-1 mb-2">
+        {/* Note — desktop uniquement */}
+        {avgRating > 0 && reviewCount > 0 && (
+          <div className="hidden md:flex items-center gap-1.5 mb-2">
             <div className="flex">
               {[...Array(5)].map((_, i) => (
                 <FaStar
                   key={i}
-                  className={`text-xs ${
-                    i < Math.floor(product.rating.average)
-                      ? 'text-yellow-400'
-                      : 'text-gray-300 dark:text-gray-600'
-                  }`}
+                  size={11}
+                  className={i < Math.floor(avgRating) ? "text-yellow-400" : "text-gray-300 dark:text-gray-600"}
                 />
               ))}
             </div>
             <span className="text-xs font-medium text-gray-700 dark:text-gray-300">
-              {product.rating.average.toFixed(1)}
+              {avgRating.toFixed(1)}
+            </span>
+            <span className="text-xs text-gray-500 dark:text-gray-400">
+              ({reviewCount})
             </span>
           </div>
         )}
 
-        {/* Price - Plus grand sur mobile */}
+        {/* Specs rapides (optionnel) */}
+        {showSpecs && product.specs && (
+          <div className="hidden md:block text-xs text-gray-600 dark:text-gray-400 mb-2 space-y-0.5">
+            {product.specs.ram && (
+              <div className="flex gap-1">
+                <span className="font-medium">RAM:</span>
+                <span>{product.specs.ram}</span>
+              </div>
+            )}
+            {product.specs.storage && (
+              <div className="flex gap-1">
+                <span className="font-medium">Stockage:</span>
+                <span>{product.specs.storage}</span>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Prix */}
         <div className="mt-auto mb-2 md:mb-3">
-          <div className="flex items-baseline gap-1.5 md:gap-2">
+          <div className="flex items-baseline gap-1.5">
             <span className="text-base md:text-lg font-bold text-blue-600 dark:text-blue-400">
               {product.price.toLocaleString()}
             </span>
-            <span className="text-[10px] md:text-xs text-gray-600 dark:text-gray-400">
-              FCFA
-            </span>
+            <span className="text-[10px] md:text-xs text-gray-600 dark:text-gray-400">FCFA</span>
           </div>
           {product.comparePrice && discount > 0 && (
             <div className="flex flex-col md:flex-row md:items-center md:gap-2">
@@ -169,29 +208,24 @@ const ProductCard = ({ product, layout = "grid" }) => {
                 {product.comparePrice.toLocaleString()} FCFA
               </span>
               <span className="text-[10px] md:text-xs text-red-500 dark:text-red-400 font-semibold">
-                -{(product.comparePrice - product.price).toLocaleString()} FCFA
+                Économisez {(product.comparePrice - product.price).toLocaleString()} FCFA
               </span>
             </div>
           )}
         </div>
 
-        {/* Add to Cart Button - Taille tactile optimale */}
+        {/* Bouton Ajouter au panier */}
         <button
           onClick={handleAddToCart}
           disabled={isOutOfStock}
-          className={`w-full py-2 md:py-2.5 px-2 rounded-lg font-semibold text-xs md:text-sm transition-all flex items-center justify-center gap-1.5 md:gap-2 ${
+          className={`w-full py-2 md:py-2.5 px-2 rounded-lg font-semibold text-xs md:text-sm transition-all flex items-center justify-center gap-1.5 active:scale-95 ${
             isOutOfStock
               ? "bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700 text-white active:scale-95"
+              : "bg-blue-600 hover:bg-blue-700 text-white"
           }`}
         >
-          <FaShoppingCart size={12} className="md:w-4 md:h-4" />
-          <span className="hidden xs:inline md:inline">
-            {isOutOfStock ? "Rupture" : "Ajouter"}
-          </span>
-          <span className="xs:hidden">
-            {isOutOfStock ? "Rupture" : "+"}
-          </span>
+          <FaShoppingCart size={12} className="md:w-[14px] md:h-[14px]" />
+          {isOutOfStock ? "Rupture de stock" : "Ajouter au panier"}
         </button>
       </div>
     </Link>

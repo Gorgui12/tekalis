@@ -19,6 +19,8 @@ import Blog from "./pages/Blog";
 import ArticleDetails from "./pages/ArticleDetails";
 import Configurator from "./pages/Configurator";
 import Apropos from "./pages/apropos";
+import Politique from "./pages/Politique";
+import Contact from "./pages/Contact";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import PaymentSuccess from "./pages/PaymentSuccess";
@@ -27,7 +29,6 @@ import PaymentCancel from "./pages/PaymentCancel";
 // Pages protégées (client connecté)
 import Cart from "./pages/Cart";
 import Checkout from "./pages/Checkout";
-import UserOrders from "./pages/Orders";
 import OrderDetails from "./pages/OrderDetails";
 import Profile from "./pages/Profile";
 import ClientDashboard from "./pages/Dashboard";
@@ -37,6 +38,7 @@ import MyRMA from "./pages/MyRMA";
 import CreateRMA from "./pages/CreateRMA";
 import Wishlist from "./pages/WishList";
 import Addresses from "./pages/Addresses";
+
 
 // GA4
 ReactGA.initialize("G-PJ4RDYQ3EQ");
@@ -78,6 +80,11 @@ function App() {
 
         {/* Pages statiques */}
         <Route path="/apropos" element={<Apropos />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/politique" element={<Politique />} />
+
+        
+        
 
         {/* Paiement */}
         <Route path="/payment/success/:orderId" element={<PaymentSuccess />} />
@@ -94,7 +101,7 @@ function App() {
           {/* Panier & Commandes */}
           <Route path="/cart" element={<Cart />} />
           <Route path="/checkout" element={<Checkout />} />
-          <Route path="/orders" element={<UserOrders />} />
+          <Route path="/orders" element={<MyOrders />} />
           <Route path="/orders/:id" element={<OrderDetails />} />
 
           {/* Profil */}

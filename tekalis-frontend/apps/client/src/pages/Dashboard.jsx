@@ -201,7 +201,7 @@ const ClientDashboard = () => {
                 </Link>
 
                 <Link
-                  to="/warranties"
+                  to="/dashboard/warranties"
                   className="flex items-center gap-3 p-3 rounded-lg hover:bg-green-50 transition group"
                 >
                   <div className="bg-green-100 rounded-full p-2 group-hover:bg-green-200">
@@ -214,7 +214,7 @@ const ClientDashboard = () => {
                 </Link>
 
                 <Link
-                  to="/rma"
+                  to="/dashboard/rma"
                   className="flex items-center gap-3 p-3 rounded-lg hover:bg-orange-50 transition group"
                 >
                   <div className="bg-orange-100 rounded-full p-2 group-hover:bg-orange-200">
