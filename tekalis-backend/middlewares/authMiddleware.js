@@ -6,99 +6,133 @@ const User = require("../models/User");
 // ===============================================
 const verifyToken = async (req, res, next) => {
   try {
-    const token = req.headers.authorization?.split(" ")[1];
+    // Récupérer le token depuis le header Authorization
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({
+        success: false,
+        message: "Accès refusé. Token manquant ou malformé."
+      });
+    }
+
+    const token = authHeader.split(" ")[1];
 
     if (!token) {
-      return res.status(401).json({ message: "Accès refusé, token manquant" });
+      return res.status(401).json({
+        success: false,
+        message: "Accès refusé. Token manquant."
+      });
     }
 
+    // Vérifier et décoder le token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    
-    // Récupérer l'utilisateur complet depuis la DB
+
+    // Récupérer l'utilisateur depuis la DB (vérifie qu'il existe encore et est actif)
     const user = await User.findById(decoded.id).select("-password");
-    
+
     if (!user) {
-      return res.status(404).json({ message: "Utilisateur non trouvé" });
+      return res.status(401).json({
+        success: false,
+        message: "Utilisateur introuvable. Token invalide."
+      });
     }
-    
-    // ✅ Stocker l'utilisateur complet dans req.user
+
+    if (!user.isActive) {
+      return res.status(403).json({
+        success: false,
+        message: "Compte désactivé. Contactez le support."
+      });
+    }
+
+    // Stocker l'utilisateur complet dans req.user
     req.user = {
       _id: user._id,
-      id: user._id, // Pour compatibilité
+      id: user._id,
       name: user.name,
       email: user.email,
-      isAdmin: user.isAdmin
+      isAdmin: user.isAdmin,
+      phone: user.phone
     };
 
-    console.log("✅ Utilisateur authentifié:", req.user.email);
     next();
   } catch (error) {
-    console.error("❌ Erreur d'authentification:", error.message);
-    
     if (error.name === "JsonWebTokenError") {
-      return res.status(401).json({ message: "Token invalide" });
+      return res.status(401).json({
+        success: false,
+        message: "Token invalide."
+      });
     }
     if (error.name === "TokenExpiredError") {
-      return res.status(401).json({ message: "Token expiré" });
+      return res.status(401).json({
+        success: false,
+        message: "Token expiré. Veuillez vous reconnecter."
+      });
     }
-    
-    res.status(401).json({ message: "Authentification échouée" });
+    console.error("❌ Erreur authMiddleware:", error.message);
+    res.status(500).json({
+      success: false,
+      message: "Erreur d'authentification."
+    });
   }
 };
 
 // ===============================================
-// Middleware pour vérifier le rôle admin
+// Middleware admin
 // ===============================================
 const isAdmin = (req, res, next) => {
   if (!req.user) {
-    return res.status(401).json({ message: "Utilisateur non authentifié" });
-  }
-  
-  if (!req.user.isAdmin) {
-    return res.status(403).json({ 
-      message: "Accès refusé. Droits administrateur requis." 
+    return res.status(401).json({
+      success: false,
+      message: "Utilisateur non authentifié."
     });
   }
-  
-  console.log("✅ Admin vérifié:", req.user.email);
+
+  if (!req.user.isAdmin) {
+    return res.status(403).json({
+      success: false,
+      message: "Accès refusé. Droits administrateur requis."
+    });
+  }
+
   next();
 };
 
 // ===============================================
-// Middleware optionnel (n'échoue pas si pas de token)
+// Middleware optionnel (ne bloque pas si pas de token)
 // ===============================================
 const optionalAuth = async (req, res, next) => {
   try {
-    const token = req.headers.authorization?.split(" ")[1];
-    
-    if (token) {
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-      const user = await User.findById(decoded.id).select("-password");
-      
-      if (user) {
-        req.user = {
-          _id: user._id,
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          isAdmin: user.isAdmin
-        };
+    const authHeader = req.headers.authorization;
+
+    if (authHeader && authHeader.startsWith("Bearer ")) {
+      const token = authHeader.split(" ")[1];
+
+      if (token) {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded.id).select("-password");
+
+        if (user && user.isActive) {
+          req.user = {
+            _id: user._id,
+            id: user._id,
+            name: user.name,
+            email: user.email,
+            isAdmin: user.isAdmin
+          };
+        }
       }
     }
-  } catch (error) {
-    // Ne pas bloquer si token invalide
-    console.log("ℹ️ Token optionnel invalide ou absent");
+  } catch {
+    // Ne pas bloquer si token invalide en mode optionnel
   }
-  
+
   next();
 };
 
-// ===============================================
-// EXPORTS
-// ===============================================
 module.exports = {
   verifyToken,
-  protect: verifyToken,  // ✅ Alias pour compatibilité
+  protect: verifyToken, // alias pour compatibilité
   isAdmin,
   optionalAuth
 };
