@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const crypto = require("crypto");
 
 // models/Order.js
 const orderSchema = new mongoose.Schema({
@@ -37,7 +38,6 @@ const orderSchema = new mongoose.Schema({
     default: 0
   },
   
-  // ✅ Champs de paiement mis à jour
   paymentMethod: { 
     type: String, 
     enum: ["cash", "online", "wave", "om", "free", "card"], 
@@ -60,7 +60,6 @@ const orderSchema = new mongoose.Schema({
     type: Date 
   },
   
-  // ✅ Champs PayDunya
   paymentToken: {
     type: String,
     index: true
@@ -71,21 +70,18 @@ const orderSchema = new mongoose.Schema({
     index: true
   },
   
-  // Informations client PayDunya (remplies après paiement)
   customerInfo: {
     name: String,
     phone: String,
     email: String
   },
   
-  // ✅ Statut de la commande
   status: { 
     type: String, 
     enum: ["pending", "processing", "shipped", "delivered", "cancelled"], 
     default: "pending" 
   },
   
-  // ✅ Champs de livraison
   deliveryName: { 
     type: String, 
     required: true 
@@ -117,7 +113,6 @@ const orderSchema = new mongoose.Schema({
     unique: true
   },
   
-  // Remboursement
   refundAmount: {
     type: Number,
     default: 0
@@ -127,7 +122,6 @@ const orderSchema = new mongoose.Schema({
     type: Date
   },
   
-  // Anciens champs (conservés pour compatibilité)
   stripePaymentIntentId: { 
     type: String 
   },
@@ -145,23 +139,27 @@ const orderSchema = new mongoose.Schema({
   timestamps: true 
 });
 
-// Générer un numéro de commande unique avant la sauvegarde
+/**
+ * Générer un numéro de commande unique avant la sauvegarde.
+ * 
+ * ✅ FIX race condition : on utilise un suffixe aléatoire crypto au lieu de
+ * compter les documents du jour (qui peut retourner la même valeur si deux
+ * commandes sont créées simultanément et que MongoDB n'a pas encore persisté
+ * la première).
+ *
+ * Format : ORD-YYMMDD-XXXXXXXX (8 hex chars aléatoires → 4 milliards de combos)
+ */
 orderSchema.pre('save', async function(next) {
   if (!this.orderNumber) {
     const date = new Date();
-    const year = date.getFullYear().toString().slice(-2);
+    const year  = date.getFullYear().toString().slice(-2);
     const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    
-    // Compter les commandes du jour pour avoir un numéro séquentiel
-    const count = await this.constructor.countDocuments({
-      createdAt: {
-        $gte: new Date(date.setHours(0, 0, 0, 0)),
-        $lt: new Date(date.setHours(23, 59, 59, 999))
-      }
-    });
-    
-    this.orderNumber = `ORD${year}${month}${day}${String(count + 1).padStart(4, '0')}`;
+    const day   = String(date.getDate()).padStart(2, '0');
+
+    // 4 octets aléatoires → 8 caractères hex, unicité quasi-garantie
+    const randomSuffix = crypto.randomBytes(4).toString("hex").toUpperCase();
+
+    this.orderNumber = `ORD${year}${month}${day}${randomSuffix}`;
   }
   next();
 });

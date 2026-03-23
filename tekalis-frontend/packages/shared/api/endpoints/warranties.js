@@ -1,31 +1,31 @@
+// ✅ FIX : ce fichier était une copie de rma.js
+// Voici les vrais endpoints pour les garanties
 import api from "../api";
 
-// ── RMA (Retours/SAV) ─────────────────────────────────────────────────────────
+// ── Garanties utilisateur ─────────────────────────────────────────────────────
 
-export const getUserRMAs = (params = {}) =>
-  api.get("/rma", { params });
+export const getUserWarranties = (params = {}) =>
+  api.get("/warranties", { params });
 
-export const getRMAById = (id) =>
-  api.get(`/rma/${id}`);
+export const getWarrantyById = (id) =>
+  api.get(`/warranties/${id}`);
 
-export const createRMA = (rmaData) =>
-  api.post("/rma", rmaData);
+export const checkWarrantyBySerial = (serialNumber) =>
+  api.post("/warranties/check", { serialNumber });
 
-export const addRMAComment = (id, comment) =>
-  api.post(`/rma/${id}/comments`, { comment });
+export const requestWarrantyExtension = (warrantyId, duration) =>
+  api.post("/warranties/extend", { warrantyId, duration });
 
-export const cancelRMA = (id) =>
-  api.delete(`/rma/${id}`);
+// ── Garanties admin ───────────────────────────────────────────────────────────
 
-// Admin RMA
-export const adminGetRMAs = (params = {}) =>
-  api.get("/admin/rma", { params });
+export const adminGetWarranties = (params = {}) =>
+  api.get("/admin/warranties", { params });
 
-export const adminGetRMAById = (id) =>
-  api.get(`/admin/rma/${id}`);
+export const adminGetWarrantyById = (id) =>
+  api.get(`/admin/warranties/${id}`);
 
-export const adminUpdateRMAStatus = (id, status, note = "") =>
-  api.patch(`/admin/rma/${id}/status`, { status, note });
+export const adminUpdateWarrantyStatus = (id, status, notes = "") =>
+  api.patch(`/admin/warranties/${id}/status`, { status, notes });
 
-export const adminGetRMAStats = () =>
-  api.get("/admin/rma/stats");
+export const adminGetWarrantyStats = () =>
+  api.get("/admin/warranties/stats");

@@ -1,6 +1,7 @@
 const Order = require("../models/Order");
 const Product = require("../models/Product");
 const Cart = require("../models/Cart");
+const PromoCode = require("../models/PromoCode");
 const nodemailer = require("nodemailer");
 
 // ===============================================
@@ -30,7 +31,8 @@ exports.createOrder = async (req, res) => {
       deliveryPhone,
       deliveryAddress,
       deliveryCity,
-      deliveryRegion
+      deliveryRegion,
+      promoCode // ✅ récupérer le code promo si présent
     } = req.body;
 
     if (!products || products.length === 0) {
@@ -87,6 +89,28 @@ exports.createOrder = async (req, res) => {
     }));
     await Product.bulkWrite(bulkOps);
 
+    // ─── Incrémenter l'usage du code promo ✅ ─────────────────────────────────
+    if (promoCode) {
+      try {
+        await PromoCode.findOneAndUpdate(
+          { code: promoCode.trim().toUpperCase(), isActive: true },
+          {
+            $inc: { usageCount: 1 },
+            $push: {
+              usedBy: {
+                user: req.user._id,
+                usedAt: new Date(),
+                orderAmount: totalPrice
+              }
+            }
+          }
+        );
+      } catch (promoErr) {
+        // Non bloquant : la commande est déjà créée
+        console.error("⚠️ Erreur mise à jour code promo:", promoErr.message);
+      }
+    }
+
     // ─── Vider le panier ──────────────────────────────────────────────────────
     await Cart.findOneAndUpdate(
       { user: req.user._id },
@@ -127,6 +151,7 @@ exports.createOrder = async (req, res) => {
             <div style="background:#fef3c7;padding:15px;border-radius:8px;margin:20px 0">
               <h3 style="margin-top:0">💳 Paiement</h3>
               <p><b>Méthode :</b> ${paymentMethod === "cash" ? "💵 Paiement à la livraison" : paymentMethod.toUpperCase()}</p>
+              ${promoCode ? `<p><b>Code promo :</b> ${promoCode}</p>` : ""}
               <p><b>Total :</b> <strong style="color:#1E40AF;font-size:1.5em">${totalPrice.toLocaleString()} FCFA</strong></p>
             </div>
             <div style="margin:20px 0">
@@ -226,7 +251,6 @@ exports.getOrderById = async (req, res) => {
       return res.status(404).json({ message: "Commande introuvable" });
     }
 
-    // Vérifier que c'est la commande de l'utilisateur OU un admin
     if (
       order.user._id.toString() !== req.user._id.toString() &&
       !req.user.isAdmin
@@ -262,7 +286,6 @@ exports.updateOrderStatus = async (req, res) => {
       return res.status(404).json({ message: "Commande introuvable" });
     }
 
-    // Si annulation, remettre le stock
     if (status === "cancelled") {
       const bulkOps = order.products.map(item => ({
         updateOne: {

@@ -3,6 +3,16 @@ const router = express.Router();
 const reviewController = require("../controllers/reviewController");
 const { verifyToken, isAdmin } = require("../middlewares/authMiddleware");
 
+// ── Routes admin (AVANT les routes dynamiques /:id) ───────────────────────────
+
+// GET /api/v1/reviews/all — tous les avis (Admin) — route nommée pour éviter conflit
+router.get("/all", verifyToken, isAdmin, reviewController.getAllReviews);
+
+// PATCH /api/v1/reviews/:id/approve (Admin)
+router.patch("/:id/approve", verifyToken, isAdmin, reviewController.toggleApprove);
+
+// ── Routes publiques/authentifiées ────────────────────────────────────────────
+
 // GET /api/v1/reviews/:productId
 router.get("/:productId", reviewController.getProductReviews);
 
@@ -14,13 +24,5 @@ router.put("/:id/helpful", verifyToken, reviewController.markHelpful);
 
 // DELETE /api/v1/reviews/:id
 router.delete("/:id", verifyToken, reviewController.deleteReview);
-
-// ── Routes admin ──────────────────────────────────────────────────────────────
-
-// GET /api/v1/reviews (tous)
-router.get("/", verifyToken, isAdmin, reviewController.getAllReviews);
-
-// PATCH /api/v1/reviews/:id/approve
-router.patch("/:id/approve", verifyToken, isAdmin, reviewController.toggleApprove);
 
 module.exports = router;

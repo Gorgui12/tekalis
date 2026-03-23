@@ -144,6 +144,98 @@ loadRoute(`${API_PREFIX}/admin/stats`, "./routes/stats");
 
 console.log("✅ Routes chargées\n");
 
+// ─── Routeur Admin ────────────────────────────────────────────────────────────
+const adminRouter = require("express").Router();
+const { verifyToken, isAdmin } = require("./middlewares/authMiddleware");
+adminRouter.use(verifyToken, isAdmin);
+
+// Réutiliser les routes existantes sous /admin/*
+adminRouter.use("/orders",     require("./routes/orderRoutes"));
+adminRouter.use("/users",      require("./routes/userRoutes"));
+adminRouter.use("/reviews",    require("./routes/reviewRoutes"));
+adminRouter.use("/rma",        require("./routes/rmaRoutes"));
+adminRouter.use("/warranties", require("./routes/warrantyRoutes"));
+
+// Paramètres du site
+const Settings = require("./models/Settings");
+adminRouter.get("/settings", async (req, res) => {
+  try {
+    let settings = await Settings.findById("site_settings");
+    if (!settings) settings = await Settings.create({ _id: "site_settings" });
+    res.json({ success: true, settings });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+});
+adminRouter.put("/settings", async (req, res) => {
+  try {
+    const settings = await Settings.findByIdAndUpdate(
+      "site_settings", req.body, { new: true, upsert: true }
+    );
+    res.json({ success: true, settings });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+});
+
+// Catégories (CRUD admin)
+const Category = require("./models/Category");
+adminRouter.get("/categories", async (req, res) => {
+  try {
+    const categories = await Category.find().sort({ order: 1 });
+    res.json({ success: true, categories });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+});
+adminRouter.post("/categories", async (req, res) => {
+  try {
+    const cat = await Category.create(req.body);
+    res.status(201).json({ success: true, category: cat });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+});
+adminRouter.put("/categories/:id", async (req, res) => {
+  try {
+    const cat = await Category.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json({ success: true, category: cat });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+});
+adminRouter.delete("/categories/:id", async (req, res) => {
+  try {
+    await Category.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: "Catégorie supprimée" });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+});
+
+// Codes promo
+const PromoCode = require("./models/PromoCode");
+adminRouter.get("/promo-codes", async (req, res) => {
+  try {
+    const promoCodes = await PromoCode.find().sort({ createdAt: -1 });
+    res.json({ success: true, promoCodes });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+});
+adminRouter.post("/promo-codes", async (req, res) => {
+  try {
+    const promo = await PromoCode.create({ ...req.body, createdBy: req.user._id });
+    res.status(201).json({ success: true, promoCode: promo });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+});
+adminRouter.put("/promo-codes/:id", async (req, res) => {
+  try {
+    const promo = await PromoCode.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json({ success: true, promoCode: promo });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+});
+adminRouter.delete("/promo-codes/:id", async (req, res) => {
+  try {
+    await PromoCode.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: "Code promo supprimé" });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+});
+
+// Analytics (stub — données vides pour l'instant)
+adminRouter.get("/analytics", async (req, res) => {
+  res.json({ success: true, stats: {}, revenue: [], categories: [], topProducts: [], customers: [] });
+});
+
+app.use(`${API_PREFIX}/admin`, adminRouter);
+// ─────────────────────────────────────────────────────────────────────────────
+
 // ─── 404 ──────────────────────────────────────────────────────────────────────
 app.use((req, res) => {
   res.status(404).json({

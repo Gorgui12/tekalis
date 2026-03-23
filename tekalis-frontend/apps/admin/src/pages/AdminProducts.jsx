@@ -39,8 +39,13 @@ const AdminProducts = () => {
       params.push(`sort=${sortBy}`);
       
       const queryString = params.length > 0 ? `?${params.join("&")}` : "";
-      const { data } = await api.get(`/products${queryString}`);
-      setProducts(data);
+      // ✅ APRÈS (corrigé)
+const { data } = await api.get(`/products${queryString}`);
+const items = Array.isArray(data) ? data
+  : Array.isArray(data.data) ? data.data
+  : Array.isArray(data.products) ? data.products
+  : [];
+setProducts(items);
     } catch (error) {
       console.error("Erreur chargement produits:", error);
       toast.error("Erreur lors du chargement des produits");

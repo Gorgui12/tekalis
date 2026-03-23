@@ -18,10 +18,11 @@ export const fetchArticleById = createAsyncThunk(
   }
 );
 
+// ✅ FIX : suppression du préfixe /api/v1 qui causait un doublon
 export const fetchArticleBySlug = createAsyncThunk(
   "articles/fetchArticleBySlug",
   async (slug) => {
-    const { data } = await api.get(`/api/v1/articles/slug/${slug}`);
+    const { data } = await api.get(`/articles/slug/${slug}`);
     return data;
   }
 );
@@ -88,7 +89,7 @@ const articleSlice = createSlice({
       })
       .addCase(fetchArticles.fulfilled, (state, action) => {
         state.loading = false;
-        state.articles = action.payload.articles;
+        state.articles = action.payload.articles || [];
         state.featuredArticles = action.payload.featured || [];
       })
       .addCase(fetchArticles.rejected, (state, action) => {
@@ -96,31 +97,30 @@ const articleSlice = createSlice({
         state.error = action.error.message;
       })
       .addCase(fetchArticleById.fulfilled, (state, action) => {
-        state.currentArticle = action.payload.article;
+        state.currentArticle = action.payload.article || action.payload;
         state.relatedArticles = action.payload.related || [];
       })
       .addCase(fetchArticleBySlug.fulfilled, (state, action) => {
-        state.currentArticle = action.payload.article;
+        state.currentArticle = action.payload.article || action.payload;
         state.relatedArticles = action.payload.related || [];
       })
       .addCase(createArticle.fulfilled, (state, action) => {
-        state.articles.unshift(action.payload.article);
+        const article = action.payload.article || action.payload;
+        state.articles.unshift(article);
       })
       .addCase(updateArticle.fulfilled, (state, action) => {
-        const index = state.articles.findIndex(a => a._id === action.payload.article._id);
-        if (index !== -1) {
-          state.articles[index] = action.payload.article;
-        }
-        if (state.currentArticle?._id === action.payload.article._id) {
-          state.currentArticle = action.payload.article;
-        }
+        const article = action.payload.article || action.payload;
+        const index = state.articles.findIndex(a => a._id === article._id);
+        if (index !== -1) state.articles[index] = article;
+        if (state.currentArticle?._id === article._id) state.currentArticle = article;
       })
       .addCase(deleteArticle.fulfilled, (state, action) => {
         state.articles = state.articles.filter(a => a._id !== action.payload);
       })
       .addCase(incrementViews.fulfilled, (state, action) => {
-        if (state.currentArticle?._id === action.payload.article._id) {
-          state.currentArticle.views = action.payload.article.views;
+        const article = action.payload.article || action.payload;
+        if (state.currentArticle?._id === article._id) {
+          state.currentArticle.views = article.views;
         }
       });
   }
