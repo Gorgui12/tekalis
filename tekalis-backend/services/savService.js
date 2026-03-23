@@ -2,7 +2,7 @@
 // 11. services/savService.js
 // ===============================================
 const RMA = require("../models/RMA");
-const Notification = require("../models/Notification");
+const Notification = require("../models/notification");
 const EmailService = require("./emailService");
 
 class SAVService {

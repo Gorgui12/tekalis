@@ -3,7 +3,8 @@
 // ===============================================
 const RMA = require("../models/RMA");
 const Order = require("../models/Order");
-const Notification = require("../models/Notification");
+// ✅ APRÈS
+const Notification = require("../models/notification");
 
 // Créer une demande SAV
 const createRMA = async (req, res) => {
