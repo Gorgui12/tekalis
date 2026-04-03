@@ -7,7 +7,7 @@ import ProductCard from "../../src/components/product/ProductCard";
 import { FaStar, FaStarHalfAlt, FaRegStar, FaShieldAlt, FaTruck, FaCheckCircle } from "react-icons/fa";
 import api from "../../../../packages/shared/api/api";
 import { useToast } from '../../../../packages/shared/context/ToastContext';
-
+import { SEOHead } from "../hooks/useSEO";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -30,7 +30,6 @@ const ProductDetails = () => {
   }, [dispatch, items.length]);
 
   useEffect(() => {
-    // Charger les avis
     const fetchReviews = async () => {
       try {
         const { data } = await api.get(`/reviews/${id}`);
@@ -55,17 +54,20 @@ const ProductDetails = () => {
     );
   }
 
-  // Images du produit (simulé pour compatibilité avec votre modèle actuel)
-  const productImages = product.images 
+  // ── Images (une seule déclaration) ───────────────────────────────────────────
+  const productImages = product.images
     ? (Array.isArray(product.images) ? product.images : [{ url: product.image }])
     : [{ url: product.image }];
 
-  // Calcul de la note moyenne
+  // ── URLs des images pour le SEO ──────────────────────────────────────────────
+  const productImageUrls = productImages.map(img => img.url || img).filter(Boolean);
+
+  // ── Note moyenne ─────────────────────────────────────────────────────────────
   const avgRating = reviews.length > 0
     ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
     : 0;
 
-  // Composant étoiles
+  // ── Composant étoiles ────────────────────────────────────────────────────────
   const StarRating = ({ rating, size = 20 }) => {
     const stars = [];
     for (let i = 1; i <= 5; i++) {
@@ -93,12 +95,8 @@ const ProductDetails = () => {
       toast.error("Connectez-vous pour laisser un avis");
       return;
     }
-
     try {
-      const { data } = await api.post("/reviews", {
-        productId: id,
-        ...newReview
-      });
+      const { data } = await api.post("/reviews", { productId: id, ...newReview });
       setReviews([data.review, ...reviews]);
       setNewReview({ rating: 5, title: "", comment: "" });
       setShowReviewForm(false);
@@ -108,16 +106,44 @@ const ProductDetails = () => {
     }
   };
 
-  const similarProducts = items.filter(
-    (item) => {
-      const itemCategories = Array.isArray(item.category) ? item.category : [item.category];
-      const productCategories = Array.isArray(product.category) ? product.category : [product.category];
-      return itemCategories.some(cat => productCategories.includes(cat)) && item._id !== product._id;
-    }
-  ).slice(0, 4);
+  const similarProducts = items.filter((item) => {
+    const itemCategories = Array.isArray(item.category) ? item.category : [item.category];
+    const productCategories = Array.isArray(product.category) ? product.category : [product.category];
+    return itemCategories.some(cat => productCategories.includes(cat)) && item._id !== product._id;
+  }).slice(0, 4);
 
   return (
     <div className="container mx-auto px-4 py-8 mt-32">
+
+      {/* ── SEO HEAD ──────────────────────────────────────────────────────── */}
+      <SEOHead
+        title={`${product.name} — Prix ${product.price?.toLocaleString()} FCFA Dakar | Tekalis`}
+        description={`Achetez ${product.name} à Dakar au prix de ${product.price?.toLocaleString()} FCFA. ${product.description?.slice(0, 100) || ''}... Livraison rapide au Sénégal. Garantie constructeur 12 mois.`}
+        image={productImageUrls[0]}
+        keywords={[
+          `${product.name} prix Dakar`,
+          `${product.name} Sénégal`,
+          `acheter ${product.name} Dakar`,
+          product.brand ? `${product.brand} Dakar` : null,
+          product.brand ? `${product.brand} Sénégal prix` : null,
+        ].filter(Boolean)}
+        type="product"
+        price={product.price}
+        availability={product.stock > 0 ? 'InStock' : 'OutOfStock'}
+        canonical={`https://tekalis.com/products/${product._id}`}
+        productData={{
+          name: product.name,
+          brand: product.brand,
+          sku: product._id,
+          images: productImageUrls,
+          rating: product.rating,
+        }}
+        breadcrumbs={[
+          { name: 'Produits', url: '/products' },
+          { name: product.name, url: `/products/${product._id}` },
+        ]}
+      />
+
       {/* Fil d'Ariane */}
       <div className="text-sm text-gray-600 mb-6">
         <Link to="/" className="hover:text-blue-600">Accueil</Link>
@@ -139,7 +165,6 @@ const ProductDetails = () => {
             />
           </div>
           
-          {/* Miniatures */}
           {productImages.length > 1 && (
             <div className="grid grid-cols-4 gap-2">
               {productImages.map((img, idx) => (
@@ -161,15 +186,11 @@ const ProductDetails = () => {
         <div>
           <h1 className="text-3xl font-bold text-gray-900 mb-4">{product.name}</h1>
           
-          {/* Avis et étoiles */}
           <div className="flex items-center gap-4 mb-6">
             <StarRating rating={avgRating} />
-            <span className="text-gray-600">
-              {avgRating.toFixed(1)} ({reviews.length} avis)
-            </span>
+            <span className="text-gray-600">{avgRating.toFixed(1)} ({reviews.length} avis)</span>
           </div>
 
-          {/* Prix */}
           <div className="mb-6">
             <div className="flex items-baseline gap-3">
               <span className="text-4xl font-bold text-blue-600">{product.price.toLocaleString()} FCFA</span>
@@ -179,7 +200,6 @@ const ProductDetails = () => {
             </div>
           </div>
 
-          {/* Badges */}
           <div className="flex gap-3 mb-6">
             <div className="flex items-center gap-2 bg-green-50 text-green-700 px-3 py-2 rounded">
               <FaCheckCircle />
@@ -191,19 +211,12 @@ const ProductDetails = () => {
             </div>
           </div>
 
-          {/* Description courte */}
           <p className="text-gray-700 mb-6 leading-relaxed">{product.description}</p>
 
-          {/* Quantité */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 mb-2">Quantité :</label>
             <div className="flex items-center gap-3">
-              <button
-                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="w-10 h-10 border rounded hover:bg-gray-100 font-bold"
-              >
-                -
-              </button>
+              <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="w-10 h-10 border rounded hover:bg-gray-100 font-bold">-</button>
               <input
                 type="number"
                 min={1}
@@ -212,32 +225,19 @@ const ProductDetails = () => {
                 onChange={(e) => setQuantity(Math.max(1, Math.min(product.stock, Number(e.target.value))))}
                 className="w-20 h-10 text-center border rounded"
               />
-              <button
-                onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
-                className="w-10 h-10 border rounded hover:bg-gray-100 font-bold"
-              >
-                +
-              </button>
+              <button onClick={() => setQuantity(Math.min(product.stock, quantity + 1))} className="w-10 h-10 border rounded hover:bg-gray-100 font-bold">+</button>
             </div>
           </div>
 
-          {/* Boutons d'action */}
           <div className="flex gap-3 mb-6">
-            <button
-              onClick={handleAddToCart}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold transition"
-            >
+            <button onClick={handleAddToCart} className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold transition">
               🛒 Ajouter au panier
             </button>
-            <button
-              className="px-6 py-3 border-2 border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition"
-              title="Ajouter aux favoris"
-            >
+            <button className="px-6 py-3 border-2 border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition" title="Ajouter aux favoris">
               ❤️
             </button>
           </div>
 
-          {/* Livraison */}
           <div className="border-t pt-6">
             <div className="flex items-start gap-3 text-sm text-gray-700">
               <FaTruck className="text-blue-600 text-xl mt-1" />
@@ -250,7 +250,7 @@ const ProductDetails = () => {
         </div>
       </div>
 
-      {/* Onglets (Description / Specs / Avis) */}
+      {/* Onglets */}
       <div className="bg-white rounded-lg shadow-lg p-6 mb-12">
         <div className="border-b mb-6">
           <div className="flex gap-6">
@@ -259,9 +259,7 @@ const ProductDetails = () => {
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={`pb-3 px-2 font-semibold transition ${
-                  activeTab === tab
-                    ? "text-blue-600 border-b-2 border-blue-600"
-                    : "text-gray-600 hover:text-blue-600"
+                  activeTab === tab ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-600 hover:text-blue-600"
                 }`}
               >
                 {tab === "description" && "📝 Description"}
@@ -272,7 +270,6 @@ const ProductDetails = () => {
           </div>
         </div>
 
-        {/* Contenu des onglets */}
         {activeTab === "description" && (
           <div className="prose max-w-none">
             <p className="text-gray-700 leading-relaxed">{product.description}</p>
@@ -296,82 +293,40 @@ const ProductDetails = () => {
 
         {activeTab === "reviews" && (
           <div>
-            {/* Bouton ajouter un avis */}
             {user && !showReviewForm && (
-              <button
-                onClick={() => setShowReviewForm(true)}
-                className="mb-6 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-              >
+              <button onClick={() => setShowReviewForm(true)} className="mb-6 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">
                 ✍️ Laisser un avis
               </button>
             )}
 
-            {/* Formulaire d'avis */}
             {showReviewForm && (
               <form onSubmit={handleSubmitReview} className="mb-8 bg-gray-50 p-6 rounded-lg">
                 <h3 className="text-lg font-semibold mb-4">Votre avis</h3>
-                
                 <div className="mb-4">
                   <label className="block text-sm font-medium mb-2">Note</label>
                   <div className="flex gap-2">
                     {[1, 2, 3, 4, 5].map((star) => (
-                      <button
-                        key={star}
-                        type="button"
-                        onClick={() => setNewReview({ ...newReview, rating: star })}
-                      >
-                        <FaStar
-                          size={24}
-                          color={star <= newReview.rating ? "#FFA41C" : "#D1D5DB"}
-                        />
+                      <button key={star} type="button" onClick={() => setNewReview({ ...newReview, rating: star })}>
+                        <FaStar size={24} color={star <= newReview.rating ? "#FFA41C" : "#D1D5DB"} />
                       </button>
                     ))}
                   </div>
                 </div>
-
                 <div className="mb-4">
                   <label className="block text-sm font-medium mb-2">Titre</label>
-                  <input
-                    type="text"
-                    value={newReview.title}
-                    onChange={(e) => setNewReview({ ...newReview, title: e.target.value })}
-                    className="w-full border rounded px-3 py-2"
-                    placeholder="Résumez votre avis..."
-                    required
-                  />
+                  <input type="text" value={newReview.title} onChange={(e) => setNewReview({ ...newReview, title: e.target.value })} className="w-full border rounded px-3 py-2" placeholder="Résumez votre avis..." required />
                 </div>
-
                 <div className="mb-4">
                   <label className="block text-sm font-medium mb-2">Commentaire</label>
-                  <textarea
-                    value={newReview.comment}
-                    onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })}
-                    className="w-full border rounded px-3 py-2"
-                    rows={4}
-                    placeholder="Partagez votre expérience..."
-                    required
-                  ></textarea>
+                  <textarea value={newReview.comment} onChange={(e) => setNewReview({ ...newReview, comment: e.target.value })} className="w-full border rounded px-3 py-2" rows={4} placeholder="Partagez votre expérience..." required></textarea>
                 </div>
-
                 <div className="flex gap-3">
-                  <button
-                    type="submit"
-                    className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
-                  >
-                    Publier
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setShowReviewForm(false)}
-                    className="bg-gray-300 px-6 py-2 rounded hover:bg-gray-400"
-                  >
-                    Annuler
-                  </button>
+                  <button type="submit" className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700">Publier</button>
+                  <button type="button" onClick={() => setShowReviewForm(false)} className="bg-gray-300 px-6 py-2 rounded hover:bg-gray-400">Annuler</button>
                 </div>
               </form>
             )}
 
-            {/* Liste des avis */}
             <div className="space-y-6">
               {reviews.length === 0 ? (
                 <p className="text-gray-500 text-center py-8">Aucun avis pour le moment. Soyez le premier à donner votre avis !</p>
@@ -383,16 +338,12 @@ const ProductDetails = () => {
                         <div className="flex items-center gap-3 mb-1">
                           <span className="font-semibold">{review.user?.name || "Anonyme"}</span>
                           {review.isVerified && (
-                            <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded">
-                              ✓ Achat vérifié
-                            </span>
+                            <span className="bg-green-100 text-green-700 text-xs px-2 py-1 rounded">✓ Achat vérifié</span>
                           )}
                         </div>
                         <StarRating rating={review.rating} size={16} />
                       </div>
-                      <span className="text-sm text-gray-500">
-                        {new Date(review.createdAt).toLocaleDateString()}
-                      </span>
+                      <span className="text-sm text-gray-500">{new Date(review.createdAt).toLocaleDateString()}</span>
                     </div>
                     {review.title && <h4 className="font-semibold mb-2">{review.title}</h4>}
                     <p className="text-gray-700">{review.comment}</p>

@@ -1,3 +1,10 @@
+/**
+ * tekalis-seo/vite.config.optimized.js
+ * 
+ * Remplace tekalis-frontend/apps/client/vite.config.js
+ * Ajout : prerendering + optimisations SEO/performance
+ */
+
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path from "path";
@@ -26,31 +33,37 @@ export default defineConfig({
   },
 
   build: {
-    // Optimisations SEO/Performance
     rollupOptions: {
       output: {
-        // Code splitting pour réduire bundle size
         manualChunks: {
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
           'redux-vendor': ['react-redux', '@reduxjs/toolkit', 'redux-persist'],
           'ui-vendor': ['react-icons', 'framer-motion'],
+          // ✅ SEO : séparer react-helmet pour chargement prioritaire
+          'seo-vendor': ['react-helmet-async'],
         },
       },
     },
-    // Compression
     minify: 'terser',
     terserOptions: {
       compress: {
-        drop_console: true, // Supprimer console.log en prod
+        drop_console: true,
         drop_debugger: true,
       },
     },
-    // Taille chunks
     chunkSizeWarningLimit: 500,
+
+    // ✅ SEO : générer les source maps pour debugging prod
+    sourcemap: false,
   },
 
-  // Preload des assets critiques
   optimizeDeps: {
-    include: ['react', 'react-dom', 'react-router-dom'],
+    include: ['react', 'react-dom', 'react-router-dom', 'react-helmet-async'],
+  },
+
+  // ✅ SEO : variables d'environnement exposées au client
+  define: {
+    __SITE_URL__: JSON.stringify('https://tekalis.com'),
+    __SITE_NAME__: JSON.stringify('Tekalis'),
   },
 });

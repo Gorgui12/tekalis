@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { BrowserRouter } from "react-router-dom";
+import { HelmetProvider } from "react-helmet-async";
 
 // Shared depuis packages/shared (ou adapter le chemin selon ta config)
 import { store, persistor } from "../../../packages/shared/redux/store";
@@ -13,7 +14,14 @@ import { ToastProvider } from "../../../packages/shared/context/ToastContext";
 import App from "./App";
 import "./index.css";
 
-ReactDOM.createRoot(document.getElementById("root")).render(
+const rootElement = document.getElementById("root");
+
+
+// Supporte à la fois prerendering (hydration) et rendu normal
+if (rootElement.hasChildNodes()) {
+  ReactDOM.hydrateRoot(rootElement, <App />);
+} else {
+  ReactDOM.createRoot(rootElement).render(
   <React.StrictMode>
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
@@ -22,7 +30,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
           <ToastProvider>
             <ThemeProvider>
               
-                <App />
+                <HelmetProvider>
+                     <App />
+                </HelmetProvider>
              
             </ThemeProvider>
           </ToastProvider>
@@ -31,4 +41,5 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       </PersistGate>
     </Provider>
   </React.StrictMode>
-);
+  );
+}

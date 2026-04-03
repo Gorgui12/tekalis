@@ -9,6 +9,31 @@
     "preview": "vite preview",
     "lint": "eslint ."
   },
+  "reactSnap": {
+    "routes": [
+      "/",
+      "/products",
+      "/blog",
+      "/apropos",
+      "/contact",
+      "/configurator",
+      "/category/smartphones",
+      "/category/laptops",
+      "/category/gaming",
+      "/category/tv",
+      "/category/electromenager",
+      "/category/climatiseurs",
+      "/category/energie-solaire",
+      "/category/accessoires",
+      "/category/audio"
+    ],
+    "puppeteerArgs": ["--no-sandbox", "--disable-setuid-sandbox"],
+    "inlineCss": false,
+    "minifyHtml": {
+      "collapseWhitespace": false,
+      "removeComments": false
+    }
+  },
   "dependencies": {
     "@reduxjs/toolkit": "^2.6.1",
     "@stripe/react-stripe-js": "^3.5.1",
@@ -29,6 +54,7 @@
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.21",
     "postcss": "^8.5.3",
+    "react-snap": "^1.23.0",
     "tailwindcss": "^3.3.5",
     "vite": "^6.2.0"
   }

@@ -12,6 +12,7 @@ import {
   FaTag
 } from "react-icons/fa";
 import api from "../../../../packages/shared/api/api";
+import { SEOHead } from "../hooks/useSEO";
 
 const ArticleDetails = () => {
   const { slug } = useParams();
@@ -190,6 +191,30 @@ const ArticleDetails = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {article && (
+    <SEOHead
+      title={`${article.title} | Blog Tekalis`}
+      description={article.excerpt || article.title}
+      image={article.image ? `https://tekalis.com${article.image}` : undefined}
+      keywords={[
+        ...(article.tags || []),
+        'blog tech Sénégal',
+        'guide achat Dakar',
+        'tekalis blog',
+      ]}
+      type="article"
+      canonical={`https://tekalis.com/blog/${article.slug}`}
+      breadcrumbs={[
+        { name: 'Blog', url: '/blog' },
+        { name: article.title, url: `/blog/${article.slug}` },
+      ]}
+      articleData={{
+        publishedAt: article.publishedAt,
+        modifiedAt: article.updatedAt,
+        author: article.author?.name || 'Équipe Tekalis',
+      }}
+    />
+  )}
       {/* Header Image */}
       <div className="relative h-96 bg-gray-900 mt-20">
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent"></div>
