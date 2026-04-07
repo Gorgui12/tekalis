@@ -113,14 +113,17 @@ const CATEGORY_SEO = {
 };
 
 // Fallback pour catégories non listées
-const DEFAULT_SEO = (slug) => ({
-  title: `${slug.replace(/-/g, ' ')} à Dakar | Tekalis Sénégal`,
-  h1: slug.replace(/-/g, ' '),
-  description: `Achetez ${slug.replace(/-/g, ' ')} en ligne à Dakar avec livraison rapide au Sénégal. Garantie constructeur incluse. Tekalis — votre boutique tech de confiance.`,
-  descriptionLong: `Découvrez notre sélection de ${slug.replace(/-/g, ' ')} disponibles à Dakar avec livraison rapide partout au Sénégal. Tekalis vous garantit des produits authentiques avec garantie constructeur et service après-vente disponible.`,
-  keywords: [`${slug} Dakar`, `${slug} Sénégal`, `acheter ${slug} Dakar`],
+const DEFAULT_SEO = (slug) => {
+  const label = slug ? slug.replace(/-/g, ' ') : 'Produits';
+  return {
+  title: `${label} à Dakar | Tekalis Sénégal`,
+  h1: label,
+  description: `Achetez ${label} en ligne à Dakar avec livraison rapide au Sénégal. Garantie constructeur incluse. Tekalis — votre boutique tech de confiance.`,
+  descriptionLong: `Découvrez notre sélection de ${label} disponibles à Dakar avec livraison rapide partout au Sénégal. Tekalis vous garantit des produits authentiques avec garantie constructeur et service après-vente disponible.`,
+  keywords: [`${label} Dakar`, `${label} Sénégal`, `acheter ${label} Dakar`],
   faqs: [],
-});
+  };
+};
 
 // ── Helper normalisation catégorie ────────────────────────────────────────────
 const getCatName = (cat) => {
@@ -132,7 +135,9 @@ const getCatName = (cat) => {
 
 // ── Composant principal ───────────────────────────────────────────────────────
 const CategoryPage = () => {
-  const { slug } = useParams();
+  // Compatibilité : le param peut s'appeler slug, category, categorySlug, etc.
+  const params = useParams();
+  const slug = params.slug ?? params.categoryName ?? params.category ?? params.categorySlug ?? params.id ?? null;
   const dispatch = useDispatch();
   const { items, isLoading } = useSelector((state) => state.products);
   const [showFilters, setShowFilters] = useState(false);
