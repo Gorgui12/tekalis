@@ -39,6 +39,7 @@ import EditArticle from "./pages/EditArticle";
 // Divers
 import PromoCodes from "./pages/PromoCodes";
 import Settings from "./pages/Settings";
+import HeroSlides from './pages/HeroSlides';
 
 function App() {
   return (
@@ -53,6 +54,7 @@ function App() {
           ROUTES PROTÉGÉES : admin seulement
           AdminGuard vérifie token + role === 'admin'
       ───────────────────────────────────────── */}
+      <Route path="/hero-slides" element={<HeroSlides />} />
       <Route element={<AdminGuard />}>
         {/* AdminLayout = sidebar + header communs */}
         <Route element={<AdminLayout />}>

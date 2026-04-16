@@ -1,40 +1,63 @@
-# Dependencies
+# ===============================================
+# .gitignore Tekalis — RENFORCÉ
+# CRITIQUE 1 : Le .env ne doit JAMAIS être commité
+# ===============================================
+
+# ── Environnement — JAMAIS COMMITER ──────────────
+.env
+.env.local
+.env.production
+.env.staging
+.env.development
+.env.development.local
+.env.test.local
+.env.production.local
+*.env
+
+# ── Dependencies ──────────────────────────────────
 node_modules/
 tekalis-backend/node_modules/
 tekalis-frontend/node_modules/
 apps/*/node_modules/
 packages/*/node_modules/
 
-# Environment files — NE JAMAIS COMMITER
-.env
-.env.local
-.env.production
-.env.staging
-.env.development.local
-.env.test.local
-.env.production.local
-
-# Build
+# ── Build ─────────────────────────────────────────
 dist/
 build/
 apps/*/dist/
 
-# Logs
+# ── Logs ──────────────────────────────────────────
 npm-debug.log*
 yarn-debug.log*
 pnpm-debug.log*
 *.log
+logs/
 
-# OS
+# ── OS ────────────────────────────────────────────
 .DS_Store
 Thumbs.db
-
-# Editor
-.vscode/
-.idea/
 *.swp
 *.swo
 
-# Coverage
+# ── Editor ────────────────────────────────────────
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# ── Tests / Coverage ──────────────────────────────
 coverage/
 .nyc_output/
+*.lcov
+
+# ── Uploads temporaires ───────────────────────────
+uploads/tmp/
+
+# ── Certificats SSL ───────────────────────────────
+*.pem
+*.key
+*.crt
+*.p12
+
+# NOTE : Un fichier .env.example (sans credentials réels) PEUT être commité.
+# Il sert de documentation sur les variables requises.

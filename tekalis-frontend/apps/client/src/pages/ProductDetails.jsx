@@ -7,7 +7,7 @@ import ProductCard from "../../src/components/product/ProductCard";
 import { FaStar, FaStarHalfAlt, FaRegStar, FaShieldAlt, FaTruck, FaCheckCircle } from "react-icons/fa";
 import api from "../../../../packages/shared/api/api";
 import { useToast } from '../../../../packages/shared/context/ToastContext';
-import { SEOHead } from "../hooks/useSEO";
+import PageMeta from '../components/seo/PageMeta';
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -116,7 +116,7 @@ const ProductDetails = () => {
     <div className="container mx-auto px-4 py-8 mt-32">
 
       {/* ── SEO HEAD ──────────────────────────────────────────────────────── */}
-      <SEOHead
+      <PageMeta
         title={`${product.name} — Prix ${product.price?.toLocaleString()} FCFA Dakar | Tekalis`}
         description={`Achetez ${product.name} à Dakar au prix de ${product.price?.toLocaleString()} FCFA. ${product.description?.slice(0, 100) || ''}... Livraison rapide au Sénégal. Garantie constructeur 12 mois.`}
         image={productImageUrls[0]}

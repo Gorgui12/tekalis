@@ -1,6 +1,7 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { useState, useEffect, useRef } from "react";
+import SearchBarLive from '../SearchBarLive';
 import { 
   FaSearch, FaShoppingCart, FaHeart, FaUser, FaBars, FaTimes,
   FaBell, FaBox, FaMapMarkerAlt, FaCog, FaSignOutAlt,
@@ -330,26 +331,12 @@ const Navbar = () => {
 
           {/* Barre de recherche */}
           <div className="pb-3">
-            <form onSubmit={handleSearch} className="flex max-w-2xl mx-auto">
-              <div className="relative flex-1">
-                <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Rechercher un produit, une marque..."
-                  className="w-full pl-12 pr-4 py-3 bg-gray-100 dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
-                  aria-label="Rechercher"
-                />
-              </div>
-              <button
-                type="submit"
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 rounded-r-lg font-semibold transition"
-                aria-label="Lancer la recherche"
-              >
-                Rechercher
-              </button>
-            </form>
+             
+<SearchBarLive
+  placeholder="Rechercher un produit, une marque…"
+  className="max-w-2xl w-full"
+  maxResults={6}
+/>
           </div>
         </div>
       </nav>

@@ -12,7 +12,7 @@ import {
   FaTag
 } from "react-icons/fa";
 import api from "../../../../packages/shared/api/api";
-import { SEOHead } from "../hooks/useSEO";
+import PageMeta from '../components/seo/PageMeta';
 
 const ArticleDetails = () => {
   const { slug } = useParams();
@@ -192,7 +192,7 @@ const ArticleDetails = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {article && (
-    <SEOHead
+    <PageMeta
       title={`${article.title} | Blog Tekalis`}
       description={article.excerpt || article.title}
       image={article.image ? `https://tekalis.com${article.image}` : undefined}

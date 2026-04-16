@@ -1,32 +1,71 @@
+// ===============================================
+// services/emailService.js — VERSION CORRIGÉE
+// MAJEUR 5 : Fichier unique consolidé
+//   → emailSeervice.js (typo) doit être supprimé
+//   → Ce fichier est la seule source de vérité
+// ===============================================
 const nodemailer = require("nodemailer");
 const emailTemplates = require("../utils/emailTemplates");
 
+// ── Vérification de la configuration ─────────────────────────────────────────
+const isEmailConfigured = () =>
+  !!(process.env.EMAIL_HOST && process.env.EMAIL_USER && process.env.EMAIL_PASS);
+
 // ── Configuration du transporteur ────────────────────────────────────────────
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: Number(process.env.EMAIL_PORT) || 465,
-  secure: Number(process.env.EMAIL_PORT) === 465,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
+// Port 465 → secure: true (SSL)
+// Port 587 → secure: false (STARTTLS)
+// Le .env de Tekalis utilise le port 465 avec mail.tekalis.com
+const createTransporter = () => {
+  const port = Number(process.env.EMAIL_PORT) || 465;
+  return nodemailer.createTransport({
+    host: process.env.EMAIL_HOST,
+    port,
+    secure: port === 465,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS
+    },
+    // Timeout pour éviter de bloquer le thread Node en prod
+    connectionTimeout: 10000,
+    greetingTimeout: 5000,
+    socketTimeout: 15000
+  });
+};
+
+// Singleton transporter (créé une seule fois au démarrage)
+let _transporter = null;
+
+const getTransporter = () => {
+  if (!_transporter) {
+    _transporter = createTransporter();
   }
-});
+  return _transporter;
+};
 
-// Vérifier la connexion au démarrage (non bloquant)
-transporter.verify()
-  .then(() => console.log("✅ Serveur email prêt"))
-  .catch((err) => console.error("❌ Erreur configuration email:", err.message));
+// Vérification au démarrage (non bloquant)
+if (isEmailConfigured()) {
+  getTransporter().verify()
+    .then(() => console.log("✅ Serveur email prêt"))
+    .catch((err) => {
+      console.error("❌ Erreur configuration email:", err.message);
+      _transporter = null; // Reset pour retry au prochain envoi
+    });
+} else {
+  console.warn("⚠️  Email non configuré (EMAIL_HOST/USER/PASS manquants) — envois désactivés");
+}
 
+// ── Classe EmailService ───────────────────────────────────────────────────────
 class EmailService {
+
   // ── Envoi générique ─────────────────────────────────────────────────────────
   static async sendEmail(to, subject, html, attachments = []) {
-    try {
-      if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-        console.log("📧 Email non configuré — envoi ignoré");
-        return { success: false, error: "Email non configuré" };
-      }
+    if (!isEmailConfigured()) {
+      console.log(`📧 Email ignoré (non configuré) → ${to} : ${subject}`);
+      return { success: false, error: "Email non configuré" };
+    }
 
-      const info = await transporter.sendMail({
+    try {
+      const info = await getTransporter().sendMail({
         from: `"${process.env.SITE_NAME || "Tekalis"}" <${process.env.EMAIL_USER}>`,
         to,
         subject,
@@ -37,7 +76,11 @@ class EmailService {
       console.log(`📧 Email envoyé: ${info.messageId} → ${to}`);
       return { success: true, messageId: info.messageId };
     } catch (error) {
-      console.error("❌ Erreur envoi email:", error.message);
+      console.error(`❌ Erreur envoi email → ${to}:`, error.message);
+      // Reset transporter en cas d'erreur de connexion pour forcer reconnexion
+      if (error.code === "ECONNECTION" || error.code === "ETIMEDOUT") {
+        _transporter = null;
+      }
       return { success: false, error: error.message };
     }
   }
@@ -101,8 +144,12 @@ class EmailService {
   }
 
   // ── Notification admin : nouvelle commande ─────────────────────────────────
+  // MAJEUR 8 : Vérification explicite de ADMIN_EMAIL avant tentative d'envoi
   static async notifyAdminNewOrder(order, user) {
-    if (!process.env.ADMIN_EMAIL) return { success: false, error: "ADMIN_EMAIL non configuré" };
+    if (!process.env.ADMIN_EMAIL) {
+      console.warn("⚠️  ADMIN_EMAIL non défini — notification admin ignorée pour la commande", order.orderNumber);
+      return { success: false, error: "ADMIN_EMAIL non configuré" };
+    }
     const html = emailTemplates.adminOrderNotification(order, user);
     return this.sendEmail(
       process.env.ADMIN_EMAIL,

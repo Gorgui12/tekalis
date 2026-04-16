@@ -25,12 +25,13 @@ api.interceptors.request.use(
     // Fallback : Redux Persist stocke sous persist:auth -> JSON.user.token
     if (!token) {
       try {
-        const persistedAuth = localStorage.getItem("persist:auth");
-        if (persistedAuth) {
-          const parsed = JSON.parse(persistedAuth);
-          const user = parsed.user ? JSON.parse(parsed.user) : null;
-          token = user?.token || null;
-        }
+// Dans api.js, remplacer le fallback persist par :
+const persistedAuth = localStorage.getItem("persist:auth");
+if (persistedAuth) {
+  const parsed = JSON.parse(persistedAuth);
+  const authState = parsed.auth ? JSON.parse(parsed.auth) : null;
+  token = authState?.token || null;
+}
       } catch (_) { /* silencieux */ }
     }
 

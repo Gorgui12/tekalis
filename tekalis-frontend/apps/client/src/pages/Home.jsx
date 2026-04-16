@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProducts } from "../../../../packages/shared/redux/slices/productSlice";
-import { SEOHead } from "../hooks/useSEO";
+import PageMeta from '../components/seo/PageMeta';
+import DynamicHero from '../components/DynamicHero';
 import { 
   FaChevronLeft, 
   FaChevronRight, 
@@ -196,7 +197,7 @@ const Home = () => {
     <div className="min-h-screen bg-gray-50">
 
       {/* ── SEO HEAD ────────────────────────────────────────────────────────── */}
-      <SEOHead
+      <PageMeta
         title="Tekalis — Boutique Électronique Dakar | Livraison Rapide Sénégal"
         description="Achetez smartphones, laptops, TV et électroménager en ligne au Sénégal. Livraison rapide à Dakar. Garantie constructeur. Paiement Wave, Orange Money."
         keywords={['boutique électronique Dakar', 'livraison rapide Sénégal', 'smartphone Dakar', 'laptop Sénégal', 'tekalis']}
@@ -205,64 +206,8 @@ const Home = () => {
       />
 
       {/* Hero Section - Carousel */}
-      <section className="relative h-[380px] sm:h-[450px] md:h-[600px] overflow-hidden mt-20">
-        {slides.map((slide, index) => (
-          <div
-            key={slide.id}
-            className={`absolute inset-0 transition-opacity duration-1000 ${
-              index === currentSlide ? "opacity-100" : "opacity-0"
-            }`}
-          >
-            <div className={`absolute inset-0 bg-gradient-to-r ${slide.bg}`}>
-              <div className="container mx-auto px-4 h-full flex items-center">
-                <div className="max-w-2xl text-white">
-                  <span className="inline-block bg-white bg-opacity-20 px-4 py-2 rounded-full text-sm font-bold mb-4 backdrop-blur-sm">
-                    {slide.badge}
-                  </span>
-                  <h1 className="text-4xl md:text-6xl font-bold mb-4 leading-tight">
-                    {slide.title}
-                  </h1>
-                  <p className="text-xl md:text-2xl mb-8 text-white/90">
-                    {slide.subtitle}
-                  </p>
-                  <Link
-                    to={slide.link}
-                    className="inline-flex items-center gap-2 bg-white text-gray-900 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition shadow-xl"
-                  >
-                    {slide.cta}
-                    <FaArrowRight />
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
 
-        <button
-          onClick={prevSlide}
-          className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white p-3 rounded-full transition"
-        >
-          <FaChevronLeft size={24} />
-        </button>
-        <button
-          onClick={nextSlide}
-          className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white p-3 rounded-full transition"
-        >
-          <FaChevronRight size={24} />
-        </button>
-
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
-          {slides.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentSlide(index)}
-              className={`w-3 h-3 rounded-full transition ${
-                index === currentSlide ? "bg-white w-8" : "bg-white/50"
-              }`}
-            />
-          ))}
-        </div>
-      </section>
+      <DynamicHero isHomePage={true} />
 
       {/* Quick Actions */}
       <section className="container mx-auto px-4 -mt-16 relative z-10 mb-16">

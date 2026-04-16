@@ -1,5 +1,6 @@
 // ===============================================
 // TEKALIS API - Server Principal
+// VERSION CORRIGÉE — Audit sécurité
 // ===============================================
 const express = require("express");
 const cors = require("cors");
@@ -10,7 +11,10 @@ const morgan = require("morgan");
 
 require("dotenv").config();
 
-// Validation des variables d'environnement critiques
+const isDev = process.env.NODE_ENV === "development";
+
+// ─── Validation des variables d'environnement critiques ──────────────────────
+// CRITIQUE 1 & 2 : Bloquer le démarrage si secrets manquants ou par défaut
 const requiredEnvVars = ["MONGODB_URI", "JWT_SECRET"];
 const missingVars = requiredEnvVars.filter(v => !process.env[v]);
 if (missingVars.length > 0) {
@@ -18,8 +22,19 @@ if (missingVars.length > 0) {
   process.exit(1);
 }
 
-if (process.env.JWT_SECRET === "superSecretKey123") {
-  console.warn("⚠️  ATTENTION: JWT_SECRET par défaut détecté. Changez-le en production !");
+// CRITIQUE 2 : JWT_SECRET par défaut = faille critique. Bloquer en production.
+const INSECURE_JWT_SECRETS = ["superSecretKey123", "secret", "changeme", "password", "tekalis"];
+if (!isDev && INSECURE_JWT_SECRETS.includes(process.env.JWT_SECRET)) {
+  console.error("❌ FATAL: JWT_SECRET non sécurisé détecté en production. Arrêt du serveur.");
+  process.exit(1);
+}
+if (isDev && INSECURE_JWT_SECRETS.includes(process.env.JWT_SECRET)) {
+  console.warn("⚠️  ATTENTION: JWT_SECRET non sécurisé. NE PAS utiliser en production !");
+}
+
+// MAJEUR 8 : Avertir si ADMIN_EMAIL manquant (emails commandes silencieux)
+if (!process.env.ADMIN_EMAIL) {
+  console.warn("⚠️  ADMIN_EMAIL non défini. Les notifications de commandes admin seront désactivées.");
 }
 
 const connectDB = require("./config/database");
@@ -31,26 +46,34 @@ const API_PREFIX = "/api/v1";
 // ─── Connexion MongoDB ────────────────────────────────────────────────────────
 connectDB().catch((err) => {
   console.error("❌ Erreur fatale de connexion MongoDB:", err.message);
-  if (process.env.NODE_ENV === "production") process.exit(1);
+  if (!isDev) process.exit(1);
 });
 
 // ─── Sécurité ─────────────────────────────────────────────────────────────────
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 
-const allowedOrigins = [
-  "http://localhost:3000",
-  "http://localhost:5173",
-  "http://localhost:5174",
-  "https://tekalis.com",
-  "https://www.tekalis.com",
-  "https://tekalis.onrender.com"
-];
+// MINEUR 14 : CORS lit maintenant CORS_ORIGIN depuis .env (plus de hardcode)
+const buildAllowedOrigins = () => {
+  const defaults = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://localhost:5174",
+  ];
+  if (process.env.CORS_ORIGIN) {
+    const envOrigins = process.env.CORS_ORIGIN.split(",").map(o => o.trim()).filter(Boolean);
+    return [...new Set([...defaults, ...envOrigins])];
+  }
+  return defaults;
+};
+
+const allowedOrigins = buildAllowedOrigins();
 
 app.use(cors({
   origin: (origin, callback) => {
+    // Requêtes sans origin (Postman, cron, etc.) autorisées
     if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin)) return callback(null, true);
-    console.error("🚫 CORS bloqué pour:", origin);
+    console.warn("🚫 CORS bloqué pour:", origin);
     callback(new Error("Non autorisé par CORS"));
   },
   methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
@@ -63,12 +86,22 @@ app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(mongoSanitize());
 
-if (process.env.NODE_ENV === "development") {
+if (isDev) {
   app.use(morgan("dev"));
 }
 
 // ─── Rate Limiting ────────────────────────────────────────────────────────────
-const apiLimiter = rateLimit({
+// MAJEUR 6 : En développement, React StrictMode double-mount déclencherait les
+// limiteurs. On les désactive en dev pour éviter les faux positifs.
+const createLimiter = (options) => {
+  if (isDev) {
+    // En dev : middleware passthrough, pas de limitation
+    return (req, res, next) => next();
+  }
+  return rateLimit(options);
+};
+
+const apiLimiter = createLimiter({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
   max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
   message: { success: false, message: "Trop de requêtes, veuillez réessayer plus tard" },
@@ -76,14 +109,14 @@ const apiLimiter = rateLimit({
   legacyHeaders: false
 });
 
-const authLimiter = rateLimit({
+const authLimiter = createLimiter({
   windowMs: 15 * 60 * 1000,
   max: 10,
   skipSuccessfulRequests: true,
   message: { success: false, message: "Trop de tentatives de connexion, réessayez dans 15 minutes" }
 });
 
-const adminLimiter = rateLimit({
+const adminLimiter = createLimiter({
   windowMs: 15 * 60 * 1000,
   max: 200,
   message: { success: false, message: "Trop de requêtes admin" }
@@ -123,6 +156,9 @@ const loadRoute = (path, file) => {
   }
 };
 
+const heroRoutes = require('./routes/heroRoutes');
+app.use('/api/hero', heroRoutes);
+
 // Routes publiques
 loadRoute(`${API_PREFIX}/auth`, "./routes/authRoutes");
 loadRoute(`${API_PREFIX}/products`, "./routes/productRoutes");
@@ -139,22 +175,27 @@ loadRoute(`${API_PREFIX}/warranties`, "./routes/warrantyRoutes");
 loadRoute(`${API_PREFIX}/rma`, "./routes/rmaRoutes");
 loadRoute(`${API_PREFIX}/payment`, "./routes/paymentRoutes");
 
-// Routes admin
+// Routes admin stats
 loadRoute(`${API_PREFIX}/admin/stats`, "./routes/stats");
 
 console.log("✅ Routes chargées\n");
 
 // ─── Routeur Admin ────────────────────────────────────────────────────────────
+// MAJEUR 9 : adminRouter ne duplique plus les routes déjà montées ci-dessus.
+// Il expose uniquement les ressources purement admin (settings, categories CRUD,
+// promo-codes, analytics) qui n'ont PAS de route publique correspondante.
 const adminRouter = require("express").Router();
+// Au tout début du adminRouter, AVANT verifyToken et isAdmin
+adminRouter.use((req, res, next) => {
+  const auth = req.headers.authorization;
+  console.log("🔐 Admin route:", req.method, req.path);
+  console.log("   Token présent:", !!auth);
+  next();
+});
 const { verifyToken, isAdmin } = require("./middlewares/authMiddleware");
-adminRouter.use(verifyToken, isAdmin);
 
-// Réutiliser les routes existantes sous /admin/*
-adminRouter.use("/orders",     require("./routes/orderRoutes"));
-adminRouter.use("/users",      require("./routes/userRoutes"));
-adminRouter.use("/reviews",    require("./routes/reviewRoutes"));
-adminRouter.use("/rma",        require("./routes/rmaRoutes"));
-adminRouter.use("/warranties", require("./routes/warrantyRoutes"));
+// Double protection : verifyToken + isAdmin sur tout le routeur admin
+adminRouter.use(verifyToken, isAdmin);
 
 // Paramètres du site
 const Settings = require("./models/Settings");
@@ -174,7 +215,7 @@ adminRouter.put("/settings", async (req, res) => {
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
 
-// Catégories (CRUD admin)
+// Catégories (CRUD admin uniquement)
 const Category = require("./models/Category");
 adminRouter.get("/categories", async (req, res) => {
   try {
@@ -228,13 +269,26 @@ adminRouter.delete("/promo-codes/:id", async (req, res) => {
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
 
-// Analytics (stub — données vides pour l'instant)
+// Analytics
 adminRouter.get("/analytics", async (req, res) => {
   res.json({ success: true, stats: {}, revenue: [], categories: [], topProducts: [], customers: [] });
 });
 
+// Articles admin
+const articleController = require("./controllers/articleController");
+adminRouter.get("/articles", articleController.getAllArticles);  // ou une version admin
+adminRouter.post("/articles", articleController.createArticle);
+adminRouter.put("/articles/:id", articleController.updateArticle);
+adminRouter.delete("/articles/:id", articleController.deleteArticle);
+adminRouter.put("/articles/:id/publish", articleController.togglePublish);
+
+// Reviews admin — route correcte
+const reviewController = require("./controllers/reviewController");
+adminRouter.get("/reviews", reviewController.getAllReviews);
+adminRouter.patch("/reviews/:id/approve", reviewController.toggleApprove);
+adminRouter.delete("/reviews/:id", reviewController.deleteReview);
+
 app.use(`${API_PREFIX}/admin`, adminRouter);
-// ─────────────────────────────────────────────────────────────────────────────
 
 // ─── 404 ──────────────────────────────────────────────────────────────────────
 app.use((req, res) => {
@@ -249,7 +303,7 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   console.error(`\n❌ ERREUR : ${req.method} ${req.originalUrl}`);
   console.error(`   ${err.name}: ${err.message}`);
-  if (process.env.NODE_ENV === "development") console.error(err.stack);
+  if (isDev) console.error(err.stack);
 
   if (err.name === "CastError") {
     return res.status(400).json({ success: false, message: "ID de ressource invalide" });
@@ -270,9 +324,7 @@ app.use((err, req, res, next) => {
 
   res.status(err.statusCode || 500).json({
     success: false,
-    message: process.env.NODE_ENV === "production"
-      ? "Erreur serveur interne"
-      : err.message
+    message: isDev ? err.message : "Erreur serveur interne"
   });
 });
 
@@ -285,12 +337,11 @@ const server = app.listen(PORT, () => {
 ║  Port:          ${PORT.toString().padEnd(27)} ║
 ║  Environnement: ${(process.env.NODE_ENV || "development").padEnd(27)} ║
 ║  URL:           http://localhost:${PORT}${API_PREFIX.padEnd(10)} ║
-║  Health:        http://localhost:${PORT}/health   ║
+║  Rate limiting: ${(isDev ? "DÉSACTIVÉ (dev)" : "ACTIF").padEnd(27)} ║
 ╚════════════════════════════════════════════╝
   `);
 });
 
-// Gestion propre de l'arrêt
 process.on("unhandledRejection", (err) => {
   console.error("❌ Unhandled Rejection:", err.message);
   server.close(() => process.exit(1));

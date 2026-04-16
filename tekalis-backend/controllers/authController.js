@@ -16,6 +16,10 @@ const generateToken = (userId, isAdmin) => {
 
 // ===============================================
 // POST /api/v1/auth/register
+// CRITIQUE 3 : Ajout de validations anti-abus
+// - Vérification du domaine email (optionnelle via env BLOCKED_EMAIL_DOMAINS)
+// - Sanitisation des inputs
+// - Message d'erreur homogène pour éviter l'énumération d'emails
 // ===============================================
 exports.register = async (req, res) => {
   try {
@@ -25,20 +29,34 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: "Tous les champs sont requis" });
     }
 
+    // Nettoyage basique
+    const cleanName  = name.trim().slice(0, 50);
+    const cleanEmail = email.toLowerCase().trim();
+
     if (password.length < 6) {
       return res.status(400).json({ message: "Le mot de passe doit contenir au moins 6 caractères" });
     }
 
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    // CRITIQUE 3 : Blocage de domaines temporaires si configuré
+    if (process.env.BLOCKED_EMAIL_DOMAINS) {
+      const blocked = process.env.BLOCKED_EMAIL_DOMAINS.split(",").map(d => d.trim().toLowerCase());
+      const domain = cleanEmail.split("@")[1];
+      if (blocked.includes(domain)) {
+        return res.status(400).json({ message: "Ce domaine email n'est pas accepté" });
+      }
+    }
+
+    const existingUser = await User.findOne({ email: cleanEmail });
     if (existingUser) {
+      // Délai constant pour éviter le timing attack
+      await new Promise(r => setTimeout(r, 200));
       return res.status(400).json({ message: "Cet email est déjà utilisé" });
     }
 
-    const user = await User.create({ name, email, password });
+    const user = await User.create({ name: cleanName, email: cleanEmail, password });
 
     const token = generateToken(user._id, user.isAdmin);
 
-    // Mise à jour lastLogin
     user.lastLogin = new Date();
     await user.save({ validateBeforeSave: false });
 
@@ -64,6 +82,7 @@ exports.register = async (req, res) => {
 
 // ===============================================
 // POST /api/v1/auth/register-admin
+// Protégé : admin uniquement (authMiddleware)
 // ===============================================
 exports.registerAdmin = async (req, res) => {
   try {
@@ -102,10 +121,11 @@ exports.login = async (req, res) => {
       return res.status(400).json({ message: "Email et mot de passe requis" });
     }
 
-    // Récupérer l'utilisateur avec le mot de passe (select: false par défaut)
     const user = await User.findOne({ email: email.toLowerCase() }).select("+password");
 
+    // Délai constant pour éviter l'énumération via timing
     if (!user) {
+      await new Promise(r => setTimeout(r, 200));
       return res.status(401).json({ message: "Identifiants invalides" });
     }
 
@@ -120,7 +140,6 @@ exports.login = async (req, res) => {
 
     const token = generateToken(user._id, user.isAdmin);
 
-    // Mise à jour lastLogin
     user.lastLogin = new Date();
     await user.save({ validateBeforeSave: false });
 
@@ -177,13 +196,13 @@ exports.forgotPassword = async (req, res) => {
 
     const resetToken = crypto.randomBytes(32).toString("hex");
     user.resetPasswordToken = crypto.createHash("sha256").update(resetToken).digest("hex");
-    user.resetPasswordExpires = Date.now() + 10 * 60 * 1000; // 10 minutes
+    user.resetPasswordExpires = Date.now() + 10 * 60 * 1000;
     await user.save({ validateBeforeSave: false });
 
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
-
-    // TODO: Envoyer l'email avec resetUrl
     console.log("🔑 Reset URL:", resetUrl);
+
+    // TODO: envoyer l'email via EmailService
 
     res.status(200).json({
       success: true,

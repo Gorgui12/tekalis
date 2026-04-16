@@ -18,7 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchProducts } from "../../../../packages/shared/redux/slices/productSlice";
 import ProductCard from "../components/product/ProductCard";
 import { Breadcrumb } from "../components/seo/Breadcrumb";
-import { SEOHead } from "../hooks/useSEO";
+import PageMeta from '../components/seo/PageMeta';
 import { FaFilter, FaThLarge, FaList, FaTruck, FaShieldAlt } from "react-icons/fa";
 
 // ── Metadata SEO par catégorie ────────────────────────────────────────────────
@@ -239,7 +239,7 @@ const CategoryPage = () => {
     <div className="min-h-screen bg-gray-50 py-8 mt-20">
 
       {/* ── SEO HEAD ──────────────────────────────────────────────────────── */}
-      <SEOHead
+      <PageMeta
         title={seo.title}
         description={seo.description}
         keywords={seo.keywords}

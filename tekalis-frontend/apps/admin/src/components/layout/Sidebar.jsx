@@ -3,11 +3,12 @@ import { NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, ShoppingCart, Package, Wrench, Shield,
   FileText, BarChart3, Users, Star, Tag, Settings,
-  ChevronDown, ChevronRight, X, Zap,
+  ChevronDown, ChevronRight, X, Zap, Image // ✅ AJOUT ICI
 } from 'lucide-react';
 
 const NAV_ITEMS = [
   { label: 'Dashboard',     icon: LayoutDashboard, to: '/dashboard' },
+  { label: 'Hero Slides', icon: Image, to: '/hero-slides' },
   { label: 'Commandes',     icon: ShoppingCart,    to: '/orders' },
   {
     label: 'Produits', icon: Package, to: '/products',
