@@ -274,7 +274,7 @@ const DynamicHero = ({
               alt={s.title}
               loading={i === 0 ? 'eager' : 'lazy'}
               decoding="async"
-              fetchpriority={i === 0 ? 'high' : 'low'}
+              fetchPriority={i === 0 ? 'high' : 'low'}
               className="absolute inset-0 w-full h-full object-cover"
               width="1920"
               height="800"

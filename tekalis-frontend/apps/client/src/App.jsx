@@ -36,7 +36,7 @@ import MyOrders from "./pages/MyOrders";
 import MyWarranties from "./pages/MyWarranties";
 import MyRMA from "./pages/MyRMA";
 import CreateRMA from "./pages/CreateRMA";
-import Wishlist from "./pages/WishList";
+import WishlistPage from "./pages/WishList";
 import Addresses from "./pages/Addresses";
 
 
@@ -70,6 +70,7 @@ function App() {
         <Route path="/products" element={<Products />} />
         <Route path="/products/:id" element={<ProductDetails />} />
         <Route path="/category/:slug" element={<CategoryPage />} />
+        <Route path="/wishlist" element={<WishlistPage />} />
 
         {/* Blog */}
         <Route path="/blog" element={<Blog />} />
@@ -113,7 +114,7 @@ function App() {
           <Route path="/dashboard/warranties" element={<MyWarranties />} />
           <Route path="/dashboard/rma" element={<MyRMA />} />
           <Route path="/dashboard/rma/create" element={<CreateRMA />} />
-          <Route path="/dashboard/wishlist" element={<Wishlist />} />
+          <Route path="/dashboard/wishlist" element={<WishlistPage />} />
           <Route path="/dashboard/addresses" element={<Addresses />} />
         </Route>
 

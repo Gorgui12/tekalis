@@ -69,58 +69,64 @@ const Checkout = () => {
     return true;
   };
 
-  // Confirmer la commande
-  const handleConfirmOrder = async () => {
-    if (!validateForm()) {
-      setShowConfirmModal(false); // ✅ AJOUTÉ
-      return;
-    }
+// Checkout.jsx — seule la fonction handleConfirmOrder change
+// Remplace le bloc handleConfirmOrder existant par celui-ci :
 
+const handleConfirmOrder = async () => {
+  if (!validateForm()) {
     setShowConfirmModal(false);
-    setIsProcessing(true);
+    return;
+  }
 
-    try {
-      const orderData = {
-        products: cart.map((item) => ({
-          product: item._id,
-          quantity: item.quantity,
-          price: item.price
-        })),
-        totalPrice: finalTotal,
-        shippingCost: shippingCost,
-        paymentMethod: "cash",
-        ...deliveryData
-      };
+  setShowConfirmModal(false);
+  setIsProcessing(true);
 
-      const action = await dispatch(createOrder(orderData));
-      
-      if (!action?.payload?._id) {
-        throw new Error("Erreur lors de la création de la commande");
-      }
+  try {
+    const orderData = {
+      products: cart.map((item) => ({
+        product: item._id,
+        quantity: item.quantity,
+        price: item.price,
+      })),
+      totalPrice: finalTotal,
+      shippingCost: shippingCost,
+      paymentMethod: "cash",
+      ...deliveryData,
+    };
 
-      const orderNumber = action.payload.orderNumber;
+    const action = await dispatch(createOrder(orderData));
 
-      dispatch(clearCart());
-      
-      // ✅ CORRIGÉ - Toast plus clair
-      toast.success(`Commande ${orderNumber} enregistrée avec succès !`, 5000, {
-        title: "Commande créée",
-        action: {
-          label: "Voir mes commandes",
-          onClick: () => navigate("/orders")
-        }
-      });
-      
-      navigate("/orders");
+    // ✅ FIX : normalise le payload — accepte { order: {} } OU l'objet direct
+    const order = action?.payload?.order || action?.payload;
 
-    } catch (err) {
-      handleError(err, { // ✅ CORRIGÉ
-        customMessage: "Erreur lors de la création de la commande"
-      });
-    } finally {
-      setIsProcessing(false);
+    if (!order?._id) {
+      throw new Error("Erreur lors de la création de la commande");
     }
-  };
+
+    const orderNumber =
+      order.orderNumber || order._id?.slice(-8).toUpperCase();
+
+    dispatch(clearCart());
+
+    toast.success(`Commande ${orderNumber} enregistrée avec succès !`, 5000, {
+      title: "Commande créée",
+      action: {
+        label: "Voir mes commandes",
+        onClick: () => navigate("/orders"),
+      },
+    });
+
+    // ✅ Redirige vers la liste des commandes, pas vers /orders/:id
+    // (évite une page 404 si OrderDetails attend un format différent)
+    navigate("/orders", { replace: true });
+  } catch (err) {
+    handleError(err, {
+      customMessage: "Erreur lors de la création de la commande",
+    });
+  } finally {
+    setIsProcessing(false);
+  }
+};
 
   // ✅ CORRIGÉ - Utilise EmptyState
   if (cart.length === 0) {
