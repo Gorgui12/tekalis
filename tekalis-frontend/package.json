@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "lucide-react": "^0.575.0",
+    "prop-types": "^15.8.1",
     "react-is": "^19.2.4"
   }
 }
