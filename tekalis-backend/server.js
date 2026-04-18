@@ -1,6 +1,13 @@
 // ===============================================
 // TEKALIS API - Server Principal
-// VERSION CORRIGÉE — Audit complet
+// VERSION CORRIGÉE — Audit complet v2
+// ✅ FIX : /api/hero → /api/v1/hero
+// ✅ FIX : adminRouter expose toutes les routes admin
+//    (articles, reviews, rma, orders, products, settings,
+//     categories, promo-codes, analytics)
+// ✅ FIX : GET /admin/articles retourne tous statuts (draft+published)
+// ✅ FIX : PUT /admin/articles/:id/publish avant PUT /admin/articles/:id
+// ✅ FIX : debug middleware conditionnel (dev only)
 // ===============================================
 const express = require("express");
 const cors = require("cors");
@@ -136,7 +143,7 @@ app.get("/", (req, res) => {
   res.json({ success: true, message: "🚀 Tekalis API v1.0", status: "Running" });
 });
 
-// ─── Routes ───────────────────────────────────────────────────────────────────
+// ─── Routes publiques & authentifiées ────────────────────────────────────────
 console.log("\n📂 Chargement des routes...");
 
 const loadRoute = (path, file) => {
@@ -155,7 +162,7 @@ loadRoute(`${API_PREFIX}/categories`,   "./routes/categoryRoutes");
 loadRoute(`${API_PREFIX}/articles`,     "./routes/articleRoutes");
 loadRoute(`${API_PREFIX}/configurator`, "./routes/configuratorRoutes");
 
-// ✅ FIX : hero monté sous /api/v1/hero (cohérence avec le reste de l'API)
+// ✅ FIX : hero monté sous /api/v1/hero (était /api/hero → 404)
 loadRoute(`${API_PREFIX}/hero`,         "./routes/heroRoutes");
 
 // Routes authentifiées
@@ -173,30 +180,89 @@ loadRoute(`${API_PREFIX}/admin/stats`, "./routes/stats");
 console.log("✅ Routes chargées\n");
 
 // ─── Routeur Admin ────────────────────────────────────────────────────────────
-// ✅ FIX : adminRouter n'expose QUE les ressources purement admin
-//    (settings, categories CRUD, promo-codes, analytics, hero admin).
-//    Les routes articles/reviews admin sont SUPPRIMÉES d'ici —
-//    elles sont déjà gérées dans leurs routes respectives avec
-//    verifyToken + isAdmin.
+// Toutes les ressources admin sous /api/v1/admin/*
+// Double protection verifyToken + isAdmin sur TOUT le routeur.
 const adminRouter = require("express").Router();
 
-// Debug middleware (dev only)
+// Debug (dev uniquement)
 if (isDev) {
   adminRouter.use((req, res, next) => {
-    const auth = req.headers.authorization;
-    console.log("🔐 Admin route:", req.method, req.path);
-    console.log("   Token présent:", !!auth);
+    console.log("🔐 Admin:", req.method, req.path, "| Token:", !!req.headers.authorization);
     next();
   });
 }
 
 const { verifyToken, isAdmin } = require("./middlewares/authMiddleware");
-
-// Double protection : verifyToken + isAdmin sur tout le routeur admin
 adminRouter.use(verifyToken, isAdmin);
 
-// ── Paramètres du site ────────────────────────────────────────────────────────
-const Settings = require("./models/Settings");
+// ── Controllers ───────────────────────────────────────────────────────────────
+const articleController = require("./controllers/articleController");
+const reviewController  = require("./controllers/reviewController");
+const rmaController     = require("./controllers/rmaController");
+const orderController   = require("./controllers/orderController");
+const productController = require("./controllers/productController");
+const Settings          = require("./models/Settings");
+const Category          = require("./models/Category");
+const PromoCode         = require("./models/PromoCode");
+
+// ── Articles (/api/v1/admin/articles) ────────────────────────────────────────
+// ✅ GET admin → tous statuts (draft + published), contrairement à la route
+//    publique /api/v1/articles qui ne retourne que les "published"
+adminRouter.get("/articles", async (req, res) => {
+  try {
+    const Article = require("./models/Article");
+    const { page = 1, limit = 12, category, search, status } = req.query;
+    const filter = {};
+    if (category) filter.category = category;
+    if (status) filter.status = status;
+    if (search) filter.$text = { $search: search };
+    const skip = (Number(page) - 1) * Number(limit);
+    const [articles, total] = await Promise.all([
+      Article.find(filter)
+        .populate("author", "name avatar")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(Number(limit))
+        .select("-content"),
+      Article.countDocuments(filter)
+    ]);
+    res.status(200).json({
+      success: true,
+      articles,
+      pagination: { page: Number(page), total, pages: Math.ceil(total / Number(limit)) }
+    });
+  } catch (e) { res.status(500).json({ message: e.message }); }
+});
+
+// ✅ PUT /:id/publish AVANT PUT /:id (sinon "publish" serait capturé comme id)
+adminRouter.post("/articles",            articleController.createArticle);
+adminRouter.put("/articles/:id/publish", articleController.togglePublish);
+adminRouter.put("/articles/:id",         articleController.updateArticle);
+adminRouter.delete("/articles/:id",      articleController.deleteArticle);
+
+// ── Reviews (/api/v1/admin/reviews) ──────────────────────────────────────────
+adminRouter.get("/reviews",               reviewController.getAllReviews);
+adminRouter.patch("/reviews/:id/approve", reviewController.toggleApprove);
+adminRouter.delete("/reviews/:id",        reviewController.deleteReview);
+
+// ── RMA (/api/v1/admin/rma) ───────────────────────────────────────────────────
+adminRouter.get("/rma",               rmaController.getAllRMAs);
+adminRouter.put("/rma/:id/status",    rmaController.updateRMAStatus);
+
+// ── Commandes (/api/v1/admin/orders) ─────────────────────────────────────────
+adminRouter.get("/orders",             orderController.getAllOrders);
+adminRouter.put("/orders/:id/status",  orderController.updateOrderStatus);
+adminRouter.put("/orders/:id/pay",     orderController.markAsPaid);
+adminRouter.delete("/orders/:id",      orderController.deleteOrder);
+
+// ── Produits (/api/v1/admin/products) ────────────────────────────────────────
+adminRouter.get("/products",           productController.getProducts);
+adminRouter.post("/products/bulk",     productController.bulkCreateProducts); // AVANT /:id
+adminRouter.post("/products",          productController.createProduct);
+adminRouter.put("/products/:id",       productController.updateProduct);
+adminRouter.delete("/products/:id",    productController.deleteProduct);
+
+// ── Paramètres du site (/api/v1/admin/settings) ──────────────────────────────
 adminRouter.get("/settings", async (req, res) => {
   try {
     let settings = await Settings.findById("site_settings");
@@ -213,8 +279,7 @@ adminRouter.put("/settings", async (req, res) => {
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
 
-// ── Catégories (CRUD admin) ───────────────────────────────────────────────────
-const Category = require("./models/Category");
+// ── Catégories (/api/v1/admin/categories) ────────────────────────────────────
 adminRouter.get("/categories", async (req, res) => {
   try {
     const categories = await Category.find().sort({ order: 1 });
@@ -240,8 +305,7 @@ adminRouter.delete("/categories/:id", async (req, res) => {
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
 
-// ── Codes promo ───────────────────────────────────────────────────────────────
-const PromoCode = require("./models/PromoCode");
+// ── Codes promo (/api/v1/admin/promo-codes) ───────────────────────────────────
 adminRouter.get("/promo-codes", async (req, res) => {
   try {
     const promoCodes = await PromoCode.find().sort({ createdAt: -1 });
@@ -267,7 +331,7 @@ adminRouter.delete("/promo-codes/:id", async (req, res) => {
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
 
-// ── Analytics ─────────────────────────────────────────────────────────────────
+// ── Analytics (/api/v1/admin/analytics) ──────────────────────────────────────
 adminRouter.get("/analytics", async (req, res) => {
   res.json({ success: true, stats: {}, revenue: [], categories: [], topProducts: [], customers: [] });
 });
