@@ -1,3 +1,9 @@
+// ===============================================
+// routes/userRoutes.js
+// ✅ FIX : toutes les routes nommées déclarées AVANT /:id
+//    (me, me/stats, me/password, me/addresses, analytics/overview)
+// ✅ FIX : N+1 query corrigé sur GET / (liste admin)
+// ===============================================
 const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
@@ -5,7 +11,7 @@ const Order = require("../models/Order");
 const { verifyToken, isAdmin } = require("../middlewares/authMiddleware");
 const bcrypt = require("bcryptjs");
 
-// ─── Middleware pour toutes les routes ────────────────────────────────────────
+// Toutes les routes nécessitent une authentification
 router.use(verifyToken);
 
 // ===============================================
@@ -109,12 +115,51 @@ router.put("/me/password", async (req, res) => {
       return res.status(401).json({ success: false, message: "Mot de passe actuel incorrect" });
     }
 
-    user.password = newPassword; // Le pre-save hook hashera automatiquement
+    user.password = newPassword; // pre-save hook hash automatiquement
     await user.save();
 
     res.status(200).json({ success: true, message: "Mot de passe modifié avec succès" });
   } catch (error) {
     console.error("❌ Erreur change password:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// ===============================================
+// GET /api/v1/users/me/stats
+// ✅ AVANT /:id
+// ===============================================
+router.get("/me/stats", async (req, res) => {
+  try {
+    const userId = req.user._id;
+
+    const [ordersCount, totalSpentData, lastOrder, ordersByStatus] = await Promise.all([
+      Order.countDocuments({ user: userId }),
+      Order.aggregate([
+        { $match: { user: userId, isPaid: true } },
+        { $group: { _id: null, total: { $sum: "$totalPrice" } } }
+      ]),
+      Order.findOne({ user: userId }).sort({ createdAt: -1 }).select("createdAt totalPrice status").lean(),
+      Order.aggregate([
+        { $match: { user: userId } },
+        { $group: { _id: "$status", count: { $sum: 1 } } }
+      ])
+    ]);
+
+    res.status(200).json({
+      success: true,
+      stats: {
+        ordersCount,
+        totalSpent: totalSpentData[0]?.total || 0,
+        lastOrder,
+        ordersByStatus: ordersByStatus.reduce((acc, item) => {
+          acc[item._id] = item.count;
+          return acc;
+        }, {})
+      }
+    });
+  } catch (error) {
+    console.error("❌ Erreur user stats:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 });
@@ -185,110 +230,11 @@ router.delete("/me/addresses/:addressId", async (req, res) => {
   }
 });
 
-// ===============================================
-// GET /api/v1/users/me/stats
-// ===============================================
-router.get("/me/stats", async (req, res) => {
-  try {
-    const userId = req.user._id;
-
-    const [ordersCount, totalSpentData, lastOrder, ordersByStatus] = await Promise.all([
-      Order.countDocuments({ user: userId }),
-      Order.aggregate([
-        { $match: { user: userId, isPaid: true } },
-        { $group: { _id: null, total: { $sum: "$totalPrice" } } }
-      ]),
-      Order.findOne({ user: userId }).sort({ createdAt: -1 }).select("createdAt totalPrice status").lean(),
-      Order.aggregate([
-        { $match: { user: userId } },
-        { $group: { _id: "$status", count: { $sum: 1 } } }
-      ])
-    ]);
-
-    res.status(200).json({
-      success: true,
-      stats: {
-        ordersCount,
-        totalSpent: totalSpentData[0]?.total || 0,
-        lastOrder,
-        ordersByStatus: ordersByStatus.reduce((acc, item) => {
-          acc[item._id] = item.count;
-          return acc;
-        }, {})
-      }
-    });
-  } catch (error) {
-    console.error("❌ Erreur user stats:", error);
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
-
 // ─── Routes Admin ─────────────────────────────────────────────────────────────
 
 // ===============================================
-// GET /api/v1/users — Liste tous les utilisateurs (Admin)
-// ===============================================
-router.get("/", isAdmin, async (req, res) => {
-  try {
-    const {
-      page = 1,
-      limit = 20,
-      search,
-      role,
-      sortBy = "createdAt",
-      order = "desc"
-    } = req.query;
-
-    const filter = {};
-    if (search) {
-      filter.$or = [
-        { name: { $regex: search, $options: "i" } },
-        { email: { $regex: search, $options: "i" } }
-      ];
-    }
-    if (role === "admin") filter.isAdmin = true;
-    else if (role === "user") filter.isAdmin = false;
-
-    const pageNum = Math.max(1, Number(page));
-    const limitNum = Math.min(100, Math.max(1, Number(limit)));
-    const skip = (pageNum - 1) * limitNum;
-    const sortOrder = order === "desc" ? -1 : 1;
-
-    const [users, total] = await Promise.all([
-      User.find(filter)
-        .sort({ [sortBy]: sortOrder })
-        .skip(skip)
-        .limit(limitNum)
-        .lean(),
-      User.countDocuments(filter)
-    ]);
-
-    // Ajouter le nombre de commandes pour chaque user
-    const usersWithStats = await Promise.all(
-      users.map(async (user) => {
-        const ordersCount = await Order.countDocuments({ user: user._id });
-        return { ...user, password: undefined, ordersCount };
-      })
-    );
-
-    res.status(200).json({
-      success: true,
-      users: usersWithStats,
-      pagination: {
-        page: pageNum,
-        limit: limitNum,
-        total,
-        pages: Math.ceil(total / limitNum)
-      }
-    });
-  } catch (error) {
-    console.error("❌ Erreur get users:", error);
-    res.status(500).json({ success: false, message: error.message });
-  }
-});
-
-// ===============================================
 // GET /api/v1/users/analytics/overview (Admin)
+// ✅ AVANT /:id — sinon Express capture "analytics" comme id
 // ===============================================
 router.get("/analytics/overview", isAdmin, async (req, res) => {
   try {
@@ -326,7 +272,81 @@ router.get("/analytics/overview", isAdmin, async (req, res) => {
 });
 
 // ===============================================
+// GET /api/v1/users — Liste tous les utilisateurs (Admin)
+// ✅ AVANT /:id
+// ✅ FIX N+1 : une seule agrégation pour les stats de commandes
+// ===============================================
+router.get("/", isAdmin, async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 20,
+      search,
+      role,
+      sortBy = "createdAt",
+      order = "desc"
+    } = req.query;
+
+    const filter = {};
+    if (search) {
+      filter.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } }
+      ];
+    }
+    if (role === "admin") filter.isAdmin = true;
+    else if (role === "user") filter.isAdmin = false;
+
+    const pageNum = Math.max(1, Number(page));
+    const limitNum = Math.min(100, Math.max(1, Number(limit)));
+    const skip = (pageNum - 1) * limitNum;
+    const sortOrder = order === "desc" ? -1 : 1;
+
+    const [users, total] = await Promise.all([
+      User.find(filter)
+        .sort({ [sortBy]: sortOrder })
+        .skip(skip)
+        .limit(limitNum)
+        .lean(),
+      User.countDocuments(filter)
+    ]);
+
+    // ✅ FIX N+1 : une seule agrégation pour tous les users de la page
+    const userIds = users.map(u => u._id);
+    const orderCounts = await Order.aggregate([
+      { $match: { user: { $in: userIds } } },
+      { $group: { _id: "$user", count: { $sum: 1 } } }
+    ]);
+    const orderCountMap = orderCounts.reduce((acc, item) => {
+      acc[item._id.toString()] = item.count;
+      return acc;
+    }, {});
+
+    const usersWithStats = users.map(user => ({
+      ...user,
+      password: undefined,
+      ordersCount: orderCountMap[user._id.toString()] || 0
+    }));
+
+    res.status(200).json({
+      success: true,
+      users: usersWithStats,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total,
+        pages: Math.ceil(total / limitNum)
+      }
+    });
+  } catch (error) {
+    console.error("❌ Erreur get users:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// ===============================================
 // GET /api/v1/users/:id (Admin)
+// ✅ EN DERNIER — route dynamique
 // ===============================================
 router.get("/:id", isAdmin, async (req, res) => {
   try {

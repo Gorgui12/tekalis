@@ -1,21 +1,15 @@
+// ===============================================
+// controllers/orderController.js
+// ✅ FIX : utilise EmailService (consolidation email)
+//    plus de nodemailer direct dans ce controller
+// ✅ FIX : createWarranty appelé après création commande
+// ===============================================
 const Order = require("../models/Order");
 const Product = require("../models/Product");
 const Cart = require("../models/Cart");
 const PromoCode = require("../models/PromoCode");
-const nodemailer = require("nodemailer");
-
-// ===============================================
-// Transporter email
-// ===============================================
-const transporter = nodemailer.createTransport({
-  host: process.env.EMAIL_HOST,
-  port: Number(process.env.EMAIL_PORT) || 465,
-  secure: Number(process.env.EMAIL_PORT) === 465,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-});
+const EmailService = require("../services/emailService");
+const warrantyController = require("./warrantyController");
 
 // ===============================================
 // POST /api/v1/orders — Créer une commande
@@ -32,7 +26,7 @@ exports.createOrder = async (req, res) => {
       deliveryAddress,
       deliveryCity,
       deliveryRegion,
-      promoCode // ✅ récupérer le code promo si présent
+      promoCode
     } = req.body;
 
     if (!products || products.length === 0) {
@@ -89,7 +83,7 @@ exports.createOrder = async (req, res) => {
     }));
     await Product.bulkWrite(bulkOps);
 
-    // ─── Incrémenter l'usage du code promo ✅ ─────────────────────────────────
+    // ─── Incrémenter l'usage du code promo ───────────────────────────────────
     if (promoCode) {
       try {
         await PromoCode.findOneAndUpdate(
@@ -106,7 +100,6 @@ exports.createOrder = async (req, res) => {
           }
         );
       } catch (promoErr) {
-        // Non bloquant : la commande est déjà créée
         console.error("⚠️ Erreur mise à jour code promo:", promoErr.message);
       }
     }
@@ -120,53 +113,25 @@ exports.createOrder = async (req, res) => {
     // ─── Répondre immédiatement ───────────────────────────────────────────────
     res.status(201).json({ success: true, ...newOrder.toObject() });
 
-    // ─── Email en arrière-plan ────────────────────────────────────────────────
-    const canSendEmail =
-      process.env.EMAIL_USER &&
-      process.env.EMAIL_PASS &&
-      process.env.ADMIN_EMAIL;
+    // ─── Tâches en arrière-plan (non bloquantes) ──────────────────────────────
 
-    if (canSendEmail) {
-      const productList = products
-        .map(p => {
-          const prod = productMap[p.product] || {};
-          return `<li>${prod.name || p.product} — ${p.quantity} × ${(p.price || 0).toLocaleString()} FCFA</li>`;
-        })
-        .join("");
+    // ✅ FIX : Créer les garanties pour chaque produit de la commande
+    // warrantyController.createWarranty n'était jamais appelé avant
+    warrantyController.createWarranty({
+      _id: newOrder._id,
+      user: req.user._id,
+      products: newOrder.products
+    }).catch(err => console.error("⚠️ Erreur création garanties:", err.message));
 
-      const mailOptions = {
-        from: `"Tekalis" <${process.env.EMAIL_USER}>`,
-        to: process.env.ADMIN_EMAIL,
-        subject: `🛍️ Nouvelle commande #${newOrder.orderNumber || newOrder._id}`,
-        html: `
-          <div style="font-family:Arial,sans-serif;color:#333;max-width:600px;margin:0 auto">
-            <h2 style="color:#1E40AF;border-bottom:3px solid #1E40AF;padding-bottom:10px">📦 Nouvelle commande reçue</h2>
-            <div style="background:#f3f4f6;padding:15px;border-radius:8px;margin:20px 0">
-              <h3 style="margin-top:0">👤 Informations client</h3>
-              <p><b>Nom :</b> ${deliveryName}</p>
-              <p><b>Téléphone :</b> ${deliveryPhone}</p>
-              <p><b>Ville :</b> ${deliveryCity || "Non spécifié"}</p>
-              <p><b>Adresse :</b> ${deliveryAddress}</p>
-            </div>
-            <div style="background:#fef3c7;padding:15px;border-radius:8px;margin:20px 0">
-              <h3 style="margin-top:0">💳 Paiement</h3>
-              <p><b>Méthode :</b> ${paymentMethod === "cash" ? "💵 Paiement à la livraison" : paymentMethod.toUpperCase()}</p>
-              ${promoCode ? `<p><b>Code promo :</b> ${promoCode}</p>` : ""}
-              <p><b>Total :</b> <strong style="color:#1E40AF;font-size:1.5em">${totalPrice.toLocaleString()} FCFA</strong></p>
-            </div>
-            <div style="margin:20px 0">
-              <h3>🛒 Produits :</h3>
-              <ul>${productList}</ul>
-            </div>
-            <p style="font-size:12px;color:#777;text-align:center">Commande du ${new Date().toLocaleString("fr-FR")} — #${newOrder.orderNumber || newOrder._id}</p>
-          </div>
-        `
-      };
+    // ✅ FIX : Email via EmailService (consolidation — plus de nodemailer direct)
+    const populatedOrder = await Order.findById(newOrder._id)
+      .populate("products.product", "name price images");
 
-      transporter.sendMail(mailOptions)
-        .then(() => console.log("✅ Email commande envoyé"))
-        .catch(err => console.error("❌ Email non envoyé:", err.message));
-    }
+    EmailService.notifyAdminNewOrder(
+      { ...populatedOrder.toObject(), promoCode },
+      { name: req.user.name, email: req.user.email }
+    ).catch(err => console.error("⚠️ Email admin non envoyé:", err.message));
+
   } catch (error) {
     console.error("❌ Erreur createOrder:", error);
     res.status(500).json({ message: error.message });
@@ -286,6 +251,7 @@ exports.updateOrderStatus = async (req, res) => {
       return res.status(404).json({ message: "Commande introuvable" });
     }
 
+    // Remettre le stock en cas d'annulation
     if (status === "cancelled") {
       const bulkOps = order.products.map(item => ({
         updateOne: {

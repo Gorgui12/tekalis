@@ -1,31 +1,53 @@
 // ===============================================
-// 15. config/cloudinary.js
+// config/cloudinary.js
+// ✅ FIX : guard si CLOUDINARY_* non configurées
+//    pas de connexion automatique au require()
+//    qui polluait les logs au démarrage
 // ===============================================
-const cloudinary = require("cloudinary").v2;
 const { Readable } = require("stream");
 
-// Configuration Cloudinary
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
+// Vérifier si Cloudinary est configuré
+const isCloudinaryConfigured = () =>
+  !!(
+    process.env.CLOUDINARY_CLOUD_NAME &&
+    process.env.CLOUDINARY_API_KEY &&
+    process.env.CLOUDINARY_API_SECRET
+  );
 
-// Vérifier la connexion
-const testConnection = async () => {
-  try {
-    await cloudinary.api.ping();
-    console.log("✅ Cloudinary connecté");
-  } catch (error) {
-    console.error("❌ Erreur connexion Cloudinary:", error);
+// Instance Cloudinary (lazy init)
+let _cloudinary = null;
+
+const getCloudinary = () => {
+  if (_cloudinary) return _cloudinary;
+
+  if (!isCloudinaryConfigured()) {
+    throw new Error(
+      "Cloudinary non configuré. Définissez CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY et CLOUDINARY_API_SECRET dans .env"
+    );
   }
+
+  const cloudinary = require("cloudinary").v2;
+  cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
+  });
+
+  _cloudinary = cloudinary;
+  return _cloudinary;
 };
 
-testConnection();
+// Log au démarrage sans bloquer ni crasher
+if (isCloudinaryConfigured()) {
+  console.log("✅ Cloudinary configuré");
+} else {
+  console.warn("⚠️  Cloudinary non configuré — upload d'images désactivé");
+}
 
 // Upload une image depuis un buffer
 const uploadFromBuffer = (buffer, folder = "products") => {
   return new Promise((resolve, reject) => {
+    const cloudinary = getCloudinary();
     const uploadStream = cloudinary.uploader.upload_stream(
       {
         folder: `tekalis/${folder}`,
@@ -47,7 +69,7 @@ const uploadFromBuffer = (buffer, folder = "products") => {
         }
       }
     );
-    
+
     const readableStream = Readable.from(buffer);
     readableStream.pipe(uploadStream);
   });
@@ -55,7 +77,7 @@ const uploadFromBuffer = (buffer, folder = "products") => {
 
 // Upload plusieurs images
 const uploadMultiple = async (files, folder = "products") => {
-  const uploadPromises = files.map(file => 
+  const uploadPromises = files.map(file =>
     uploadFromBuffer(file.buffer, folder)
   );
   return await Promise.all(uploadPromises);
@@ -64,6 +86,7 @@ const uploadMultiple = async (files, folder = "products") => {
 // Supprimer une image
 const deleteImage = async (publicId) => {
   try {
+    const cloudinary = getCloudinary();
     const result = await cloudinary.uploader.destroy(publicId);
     return result;
   } catch (error) {
@@ -75,6 +98,7 @@ const deleteImage = async (publicId) => {
 // Supprimer plusieurs images
 const deleteMultiple = async (publicIds) => {
   try {
+    const cloudinary = getCloudinary();
     const result = await cloudinary.api.delete_resources(publicIds);
     return result;
   } catch (error) {
@@ -84,7 +108,7 @@ const deleteMultiple = async (publicIds) => {
 };
 
 module.exports = {
-  cloudinary,
+  isCloudinaryConfigured,
   uploadFromBuffer,
   uploadMultiple,
   deleteImage,

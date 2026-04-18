@@ -1,6 +1,6 @@
 // ===============================================
 // TEKALIS API - Server Principal
-// VERSION CORRIGÉE — Audit sécurité
+// VERSION CORRIGÉE — Audit complet
 // ===============================================
 const express = require("express");
 const cors = require("cors");
@@ -14,7 +14,6 @@ require("dotenv").config();
 const isDev = process.env.NODE_ENV === "development";
 
 // ─── Validation des variables d'environnement critiques ──────────────────────
-// CRITIQUE 1 & 2 : Bloquer le démarrage si secrets manquants ou par défaut
 const requiredEnvVars = ["MONGODB_URI", "JWT_SECRET"];
 const missingVars = requiredEnvVars.filter(v => !process.env[v]);
 if (missingVars.length > 0) {
@@ -22,7 +21,6 @@ if (missingVars.length > 0) {
   process.exit(1);
 }
 
-// CRITIQUE 2 : JWT_SECRET par défaut = faille critique. Bloquer en production.
 const INSECURE_JWT_SECRETS = ["superSecretKey123", "secret", "changeme", "password", "tekalis"];
 if (!isDev && INSECURE_JWT_SECRETS.includes(process.env.JWT_SECRET)) {
   console.error("❌ FATAL: JWT_SECRET non sécurisé détecté en production. Arrêt du serveur.");
@@ -32,7 +30,6 @@ if (isDev && INSECURE_JWT_SECRETS.includes(process.env.JWT_SECRET)) {
   console.warn("⚠️  ATTENTION: JWT_SECRET non sécurisé. NE PAS utiliser en production !");
 }
 
-// MAJEUR 8 : Avertir si ADMIN_EMAIL manquant (emails commandes silencieux)
 if (!process.env.ADMIN_EMAIL) {
   console.warn("⚠️  ADMIN_EMAIL non défini. Les notifications de commandes admin seront désactivées.");
 }
@@ -52,7 +49,6 @@ connectDB().catch((err) => {
 // ─── Sécurité ─────────────────────────────────────────────────────────────────
 app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
 
-// MINEUR 14 : CORS lit maintenant CORS_ORIGIN depuis .env (plus de hardcode)
 const buildAllowedOrigins = () => {
   const defaults = [
     "http://localhost:3000",
@@ -70,7 +66,6 @@ const allowedOrigins = buildAllowedOrigins();
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Requêtes sans origin (Postman, cron, etc.) autorisées
     if (!origin) return callback(null, true);
     if (allowedOrigins.includes(origin)) return callback(null, true);
     console.warn("🚫 CORS bloqué pour:", origin);
@@ -91,11 +86,8 @@ if (isDev) {
 }
 
 // ─── Rate Limiting ────────────────────────────────────────────────────────────
-// MAJEUR 6 : En développement, React StrictMode double-mount déclencherait les
-// limiteurs. On les désactive en dev pour éviter les faux positifs.
 const createLimiter = (options) => {
   if (isDev) {
-    // En dev : middleware passthrough, pas de limitation
     return (req, res, next) => next();
   }
   return rateLimit(options);
@@ -156,24 +148,24 @@ const loadRoute = (path, file) => {
   }
 };
 
-const heroRoutes = require('./routes/heroRoutes');
-app.use('/api/hero', heroRoutes);
-
 // Routes publiques
-loadRoute(`${API_PREFIX}/auth`, "./routes/authRoutes");
-loadRoute(`${API_PREFIX}/products`, "./routes/productRoutes");
-loadRoute(`${API_PREFIX}/categories`, "./routes/categoryRoutes");
-loadRoute(`${API_PREFIX}/articles`, "./routes/articleRoutes");
+loadRoute(`${API_PREFIX}/auth`,         "./routes/authRoutes");
+loadRoute(`${API_PREFIX}/products`,     "./routes/productRoutes");
+loadRoute(`${API_PREFIX}/categories`,   "./routes/categoryRoutes");
+loadRoute(`${API_PREFIX}/articles`,     "./routes/articleRoutes");
 loadRoute(`${API_PREFIX}/configurator`, "./routes/configuratorRoutes");
 
+// ✅ FIX : hero monté sous /api/v1/hero (cohérence avec le reste de l'API)
+loadRoute(`${API_PREFIX}/hero`,         "./routes/heroRoutes");
+
 // Routes authentifiées
-loadRoute(`${API_PREFIX}/users`, "./routes/userRoutes");
-loadRoute(`${API_PREFIX}/cart`, "./routes/cartRoutes");
-loadRoute(`${API_PREFIX}/orders`, "./routes/orderRoutes");
-loadRoute(`${API_PREFIX}/reviews`, "./routes/reviewRoutes");
-loadRoute(`${API_PREFIX}/warranties`, "./routes/warrantyRoutes");
-loadRoute(`${API_PREFIX}/rma`, "./routes/rmaRoutes");
-loadRoute(`${API_PREFIX}/payment`, "./routes/paymentRoutes");
+loadRoute(`${API_PREFIX}/users`,       "./routes/userRoutes");
+loadRoute(`${API_PREFIX}/cart`,        "./routes/cartRoutes");
+loadRoute(`${API_PREFIX}/orders`,      "./routes/orderRoutes");
+loadRoute(`${API_PREFIX}/reviews`,     "./routes/reviewRoutes");
+loadRoute(`${API_PREFIX}/warranties`,  "./routes/warrantyRoutes");
+loadRoute(`${API_PREFIX}/rma`,         "./routes/rmaRoutes");
+loadRoute(`${API_PREFIX}/payment`,     "./routes/paymentRoutes");
 
 // Routes admin stats
 loadRoute(`${API_PREFIX}/admin/stats`, "./routes/stats");
@@ -181,23 +173,29 @@ loadRoute(`${API_PREFIX}/admin/stats`, "./routes/stats");
 console.log("✅ Routes chargées\n");
 
 // ─── Routeur Admin ────────────────────────────────────────────────────────────
-// MAJEUR 9 : adminRouter ne duplique plus les routes déjà montées ci-dessus.
-// Il expose uniquement les ressources purement admin (settings, categories CRUD,
-// promo-codes, analytics) qui n'ont PAS de route publique correspondante.
+// ✅ FIX : adminRouter n'expose QUE les ressources purement admin
+//    (settings, categories CRUD, promo-codes, analytics, hero admin).
+//    Les routes articles/reviews admin sont SUPPRIMÉES d'ici —
+//    elles sont déjà gérées dans leurs routes respectives avec
+//    verifyToken + isAdmin.
 const adminRouter = require("express").Router();
-// Au tout début du adminRouter, AVANT verifyToken et isAdmin
-adminRouter.use((req, res, next) => {
-  const auth = req.headers.authorization;
-  console.log("🔐 Admin route:", req.method, req.path);
-  console.log("   Token présent:", !!auth);
-  next();
-});
+
+// Debug middleware (dev only)
+if (isDev) {
+  adminRouter.use((req, res, next) => {
+    const auth = req.headers.authorization;
+    console.log("🔐 Admin route:", req.method, req.path);
+    console.log("   Token présent:", !!auth);
+    next();
+  });
+}
+
 const { verifyToken, isAdmin } = require("./middlewares/authMiddleware");
 
 // Double protection : verifyToken + isAdmin sur tout le routeur admin
 adminRouter.use(verifyToken, isAdmin);
 
-// Paramètres du site
+// ── Paramètres du site ────────────────────────────────────────────────────────
 const Settings = require("./models/Settings");
 adminRouter.get("/settings", async (req, res) => {
   try {
@@ -215,7 +213,7 @@ adminRouter.put("/settings", async (req, res) => {
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
 
-// Catégories (CRUD admin uniquement)
+// ── Catégories (CRUD admin) ───────────────────────────────────────────────────
 const Category = require("./models/Category");
 adminRouter.get("/categories", async (req, res) => {
   try {
@@ -242,7 +240,7 @@ adminRouter.delete("/categories/:id", async (req, res) => {
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
 
-// Codes promo
+// ── Codes promo ───────────────────────────────────────────────────────────────
 const PromoCode = require("./models/PromoCode");
 adminRouter.get("/promo-codes", async (req, res) => {
   try {
@@ -269,24 +267,10 @@ adminRouter.delete("/promo-codes/:id", async (req, res) => {
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
 
-// Analytics
+// ── Analytics ─────────────────────────────────────────────────────────────────
 adminRouter.get("/analytics", async (req, res) => {
   res.json({ success: true, stats: {}, revenue: [], categories: [], topProducts: [], customers: [] });
 });
-
-// Articles admin
-const articleController = require("./controllers/articleController");
-adminRouter.get("/articles", articleController.getAllArticles);  // ou une version admin
-adminRouter.post("/articles", articleController.createArticle);
-adminRouter.put("/articles/:id", articleController.updateArticle);
-adminRouter.delete("/articles/:id", articleController.deleteArticle);
-adminRouter.put("/articles/:id/publish", articleController.togglePublish);
-
-// Reviews admin — route correcte
-const reviewController = require("./controllers/reviewController");
-adminRouter.get("/reviews", reviewController.getAllReviews);
-adminRouter.patch("/reviews/:id/approve", reviewController.toggleApprove);
-adminRouter.delete("/reviews/:id", reviewController.deleteReview);
 
 app.use(`${API_PREFIX}/admin`, adminRouter);
 
