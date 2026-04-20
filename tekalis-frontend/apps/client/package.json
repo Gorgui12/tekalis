@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "generate:sitemap": "node scripts/generate-sitemap.js",
     "build": "vite build",
     "postbuild": "npm run generate:sitemap && react-snap",
     "preview": "vite preview",

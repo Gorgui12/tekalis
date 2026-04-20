@@ -27,3 +27,18 @@ export const adminApproveReview = (id) =>
 
 export const adminGetReviewStats = () =>
   api.get("/admin/reviews/stats");
+
+// ✅ EXPORT DEFAULT (solution à ton erreur)
+const reviewsApi = {
+  getProductReviews,
+  addReview,
+  updateReview,
+  deleteReview,
+  likeReview,
+  adminGetReviews,
+  adminDeleteReview,
+  adminApproveReview,
+  adminGetReviewStats,
+};
+
+export default reviewsApi;
