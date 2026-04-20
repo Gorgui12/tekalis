@@ -5,26 +5,13 @@ import SearchBarLive from '../SearchBarLive';
 import { 
   FaSearch, FaShoppingCart, FaHeart, FaUser, FaBars, FaTimes,
   FaBell, FaBox, FaMapMarkerAlt, FaCog, FaSignOutAlt,
-  FaChevronDown, FaHome, FaTag, FaNewspaper, FaEnvelope
+  FaChevronDown, FaHome, FaTag, FaNewspaper, FaEnvelope,
+  FaTachometerAlt
 } from "react-icons/fa";
 import { useToast } from "../../../../../packages/shared/context/ToastContext";
 import { ThemeToggle } from "../../../../../packages/shared/context/ThemeContext";
 import useAuth from "../../../../../packages/shared/hooks/useAuth";
 
-/**
- * Navbar Premium V2 - Score 9/10
- * 
- * Fonctionnalités :
- * - Mode sombre avec ThemeToggle
- * - Recherche intelligente
- * - User dropdown menu
- * - Badges (panier, wishlist, notifications)
- * - Mega menu catégories
- * - Menu mobile animé
- * - Sticky header avec effet scroll
- * - Accessibilité ARIA complète
- * - Design moderne (glassmorphism, gradients)
- */
 const Navbar = () => {
   const { user } = useSelector((state) => state.auth);
   const cartItems = useSelector((state) => state.cart.items);
@@ -37,14 +24,12 @@ const Navbar = () => {
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
-  const [searchTerm, setSearchTerm] = useState("");
   const [isScrolled, setIsScrolled] = useState(false);
   const [categoriesOpen, setCategoriesOpen] = useState(false);
 
   const userDropdownRef = useRef(null);
   const categoriesRef = useRef(null);
 
-  // Fermer dropdowns au clic extérieur
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (userDropdownRef.current && !userDropdownRef.current.contains(event.target)) {
@@ -54,33 +39,19 @@ const Navbar = () => {
         setCategoriesOpen(false);
       }
     };
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Effet scroll pour sticky header
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Fermer menu mobile au changement de route
   useEffect(() => {
     setMobileMenuOpen(false);
   }, [location]);
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchTerm.trim()) {
-      navigate(`/products?search=${encodeURIComponent(searchTerm)}`);
-      setSearchTerm("");
-    }
-  };
 
   const handleLogout = () => {
     logout();
@@ -89,15 +60,16 @@ const Navbar = () => {
     navigate("/");
   };
 
-  const isAdmin = user?.role === "admin"; // ✅ CORRIGÉ
+  const isAdmin = user?.role === "admin";
 
-  // Catégories (à adapter selon vos besoins)
   const categories = [
-    { name: "Électronique", path: "/products?category=electronique" },
-    { name: "Mode", path: "/products?category=mode" },
-    { name: "Maison", path: "/products?category=maison" },
-    { name: "Sport", path: "/products?category=sport" },
-    { name: "Beauté", path: "/products?category=beaute" }
+    { name: "Smartphones", path: "/category/smartphones" },
+    { name: "Laptops", path: "/category/laptops" },
+    { name: "Gaming", path: "/category/gaming" },
+    { name: "TV", path: "/category/tv" },
+    { name: "Électroménager", path: "/category/electromenager" },
+    { name: "Audio", path: "/category/audio" },
+    { name: "Accessoires", path: "/category/accessoires" },
   ];
 
   return (
@@ -141,7 +113,7 @@ const Navbar = () => {
                 Accueil
               </Link>
 
-              {/* Dropdown Produits/Catégories */}
+              {/* Dropdown Catégories */}
               <div className="relative" ref={categoriesRef}>
                 <button
                   onClick={() => setCategoriesOpen(!categoriesOpen)}
@@ -154,7 +126,6 @@ const Navbar = () => {
                   <FaChevronDown size={12} className={`transition-transform ${categoriesOpen ? 'rotate-180' : ''}`} />
                 </button>
 
-                {/* Mega menu catégories */}
                 {categoriesOpen && (
                   <div className="absolute top-full left-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-2">
                     <Link
@@ -205,7 +176,6 @@ const Navbar = () => {
 
             {/* Actions utilisateur */}
             <div className="flex items-center gap-3">
-              {/* Theme Toggle */}
               <ThemeToggle />
 
               {/* Wishlist */}
@@ -260,7 +230,6 @@ const Navbar = () => {
                     <FaChevronDown size={12} className={`hidden sm:block transition-transform ${userDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
 
-                  {/* Dropdown menu */}
                   {userDropdownOpen && (
                     <div className="absolute right-0 top-full mt-2 w-64 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 py-2">
                       {/* User info */}
@@ -274,7 +243,18 @@ const Navbar = () => {
                         )}
                       </div>
 
-                      {/* Menu items */}
+                      {/* ─── Mon espace client (lien dashboard) ─── */}
+                      <Link
+                        to="/dashboard"
+                        className="flex items-center gap-3 px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition font-medium"
+                        onClick={() => setUserDropdownOpen(false)}
+                      >
+                        <FaTachometerAlt size={16} className="text-blue-600" />
+                        Mon espace
+                      </Link>
+
+                      <div className="border-t border-gray-100 dark:border-gray-700 my-1"></div>
+
                       {isAdmin && (
                         <Link
                           to="/admin"
@@ -296,7 +276,7 @@ const Navbar = () => {
                       </Link>
 
                       <Link
-                        to="/orders"
+                        to="/dashboard/orders"
                         className="flex items-center gap-3 px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition"
                         onClick={() => setUserDropdownOpen(false)}
                       >
@@ -305,7 +285,7 @@ const Navbar = () => {
                       </Link>
 
                       <Link
-                        to="/addresses"
+                        to="/dashboard/addresses"
                         className="flex items-center gap-3 px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition"
                         onClick={() => setUserDropdownOpen(false)}
                       >
@@ -331,12 +311,11 @@ const Navbar = () => {
 
           {/* Barre de recherche */}
           <div className="pb-3">
-             
-<SearchBarLive
-  placeholder="Rechercher un produit, une marque…"
-  className="max-w-2xl w-full"
-  maxResults={6}
-/>
+            <SearchBarLive
+              placeholder="Rechercher un produit, une marque…"
+              className="max-w-2xl w-full"
+              maxResults={6}
+            />
           </div>
         </div>
       </nav>
@@ -344,16 +323,13 @@ const Navbar = () => {
       {/* Menu mobile */}
       {mobileMenuOpen && (
         <>
-          {/* Overlay */}
           <div 
             className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden"
             onClick={() => setMobileMenuOpen(false)}
           />
 
-          {/* Menu sliding panel */}
           <div className="fixed top-0 left-0 h-full w-80 bg-white dark:bg-gray-900 shadow-2xl z-50 lg:hidden overflow-y-auto">
             <div className="p-6">
-              {/* Close button */}
               <div className="flex items-center justify-between mb-6">
                 <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                   Menu
@@ -367,7 +343,6 @@ const Navbar = () => {
                 </button>
               </div>
 
-              {/* User section */}
               {user && (
                 <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg p-4 mb-6">
                   <p className="font-semibold">{user.name}</p>
@@ -375,7 +350,6 @@ const Navbar = () => {
                 </div>
               )}
 
-              {/* Navigation */}
               <nav className="space-y-2">
                 <Link
                   to="/"
@@ -419,7 +393,16 @@ const Navbar = () => {
                 {user && (
                   <>
                     <div className="border-t border-gray-200 dark:border-gray-700 my-4"></div>
-                    
+
+                    {/* Lien dashboard mobile */}
+                    <Link
+                      to="/dashboard"
+                      className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-lg transition font-medium"
+                    >
+                      <FaTachometerAlt />
+                      Mon espace
+                    </Link>
+
                     <Link
                       to="/profile"
                       className="flex items-center gap-3 p-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-800 rounded-lg transition"
@@ -429,7 +412,7 @@ const Navbar = () => {
                     </Link>
 
                     <Link
-                      to="/orders"
+                      to="/dashboard/orders"
                       className="flex items-center gap-3 p-3 text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-800 rounded-lg transition"
                     >
                       <FaBox />
@@ -461,7 +444,6 @@ const Navbar = () => {
         </>
       )}
 
-      {/* Spacer pour compenser le navbar fixe */}
       <div className="h-0"></div>
     </>
   );

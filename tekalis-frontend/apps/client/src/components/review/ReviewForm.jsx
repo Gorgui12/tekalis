@@ -3,7 +3,14 @@ import { useSelector } from "react-redux";
 import { FaPaperPlane, FaExclamationCircle } from "react-icons/fa";
 import StarRating from "./StarRating";
 import Button from "../shared/Button";
-import api from "../../../../../packages/shared/api/client";
+import api from "../../../../../packages/shared/api/api"; // ← instance axios centralisée
+import {
+  getProductReviews,
+  addReview,
+  updateReview,
+  deleteReview,
+  likeReview
+} from "../../../../../packages/shared/api/endpoints/reviews";
 import { useToast } from "../../../../../packages/shared/context/ToastContext";
 
 /**

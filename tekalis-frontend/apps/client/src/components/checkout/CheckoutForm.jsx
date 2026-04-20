@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { clearCart } from "../../../../../packages/shared/redux/slices/cartSlice";
 import { useToast } from "../../../../../packages/shared/context/ToastContext";
-import api from "../../../../../packages/shared/api/client"; // ← instance axios centralisée
+import api from "../../../../../packages/shared/api/api"; // ← instance axios centralisée
 
 import CheckoutSteps from "./CheckoutSteps";
 import DeliveryForm from "./DeliveryForm";
