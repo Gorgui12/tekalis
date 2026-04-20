@@ -16,6 +16,9 @@ const mongoSanitize = require("express-mongo-sanitize");
 const rateLimit = require("express-rate-limit");
 const morgan = require("morgan");
 
+const sitemapRouter = require('./routes/sitemap');
+app.use('/api/v1', sitemapRouter);
+
 require("dotenv").config();
 
 const isDev = process.env.NODE_ENV === "development";
