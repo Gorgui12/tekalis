@@ -12,6 +12,7 @@
     "lint": "eslint ."
   },
   "reactSnap": {
+    "source": "dist",
     "routes": [
       "/",
       "/products",
