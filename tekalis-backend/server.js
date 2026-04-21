@@ -16,8 +16,7 @@ const mongoSanitize = require("express-mongo-sanitize");
 const rateLimit = require("express-rate-limit");
 const morgan = require("morgan");
 
-const sitemapRouter = require('./routes/sitemap');
-app.use('/api/v1', sitemapRouter);
+
 
 require("dotenv").config();
 
@@ -49,6 +48,8 @@ const connectDB = require("./config/database");
 const app = express();
 const PORT = process.env.PORT || 5000;
 const API_PREFIX = "/api/v1";
+const sitemapRouter = require('./routes/sitemap');
+app.use('/api/v1', sitemapRouter);
 
 // ─── Connexion MongoDB ────────────────────────────────────────────────────────
 connectDB().catch((err) => {
