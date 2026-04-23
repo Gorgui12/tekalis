@@ -1,13 +1,9 @@
+
 // ===============================================
 // TEKALIS API - Server Principal
-// VERSION CORRIGÉE — Audit complet v2
-// ✅ FIX : /api/hero → /api/v1/hero
-// ✅ FIX : adminRouter expose toutes les routes admin
-//    (articles, reviews, rma, orders, products, settings,
-//     categories, promo-codes, analytics)
-// ✅ FIX : GET /admin/articles retourne tous statuts (draft+published)
-// ✅ FIX : PUT /admin/articles/:id/publish avant PUT /admin/articles/:id
-// ✅ FIX : debug middleware conditionnel (dev only)
+// ✅ FIX BUG 1 : ajout routes /admin/users dans adminRouter
+// ✅ FIX BUG 2 : POST /admin/articles — author injecté depuis req.user
+// ✅ FIX BUG 3 : POST /admin/promo-codes — mapping expiryDate → endDate
 // ===============================================
 const express = require("express");
 const cors = require("cors");
@@ -15,8 +11,6 @@ const helmet = require("helmet");
 const mongoSanitize = require("express-mongo-sanitize");
 const rateLimit = require("express-rate-limit");
 const morgan = require("morgan");
-
-
 
 require("dotenv").config();
 
@@ -48,6 +42,7 @@ const connectDB = require("./config/database");
 const app = express();
 const PORT = process.env.PORT || 5000;
 const API_PREFIX = "/api/v1";
+
 const sitemapRouter = require('./routes/sitemap');
 app.use('/api/v1', sitemapRouter);
 
@@ -159,36 +154,26 @@ const loadRoute = (path, file) => {
   }
 };
 
-// Routes publiques
 loadRoute(`${API_PREFIX}/auth`,         "./routes/authRoutes");
 loadRoute(`${API_PREFIX}/products`,     "./routes/productRoutes");
 loadRoute(`${API_PREFIX}/categories`,   "./routes/categoryRoutes");
 loadRoute(`${API_PREFIX}/articles`,     "./routes/articleRoutes");
 loadRoute(`${API_PREFIX}/configurator`, "./routes/configuratorRoutes");
-
-// ✅ FIX : hero monté sous /api/v1/hero (était /api/hero → 404)
 loadRoute(`${API_PREFIX}/hero`,         "./routes/heroRoutes");
-
-// Routes authentifiées
-loadRoute(`${API_PREFIX}/users`,       "./routes/userRoutes");
-loadRoute(`${API_PREFIX}/cart`,        "./routes/cartRoutes");
-loadRoute(`${API_PREFIX}/orders`,      "./routes/orderRoutes");
-loadRoute(`${API_PREFIX}/reviews`,     "./routes/reviewRoutes");
-loadRoute(`${API_PREFIX}/warranties`,  "./routes/warrantyRoutes");
-loadRoute(`${API_PREFIX}/rma`,         "./routes/rmaRoutes");
-loadRoute(`${API_PREFIX}/payment`,     "./routes/paymentRoutes");
-
-// Routes admin stats
-loadRoute(`${API_PREFIX}/admin/stats`, "./routes/stats");
+loadRoute(`${API_PREFIX}/users`,        "./routes/userRoutes");
+loadRoute(`${API_PREFIX}/cart`,         "./routes/cartRoutes");
+loadRoute(`${API_PREFIX}/orders`,       "./routes/orderRoutes");
+loadRoute(`${API_PREFIX}/reviews`,      "./routes/reviewRoutes");
+loadRoute(`${API_PREFIX}/warranties`,   "./routes/warrantyRoutes");
+loadRoute(`${API_PREFIX}/rma`,          "./routes/rmaRoutes");
+loadRoute(`${API_PREFIX}/payment`,      "./routes/paymentRoutes");
+loadRoute(`${API_PREFIX}/admin/stats`,  "./routes/stats");
 
 console.log("✅ Routes chargées\n");
 
 // ─── Routeur Admin ────────────────────────────────────────────────────────────
-// Toutes les ressources admin sous /api/v1/admin/*
-// Double protection verifyToken + isAdmin sur TOUT le routeur.
 const adminRouter = require("express").Router();
 
-// Debug (dev uniquement)
 if (isDev) {
   adminRouter.use((req, res, next) => {
     console.log("🔐 Admin:", req.method, req.path, "| Token:", !!req.headers.authorization);
@@ -208,10 +193,10 @@ const productController = require("./controllers/productController");
 const Settings          = require("./models/Settings");
 const Category          = require("./models/Category");
 const PromoCode         = require("./models/PromoCode");
+const User              = require("./models/User");
+const Order             = require("./models/Order");
 
 // ── Articles (/api/v1/admin/articles) ────────────────────────────────────────
-// ✅ GET admin → tous statuts (draft + published), contrairement à la route
-//    publique /api/v1/articles qui ne retourne que les "published"
 adminRouter.get("/articles", async (req, res) => {
   try {
     const Article = require("./models/Article");
@@ -238,8 +223,17 @@ adminRouter.get("/articles", async (req, res) => {
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
 
-// ✅ PUT /:id/publish AVANT PUT /:id (sinon "publish" serait capturé comme id)
-adminRouter.post("/articles",            articleController.createArticle);
+// ✅ FIX BUG 2 : POST /admin/articles
+// articleController.createArticle lit req.user._id comme author
+// Mais il faut s'assurer que le body contient bien les champs requis du modèle
+adminRouter.post("/articles", (req, res) => {
+  // Injecter l'auteur si absent (sécurité)
+  if (!req.body.author) {
+    req.body.author = req.user._id;
+  }
+  articleController.createArticle(req, res);
+});
+
 adminRouter.put("/articles/:id/publish", articleController.togglePublish);
 adminRouter.put("/articles/:id",         articleController.updateArticle);
 adminRouter.delete("/articles/:id",      articleController.deleteArticle);
@@ -261,7 +255,7 @@ adminRouter.delete("/orders/:id",      orderController.deleteOrder);
 
 // ── Produits (/api/v1/admin/products) ────────────────────────────────────────
 adminRouter.get("/products",           productController.getProducts);
-adminRouter.post("/products/bulk",     productController.bulkCreateProducts); // AVANT /:id
+adminRouter.post("/products/bulk",     productController.bulkCreateProducts);
 adminRouter.post("/products",          productController.createProduct);
 adminRouter.put("/products/:id",       productController.updateProduct);
 adminRouter.delete("/products/:id",    productController.deleteProduct);
@@ -316,18 +310,82 @@ adminRouter.get("/promo-codes", async (req, res) => {
     res.json({ success: true, promoCodes });
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
+
+// ✅ FIX BUG 3 : POST /admin/promo-codes
+// Le frontend envoie { code, type, value, minPurchase, maxDiscount, usageLimit, expiryDate, isActive }
+// Le modèle PromoCode attend : { code, type, discount, minAmount, maxDiscount, usageLimit, endDate, isActive }
+// → mapping expiryDate → endDate, value → discount, minPurchase → minAmount
 adminRouter.post("/promo-codes", async (req, res) => {
   try {
-    const promo = await PromoCode.create({ ...req.body, createdBy: req.user._id });
+    const {
+      code,
+      type,
+      value,       // frontend envoie "value", le modèle attend "discount"
+      discount,    // au cas où le frontend envoie déjà "discount"
+      minPurchase, // frontend envoie "minPurchase", le modèle attend "minAmount"
+      minAmount,
+      maxDiscount,
+      usageLimit,
+      expiryDate,  // frontend envoie "expiryDate", le modèle attend "endDate"
+      endDate,
+      isActive,
+      description
+    } = req.body;
+
+    if (!code || !type || !expiryDate && !endDate) {
+      return res.status(400).json({
+        success: false,
+        message: "Champs requis manquants: code, type, date d'expiration"
+      });
+    }
+
+    const promoData = {
+      code: code.trim().toUpperCase(),
+      description: description || `Code ${code.trim().toUpperCase()}`,
+      type,
+      discount: discount ?? value ?? 0,
+      minAmount: minAmount ?? minPurchase ?? 0,
+      maxDiscount: maxDiscount ?? null,
+      usageLimit: usageLimit ?? null,
+      endDate: endDate ?? expiryDate,
+      isActive: isActive !== undefined ? isActive : true,
+      createdBy: req.user._id
+    };
+
+    const promo = await PromoCode.create(promoData);
     res.status(201).json({ success: true, promoCode: promo });
-  } catch (e) { res.status(500).json({ message: e.message }); }
+  } catch (e) {
+    console.error("❌ Erreur création promo-code:", e.message);
+    res.status(500).json({ success: false, message: e.message });
+  }
 });
+
 adminRouter.put("/promo-codes/:id", async (req, res) => {
   try {
-    const promo = await PromoCode.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    // Même mapping que pour le POST
+    const {
+      value, discount,
+      minPurchase, minAmount,
+      expiryDate, endDate,
+      ...rest
+    } = req.body;
+
+    const updateData = {
+      ...rest,
+      ...(value !== undefined && { discount: value }),
+      ...(discount !== undefined && { discount }),
+      ...(minPurchase !== undefined && { minAmount: minPurchase }),
+      ...(minAmount !== undefined && { minAmount }),
+      ...(expiryDate && { endDate: expiryDate }),
+      ...(endDate && { endDate }),
+    };
+
+    const promo = await PromoCode.findByIdAndUpdate(req.params.id, updateData, { new: true });
+    if (!promo) return res.status(404).json({ success: false, message: "Code promo introuvable" });
     res.json({ success: true, promoCode: promo });
-  } catch (e) { res.status(500).json({ message: e.message }); }
+  } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
+
 adminRouter.delete("/promo-codes/:id", async (req, res) => {
   try {
     await PromoCode.findByIdAndDelete(req.params.id);
@@ -338,6 +396,208 @@ adminRouter.delete("/promo-codes/:id", async (req, res) => {
 // ── Analytics (/api/v1/admin/analytics) ──────────────────────────────────────
 adminRouter.get("/analytics", async (req, res) => {
   res.json({ success: true, stats: {}, revenue: [], categories: [], topProducts: [], customers: [] });
+});
+
+// ✅ FIX BUG 1 : Routes /admin/users — manquaient totalement dans adminRouter
+// Le frontend (Users.jsx) appelle api.get('/admin/users'), api.put('/admin/users/:id/role'), etc.
+// Ces routes n'existaient que sous /api/v1/users (userRoutes.js), pas sous /api/v1/admin/users
+
+adminRouter.get("/users", async (req, res) => {
+  try {
+    const {
+      page = 1,
+      limit = 20,
+      search,
+      role,
+      sortBy = "createdAt",
+      order = "desc"
+    } = req.query;
+
+    const filter = {};
+    if (search) {
+      filter.$or = [
+        { name: { $regex: search, $options: "i" } },
+        { email: { $regex: search, $options: "i" } }
+      ];
+    }
+    if (role === "admin") filter.isAdmin = true;
+    else if (role === "customer") filter.isAdmin = false;
+
+    const pageNum = Math.max(1, Number(page));
+    const limitNum = Math.min(100, Math.max(1, Number(limit)));
+    const skip = (pageNum - 1) * limitNum;
+    const sortOrder = order === "desc" ? -1 : 1;
+
+    const [users, total] = await Promise.all([
+      User.find(filter)
+        .sort({ [sortBy]: sortOrder })
+        .skip(skip)
+        .limit(limitNum)
+        .lean(),
+      User.countDocuments(filter)
+    ]);
+
+    // Récupérer le count des commandes en une seule agrégation
+    const userIds = users.map(u => u._id);
+    const orderStats = await Order.aggregate([
+      { $match: { user: { $in: userIds } } },
+      {
+        $group: {
+          _id: "$user",
+          totalOrders: { $sum: 1 },
+          totalSpent: { $sum: "$totalPrice" }
+        }
+      }
+    ]);
+    const statsMap = orderStats.reduce((acc, item) => {
+      acc[item._id.toString()] = {
+        totalOrders: item.totalOrders,
+        totalSpent: item.totalSpent
+      };
+      return acc;
+    }, {});
+
+    const usersWithStats = users.map(user => ({
+      ...user,
+      password: undefined,
+      // Mapper isAdmin → role pour le frontend admin qui utilise user.role
+      role: user.isAdmin ? "admin" : "customer",
+      totalOrders: statsMap[user._id.toString()]?.totalOrders || 0,
+      totalSpent: statsMap[user._id.toString()]?.totalSpent || 0,
+      isActive: user.isActive !== false // défaut true si absent
+    }));
+
+    res.status(200).json({
+      success: true,
+      users: usersWithStats,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total,
+        pages: Math.ceil(total / limitNum)
+      }
+    });
+  } catch (e) {
+    console.error("❌ Erreur admin/users:", e);
+    res.status(500).json({ success: false, message: e.message });
+  }
+});
+
+adminRouter.get("/users/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).lean();
+    if (!user) return res.status(404).json({ success: false, message: "Utilisateur introuvable" });
+
+    const [ordersCount, orderAgg, recentOrders] = await Promise.all([
+      Order.countDocuments({ user: user._id }),
+      Order.aggregate([
+        { $match: { user: user._id } },
+        { $group: { _id: null, totalSpent: { $sum: "$totalPrice" }, averageOrder: { $avg: "$totalPrice" } } }
+      ]),
+      Order.find({ user: user._id })
+        .sort({ createdAt: -1 })
+        .limit(5)
+        .select("orderNumber totalPrice status createdAt")
+        .lean()
+    ]);
+
+    res.status(200).json({
+      success: true,
+      user: {
+        ...user,
+        password: undefined,
+        role: user.isAdmin ? "admin" : "customer",
+        stats: {
+          ordersCount,
+          totalSpent: orderAgg[0]?.totalSpent || 0,
+          averageOrder: orderAgg[0]?.averageOrder || 0,
+          recentOrders
+        }
+      }
+    });
+  } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+adminRouter.put("/users/:id", async (req, res) => {
+  try {
+    const { name, email, phone, isAdmin, isActive, role } = req.body;
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ success: false, message: "Utilisateur introuvable" });
+
+    if (name !== undefined) user.name = name;
+    if (email !== undefined) user.email = email;
+    if (phone !== undefined) user.phone = phone;
+    if (isActive !== undefined) user.isActive = isActive;
+    // Supporter les deux formats : isAdmin (boolean) ou role (string)
+    if (isAdmin !== undefined) user.isAdmin = isAdmin;
+    if (role !== undefined) user.isAdmin = (role === "admin");
+
+    await user.save();
+    res.status(200).json({
+      success: true,
+      message: "Utilisateur mis à jour",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        isAdmin: user.isAdmin,
+        role: user.isAdmin ? "admin" : "customer",
+        isActive: user.isActive
+      }
+    });
+  } catch (e) {
+    if (e.code === 11000) return res.status(400).json({ success: false, message: "Cet email est déjà utilisé" });
+    res.status(500).json({ success: false, message: e.message });
+  }
+});
+
+// Route PUT /admin/users/:id/role — utilisée par Users.jsx → changeRole()
+adminRouter.put("/users/:id/role", async (req, res) => {
+  try {
+    const { role } = req.body;
+    const isAdminRole = (role === "admin");
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { isAdmin: isAdminRole },
+      { new: true }
+    );
+    if (!user) return res.status(404).json({ success: false, message: "Utilisateur introuvable" });
+    res.json({
+      success: true,
+      message: "Rôle mis à jour",
+      user: { ...user.toObject(), role: user.isAdmin ? "admin" : "customer", password: undefined }
+    });
+  } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+// Route PUT /admin/users/:id/status — utilisée par Users.jsx → toggleUserStatus()
+adminRouter.put("/users/:id/status", async (req, res) => {
+  try {
+    const { isActive } = req.body;
+    const user = await User.findByIdAndUpdate(
+      req.params.id,
+      { isActive },
+      { new: true }
+    );
+    if (!user) return res.status(404).json({ success: false, message: "Utilisateur introuvable" });
+    res.json({
+      success: true,
+      message: `Utilisateur ${isActive ? "activé" : "désactivé"}`,
+      user: { ...user.toObject(), password: undefined }
+    });
+  } catch (e) { res.status(500).json({ success: false, message: e.message }); }
+});
+
+adminRouter.delete("/users/:id", async (req, res) => {
+  try {
+    if (req.params.id === req.user._id.toString()) {
+      return res.status(400).json({ success: false, message: "Vous ne pouvez pas supprimer votre propre compte" });
+    }
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) return res.status(404).json({ success: false, message: "Utilisateur introuvable" });
+    res.json({ success: true, message: "Utilisateur supprimé" });
+  } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
 app.use(`${API_PREFIX}/admin`, adminRouter);
