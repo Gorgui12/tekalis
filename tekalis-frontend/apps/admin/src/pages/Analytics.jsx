@@ -43,7 +43,16 @@ const AdminAnalytics = () => {
   const fetchAnalytics = async () => {
     try {
       const { data } = await api.get(`/admin/analytics?period=${period}`);
-      setAnalyticsData(data || getDemoAnalytics());
+      const safeData = {
+  ...getDemoAnalytics(),
+  ...data,
+  stats: {
+    ...getDemoAnalytics().stats,
+    ...(data?.stats || {})
+  }
+};
+
+setAnalyticsData(safeData);
     } catch (error) {
       console.error("Erreur chargement analytics:", error);
       setAnalyticsData(getDemoAnalytics());
