@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * CheckoutForm.jsx — Tunnel de commande Tekalis
  *
@@ -6,7 +8,7 @@
  *   - L'adresse est aplatie (deliveryName, deliveryPhone, etc.)
  *   - Le total s'appelle `totalPrice` côté backend
  */
-
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -21,7 +23,8 @@ import OrderSummary from "./OrderSummary";
 
 const CheckoutForm = () => {
   const dispatch    = useDispatch();
-  const navigate    = useNavigate();
+  const navigate    = const router = useRouter()
+router.push();
   const toast       = useToast();
 
   const { items, totalAmount } = useSelector((state) => state.cart);

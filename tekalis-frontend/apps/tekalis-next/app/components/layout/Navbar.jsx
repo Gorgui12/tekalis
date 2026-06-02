@@ -1,5 +1,8 @@
+"use client";
+
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import SearchBarLive from '../SearchBarLive';
 import {
@@ -86,7 +89,9 @@ const Navbar = () => {
   const cartItems        = useSelector((state) => state.cart.items);
   const wishlistItems    = useSelector((state) => state.wishlist?.items || []);
 
-  const navigate  = useNavigate();
+  const router = useRouter();
+// Si vous vouliez juste utiliser router pour naviguer :
+const navigate = (path) => router.push(path);
   const location  = useLocation();
   const toast     = useToast();
   const { logout } = useAuth();

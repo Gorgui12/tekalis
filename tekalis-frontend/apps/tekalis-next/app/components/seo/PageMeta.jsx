@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * PageMeta — Composant SEO unifié pour toutes les pages
  * 
@@ -207,3 +209,4 @@ const PageMeta = ({
 };
 
 export default PageMeta;
+

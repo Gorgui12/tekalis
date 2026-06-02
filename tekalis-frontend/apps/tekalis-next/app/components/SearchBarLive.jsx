@@ -1,9 +1,11 @@
+"use client";
+
 /**
  * SearchBarLive — Barre de recherche avec résultats en temps réel
  * Affiche : image, nom, prix, stock directement dans le dropdown
  * Mobile-first · a11y · debounce 300ms
  */
-
+import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaSearch, FaTimes, FaSpinner, FaArrowRight } from 'react-icons/fa';
@@ -85,7 +87,8 @@ const SearchBarLive = ({
   maxResults = 6,
   onResultSelect,
 }) => {
-  const navigate = useNavigate();
+  const navigate = const router = useRouter()
+router.push();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -375,3 +378,4 @@ const SearchBarLive = ({
 };
 
 export default SearchBarLive;
+

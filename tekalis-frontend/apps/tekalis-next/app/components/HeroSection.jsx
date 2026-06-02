@@ -1,5 +1,7 @@
+"use client";
+
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 const HeroSection = ({ slides, autoplay = true, interval = 5000 }) => {

@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  tekalis-seo/sitemap/sitemap.optimized.xml
+  
+  REMPLACE : tekalis-frontend/apps/client/public/sitemap.xml
+  
+  CHANGEMENTS MAJEURS :
+  1. Les catégories utilisent maintenant /category/slug (vraies routes React)
+     et NON PLUS /products?category=slug (Google ignore les query params)
+  2. Ajout des pages blog individuelles (à compléter dynamiquement)
+  3. Suppression des filtres promotions/nouveautés (duplicate content)
+  4. Priorités recalibrées
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+  <!-- ═══════════════════════════════════════════════════════════
+       PAGES PRIORITAIRES
+  ═══════════════════════════════════════════════════════════ -->
+
+  <url>
+    <loc>https://tekalis.com/</loc>
+    <lastmod>2026-03-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <url>
+    <loc>https://tekalis.com/products</loc>
+    <lastmod>2026-03-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       CATÉGORIES — VRAIES ROUTES /category/:slug
+       (NE PAS utiliser /products?category= pour le SEO)
+  ═══════════════════════════════════════════════════════════ -->
+
+  <url>
+    <loc>https://tekalis.com/category/smartphones</loc>
+    <lastmod>2026-03-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://tekalis.com/category/laptops</loc>
+    <lastmod>2026-03-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://tekalis.com/category/gaming</loc>
+    <lastmod>2026-03-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://tekalis.com/category/tv</loc>
+    <lastmod>2026-03-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://tekalis.com/category/electromenager</loc>
+    <lastmod>2026-03-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://tekalis.com/category/climatiseurs</loc>
+    <lastmod>2026-03-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://tekalis.com/category/energie-solaire</loc>
+    <lastmod>2026-03-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://tekalis.com/category/accessoires</loc>
+    <lastmod>2026-03-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://tekalis.com/category/audio</loc>
+    <lastmod>2026-03-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- ═══════════════════════════════════════════════════════════
+       PAGES UTILITAIRES
+  ═══════════════════════════════════════════════════════════ -->
+
+  <url>
+    <loc>https://tekalis.com/blog</loc>
+    <lastmod>2026-03-28</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://tekalis.com/configurator</loc>
+    <lastmod>2026-03-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <url>
+    <loc>https://tekalis.com/apropos</loc>
+    <lastmod>2026-03-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <url>
+    <loc>https://tekalis.com/contact</loc>
+    <lastmod>2026-03-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.5</priority>
+  </url>
+
+  <!--
+    PRODUITS INDIVIDUELS : générés dynamiquement par sitemap-generator.js
+    Exemple :
+    <url>
+      <loc>https://tekalis.com/products/PRODUCT_ID</loc>
+      <lastmod>2026-03-28</lastmod>
+      <changefreq>weekly</changefreq>
+      <priority>0.7</priority>
+    </url>
+
+    ARTICLES BLOG : générés dynamiquement par sitemap-generator.js
+    Exemple :
+    <url>
+      <loc>https://tekalis.com/blog/meilleur-smartphone-dakar-2025</loc>
+      <lastmod>2026-03-28</lastmod>
+      <changefreq>monthly</changefreq>
+      <priority>0.6</priority>
+    </url>
+  -->
+
+</urlset>

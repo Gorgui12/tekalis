@@ -1,3 +1,5 @@
+"use client";
+
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
@@ -68,4 +70,5 @@ const MobileMoneyPayment = ({ orderId }) => {
 };
 
 export default MobileMoneyPayment;
+
 

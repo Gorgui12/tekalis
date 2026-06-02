@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * lib/api.js
  * Instance Axios centralisée — fonctionne côté serveur ET client.
