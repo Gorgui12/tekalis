@@ -3,13 +3,13 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
-import { addToCart } from "../../../../../packages/shared/redux/slices/cartSlice";
+import { addToCart } from "../@/store/slices/cartSlice";
 import {
   addToWishlist,
   removeFromWishlist,
   addToWishlistLocal,
   removeFromWishlistLocal,
-} from "../../../../../packages/shared/redux/slices/wishListSlice";
+} from "../@/store/slices/wishListSlice";
 import { useToast } from "../../../../../packages/shared/context/ToastContext";
 import {
   FaStar,
@@ -272,3 +272,4 @@ const ProductCard = ({ product, showSpecs = false }) => {
 };
 
 export default ProductCard;
+

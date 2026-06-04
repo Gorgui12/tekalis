@@ -5,7 +5,7 @@ import { useNavigate, useSearchParams, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { FaTools, FaUpload, FaTimes } from "react-icons/fa";
 import api from "../../../../packages/shared/api/api";
-import { useToast } from '../../../../packages/shared/context/ToastContext';
+import { useToast } from '@/components/shared/ToastProvider';
 import { useRouter } from "next/navigation";
 
 const CreateRMA = () => {
@@ -422,3 +422,4 @@ router.push();
 };
 
 export default CreateRMA;
+

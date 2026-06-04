@@ -10,11 +10,11 @@ import {
   FaTh,
 } from "react-icons/fa";
 
-import ProductCard from "../../src/components/product/ProductCard";
+import ProductCard from "@/components/product/ProductCard";
 import useProducts from "../../../../packages/shared/hooks/useProducts";
 import useDebounce from "../../../../packages/shared/hooks/useDebounce";
 import usePagination from "../../../../packages/shared/hooks/usePagination";
-import Pagination from "../../src/components/shared/Pagination";
+import Pagination from "@/components/shared/Pagination";
 import { useRouter } from "next/navigation";
 // ─── Helper : normalise une catégorie (objet OU string) en string ─────────────
 const getCatName = (cat) => {
@@ -269,3 +269,4 @@ router.push();
 };
 
 export default Products;
+

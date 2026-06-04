@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaSpinner, FaCheckCircle } from "react-icons/fa";
 import api from "../../../../packages/shared/api/api";
-import { useToast } from "../../../../packages/shared/context/ToastContext";
+import { useToast } from "@/components/shared/ToastProvider";
 import { useRouter } from "next/navigation";
 
 /* ── Règles de validation mot de passe ────────────────────────────────── */
@@ -311,3 +311,4 @@ router.push();
 }
 
 export default Register;
+

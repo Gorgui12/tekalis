@@ -6,9 +6,9 @@ import { FaHeart, FaShoppingCart, FaTrash } from "react-icons/fa";
 import {
   removeFromWishlist,
   removeFromWishlistLocal,
-} from "../../../../packages/shared/redux/slices/wishListSlice";
-import { addToCart } from "../../../../packages/shared/redux/slices/cartSlice";
-import { useToast } from "../../../../packages/shared/context/ToastContext";
+} from "@/store/slices/wishlistSlice";
+import { addToCart } from "@/store/slices/cartSlice";
+import { useToast } from "@/components/shared/ToastProvider";
 
 const WishlistPage = () => {
   const dispatch = useDispatch();
@@ -177,3 +177,5 @@ const WishlistPage = () => {
 };
 
 export default WishlistPage;
+
+

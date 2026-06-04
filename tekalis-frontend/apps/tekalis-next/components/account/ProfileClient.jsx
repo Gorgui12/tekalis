@@ -6,12 +6,12 @@ import {
   FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaEdit, FaSave, FaTimes, 
   FaSignOutAlt, FaShieldAlt, FaBell
 } from "react-icons/fa";
-import useAuth from "../../../../packages/shared/hooks/useAuth";
+import useAuth from "@/lib/hooks/useAuth";
 import useErrorHandler from "../../../../packages/shared/hooks/useErrorHandler"; // ✅ AJOUTÉ
-import { useToast } from "../../../../packages/shared/context/ToastContext"; // ✅ CORRIGÉ
-import { validateEmail, validatePhone, validatePassword, sanitizeInput } from "../../../../packages/shared/outils/validators"; // ✅ AJOUTÉ
-import LoadingSpinner from "../../src/components/shared/LoadingSpinner"; // ✅ AJOUTÉ
-import Button from "../../src/components/shared/Button"; // ✅ AJOUTÉ
+import { useToast } from "@/components/shared/ToastProvider"; // ✅ CORRIGÉ
+import { validateEmail, validatePhone, validatePassword, sanitizeInput } from "@/lib/utils/validators"; // ✅ AJOUTÉ
+import LoadingSpinner from "@/components/shared/LoadingSpinner"; // ✅ AJOUTÉ
+import Button from "@/components/shared/Button"; // ✅ AJOUTÉ
 import api from "../../../../packages/shared/api/api";
 import { useRouter } from "next/navigation";
 
@@ -523,4 +523,5 @@ router.push();
 };
 
 export default Profile;
+
 

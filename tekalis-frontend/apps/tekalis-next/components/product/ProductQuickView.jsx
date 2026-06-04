@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { addToCart } from "../../../../../packages/shared/redux/slices/cartSlice";
-import { toggleWishlist } from "../../../../../packages/shared/redux/slices/wishListSlice";
+import { addToCart } from "@/store/slices/cartSlice";
+import { toggleWishlist } from "@/store/slices/wishlistSlice";
 import Link from "next/link";
 import { 
   FaTimes, FaShoppingCart, FaHeart, FaStar, FaMinus, FaPlus,
   FaExternalLinkAlt, FaCheckCircle, FaBox
 } from "react-icons/fa";
-import { useToast } from "../../../../../packages/shared/context/ToastContext";
+import { useToast } from "@/components/shared/ToastProvider";
 import Button from "../../shared/Button";
 
 /**
@@ -263,3 +263,6 @@ const ProductQuickView = ({ product, isOpen, onClose }) => {
 };
 
 export default ProductQuickView;
+
+
+

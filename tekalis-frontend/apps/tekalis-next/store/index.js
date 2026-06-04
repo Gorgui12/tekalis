@@ -25,3 +25,13 @@ export const makeStore = () =>
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({ serializableCheck: false }),
   });
+
+export const store = configureStore({
+  reducer: {
+    auth: authReducer,
+    cart: cartReducer,
+    wishlist: wishlistReducer,
+    product: productReducer,
+    ui: uiReducer,
+  },
+});

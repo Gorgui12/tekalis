@@ -13,7 +13,7 @@ import {
   FaFilter
 } from "react-icons/fa";
 import api from "../../../../packages/shared/api/api";
-import { useToast } from '../../../../packages/shared/context/ToastContext';
+import { useToast } from '@/components/shared/ToastProvider';
 import { useRouter } from "next/navigation";
 
 const MyWarranties = () => {
@@ -387,3 +387,4 @@ router.push();
 };
 
 export default MyWarranties;
+

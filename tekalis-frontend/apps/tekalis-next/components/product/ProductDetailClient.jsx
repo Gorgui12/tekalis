@@ -3,19 +3,19 @@
 import { useParams, Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
-import { fetchProducts } from "../../../../packages/shared/redux/slices/productSlice";
-import { addToCart } from "../../../../packages/shared/redux/slices/cartSlice";
+import { fetchProducts } from "@/store/slices/productSlice";
+import { addToCart } from "@/store/slices/cartSlice";
 import {
   addToWishlist,
   removeFromWishlist,
   addToWishlistLocal,
   removeFromWishlistLocal,
-} from "../../../../packages/shared/redux/slices/wishListSlice";
-import ProductCard from "../../src/components/product/ProductCard";
-import ProductGallery from "../../src/components/product/ProductGallery";
-import ProductSpecs from "../../src/components/product/ProductSpecs";
-import ReviewList from "../../src/components/review/ReviewList";
-import { Breadcrumb } from "../../src/components/seo/Breadcrumb";
+} from "@/store/slices/wishlistSlice";
+import ProductCard from "@/components/product/ProductCard";
+import ProductGallery from "@/components/product/ProductGallery";
+import ProductSpecs from "@/components/product/ProductSpecs";
+import ReviewList from "@/components/review/ReviewList";
+import { Breadcrumb } from "@/components/seo/Breadcrumb";
 import PageMeta from "../components/seo/PageMeta";
 import {
   FaShieldAlt,
@@ -27,7 +27,7 @@ import {
   FaRegHeart,
   FaShoppingCart,
 } from "react-icons/fa";
-import { useToast } from "../../../../packages/shared/context/ToastContext";
+import { useToast } from "@/components/shared/ToastProvider";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -360,3 +360,6 @@ const ProductDetails = () => {
 };
 
 export default ProductDetails;
+
+
+

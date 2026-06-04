@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-import { addToCart } from "../../../../../packages/shared/redux/slices/cartSlice";
-import { toggleWishlist } from "../../../../../packages/shared/redux/slices/wishListSlice";
+import { addToCart } from "../@/store/slices/cartSlice";
+import { toggleWishlist } from "../@/store/slices/wishListSlice";
 import Link from "next/link";
 import { 
   FaTimes, FaShoppingCart, FaHeart, FaStar, FaMinus, FaPlus,
@@ -263,3 +263,4 @@ const ProductQuickView = ({ product, isOpen, onClose }) => {
 };
 
 export default ProductQuickView;
+

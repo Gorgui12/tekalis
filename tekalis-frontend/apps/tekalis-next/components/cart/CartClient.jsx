@@ -7,7 +7,7 @@ import {
   increaseQuantity,
   decreaseQuantity,
   clearCart,
-} from "../../../../packages/shared/redux/slices/cartSlice";
+} from "@/store/slices/cartSlice";
 import { FaTrash, FaMinus, FaPlus, FaShieldAlt, FaTruck, FaLock } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 
@@ -236,3 +236,4 @@ router.push();
 };
 
 export default Cart;
+

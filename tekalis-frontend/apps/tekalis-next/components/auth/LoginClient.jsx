@@ -6,8 +6,8 @@ import {
   FaEnvelope, FaLock, FaEye, FaEyeSlash, FaSpinner,
   FaShieldAlt, FaTruck, FaHeadset
 } from "react-icons/fa";
-import useAuth from "../../../../packages/shared/hooks/useAuth";
-import { useToast } from "../../../../packages/shared/context/ToastContext";
+import useAuth from "@/lib/hooks/useAuth";
+import { useToast } from "@/components/shared/ToastProvider";
 import { useRouter } from "next/navigation";
 
 function Login() {
@@ -264,3 +264,4 @@ const navigate = (path) => router.push(path);
 }
 
 export default Login;
+

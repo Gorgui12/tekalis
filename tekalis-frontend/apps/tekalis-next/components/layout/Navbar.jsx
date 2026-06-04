@@ -12,9 +12,9 @@ import {
   FaThermometerHalf, FaHeadphones, FaWrench, FaSun, FaTag,
   FaChevronUp
 } from "react-icons/fa";
-import { useToast } from "../../../../../packages/shared/context/ToastContext";
-import { ThemeToggle } from "../../../../../packages/shared/context/ThemeContext";
-import useAuth from "../../../../../packages/shared/hooks/useAuth";
+import { useToast } from "@/components/shared/ToastProvider";
+import { ThemeToggle } from "@/components/shared/ThemeProvider";
+import useAuth from "@/lib/hooks/useAuth";
 import { useRouter } from "next/navigation";
 
 /* ── Catégories avec icônes et couleurs ────────────────────────────────── */
@@ -523,3 +523,5 @@ const navigate = (path) => router.push(path);
 };
 
 export default Navbar;
+
+

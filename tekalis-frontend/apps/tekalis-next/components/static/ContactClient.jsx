@@ -7,7 +7,7 @@ import {
   FaWhatsapp, FaFacebook, FaInstagram, FaLinkedin,
   FaPaperPlane, FaCheckCircle, FaExclamationCircle
 } from "react-icons/fa";
-import { useToast } from "../../../../packages/shared/context/ToastContext";
+import { useToast } from "@/components/shared/ToastProvider";
 import Button from "../components/shared/Button";
 import { Breadcrumb } from "../components/seo/Breadcrumb";
 
@@ -445,3 +445,4 @@ const Contact = () => {
 };
 
 export default Contact;
+

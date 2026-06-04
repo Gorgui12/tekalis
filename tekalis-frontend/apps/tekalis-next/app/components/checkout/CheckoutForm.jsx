@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { clearCart } from "../../../../../packages/shared/redux/slices/cartSlice";
+import { clearCart } from "../@/store/slices/cartSlice";
 import { useToast } from "../../../../../packages/shared/context/ToastContext";
 import api from "../../../../../packages/shared/api/api";
 
@@ -190,3 +190,4 @@ router.push();
 };
 
 export default CheckoutForm;
+

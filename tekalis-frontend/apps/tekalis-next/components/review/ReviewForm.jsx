@@ -13,7 +13,7 @@ import {
   deleteReview,
   likeReview
 } from "../../../../../packages/shared/api/endpoints/reviews";
-import { useToast } from "../../../../../packages/shared/context/ToastContext";
+import { useToast } from "@/components/shared/ToastProvider";
 
 /**
  * ReviewForm — Formulaire d'ajout d'un avis produit
@@ -188,3 +188,5 @@ const ReviewForm = ({ productId, onSuccess }) => {
 };
 
 export default ReviewForm;
+
+

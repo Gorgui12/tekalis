@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import StatusBadge from "../../src/components/shared/StatusBadge";
+import StatusBadge from "@/components/shared/StatusBadge";
 
 import { 
   FaBox, 
@@ -17,7 +17,7 @@ import {
   FaRedo
 } from "react-icons/fa";
 import api from "../../../../packages/shared/api/api";
-import { useToast } from '../../../../packages/shared/context/ToastContext';
+import { useToast } from '@/components/shared/ToastProvider';
 import { useRouter } from "next/navigation";
 const OrderDetails = () => {
   const { id } = useParams();
@@ -371,3 +371,4 @@ router.push();
 
 
 export default OrderDetails;
+

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProducts } from "../../../../packages/shared/redux/slices/productSlice";
+import { fetchProducts } from "@/store/slices/productSlice";
 import PageMeta from '../components/seo/PageMeta';
 import DynamicHero from '../components/DynamicHero';
 import { 
@@ -23,7 +23,7 @@ import {
   FaKeyboard
 } from "react-icons/fa";
 import api from "../../../../packages/shared/api/api";
-import ProductCard from "../../src/components/product/ProductCard";
+import ProductCard from "@/components/product/ProductCard";
 
 // ── Schema.org défini EN DEHORS du composant (évite recréation à chaque render) ──
 const HOME_SCHEMA = {
@@ -410,3 +410,5 @@ const Home = () => {
 };
 
 export default Home;
+
+

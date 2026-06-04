@@ -6,7 +6,7 @@ import {
   FaMemory, FaMicrochip, FaHdd, FaDesktop, FaBatteryFull,
   FaWeight, FaRuler, FaPalette
 } from "react-icons/fa";
-import { useToast } from "../../../../../packages/shared/context/ToastContext";
+import { useToast } from "@/components/shared/ToastProvider";
 
 /**
  * ProductSpecs - Score 9/10
@@ -228,3 +228,5 @@ const ProductSpecs = ({ product }) => {
 };
 
 export default ProductSpecs;
+
+

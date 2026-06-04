@@ -12,8 +12,8 @@
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { clearCart } from "../../../../../packages/shared/redux/slices/cartSlice";
-import { useToast } from "../../../../../packages/shared/context/ToastContext";
+import { clearCart } from "@/store/slices/cartSlice";
+import { useToast } from "@/components/shared/ToastProvider";
 import api from "../../../../../packages/shared/api/api";
 
 import CheckoutSteps from "./CheckoutSteps";
@@ -191,3 +191,6 @@ router.push();
 };
 
 export default CheckoutForm;
+
+
+

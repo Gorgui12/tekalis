@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
-import { addToCart } from "../../../../packages/shared/redux/slices/cartSlice";
+import { addToCart } from "@/store/slices/cartSlice";
 import { 
   FaCheckCircle, 
   FaArrowRight, 
@@ -17,7 +17,7 @@ import {
   FaShoppingCart,
   FaSpinner
 } from "react-icons/fa";
-import { useToast } from '../../../../packages/shared/context/ToastContext';
+import { useToast } from '@/components/shared/ToastProvider';
 import api from "../../../../packages/shared/api/api";
 import { useRouter } from "next/navigation";
 
@@ -705,3 +705,5 @@ const fetchAllProducts = async () => {
 };
 
 export default Configurator;
+
+

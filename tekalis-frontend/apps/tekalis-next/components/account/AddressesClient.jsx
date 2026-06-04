@@ -13,7 +13,7 @@ import {
   FaTimes
 } from "react-icons/fa";
 import api from "../../../../packages/shared/api/api";
-import { useToast } from '../../../../packages/shared/context/ToastContext';
+import { useToast } from '@/components/shared/ToastProvider';
 const Addresses = () => {
   const toast = useToast();
   const navigate = const router = useRouter()
@@ -459,3 +459,4 @@ router.push();
 };
 
 export default Addresses;
+

@@ -17,7 +17,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { fetchProducts } from "../../../../packages/shared/redux/slices/productSlice";
+import { fetchProducts } from "@/store/slices/productSlice";
 import ProductCard from "../components/product/ProductCard";
 import { Breadcrumb } from "../components/seo/Breadcrumb";
 import PageMeta from '../components/seo/PageMeta';
@@ -450,3 +450,4 @@ const CategoryPage = () => {
 };
 
 export default CategoryPage;
+
