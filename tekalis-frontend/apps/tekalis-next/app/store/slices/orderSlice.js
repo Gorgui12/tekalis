@@ -1,5 +1,5 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "../../../../packages/shared/api/api"; // Modifie selon ton setup
+﻿import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "@/lib/api"; // Modifie selon ton setup
 
 // 🔥 Récupérer les commandes de l'utilisateur
 export const fetchUserOrders = createAsyncThunk("orders/fetchUserOrders", async (_, { rejectWithValue }) => {

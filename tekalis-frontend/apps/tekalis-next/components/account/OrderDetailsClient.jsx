@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, Link, useNavigate } /* react-router-dom retire */ from "next/navigation";
 import { useSelector } from "react-redux";
 import StatusBadge from "@/components/shared/StatusBadge";
 
@@ -16,13 +16,13 @@ import {
   FaCreditCard,
   FaRedo
 } from "react-icons/fa";
-import api from "../../../../packages/shared/api/api";
+import api from "@/lib/api";
 import { useToast } from '@/components/shared/ToastProvider';
 import { useRouter } from "next/navigation";
 const OrderDetails = () => {
   const { id } = useParams();
-  const navigate = const router = useRouter()
-router.push();
+  const router = useRouter();
+  const navigate = (path) => router.push(path);
   const { user } = useSelector((state) => state.auth);
   const toast = useToast();
   
@@ -64,7 +64,7 @@ router.push();
       <div className="min-h-screen flex items-center justify-center mt-20">
         <div className="text-center">
           <p className="text-xl text-gray-600 mb-4">Commande introuvable</p>
-          <Link to="/orders" className="text-blue-600 hover:text-blue-700 font-semibold">
+          <Link href="/orders" className="text-blue-600 hover:text-blue-700 font-semibold">
             ← Retour aux commandes
           </Link>
         </div>

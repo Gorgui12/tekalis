@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * PageMeta — Composant SEO unifié pour toutes les pages
@@ -24,7 +24,7 @@
  *   <PageMeta title="Contact" description="..." h1="Contactez-nous" />
  */
 
-import { Helmet } from 'react-helmet-async';
+// Helmet supprime - utiliser metadata export de Next.js
 
 const SITE_NAME = 'Tekalis';
 const SITE_URL = 'https://tekalis.com';
@@ -66,7 +66,7 @@ const PageMeta = ({
   // Canonical : utiliser l'URL fournie ou construire depuis window.location
   const canonicalUrl = canonical
     || (typeof window !== 'undefined'
-      ? `${SITE_URL}${window.location.pathname}`
+      ? `${SITE_URL}${window.pathname}`
       : SITE_URL);
 
   /* ── Génération Schema.org ───────────────────────────────────────────── */

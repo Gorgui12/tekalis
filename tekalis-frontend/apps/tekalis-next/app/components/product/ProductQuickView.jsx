@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useDispatch } from "react-redux";
@@ -9,7 +9,7 @@ import {
   FaTimes, FaShoppingCart, FaHeart, FaStar, FaMinus, FaPlus,
   FaExternalLinkAlt, FaCheckCircle, FaBox
 } from "react-icons/fa";
-import { useToast } from "../../../../../packages/shared/context/ToastContext";
+import { useToast } from "../@/components/shared/ToastProvider";
 import Button from "../../shared/Button";
 
 /**

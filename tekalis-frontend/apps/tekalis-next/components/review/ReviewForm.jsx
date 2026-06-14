@@ -1,18 +1,18 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useSelector } from "react-redux";
 import { FaPaperPlane, FaExclamationCircle } from "react-icons/fa";
 import StarRating from "./StarRating";
 import Button from "../shared/Button";
-import api from "../../../../../packages/shared/api/api"; // ← instance axios centralisée
+import api from "../@/lib/api"; // ← instance axios centralisée
 import {
   getProductReviews,
   addReview,
   updateReview,
   deleteReview,
   likeReview
-} from "../../../../../packages/shared/api/endpoints/reviews";
+} from "@/lib/api";
 import { useToast } from "@/components/shared/ToastProvider";
 
 /**

@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
-import { Helmet } from "react-helmet-async";
+// Helmet supprime - utiliser metadata export de Next.js
 import {
   FaPhone, FaEnvelope, FaMapMarkerAlt, FaClock,
   FaWhatsapp, FaFacebook, FaInstagram, FaLinkedin,

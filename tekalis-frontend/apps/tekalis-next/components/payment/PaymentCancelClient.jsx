@@ -1,14 +1,14 @@
-"use client";
+﻿"use client";
 
 import { useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } /* react-router-dom retire */ from "next/navigation";
 import { FaTimesCircle } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 
 const PaymentCancel = () => {
   const { orderId } = useParams();
-  const navigate = const router = useRouter()
-router.push();
+  const router = useRouter();
+  const navigate = (path) => router.push(path);
 
   useEffect(() => {
     // Optionnel : log ou analytics

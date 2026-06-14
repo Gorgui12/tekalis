@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import Link from "next/link"; import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { 
   FaMapMarkerAlt, 
@@ -13,14 +13,13 @@ import {
   FaHeart,
   FaBox
 } from "react-icons/fa";
-import api from "../../../../packages/shared/api/api";
+import api from "@/lib/api";
 import DashboardStats from "../components/account/DashboardStats";
 import RecentOrders from "../components/account/RecentOrders";
-import { useRouter } from "next/navigation";
 
 const ClientDashboard = () => {
-  const navigate = const router = useRouter()
-router.push();
+  const router = useRouter();
+  const navigate = (path) => router.push(path);
   const { user } = useSelector((state) => state.auth);
   
   const [loading, setLoading] = useState(true);

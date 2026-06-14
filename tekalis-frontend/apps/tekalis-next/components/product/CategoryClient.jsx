@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * tekalis-seo/pages/CategoryPage.optimized.jsx
@@ -15,7 +15,7 @@
  */
 
 import { useEffect, useState, useMemo } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link } /* react-router-dom retire */ from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProducts } from "@/store/slices/productSlice";
 import ProductCard from "../components/product/ProductCard";
@@ -403,7 +403,7 @@ const CategoryPage = () => {
               <div className="bg-white rounded-xl shadow-sm p-12 text-center border border-gray-100">
                 <div className="text-5xl mb-4">🔍</div>
                 <h3 className="text-lg font-bold text-gray-900 mb-2">Aucun produit trouvé</h3>
-                <p className="text-gray-600 mb-6">Essayez de modifier vos filtres ou <Link to="/products" className="text-blue-600 hover:underline">voir tous les produits</Link></p>
+                <p className="text-gray-600 mb-6">Essayez de modifier vos filtres ou <Link href="/products" className="text-blue-600 hover:underline">voir tous les produits</Link></p>
               </div>
             ) : (
               <div className={viewMode === "grid"

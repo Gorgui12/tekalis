@@ -1,16 +1,16 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams, Link } from "react-router-dom";
+import { useNavigate, useSearchParams, Link } /* react-router-dom retire */ from "next/navigation";
 import { useSelector } from "react-redux";
 import { FaTools, FaUpload, FaTimes } from "react-icons/fa";
-import api from "../../../../packages/shared/api/api";
+import api from "@/lib/api";
 import { useToast } from '@/components/shared/ToastProvider';
 import { useRouter } from "next/navigation";
 
 const CreateRMA = () => {
-  const navigate = const router = useRouter()
-router.push();
+  const router = useRouter();
+  const navigate = (path) => router.push(path);
   const [searchParams] = useSearchParams();
   const { user } = useSelector((state) => state.auth);
   

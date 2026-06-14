@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useState } from "react";
@@ -7,8 +7,8 @@ import {
   FaEnvelope, FaPhone, FaMapMarkerAlt, FaClock,
   FaArrowUp, FaHeart, FaShieldAlt, FaTruck, FaUndo
 } from "react-icons/fa";
-import { useToast } from "../../../../../packages/shared/context/ToastContext";
-import { validateEmail } from "../../../../../packages/shared/outils/validators";
+import { useToast } from "../@/components/shared/ToastProvider";
+import { validateEmail } from "../@/lib/utils/validators";
 import Button from "../shared/Button";
 
 /**

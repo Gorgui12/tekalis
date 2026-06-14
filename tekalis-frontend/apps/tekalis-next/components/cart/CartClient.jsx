@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import {
   removeFromCart,
   increaseQuantity,
@@ -9,12 +9,11 @@ import {
   clearCart,
 } from "@/store/slices/cartSlice";
 import { FaTrash, FaMinus, FaPlus, FaShieldAlt, FaTruck, FaLock } from "react-icons/fa";
-import { useRouter } from "next/navigation";
 
 const Cart = () => {
   const dispatch = useDispatch();
-  const navigate = const router = useRouter()
-router.push();
+  const router = useRouter();
+  const navigate = (path) => router.push(path);
   const { items, totalAmount } = useSelector((state) => state.cart);
 
   const shippingCost = 0; // Livraison gratuite pour l'instant

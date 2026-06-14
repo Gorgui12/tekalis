@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
-import { useNavigate, Link, useLocation } from "react-router-dom";
+import Link from "next/link"; import { useRouter, usePathname } from "next/navigation";
 import {
   FaEnvelope, FaLock, FaEye, FaEyeSlash, FaSpinner,
   FaShieldAlt, FaTruck, FaHeadset
@@ -14,7 +14,7 @@ function Login() {
   const router = useRouter();
 // Si vous vouliez juste utiliser router pour naviguer :
 const navigate = (path) => router.push(path);
-  const location  = useLocation();
+  const pathname = usePathname();
   const toast     = useToast();
   const { login, loading } = useAuth();
 
@@ -23,7 +23,7 @@ const navigate = (path) => router.push(path);
   const [rememberMe,  setRememberMe]  = useState(false);
   const [errors,      setErrors]      = useState({});
 
-  const from = location.state?.from?.pathname || "/";
+  const from = "/dashboard" || "/";
 
   /* ── Helpers ─────────────────────────────────────────────────────────── */
   const set = (field) => (e) => {
@@ -85,7 +85,7 @@ const navigate = (path) => router.push(path);
         <div className="absolute top-1/3 right-8 w-40 h-40 bg-white/5 rounded-full" />
 
         <div className="relative z-10 max-w-sm">
-          <Link to="/" className="text-4xl font-extrabold tracking-tight mb-2 block">
+          <Link href="/" className="text-4xl font-extrabold tracking-tight mb-2 block">
             Tekalis
           </Link>
           <p className="text-blue-200 text-sm mb-10">Boutique High-Tech · Dakar, Sénégal</p>
@@ -118,7 +118,7 @@ const navigate = (path) => router.push(path);
         <div className="w-full max-w-md">
 
           {/* Logo mobile */}
-          <Link to="/" className="lg:hidden block text-center mb-8">
+          <Link href="/" className="lg:hidden block text-center mb-8">
             <span className="text-3xl font-extrabold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Tekalis
             </span>
@@ -132,7 +132,7 @@ const navigate = (path) => router.push(path);
               </h1>
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 Pas encore de compte ?{" "}
-                <Link to="/register" className="text-blue-600 dark:text-blue-400 hover:underline font-semibold">
+                <Link href="/register" className="text-blue-600 dark:text-blue-400 hover:underline font-semibold">
                   S'inscrire gratuitement
                 </Link>
               </p>
@@ -255,7 +255,7 @@ const navigate = (path) => router.push(path);
 
           <p className="text-center text-xs text-gray-400 dark:text-gray-500 mt-5">
             En vous connectant, vous acceptez nos{" "}
-            <Link to="/politique" className="hover:underline text-blue-500">conditions d'utilisation</Link>.
+            <Link href="/politique" className="hover:underline text-blue-500">conditions d'utilisation</Link>.
           </p>
         </div>
       </div>

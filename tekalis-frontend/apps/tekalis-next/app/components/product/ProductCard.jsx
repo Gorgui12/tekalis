@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -10,7 +10,7 @@ import {
   addToWishlistLocal,
   removeFromWishlistLocal,
 } from "../@/store/slices/wishListSlice";
-import { useToast } from "../../../../../packages/shared/context/ToastContext";
+import { useToast } from "../@/components/shared/ToastProvider";
 import {
   FaStar,
   FaShoppingCart,

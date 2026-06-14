@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { addToCart } from "@/store/slices/cartSlice";
 import { 
@@ -18,12 +18,11 @@ import {
   FaSpinner
 } from "react-icons/fa";
 import { useToast } from '@/components/shared/ToastProvider';
-import api from "../../../../packages/shared/api/api";
-import { useRouter } from "next/navigation";
+import api from "@/lib/api";
 
 const Configurator = () => {
-  const navigate = const router = useRouter()
-router.push();
+  const router = useRouter();
+  const navigate = (path) => router.push(path);
   const dispatch = useDispatch();
   const toast = useToast();
 
@@ -67,7 +66,6 @@ const fetchAllProducts = async () => {
     setLoadingProducts(false);
   }
 };
-
 
   // Étape 1: Usage principal
   const usageOptions = [
@@ -705,5 +703,4 @@ const fetchAllProducts = async () => {
 };
 
 export default Configurator;
-
 

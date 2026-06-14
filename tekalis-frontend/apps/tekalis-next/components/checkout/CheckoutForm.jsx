@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * CheckoutForm.jsx — Tunnel de commande Tekalis
@@ -11,21 +11,20 @@
 
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import { clearCart } from "@/store/slices/cartSlice";
 import { useToast } from "@/components/shared/ToastProvider";
-import api from "../../../../../packages/shared/api/api";
+import api from "../@/lib/api";
 
 import CheckoutSteps from "./CheckoutSteps";
 import DeliveryForm from "./DeliveryForm";
 import PaymentMethods from "./PaymentMethods";
 import OrderSummary from "./OrderSummary";
-import { useRouter } from "next/navigation";
 
 const CheckoutForm = () => {
   const dispatch    = useDispatch();
-  const navigate    = const router = useRouter()
-router.push();
+  const router = useRouter();
+  const navigate = (path) => router.push(path);
   const toast       = useToast();
 
   const { items, totalAmount } = useSelector((state) => state.cart);
@@ -191,6 +190,4 @@ router.push();
 };
 
 export default CheckoutForm;
-
-
 

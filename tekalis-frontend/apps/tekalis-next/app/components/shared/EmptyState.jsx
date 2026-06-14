@@ -1,8 +1,8 @@
-"use client";
+﻿"use client";
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
+import Link from "next/link";
 
 /**
  * Composant EmptyState réutilisable pour les états vides
@@ -58,7 +58,7 @@ const EmptyState = ({
 
     if (actionLink) {
       return (
-        <Link to={actionLink} className={buttonClasses}>
+        <Link href={actionLink} className={buttonClasses}>
           {actionText}
         </Link>
       );

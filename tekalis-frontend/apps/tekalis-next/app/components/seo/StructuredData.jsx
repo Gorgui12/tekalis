@@ -1,4 +1,4 @@
-import { Helmet } from 'react-helmet-async';
+﻿// Helmet supprime - utiliser metadata export de Next.js
 
 /**
  * Composant Schema.org pour rich snippets Google

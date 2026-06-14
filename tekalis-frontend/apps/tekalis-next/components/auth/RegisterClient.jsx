@@ -1,11 +1,10 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import Link from "next/link"; import { useRouter } from "next/navigation";
 import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaSpinner, FaCheckCircle } from "react-icons/fa";
-import api from "../../../../packages/shared/api/api";
+import api from "@/lib/api";
 import { useToast } from "@/components/shared/ToastProvider";
-import { useRouter } from "next/navigation";
 
 /* ── Règles de validation mot de passe ────────────────────────────────── */
 const PASSWORD_RULES = [
@@ -17,8 +16,8 @@ const PASSWORD_RULES = [
 
 function Register() {
   const toast    = useToast();
-  const navigate = const router = useRouter()
-router.push();
+  const router = useRouter();
+  const navigate = (path) => router.push(path);
 
   const [formData, setFormData] = useState({ name: "", email: "", password: "", confirm: "" });
   const [showPw,   setShowPw]   = useState(false);
@@ -95,7 +94,7 @@ router.push();
         <div className="absolute top-1/3 right-8 w-40 h-40 bg-white/5 rounded-full" />
 
         <div className="relative z-10 max-w-sm">
-          <Link to="/" className="text-4xl font-extrabold tracking-tight mb-2 block">
+          <Link href="/" className="text-4xl font-extrabold tracking-tight mb-2 block">
             Tekalis
           </Link>
           <p className="text-blue-200 text-sm mb-10">Boutique High-Tech · Dakar, Sénégal</p>
@@ -127,7 +126,7 @@ router.push();
         <div className="w-full max-w-md">
 
           {/* Logo mobile */}
-          <Link to="/" className="lg:hidden block text-center mb-8">
+          <Link href="/" className="lg:hidden block text-center mb-8">
             <span className="text-3xl font-extrabold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
               Tekalis
             </span>
@@ -141,7 +140,7 @@ router.push();
               </h1>
               <p className="text-sm text-gray-500 dark:text-gray-400">
                 Déjà inscrit ?{" "}
-                <Link to="/login" className="text-blue-600 dark:text-blue-400 hover:underline font-semibold">
+                <Link href="/login" className="text-blue-600 dark:text-blue-400 hover:underline font-semibold">
                   Se connecter
                 </Link>
               </p>
@@ -285,7 +284,7 @@ router.push();
               {/* CGU */}
               <p className="text-xs text-gray-500 dark:text-gray-400">
                 En créant un compte, vous acceptez nos{" "}
-                <Link to="/politique" className="text-blue-600 dark:text-blue-400 hover:underline">
+                <Link href="/politique" className="text-blue-600 dark:text-blue-400 hover:underline">
                   conditions d'utilisation
                 </Link>.
               </p>

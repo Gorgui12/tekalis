@@ -1,6 +1,6 @@
-"use client";
+﻿"use client";
 
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link } /* react-router-dom retire */ from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect, useState } from "react";
 import { fetchProducts } from "@/store/slices/productSlice";

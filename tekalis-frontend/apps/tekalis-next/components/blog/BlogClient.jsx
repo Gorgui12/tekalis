@@ -1,9 +1,9 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { FaSearch, FaFilter, FaClock, FaEye, FaTimes } from "react-icons/fa";
-import api from "../../../../packages/shared/api/api";
+import api from "@/lib/api";
 
 const Blog = () => {
   const [articles, setArticles] = useState([]);

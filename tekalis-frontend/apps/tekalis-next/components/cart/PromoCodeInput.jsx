@@ -1,8 +1,8 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { FaTag, FaTimes, FaCheckCircle, FaSpinner } from "react-icons/fa";
-import api from "../../../../../packages/shared/api/client";
+import api from "@/lib/api";
 
 /**
  * PromoCodeInput — Champ saisie et validation d'un code promo

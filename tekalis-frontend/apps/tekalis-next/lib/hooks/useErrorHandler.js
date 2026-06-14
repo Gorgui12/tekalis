@@ -1,16 +1,16 @@
-"use client";
+﻿"use client";
 
 import { useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useRouter } from "next/navigation";
+
 /**
  * Hook pour gérer les erreurs de manière centralisée
  * @returns {Object} error, handleError, clearError
  */
 const useErrorHandler = () => {
   const [error, setError] = useState(null);
-  const navigate = const router = useRouter()
-router.push();
+  const router = useRouter();
+  const navigate = (path) => router.push(path);
 
   /**
    * Gérer une erreur

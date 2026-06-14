@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+﻿import Link from "next/link";
 import { FaHome, FaChevronRight } from 'react-icons/fa';
 
 /**

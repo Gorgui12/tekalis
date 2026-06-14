@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import Link from "next/link"; import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import {
   FaBox,
@@ -12,14 +12,13 @@ import {
   FaRedo,
   FaTimes,
 } from "react-icons/fa";
-import api from "../../../../packages/shared/api/api";
+import api from "@/lib/api";
 import { useToast } from "@/components/shared/ToastProvider";
-import { useRouter } from "next/navigation";
 
 const MyOrders = () => {
   const toast = useToast();
-  const navigate = const router = useRouter()
-router.push();
+  const router = useRouter();
+  const navigate = (path) => router.push(path);
   const { user } = useSelector((state) => state.auth);
 
   const [orders, setOrders] = useState([]);
@@ -111,7 +110,7 @@ router.push();
         {/* En-tête */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <Link to="/dashboard" className="text-blue-600 hover:text-blue-700 font-semibold">
+            <Link href="/dashboard" className="text-blue-600 hover:text-blue-700 font-semibold">
               ← Retour au dashboard
             </Link>
           </div>

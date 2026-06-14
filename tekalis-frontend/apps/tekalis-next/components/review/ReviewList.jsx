@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import { FaFilter, FaSortAmountDown } from "react-icons/fa";
@@ -8,14 +8,14 @@ import { StarRatingDisplay } from "./StarRating";
 import LoadingSpinner from "../shared/LoadingSpinner";
 import EmptyState from "../shared/EmptyState";
 import Pagination from "../shared/Pagination";
-import api from "../../../../../packages/shared/api/api"; // ← instance axios centralisée
+import api from "../@/lib/api"; // ← instance axios centralisée
 import {
   getProductReviews,
   addReview,
   updateReview,
   deleteReview,
   likeReview
-} from "../../../../../packages/shared/api/endpoints/reviews";
+} from "@/lib/api";
 
 /**
  * ReviewList — Liste des avis avec moyenne, tri et pagination

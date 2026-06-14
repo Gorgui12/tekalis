@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import Link from "next/link"; import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { 
   FaTools, 
@@ -10,12 +10,11 @@ import {
   FaFilter,
   FaCommentDots
 } from "react-icons/fa";
-import api from "../../../../packages/shared/api/api";
-import { useRouter } from "next/navigation";
+import api from "@/lib/api";
 
 const MyRMA = () => {
-  const navigate = const router = useRouter()
-router.push();
+  const router = useRouter();
+  const navigate = (path) => router.push(path);
   const { user } = useSelector((state) => state.auth);
   
   const [rmas, setRmas] = useState([]);

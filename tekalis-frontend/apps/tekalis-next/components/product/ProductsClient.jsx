@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } /* react-router-dom retire */ from "next/navigation";
 import {
   FaSearch,
   FaList,
@@ -11,9 +11,9 @@ import {
 } from "react-icons/fa";
 
 import ProductCard from "@/components/product/ProductCard";
-import useProducts from "../../../../packages/shared/hooks/useProducts";
-import useDebounce from "../../../../packages/shared/hooks/useDebounce";
-import usePagination from "../../../../packages/shared/hooks/usePagination";
+import useProducts from "@/lib/hooks/useProducts";
+import useDebounce from "@/lib/hooks/useDebounce";
+import usePagination from "@/lib/hooks/usePagination";
 import Pagination from "@/components/shared/Pagination";
 import { useRouter } from "next/navigation";
 // ─── Helper : normalise une catégorie (objet OU string) en string ─────────────
@@ -25,9 +25,9 @@ const getCatName = (cat) => {
 };
 
 const Products = () => {
-  const location = useLocation();
-  const navigate = const router = useRouter()
-router.push();
+  const pathname = usePathname();
+  const router = useRouter();
+  const navigate = (path) => router.push(path);
 
   const searchParams = new URLSearchParams(location.search);
   const urlQuery = searchParams.get("search") || "";

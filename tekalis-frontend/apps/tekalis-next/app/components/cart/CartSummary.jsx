@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useSelector } from "react-redux";
@@ -105,7 +105,7 @@ const CartSummary = ({ onCheckout }) => {
           Commander maintenant
         </Button>
       ) : (
-        <Link to="/checkout">
+        <Link href="/checkout">
           <Button variant="primary" fullWidth size="lg" icon={<FaArrowRight />}>
             Passer la commande
           </Button>

@@ -1,17 +1,17 @@
-"use client";
+﻿"use client";
 
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 // ✅ FIX : import registerUser (et non "register" qui n'existe pas)
 import { loginUser, registerUser, updateProfile, logout } from "../redux/slices/authSlice";
-import { useRouter } from "next/navigation";
+
 /**
  * Hook personnalisé pour gérer l'authentification
  */
 const useAuth = () => {
   const dispatch = useDispatch();
-  const navigate = const router = useRouter()
-router.push();
+  const router = useRouter();
+  const navigate = (path) => router.push(path);
 
   const { user, token, isAuthenticated, isLoading: loading, error } = useSelector(
     (state) => state.auth

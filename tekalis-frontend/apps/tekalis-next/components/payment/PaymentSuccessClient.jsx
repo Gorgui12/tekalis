@@ -1,15 +1,15 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate } /* react-router-dom retire */ from "next/navigation";
 import { FaCheckCircle, FaSpinner } from "react-icons/fa";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 
 const PaymentSuccess = () => {
   const { orderId } = useParams();
-  const navigate = const router = useRouter()
-router.push();
+  const router = useRouter();
+  const navigate = (path) => router.push(path);
   const [status, setStatus] = useState("verifying"); // verifying, success, failed
   const [orderDetails, setOrderDetails] = useState(null);
 

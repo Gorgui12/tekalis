@@ -1,6 +1,6 @@
-"use client";
+﻿"use client";
 
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import Link from "next/link"; import { useRouter, usePathname } from "next/navigation";
 import { useSelector } from "react-redux";
 import { useState, useEffect, useRef } from "react";
 import SearchBarLive from '../SearchBarLive';
@@ -92,7 +92,7 @@ const Navbar = () => {
   const router = useRouter();
 // Si vous vouliez juste utiliser router pour naviguer :
 const navigate = (path) => router.push(path);
-  const location  = useLocation();
+  const pathname = usePathname();
   const toast     = useToast();
   const { logout } = useAuth();
 
@@ -176,7 +176,7 @@ const navigate = (path) => router.push(path);
 
             {/* Navigation desktop */}
             <div className="hidden lg:flex items-center gap-5">
-              <Link to="/" className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition font-medium text-sm">
+              <Link href="/" className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition font-medium text-sm">
                 <FaHome size={14} /> Accueil
               </Link>
 
@@ -218,13 +218,13 @@ const navigate = (path) => router.push(path);
                 )}
               </div>
 
-              <Link to="/blog"    className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition font-medium text-sm">
+              <Link href="/blog"    className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition font-medium text-sm">
                 <FaNewspaper size={14} /> Blog
               </Link>
-              <Link to="/apropos" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition font-medium text-sm">
+              <Link href="/apropos" className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition font-medium text-sm">
                 À propos
               </Link>
-              <Link to="/contact" className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition font-medium text-sm">
+              <Link href="/contact" className="flex items-center gap-1.5 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition font-medium text-sm">
                 <FaEnvelope size={14} /> Contact
               </Link>
             </div>
@@ -234,7 +234,7 @@ const navigate = (path) => router.push(path);
               <ThemeToggle />
 
               {/* Wishlist */}
-              <Link to="/wishlist" className="relative p-2 text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 transition" aria-label="Favoris">
+              <Link href="/wishlist" className="relative p-2 text-gray-700 dark:text-gray-300 hover:text-red-500 dark:hover:text-red-400 transition" aria-label="Favoris">
                 <FaHeart size={19} />
                 {wishlistItems.length > 0 && (
                   <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
@@ -244,7 +244,7 @@ const navigate = (path) => router.push(path);
               </Link>
 
               {/* Panier */}
-              <Link to="/cart" className="relative p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition" aria-label="Panier">
+              <Link href="/cart" className="relative p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition" aria-label="Panier">
                 <FaShoppingCart size={19} />
                 {cartItems.length > 0 && (
                   <span className="absolute -top-1 -right-1 bg-blue-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">
@@ -255,7 +255,7 @@ const navigate = (path) => router.push(path);
 
               {/* User menu */}
               {!user ? (
-                <Link to="/login" className="hidden sm:flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition text-sm">
+                <Link href="/login" className="hidden sm:flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition text-sm">
                   <FaUser size={13} /> Connexion
                 </Link>
               ) : (
@@ -283,22 +283,22 @@ const navigate = (path) => router.push(path);
                         )}
                       </div>
 
-                      <Link to="/dashboard" onClick={() => setUserDropdownOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition font-semibold">
+                      <Link href="/dashboard" onClick={() => setUserDropdownOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition font-semibold">
                         <FaTachometerAlt size={13} className="text-blue-600" /> Mon espace
                       </Link>
                       <div className="border-t border-gray-100 dark:border-gray-700 my-1" />
                       {isAdmin && (
-                        <Link to="/admin" onClick={() => setUserDropdownOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition">
+                        <Link href="/admin" onClick={() => setUserDropdownOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition">
                           <FaCog size={13} /> Dashboard Admin
                         </Link>
                       )}
-                      <Link to="/profile"             onClick={() => setUserDropdownOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition">
+                      <Link href="/profile"             onClick={() => setUserDropdownOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition">
                         <FaUser size={13} /> Mon profil
                       </Link>
-                      <Link to="/dashboard/orders"    onClick={() => setUserDropdownOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition">
+                      <Link href="/dashboard/orders"    onClick={() => setUserDropdownOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition">
                         <FaBox size={13} /> Mes commandes
                       </Link>
-                      <Link to="/dashboard/addresses" onClick={() => setUserDropdownOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition">
+                      <Link href="/dashboard/addresses" onClick={() => setUserDropdownOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-gray-700 transition">
                         <FaMapMarkerAlt size={13} /> Mes adresses
                       </Link>
                       <div className="border-t border-gray-100 dark:border-gray-700 my-1" />
@@ -344,7 +344,7 @@ const navigate = (path) => router.push(path);
       >
         {/* Header panel */}
         <div className="sticky top-0 z-10 bg-gradient-to-r from-blue-600 to-indigo-700 px-5 py-4 flex items-center justify-between shadow-md">
-          <Link to="/" className="text-xl font-extrabold text-white tracking-tight" onClick={() => setMobileMenuOpen(false)}>
+          <Link href="/" className="text-xl font-extrabold text-white tracking-tight" onClick={() => setMobileMenuOpen(false)}>
             Tekalis
           </Link>
           <button onClick={() => setMobileMenuOpen(false)} className="text-white/80 hover:text-white transition p-1" aria-label="Fermer">
@@ -369,7 +369,7 @@ const navigate = (path) => router.push(path);
 
           {/* Nav principale */}
           <nav className="space-y-0.5">
-            <Link to="/" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition font-medium text-sm">
+            <Link href="/" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition font-medium text-sm">
               <FaHome className="text-blue-500 w-4" /> Accueil
             </Link>
 
@@ -422,16 +422,16 @@ const navigate = (path) => router.push(path);
               )}
             </div>
 
-            <Link to="/configurator" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition font-medium text-sm">
+            <Link href="/configurator" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition font-medium text-sm">
               <FaCog className="text-purple-500 w-4" /> Configurateur PC
             </Link>
-            <Link to="/blog" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition font-medium text-sm">
+            <Link href="/blog" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition font-medium text-sm">
               <FaNewspaper className="text-orange-500 w-4" /> Blog & Guides
             </Link>
-            <Link to="/apropos" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition font-medium text-sm">
+            <Link href="/apropos" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition font-medium text-sm">
               <FaHome className="text-teal-500 w-4" /> À propos
             </Link>
-            <Link to="/contact" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition font-medium text-sm">
+            <Link href="/contact" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition font-medium text-sm">
               <FaEnvelope className="text-green-500 w-4" /> Contact
             </Link>
           </nav>
@@ -442,16 +442,16 @@ const navigate = (path) => router.push(path);
               <nav className="space-y-0.5">
                 <p className="px-3 py-1 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Mon compte</p>
 
-                <Link to="/dashboard" className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-semibold text-sm transition hover:bg-blue-100 dark:hover:bg-blue-900/40">
+                <Link href="/dashboard" className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-semibold text-sm transition hover:bg-blue-100 dark:hover:bg-blue-900/40">
                   <FaTachometerAlt className="w-4" /> Mon espace
                 </Link>
-                <Link to="/profile" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition text-sm">
+                <Link href="/profile" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition text-sm">
                   <FaUser className="text-gray-400 w-4" /> Mon profil
                 </Link>
-                <Link to="/dashboard/orders" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition text-sm">
+                <Link href="/dashboard/orders" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition text-sm">
                   <FaBox className="text-gray-400 w-4" /> Mes commandes
                 </Link>
-                <Link to="/wishlist" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition text-sm">
+                <Link href="/wishlist" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition text-sm">
                   <FaHeart className="text-red-400 w-4" />
                   Mes favoris
                   {wishlistItems.length > 0 && (
@@ -460,7 +460,7 @@ const navigate = (path) => router.push(path);
                     </span>
                   )}
                 </Link>
-                <Link to="/cart" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition text-sm">
+                <Link href="/cart" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition text-sm">
                   <FaShoppingCart className="text-blue-400 w-4" />
                   Mon panier
                   {cartItems.length > 0 && (
@@ -469,12 +469,12 @@ const navigate = (path) => router.push(path);
                     </span>
                   )}
                 </Link>
-                <Link to="/dashboard/addresses" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition text-sm">
+                <Link href="/dashboard/addresses" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition text-sm">
                   <FaMapMarkerAlt className="text-gray-400 w-4" /> Mes adresses
                 </Link>
 
                 {isAdmin && (
-                  <Link to="/admin" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-purple-700 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition text-sm font-semibold">
+                  <Link href="/admin" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-purple-700 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition text-sm font-semibold">
                     <FaCog className="w-4" /> Dashboard Admin
                   </Link>
                 )}

@@ -1,19 +1,18 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/navigation";
 import { 
   FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaEdit, FaSave, FaTimes, 
   FaSignOutAlt, FaShieldAlt, FaBell
 } from "react-icons/fa";
 import useAuth from "@/lib/hooks/useAuth";
-import useErrorHandler from "../../../../packages/shared/hooks/useErrorHandler"; // ✅ AJOUTÉ
+import useErrorHandler from "@/lib/hooks/useErrorHandler"; // ✅ AJOUTÉ
 import { useToast } from "@/components/shared/ToastProvider"; // ✅ CORRIGÉ
 import { validateEmail, validatePhone, validatePassword, sanitizeInput } from "@/lib/utils/validators"; // ✅ AJOUTÉ
 import LoadingSpinner from "@/components/shared/LoadingSpinner"; // ✅ AJOUTÉ
 import Button from "@/components/shared/Button"; // ✅ AJOUTÉ
-import api from "../../../../packages/shared/api/api";
-import { useRouter } from "next/navigation";
+import api from "@/lib/api";
 
 const Profile = () => {
   const [userData, setUserData] = useState(null);
@@ -28,8 +27,8 @@ const Profile = () => {
   });
   const [passwordErrors, setPasswordErrors] = useState({}); // ✅ AJOUTÉ
 
-  const navigate = const router = useRouter()
-router.push();
+  const router = useRouter();
+  const navigate = (path) => router.push(path);
   const { logout, updateProfile } = useAuth();
   const toast = useToast(); // ✅ Nouveau ToastContext
   const { handleError } = useErrorHandler(); // ✅ AJOUTÉ
@@ -523,5 +522,4 @@ router.push();
 };
 
 export default Profile;
-
 

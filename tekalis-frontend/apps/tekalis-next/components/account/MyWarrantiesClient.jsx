@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import Link from "next/link"; import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { 
   FaShieldAlt, 
@@ -12,14 +12,13 @@ import {
   FaPlus,
   FaFilter
 } from "react-icons/fa";
-import api from "../../../../packages/shared/api/api";
+import api from "@/lib/api";
 import { useToast } from '@/components/shared/ToastProvider';
-import { useRouter } from "next/navigation";
 
 const MyWarranties = () => {
   const toast = useToast();
-  const navigate = const router = useRouter()
-router.push();
+  const router = useRouter();
+  const navigate = (path) => router.push(path);
   const { user } = useSelector((state) => state.auth);
   
   const [warranties, setWarranties] = useState([]);

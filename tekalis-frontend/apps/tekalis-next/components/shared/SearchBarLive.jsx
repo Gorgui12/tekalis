@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * SearchBarLive — Barre de recherche avec résultats en temps réel
@@ -7,10 +7,10 @@
  */
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import Link from "next/link"; import { useRouter } from "next/navigation";
 import { FaSearch, FaTimes, FaSpinner, FaArrowRight } from 'react-icons/fa';
-import api from '../../../../packages/shared/api/api';
-import { useRouter } from "next/navigation";
+import api from '@/lib/api';
+
 
 /* ── Debounce hook ─────────────────────────────────────────────────────── */
 const useDebounce = (value, delay) => {
@@ -88,8 +88,8 @@ const SearchBarLive = ({
   maxResults = 6,
   onResultSelect,
 }) => {
-  const navigate = const router = useRouter()
-router.push();
+  const router = useRouter();
+  const navigate = (path) => router.push(path);
   const [query, setQuery] = useState('');
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);

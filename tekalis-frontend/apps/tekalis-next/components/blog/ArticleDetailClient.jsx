@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link } /* react-router-dom retire */ from "next/navigation";
 import { 
   FaClock, 
   FaEye, 
@@ -13,7 +13,7 @@ import {
   FaArrowLeft,
   FaTag
 } from "react-icons/fa";
-import api from "../../../../packages/shared/api/api";
+import api from "@/lib/api";
 import PageMeta from '../components/seo/PageMeta';
 
 const ArticleDetails = () => {
@@ -181,7 +181,7 @@ const ArticleDetails = () => {
       <div className="min-h-screen flex items-center justify-center mt-20">
         <div className="text-center">
           <p className="text-xl text-gray-600 mb-4">Article introuvable</p>
-          <Link to="/blog" className="text-blue-600 hover:text-blue-700 font-semibold">
+          <Link href="/blog" className="text-blue-600 hover:text-blue-700 font-semibold">
             ← Retour au blog
           </Link>
         </div>

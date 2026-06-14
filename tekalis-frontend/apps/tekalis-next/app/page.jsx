@@ -1,4 +1,4 @@
-import { serverFetch } from '@/lib/api';
+﻿import { serverFetch } from "@/lib/serverFetch";
 import HomeClient from '@/components/home/HomeClient';
 
 export const metadata = {

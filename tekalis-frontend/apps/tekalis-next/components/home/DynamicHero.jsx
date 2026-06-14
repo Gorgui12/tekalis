@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * HeroSection dynamique — récupère les slides depuis l'API
@@ -11,9 +11,9 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import Link from "next/link";
 import { FaChevronLeft, FaChevronRight, FaArrowRight } from 'react-icons/fa';
-import api from '../../../../packages/shared/api/api';
+import api from '@/lib/api';
 
 /* ── Slides de secours (si API offline) ─────────────────────────────────── */
 const FALLBACK_SLIDES = [

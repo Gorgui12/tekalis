@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
@@ -22,7 +22,7 @@ import {
   FaDesktop,
   FaKeyboard
 } from "react-icons/fa";
-import api from "../../../../packages/shared/api/api";
+import api from "@/lib/api";
 import ProductCard from "@/components/product/ProductCard";
 
 // ── Schema.org défini EN DEHORS du composant (évite recréation à chaque render) ──
@@ -214,7 +214,7 @@ const Home = () => {
       {/* Quick Actions */}
       <section className="container mx-auto px-4 -mt-16 relative z-10 mb-16">
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <Link to="/products" className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition group">
+          <Link href="/products" className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition group">
             <div className="flex items-center gap-4">
               <div className="bg-blue-100 rounded-full p-4 group-hover:bg-blue-200 transition">
                 <FaLaptop className="text-blue-600 text-2xl" />
@@ -226,7 +226,7 @@ const Home = () => {
             </div>
           </Link>
 
-          <Link to="/configurator" className="bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg shadow-lg p-6 hover:shadow-xl transition text-white group">
+          <Link href="/configurator" className="bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg shadow-lg p-6 hover:shadow-xl transition text-white group">
             <div className="flex items-center gap-4">
               <div className="bg-white/20 rounded-full p-4 group-hover:bg-white/30 transition">
                 <FaDesktop className="text-white text-2xl" />
@@ -238,7 +238,7 @@ const Home = () => {
             </div>
           </Link>
 
-          <Link to="/blog" className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition group">
+          <Link href="/blog" className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition group">
             <div className="flex items-center gap-4">
               <div className="bg-orange-100 rounded-full p-4 group-hover:bg-orange-200 transition">
                 <FaStar className="text-orange-600 text-2xl" />
@@ -275,7 +275,7 @@ const Home = () => {
       <section className="container mx-auto px-4 mb-16">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-3xl font-bold text-gray-900">⚡ Nouveautés</h2>
-          <Link to="/products?sort=newest" className="text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-2">
+          <Link href="/products?sort=newest" className="text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-2">
             Voir tout <FaArrowRight />
           </Link>
         </div>
@@ -304,7 +304,7 @@ const Home = () => {
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-3xl font-bold text-gray-900">🔥 Meilleures ventes</h2>
-            <Link to="/products?sort=popular" className="text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-2">
+            <Link href="/products?sort=popular" className="text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-2">
               Voir tout <FaArrowRight />
             </Link>
           </div>
@@ -358,7 +358,7 @@ const Home = () => {
               <h2 className="text-3xl font-bold mb-2">📝 Le Labo Tech</h2>
               <p className="text-gray-400">Tests, guides d'achat et actualités tech</p>
             </div>
-            <Link to="/blog" className="bg-white text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition flex items-center gap-2">
+            <Link href="/blog" className="bg-white text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition flex items-center gap-2">
               Voir le blog <FaArrowRight />
             </Link>
           </div>
@@ -391,7 +391,7 @@ const Home = () => {
           <h2 className="text-4xl font-bold mb-4">Besoin d'aide pour choisir ?</h2>
           <p className="text-xl mb-8 text-blue-100">Notre équipe d'experts est là pour vous conseiller</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/configurator" className="bg-white text-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition">
+            <Link href="/configurator" className="bg-white text-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition">
               Configurer mon PC
             </Link>
             <a
