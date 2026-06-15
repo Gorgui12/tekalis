@@ -1,9 +1,8 @@
-﻿"use client";
+"use client";
 
 import { useEffect } from "react";
-import { useParams, useNavigate } /* react-router-dom retire */ from "next/navigation";
+import { useParams, useNavigate, useRouter } from "next/navigation";
 import { FaTimesCircle } from "react-icons/fa";
-import { useRouter } from "next/navigation";
 
 const PaymentCancel = () => {
   const { orderId } = useParams();

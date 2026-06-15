@@ -1,14 +1,13 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
-import Link from "next/link"; import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import {
   FaEnvelope, FaLock, FaEye, FaEyeSlash, FaSpinner,
   FaShieldAlt, FaTruck, FaHeadset
 } from "react-icons/fa";
 import useAuth from "@/lib/hooks/useAuth";
 import { useToast } from "@/components/shared/ToastProvider";
-import { useRouter } from "next/navigation";
 
 function Login() {
   const router = useRouter();

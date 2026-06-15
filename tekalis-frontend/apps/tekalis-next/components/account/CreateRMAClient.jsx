@@ -1,12 +1,11 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams, Link } /* react-router-dom retire */ from "next/navigation";
+import { useNavigate, useSearchParams, Link, useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { FaTools, FaUpload, FaTimes } from "react-icons/fa";
 import api from "@/lib/api";
 import { useToast } from '@/components/shared/ToastProvider';
-import { useRouter } from "next/navigation";
 
 const CreateRMA = () => {
   const router = useRouter();

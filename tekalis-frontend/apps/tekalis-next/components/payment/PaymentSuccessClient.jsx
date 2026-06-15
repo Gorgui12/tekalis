@@ -1,10 +1,9 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } /* react-router-dom retire */ from "next/navigation";
+import { useParams, useNavigate, useRouter } from "next/navigation";
 import { FaCheckCircle, FaSpinner } from "react-icons/fa";
 import axios from "axios";
-import { useRouter } from "next/navigation";
 
 const PaymentSuccess = () => {
   const { orderId } = useParams();

@@ -1,7 +1,7 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
-import { useParams, Link, useNavigate } /* react-router-dom retire */ from "next/navigation";
+import { useParams, Link, useNavigate, useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import StatusBadge from "@/components/shared/StatusBadge";
 
@@ -18,7 +18,6 @@ import {
 } from "react-icons/fa";
 import api from "@/lib/api";
 import { useToast } from '@/components/shared/ToastProvider';
-import { useRouter } from "next/navigation";
 const OrderDetails = () => {
   const { id } = useParams();
   const router = useRouter();

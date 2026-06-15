@@ -1,7 +1,7 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useLocation, useNavigate } /* react-router-dom retire */ from "next/navigation";
+import { useLocation, useNavigate, useRouter } from "next/navigation";
 import {
   FaSearch,
   FaList,
@@ -15,7 +15,6 @@ import useProducts from "@/lib/hooks/useProducts";
 import useDebounce from "@/lib/hooks/useDebounce";
 import usePagination from "@/lib/hooks/usePagination";
 import Pagination from "@/components/shared/Pagination";
-import { useRouter } from "next/navigation";
 // ─── Helper : normalise une catégorie (objet OU string) en string ─────────────
 const getCatName = (cat) => {
   if (!cat) return null;
