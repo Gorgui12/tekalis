@@ -3,7 +3,7 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 // ✅ FIX : import registerUser (et non "register" qui n'existe pas)
-import { loginUser, registerUser, updateProfile, logout } from "../redux/slices/authSlice";
+import { loginUser, registerUser, updateProfile, logout } from "@/store/slices/authSlice";
 
 /**
  * Hook personnalisé pour gérer l'authentification

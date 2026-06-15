@@ -14,8 +14,8 @@ import {
   FaBox
 } from "react-icons/fa";
 import api from "@/lib/api";
-import DashboardStats from "../components/account/DashboardStats";
-import RecentOrders from "../components/account/RecentOrders";
+import DashboardStats from "@/components/account/DashboardStats";
+import RecentOrders from "@/components/account/RecentOrders";
 
 const ClientDashboard = () => {
   const router = useRouter();

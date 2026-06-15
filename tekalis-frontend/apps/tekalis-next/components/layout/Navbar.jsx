@@ -3,7 +3,7 @@
 import Link from "next/link"; import { useRouter, usePathname } from "next/navigation";
 import { useSelector } from "react-redux";
 import { useState, useEffect, useRef } from "react";
-import SearchBarLive from '../SearchBarLive';
+import SearchBarLive from "@/components/shared/SearchBarLive";
 import {
   FaSearch, FaShoppingCart, FaHeart, FaUser, FaBars, FaTimes,
   FaBox, FaMapMarkerAlt, FaCog, FaSignOutAlt,
@@ -523,5 +523,4 @@ const navigate = (path) => router.push(path);
 };
 
 export default Navbar;
-
 

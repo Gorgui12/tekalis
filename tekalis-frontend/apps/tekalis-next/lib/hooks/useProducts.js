@@ -1,7 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect, useCallback } from "react";
-import api from "../api/api";
+import api from "@/lib/api";
 
 /**
  * Hook personnalisé pour gérer les produits

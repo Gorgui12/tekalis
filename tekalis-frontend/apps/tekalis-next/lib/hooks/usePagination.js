@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useMemo, useCallback } from 'react';
 
@@ -218,7 +218,7 @@ export default usePagination;
  * );
  * 
  * // Avec le composant Pagination
- * import Pagination from '../components/shared/Pagination';
+ * import Pagination from "@/components/shared/Pagination';
  * 
  * const {
  *   paginatedItems,

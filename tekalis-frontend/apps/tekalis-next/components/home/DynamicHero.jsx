@@ -5,7 +5,7 @@
  * Mobile-first · LCP optimisé · SEO-friendly (un seul H1 par page)
  * 
  * USAGE dans Home.jsx :
- *   import DynamicHero from '../components/DynamicHero';
+ *   import DynamicHero from "@/components/DynamicHero';
  *   <DynamicHero isHomePage={true} />  // → génère le H1
  *   <DynamicHero isHomePage={false} /> // → génère un H2 (pages catégories, etc.)
  */

@@ -18,9 +18,9 @@ import { useEffect, useState, useMemo } from "react";
 import { useParams, Link } /* react-router-dom retire */ from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProducts } from "@/store/slices/productSlice";
-import ProductCard from "../components/product/ProductCard";
-import { Breadcrumb } from "../components/seo/Breadcrumb";
-import PageMeta from '../components/seo/PageMeta';
+import ProductCard from "@/components/product/ProductCard";
+import { Breadcrumb } from "@/components/seo/Breadcrumb";
+import PageMeta from "@/components/seo/PageMeta";
 import { FaFilter, FaThLarge, FaList, FaTruck, FaShieldAlt } from "react-icons/fa";
 
 // ── Metadata SEO par catégorie ────────────────────────────────────────────────

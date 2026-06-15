@@ -8,8 +8,8 @@ import {
   FaPaperPlane, FaCheckCircle, FaExclamationCircle
 } from "react-icons/fa";
 import { useToast } from "@/components/shared/ToastProvider";
-import Button from "../components/shared/Button";
-import { Breadcrumb } from "../components/seo/Breadcrumb";
+import Button from "@/components/shared/Button";
+import { Breadcrumb } from "@/components/seo/Breadcrumb";
 
 // ─── Données de contact ────────────────────────────────────────────────────────
 const CONTACT_INFO = [

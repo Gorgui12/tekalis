@@ -14,7 +14,7 @@ import {
   FaTag
 } from "react-icons/fa";
 import api from "@/lib/api";
-import PageMeta from '../components/seo/PageMeta';
+import PageMeta from "@/components/seo/PageMeta";
 
 const ArticleDetails = () => {
   const { slug } = useParams();

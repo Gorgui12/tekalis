@@ -16,7 +16,7 @@ import ProductGallery from "@/components/product/ProductGallery";
 import ProductSpecs from "@/components/product/ProductSpecs";
 import ReviewList from "@/components/review/ReviewList";
 import { Breadcrumb } from "@/components/seo/Breadcrumb";
-import PageMeta from "../components/seo/PageMeta";
+import PageMeta from "@/components/seo/PageMeta";
 import {
   FaShieldAlt,
   FaTruck,

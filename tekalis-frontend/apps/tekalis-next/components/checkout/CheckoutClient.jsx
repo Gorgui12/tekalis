@@ -1,11 +1,11 @@
-/**
+﻿/**
  * Checkout.jsx
  * Délègue entièrement à CheckoutForm qui contient l'architecture complète :
  * DeliveryForm → PaymentMethods → OrderSummary
  * avec gestion des adresses sauvegardées, modes de livraison, etc.
  */
-import CheckoutForm from "../components/checkout/CheckoutForm";
-import PageMeta from "../components/seo/PageMeta";
+import CheckoutForm from "@/components/checkout/CheckoutForm";
+import PageMeta from "@/components/seo/PageMeta";
 
 const Checkout = () => {
   return (

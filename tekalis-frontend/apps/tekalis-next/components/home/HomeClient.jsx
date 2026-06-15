@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProducts } from "@/store/slices/productSlice";
-import PageMeta from '../components/seo/PageMeta';
-import DynamicHero from '../components/DynamicHero';
+import PageMeta from "@/components/seo/PageMeta";
+import DynamicHero from "@/components/home/DynamicHero";
 import { 
   FaChevronLeft, 
   FaChevronRight, 

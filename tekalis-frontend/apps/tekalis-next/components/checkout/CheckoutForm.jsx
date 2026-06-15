@@ -14,7 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { clearCart } from "@/store/slices/cartSlice";
 import { useToast } from "@/components/shared/ToastProvider";
-import api from "../@/lib/api";
+import api from "@/lib/api";
 
 import CheckoutSteps from "./CheckoutSteps";
 import DeliveryForm from "./DeliveryForm";
