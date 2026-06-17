@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { FaArrowRight, FaWhatsapp } from "react-icons/fa";
 
 const CTASection = ({ 
@@ -85,8 +85,7 @@ const CTASection = ({
                       {!primaryButton.icon && <FaArrowRight />}
                     </a>
                   ) : (
-                    <Link
-                      to={primaryButton.link}
+                    <Link href={primaryButton.link}
                       className={`inline-flex items-center justify-center gap-2 bg-white text-gray-900 px-6 md:px-8 py-3 md:py-4 rounded-lg font-bold text-base md:text-lg hover:bg-gray-100 transition shadow-xl transform hover:scale-105 ${primaryButton.className || ""}`}
                     >
                       {primaryButton.icon}
@@ -109,8 +108,7 @@ const CTASection = ({
                       {secondaryButton.text}
                     </a>
                   ) : (
-                    <Link
-                      to={secondaryButton.link}
+                    <Link href={secondaryButton.link}
                       className={`inline-flex items-center justify-center gap-2 bg-white/20 backdrop-blur-sm text-white px-6 md:px-8 py-3 md:py-4 rounded-lg font-bold text-base md:text-lg hover:bg-white/30 transition border-2 border-white/50 ${secondaryButton.className || ""}`}
                     >
                       {secondaryButton.icon}

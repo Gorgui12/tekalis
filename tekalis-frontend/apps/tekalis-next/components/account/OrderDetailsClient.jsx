@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate, useRouter } from "next/navigation";
@@ -192,8 +192,7 @@ const OrderDetails = () => {
                       className="w-24 h-24 object-contain rounded border"
                     />
                     <div className="flex-1">
-                      <Link
-                        to={`/product/${item.product?._id}`}
+                      <Link href={`/product/${item.product?._id}`}
                         className="font-semibold text-gray-900 hover:text-blue-600 block mb-1"
                       >
                         {item.product?.name || "Produit"}
@@ -254,8 +253,7 @@ const OrderDetails = () => {
               </button>
               
               {order.status === "delivered" && (
-                <Link
-                  to={`/rma/create?orderId=${order._id}`}
+                <Link href={`/rma/create?orderId=${order._id}`}
                   className="flex-1 sm:flex-none bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition"
                 >
                   <FaRedo />
@@ -370,4 +368,5 @@ const OrderDetails = () => {
 
 
 export default OrderDetails;
+
 

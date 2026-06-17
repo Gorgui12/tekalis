@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { FaArrowRight, FaBox, FaEye } from "react-icons/fa";
 import StatusBadge from "../shared/StatusBadge";
 
@@ -38,8 +38,7 @@ const RecentOrders = ({ orders = [], loading = false }) => {
           <FaBox className="text-blue-600" />
           Commandes récentes
         </h3>
-        <Link
-          to="/dashboard/orders"
+        <Link href="/dashboard/orders"
           className="text-sm text-blue-600 dark:text-blue-400 hover:underline font-semibold flex items-center gap-1"
         >
           Voir tout <FaArrowRight size={12} />
@@ -53,8 +52,7 @@ const RecentOrders = ({ orders = [], loading = false }) => {
           <p className="text-gray-500 dark:text-gray-400 font-medium">
             Aucune commande pour le moment
           </p>
-          <Link
-            to="/products"
+          <Link href="/products"
             className="inline-block mt-4 text-sm text-blue-600 dark:text-blue-400 hover:underline"
           >
             Parcourir les produits →
@@ -112,8 +110,7 @@ const RecentOrders = ({ orders = [], loading = false }) => {
                       {(order.totalAmount || 0).toLocaleString()} FCFA
                     </td>
                     <td className="py-3 text-right">
-                      <Link
-                        to={`/dashboard/orders/${order._id}`}
+                      <Link href={`/dashboard/orders/${order._id}`}
                         className="inline-flex items-center gap-1 text-xs text-blue-600 dark:text-blue-400 hover:underline font-semibold"
                       >
                         <FaEye size={12} />

@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { 
   FaLaptop, 
   FaMobileAlt, 
@@ -166,8 +166,7 @@ const CategoriesGrid = ({ categories, columns = 6, showAll = false }) => {
       {/* Bouton "Voir toutes les catégories" */}
       {!showAll && displayCategories.length > columns && (
         <div className="text-center mt-8">
-          <Link
-            to="/categories"
+          <Link href="/categories"
             className="inline-block bg-gray-900 hover:bg-gray-800 text-white px-8 py-3 rounded-lg font-bold transition"
           >
             Voir toutes les catégories →

@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { FaClock, FaEye, FaUser } from "react-icons/fa";
 
 const ArticleCard = ({ article, variant = "default", featured = false }) => {
@@ -16,8 +16,7 @@ const ArticleCard = ({ article, variant = "default", featured = false }) => {
   // Variant: "default", "compact", "horizontal"
   if (variant === "compact") {
     return (
-      <Link
-        to={`/blog/${article.slug}`}
+      <Link href={`/blog/${article.slug}`}
         className="flex gap-3 p-3 hover:bg-gray-50 rounded-lg transition group"
       >
         <div className="w-20 h-20 bg-gray-200 rounded flex-shrink-0"></div>
@@ -38,8 +37,7 @@ const ArticleCard = ({ article, variant = "default", featured = false }) => {
 
   if (variant === "horizontal") {
     return (
-      <Link
-        to={`/blog/${article.slug}`}
+      <Link href={`/blog/${article.slug}`}
         className="flex flex-col md:flex-row gap-4 bg-white rounded-lg shadow-md hover:shadow-lg transition overflow-hidden group"
       >
         <div className="md:w-1/3 relative">
@@ -79,8 +77,7 @@ const ArticleCard = ({ article, variant = "default", featured = false }) => {
 
   // Default variant (card)
   return (
-    <Link
-      to={`/blog/${article.slug}`}
+    <Link href={`/blog/${article.slug}`}
       className={`block bg-white rounded-lg shadow-md hover:shadow-xl transition overflow-hidden group ${
         featured ? "md:col-span-2 md:row-span-2" : ""
       }`}

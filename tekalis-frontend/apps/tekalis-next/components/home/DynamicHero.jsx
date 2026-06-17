@@ -112,8 +112,7 @@ const SlideContent = ({ slide, isActive, index, isHomePage }) => {
         slide.textPosition === 'center' ? 'items-center justify-center' : 'items-start'
       }`}>
         {slide.primaryCta?.text && (
-          <Link
-            to={slide.primaryCta.link || '/products'}
+          <Link href={slide.primaryCta.link || '/products'}
             className={`inline-flex items-center gap-2 px-5 sm:px-7 py-3 sm:py-3.5 rounded-xl font-bold text-sm sm:text-base transition-all duration-200 active:scale-95 ${
               ctaStyle[slide.primaryCta.style || 'white']
             }`}
@@ -123,8 +122,7 @@ const SlideContent = ({ slide, isActive, index, isHomePage }) => {
           </Link>
         )}
         {slide.secondaryCta?.text && (
-          <Link
-            to={slide.secondaryCta.link || '#'}
+          <Link href={slide.secondaryCta.link || '#'}
             className={`inline-flex items-center gap-2 px-5 sm:px-7 py-3 sm:py-3.5 rounded-xl font-semibold text-sm sm:text-base transition-all duration-200 active:scale-95 ${
               ctaStyle[slide.secondaryCta.style || 'outline']
             }`}
@@ -375,4 +373,5 @@ const DynamicHero = ({
 };
 
 export default DynamicHero;
+
 

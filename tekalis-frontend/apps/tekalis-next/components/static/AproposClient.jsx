@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { 
   FaShieldAlt, FaBolt, FaUsers, FaRocket, FaAward, FaTruck,
   FaCheckCircle, FaHeart, FaLightbulb, FaHandshake, FaGlobe,
@@ -331,15 +331,13 @@ const Apropos = () => {
               </p>
               
               <div className="flex flex-wrap justify-center gap-4">
-                <Link
-                  to="/products"
+                <Link href="/products"
                   className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition transform hover:scale-105 inline-flex items-center gap-2"
                 >
                   <FaBox />
                   Découvrir nos produits
                 </Link>
-                <Link
-                  to="/contact"
+                <Link href="/contact"
                   className="bg-white dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-900 dark:text-white px-8 py-3 rounded-lg font-semibold transition border-2 border-gray-200 dark:border-gray-700 inline-flex items-center gap-2"
                 >
                   <FaUsers />
@@ -362,8 +360,7 @@ const Apropos = () => {
             <p className="text-xl text-blue-100 mb-8">
               Rejoignez plus de 10,000 clients satisfaits qui nous font confiance
             </p>
-            <Link
-              to="/register"
+            <Link href="/register"
               className="inline-block bg-white text-blue-600 hover:bg-blue-50 px-10 py-4 rounded-lg font-bold text-lg transition transform hover:scale-105 shadow-xl"
             >
               Créer un compte gratuitement

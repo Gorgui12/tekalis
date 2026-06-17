@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
@@ -168,8 +168,7 @@ const navigate = (path) => router.push(path);
                   <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">
                     Mot de passe
                   </label>
-                  <Link
-                    to="/forgot-password"
+                  <Link href="/forgot-password"
                     className="text-xs text-blue-600 dark:text-blue-400 hover:underline"
                   >
                     Mot de passe oublié ?
@@ -263,4 +262,5 @@ const navigate = (path) => router.push(path);
 }
 
 export default Login;
+
 

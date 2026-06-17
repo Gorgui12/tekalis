@@ -94,8 +94,7 @@ const MyWarranties = () => {
                 className="w-20 h-20 object-contain rounded border"
               />
               <div>
-                <Link
-                  to={`/product/${warranty.product?._id}`}
+                <Link href={`/product/${warranty.product?._id}`}
                   className="font-bold text-gray-900 hover:text-blue-600 block mb-1"
                 >
                   {warranty.product?.name || "Produit"}
@@ -193,8 +192,7 @@ const MyWarranties = () => {
             </button>
 
             {!isExpired && (
-              <Link
-                to={`/rma/create?productId=${warranty.product?._id}&warrantyId=${warranty._id}`}
+              <Link href={`/rma/create?productId=${warranty.product?._id}&warrantyId=${warranty._id}`}
                 className="flex-1 sm:flex-none bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center justify-center gap-2 transition text-sm"
               >
                 Demande SAV
@@ -229,8 +227,7 @@ const MyWarranties = () => {
       <div className="container mx-auto px-4 max-w-7xl">
         {/* En-tête */}
         <div className="mb-8">
-          <Link
-            to="/dashboard"
+          <Link href="/dashboard"
             className="text-blue-600 hover:text-blue-700 font-semibold mb-4 inline-block"
           >
             ← Retour au dashboard
@@ -332,8 +329,7 @@ const MyWarranties = () => {
                 : "Essayez un autre filtre"}
             </p>
             {filter === "all" && (
-              <Link
-                to="/products"
+              <Link href="/products"
                 className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold"
               >
                 Découvrir nos produits
@@ -386,4 +382,5 @@ const MyWarranties = () => {
 };
 
 export default MyWarranties;
+
 

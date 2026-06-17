@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { FaShoppingCart, FaEye, FaCheckCircle, FaExclamationTriangle } from "react-icons/fa";
@@ -52,8 +52,7 @@ const RecommendationCard = ({
           >
             <FaShoppingCart />
           </button>
-          <Link
-            to={`/product/${product.id}`}
+          <Link href={`/product/${product.id}`}
             className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-semibold transition flex items-center justify-center gap-2"
           >
             <FaEye />
@@ -190,8 +189,7 @@ const RecommendationCard = ({
               Ajouter au panier
             </button>
             
-            <Link
-              to={`/product/${product.id}`}
+            <Link href={`/product/${product.id}`}
               className="flex-1 sm:flex-none bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2"
             >
               <FaEye />
@@ -220,3 +218,4 @@ const RecommendationCard = ({
 };
 
 export default RecommendationCard;
+

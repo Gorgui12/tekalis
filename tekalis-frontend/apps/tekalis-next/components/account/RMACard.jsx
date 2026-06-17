@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import {
   FaTools, FaCalendarAlt, FaTag, FaArrowRight,
   FaBoxOpen, FaCheckCircle, FaTimesCircle, FaClock, FaWrench
@@ -26,8 +26,7 @@ const RMACard = ({ rma, compact = false }) => {
   // ─── Version compacte ─────────────────────────────────────────────────────
   if (compact) {
     return (
-      <Link
-        to={`/dashboard/rma/${rma._id}`}
+      <Link href={`/dashboard/rma/${rma._id}`}
         className="flex items-center gap-4 p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-md transition-all group"
       >
         <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${typeInfo.color}`}>
@@ -160,8 +159,7 @@ const RMACard = ({ rma, compact = false }) => {
 
       {/* Footer */}
       <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-700">
-        <Link
-          to={`/dashboard/rma/${rma._id}`}
+        <Link href={`/dashboard/rma/${rma._id}`}
           className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 hover:underline font-semibold"
         >
           <FaTools size={12} />

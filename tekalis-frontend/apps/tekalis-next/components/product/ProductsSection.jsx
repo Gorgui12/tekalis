@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { FaArrowRight } from "react-icons/fa";
 import ProductCard from "./ProductCard";
 import LoadingSpinner from "../../shared/LoadingSpinner";
@@ -97,8 +97,7 @@ const ProductsSection = ({
           </div>
           
           {viewAllLink && (
-            <Link
-              to={viewAllLink}
+            <Link href={viewAllLink}
               className={`mt-4 sm:mt-0 font-semibold flex items-center gap-2 hover:gap-3 transition-all ${
                 theme === "dark" 
                   ? "text-blue-400 hover:text-blue-300" 
@@ -127,3 +126,4 @@ const ProductsSection = ({
 };
 
 export default ProductsSection;
+

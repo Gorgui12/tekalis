@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { 
   FaShieldAlt, 
   FaLock, 
@@ -199,8 +199,7 @@ const Politique = () => {
 
         {/* Navigation */}
         <div className="mt-8 text-center">
-          <Link
-            to="/"
+          <Link href="/"
             className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition"
           >
             Retour à l'accueil

@@ -186,8 +186,7 @@ const MyOrders = () => {
                 : "Commencez vos achats dès maintenant !"}
             </p>
             {!searchTerm && statusFilter === "all" && (
-              <Link
-                to="/products"
+              <Link href="/products"
                 className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold"
               >
                 Découvrir nos produits
@@ -258,8 +257,7 @@ const MyOrders = () => {
 
                   {/* Actions */}
                   <div className="flex flex-wrap gap-2">
-                    <Link
-                      to={`/orders/${order._id}`}
+                    <Link href={`/orders/${order._id}`}
                       className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold text-center flex items-center justify-center gap-2 transition"
                     >
                       <FaEye />
@@ -320,4 +318,5 @@ const MyOrders = () => {
 };
 
 export default MyOrders;
+
 

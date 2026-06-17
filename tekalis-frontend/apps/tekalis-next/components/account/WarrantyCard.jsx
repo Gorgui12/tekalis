@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { FaShieldAlt, FaCalendarAlt, FaExclamationTriangle, FaCheckCircle, FaTimesCircle, FaTools } from "react-icons/fa";
 import StatusBadge from "../shared/StatusBadge";
 
@@ -182,8 +182,7 @@ const WarrantyCard = ({ warranty, compact = false }) => {
 
       {/* Footer actions */}
       <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-700 flex items-center gap-3">
-        <Link
-          to={`/dashboard/warranties/${warranty._id}`}
+        <Link href={`/dashboard/warranties/${warranty._id}`}
           className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 hover:underline font-semibold"
         >
           <FaShieldAlt size={12} />
@@ -191,8 +190,7 @@ const WarrantyCard = ({ warranty, compact = false }) => {
         </Link>
 
         {status !== "expired" && (
-          <Link
-            to={`/dashboard/rma/create?warrantyId=${warranty._id}`}
+          <Link href={`/dashboard/rma/create?warrantyId=${warranty._id}`}
             className="flex items-center gap-2 text-sm text-orange-600 dark:text-orange-400 hover:underline font-semibold ml-auto"
           >
             <FaTools size={12} />

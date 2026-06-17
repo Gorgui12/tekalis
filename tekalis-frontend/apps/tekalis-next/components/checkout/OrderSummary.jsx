@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useSelector } from "react-redux";
 import Link from "next/link";
@@ -26,8 +26,7 @@ const OrderSummary = ({ deliveryFee = 0, promoDiscount = 0, promoCode = "" }) =>
           <FaShoppingCart className="text-blue-600" />
           Récapitulatif
         </h3>
-        <Link
-          to="/cart"
+        <Link href="/cart"
           className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
         >
           <FaEdit size={11} />
@@ -122,3 +121,4 @@ const OrderSummary = ({ deliveryFee = 0, promoDiscount = 0, promoCode = "" }) =>
 };
 
 export default OrderSummary;
+

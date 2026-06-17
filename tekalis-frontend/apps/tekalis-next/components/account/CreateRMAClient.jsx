@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams, Link, useRouter } from "next/navigation";
@@ -130,8 +130,7 @@ const CreateRMA = () => {
       <div className="container mx-auto px-4 max-w-4xl">
         {/* En-tête */}
         <div className="mb-8">
-          <Link
-            to="/rma"
+          <Link href="/rma"
             className="text-blue-600 hover:text-blue-700 font-semibold mb-4 inline-block"
           >
             ← Retour aux demandes SAV
@@ -407,8 +406,7 @@ const CreateRMA = () => {
               )}
             </button>
             
-            <Link
-              to="/rma"
+            <Link href="/rma"
               className="flex-1 sm:flex-none bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 px-6 rounded-lg font-semibold transition text-center"
             >
               Annuler
@@ -421,4 +419,5 @@ const CreateRMA = () => {
 };
 
 export default CreateRMA;
+
 

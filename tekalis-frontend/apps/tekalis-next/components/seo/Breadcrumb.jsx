@@ -10,8 +10,7 @@ export const Breadcrumb = ({ items = [] }) => {
     <nav aria-label="Fil d'Ariane" className="py-3 px-4">
       <ol className="flex items-center gap-2 text-sm flex-wrap">
         <li>
-          <Link
-            to="/"
+          <Link href="/"
             className="flex items-center gap-1 text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition"
           >
             <FaHome />
@@ -27,8 +26,7 @@ export const Breadcrumb = ({ items = [] }) => {
                 {item.name}
               </span>
             ) : (
-              <Link
-                to={item.path}
+              <Link href={item.path}
                 className="text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition"
               >
                 {item.name}

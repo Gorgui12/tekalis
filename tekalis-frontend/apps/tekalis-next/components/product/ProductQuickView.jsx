@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { useDispatch } from "react-redux";
@@ -247,8 +247,7 @@ const ProductQuickView = ({ product, isOpen, onClose }) => {
             </div>
 
             {/* View full details */}
-            <Link
-              to={`/products/${product._id}`}
+            <Link href={`/products/${product._id}`}
               className="flex items-center justify-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold transition"
               onClick={onClose}
             >
@@ -263,6 +262,7 @@ const ProductQuickView = ({ product, isOpen, onClose }) => {
 };
 
 export default ProductQuickView;
+
 
 
 

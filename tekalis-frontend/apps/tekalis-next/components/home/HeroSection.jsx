@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
@@ -91,8 +91,7 @@ const HeroSection = ({ slides, autoplay = true, interval = 5000 }) => {
               {/* CTA Buttons */}
               <div className="flex flex-wrap gap-4 animate-fade-in-up animation-delay-600">
                 {slide.cta && slide.link && (
-                  <Link
-                    to={slide.link}
+                  <Link href={slide.link}
                     className="inline-flex items-center gap-2 bg-white text-gray-900 px-6 md:px-8 py-3 md:py-4 rounded-lg font-bold text-base md:text-lg hover:bg-gray-100 transition shadow-xl transform hover:scale-105"
                   >
                     {slide.cta}
@@ -101,8 +100,7 @@ const HeroSection = ({ slides, autoplay = true, interval = 5000 }) => {
                 )}
 
                 {slide.secondaryCta && slide.secondaryLink && (
-                  <Link
-                    to={slide.secondaryLink}
+                  <Link href={slide.secondaryLink}
                     className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white px-6 md:px-8 py-3 md:py-4 rounded-lg font-bold text-base md:text-lg hover:bg-white/30 transition border-2 border-white/50"
                   >
                     {slide.secondaryCta}
@@ -168,3 +166,4 @@ const HeroSection = ({ slides, autoplay = true, interval = 5000 }) => {
 };
 
 export default HeroSection;
+

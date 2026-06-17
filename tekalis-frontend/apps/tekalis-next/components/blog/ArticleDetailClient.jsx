@@ -222,8 +222,7 @@ const ArticleDetails = () => {
         <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent"></div>
         <div className="absolute bottom-0 left-0 right-0 p-8">
           <div className="container mx-auto">
-            <Link
-              to="/blog"
+            <Link href="/blog"
               className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-4 transition"
             >
               <FaArrowLeft />
@@ -443,3 +442,4 @@ const ArticleDetails = () => {
 };
 
 export default ArticleDetails;
+

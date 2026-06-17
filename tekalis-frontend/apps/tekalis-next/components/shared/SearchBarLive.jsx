@@ -41,8 +41,7 @@ const ResultItem = ({ product, onSelect }) => {
     : 0;
 
   return (
-    <Link
-      to={`/products/${product._id}`}
+    <Link href={`/products/${product._id}`}
       onClick={onSelect}
       className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition group"
     >
@@ -314,8 +313,7 @@ const SearchBarLive = ({
                   <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
                     Aucun résultat pour « <strong>{query}</strong> »
                   </p>
-                  <Link
-                    to="/products"
+                  <Link href="/products"
                     onClick={handleSelect}
                     className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
                   >
@@ -379,4 +377,5 @@ const SearchBarLive = ({
 };
 
 export default SearchBarLive;
+
 

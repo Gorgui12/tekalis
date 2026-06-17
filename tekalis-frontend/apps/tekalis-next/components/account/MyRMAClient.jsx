@@ -101,8 +101,7 @@ const MyRMA = () => {
       <div className="container mx-auto px-4 max-w-7xl">
         {/* En-tête */}
         <div className="mb-8">
-          <Link
-            to="/dashboard"
+          <Link href="/dashboard"
             className="text-blue-600 hover:text-blue-700 font-semibold mb-4 inline-block"
           >
             ← Retour au dashboard
@@ -116,8 +115,7 @@ const MyRMA = () => {
                 Suivez vos demandes de service après-vente
               </p>
             </div>
-            <Link
-              to="/rma/create"
+            <Link href="/rma/create"
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition"
             >
               <FaPlus />
@@ -228,8 +226,7 @@ const MyRMA = () => {
                 : "Essayez un autre filtre"}
             </p>
             {filter === "all" && (
-              <Link
-                to="/rma/create"
+              <Link href="/rma/create"
                 className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold"
               >
                 Créer une demande
@@ -271,8 +268,7 @@ const MyRMA = () => {
                       className="w-20 h-20 object-contain rounded border"
                     />
                     <div className="flex-1">
-                      <Link
-                        to={`/product/${rma.product?._id}`}
+                      <Link href={`/product/${rma.product?._id}`}
                         className="font-semibold text-gray-900 hover:text-blue-600 block mb-1"
                       >
                         {rma.product?.name || "Produit"}
@@ -316,8 +312,7 @@ const MyRMA = () => {
 
                   {/* Actions */}
                   <div className="flex flex-wrap gap-2">
-                    <Link
-                      to={`/rma/${rma._id}`}
+                    <Link href={`/rma/${rma._id}`}
                       className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center justify-center gap-2 transition"
                     >
                       <FaEye />
@@ -378,3 +373,4 @@ const MyRMA = () => {
 };
 
 export default MyRMA;
+

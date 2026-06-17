@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Link from "next/link";
@@ -93,8 +93,7 @@ const ProductCard = ({ product, showSpecs = false }) => {
   };
 
   return (
-    <Link
-      to={`/products/${product._id}`}
+    <Link href={`/products/${product._id}`}
       className="group bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col h-full"
     >
       {/* ─── Image ─────────────────────────────────────────────────────────── */}
@@ -272,6 +271,7 @@ const ProductCard = ({ product, showSpecs = false }) => {
 };
 
 export default ProductCard;
+
 
 
 

@@ -150,8 +150,7 @@ const Addresses = () => {
       <div className="container mx-auto px-4 max-w-6xl">
         {/* En-tête */}
         <div className="mb-8">
-          <Link
-            to="/dashboard"
+          <Link href="/dashboard"
             className="text-blue-600 hover:text-blue-700 font-semibold mb-4 inline-block"
           >
             ← Retour au dashboard
@@ -459,4 +458,5 @@ const Addresses = () => {
 };
 
 export default Addresses;
+
 

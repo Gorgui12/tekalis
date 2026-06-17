@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { useState } from "react";
@@ -127,48 +127,42 @@ const Footer = () => {
             </h4>
             <ul className="space-y-2.5">
               <li>
-                <Link 
-                  to="/" 
+                <Link href="/" 
                   className="text-gray-300 hover:text-blue-400 transition hover:translate-x-1 inline-block"
                 >
                   Accueil
                 </Link>
               </li>
               <li>
-                <Link 
-                  to="/products" 
+                <Link href="/products" 
                   className="text-gray-300 hover:text-blue-400 transition hover:translate-x-1 inline-block"
                 >
                   Tous les produits
                 </Link>
               </li>
               <li>
-                <Link 
-                  to="/products?filter=nouveautes" 
+                <Link href="/products?filter=nouveautes" 
                   className="text-gray-300 hover:text-blue-400 transition hover:translate-x-1 inline-block"
                 >
                   Nouveautés
                 </Link>
               </li>
               <li>
-                <Link 
-                  to="/products?filter=promotions" 
+                <Link href="/products?filter=promotions" 
                   className="text-gray-300 hover:text-blue-400 transition hover:translate-x-1 inline-block"
                 >
                   Promotions
                 </Link>
               </li>
               <li>
-                <Link 
-                  to="/blog" 
+                <Link href="/blog" 
                   className="text-gray-300 hover:text-blue-400 transition hover:translate-x-1 inline-block"
                 >
                   Blog
                 </Link>
               </li>
               <li>
-                <Link 
-                  to="/apropos" 
+                <Link href="/apropos" 
                   className="text-gray-300 hover:text-blue-400 transition hover:translate-x-1 inline-block"
                 >
                   À propos de nous
@@ -185,48 +179,42 @@ const Footer = () => {
             </h4>
             <ul className="space-y-2.5">
               <li>
-                <Link 
-                  to="/contact" 
+                <Link href="/contact" 
                   className="text-gray-300 hover:text-blue-400 transition hover:translate-x-1 inline-block"
                 >
                   Nous contacter
                 </Link>
               </li>
               <li>
-                <Link 
-                  to="/faq" 
+                <Link href="/faq" 
                   className="text-gray-300 hover:text-blue-400 transition hover:translate-x-1 inline-block"
                 >
                   FAQ - Questions fréquentes
                 </Link>
               </li>
               <li>
-                <Link 
-                  to="/livraison" 
+                <Link href="/livraison" 
                   className="text-gray-300 hover:text-blue-400 transition hover:translate-x-1 inline-block"
                 >
                   Livraison & Expédition
                 </Link>
               </li>
               <li>
-                <Link 
-                  to="/retours" 
+                <Link href="/retours" 
                   className="text-gray-300 hover:text-blue-400 transition hover:translate-x-1 inline-block"
                 >
                   Retours & Remboursements
                 </Link>
               </li>
               <li>
-                <Link 
-                  to="/garanties" 
+                <Link href="/garanties" 
                   className="text-gray-300 hover:text-blue-400 transition hover:translate-x-1 inline-block"
                 >
                   Garanties
                 </Link>
               </li>
               <li>
-                <Link 
-                  to="/cgv" 
+                <Link href="/cgv" 
                   className="text-gray-300 hover:text-blue-400 transition hover:translate-x-1 inline-block"
                 >
                   Conditions générales
@@ -365,29 +353,25 @@ const Footer = () => {
 
           {/* Liens légaux */}
           <div className="flex flex-wrap items-center justify-center gap-4">
-            <Link 
-              to="/mentions-legales" 
+            <Link href="/mentions-legales" 
               className="hover:text-blue-400 transition"
             >
               Mentions légales
             </Link>
             <span className="text-gray-600">•</span>
-            <Link 
-              to="/politique" 
+            <Link href="/politique" 
               className="hover:text-blue-400 transition"
             >
               Confidentialité
             </Link>
             <span className="text-gray-600">•</span>
-            <Link 
-              to="/cgv" 
+            <Link href="/cgv" 
               className="hover:text-blue-400 transition"
             >
               CGV
             </Link>
             <span className="text-gray-600">•</span>
-            <Link 
-              to="/cookies" 
+            <Link href="/cookies" 
               className="hover:text-blue-400 transition"
             >
               Cookies
@@ -440,5 +424,3 @@ const Footer = () => {
 };
 
 export default Footer;
-
-

@@ -265,8 +265,7 @@ const Blog = () => {
         {featuredArticle && (
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">📌 Article mis en avant</h2>
-            <Link
-              to={`/blog/${featuredArticle.slug}`}
+            <Link href={`/blog/${featuredArticle.slug}`}
               className="block bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition group"
             >
               <div className="md:flex">
@@ -412,3 +411,4 @@ const Blog = () => {
 };
 
 export default Blog;
+

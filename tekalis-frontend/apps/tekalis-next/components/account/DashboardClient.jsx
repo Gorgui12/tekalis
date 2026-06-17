@@ -179,8 +179,7 @@ const ClientDashboard = () => {
                   </span>
                 </div>
               </div>
-              <Link
-                to={`/orders/${lastOrder._id}`}
+              <Link href={`/orders/${lastOrder._id}`}
                 className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition"
               >
                 Voir les détails →
@@ -267,3 +266,4 @@ const ClientDashboard = () => {
 };
 
 export default ClientDashboard;
+

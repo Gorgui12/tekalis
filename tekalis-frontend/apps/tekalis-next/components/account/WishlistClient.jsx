@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useSelector, useDispatch } from "react-redux";
 import Link from "next/link";
@@ -51,8 +51,7 @@ const WishlistPage = () => {
             <p className="text-gray-500 mb-6">
               Cliquez sur le ❤️ sur un produit pour l'ajouter à vos favoris.
             </p>
-            <Link
-              to="/products"
+            <Link href="/products"
               className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition"
             >
               Découvrir les produits
@@ -82,8 +81,7 @@ const WishlistPage = () => {
                   className="bg-white rounded-xl shadow-md hover:shadow-lg transition overflow-hidden flex flex-col"
                 >
                   {/* Image */}
-                  <Link
-                    to={`/products/${product._id}`}
+                  <Link href={`/products/${product._id}`}
                     className="relative block aspect-square bg-gray-50 overflow-hidden"
                   >
                     <img
@@ -106,8 +104,7 @@ const WishlistPage = () => {
                         {product.brand}
                       </span>
                     )}
-                    <Link
-                      to={`/products/${product._id}`}
+                    <Link href={`/products/${product._id}`}
                       className="font-semibold text-gray-900 hover:text-blue-600 line-clamp-2 mb-2 transition"
                     >
                       {product.name}
@@ -163,8 +160,7 @@ const WishlistPage = () => {
 
         {items.length > 0 && (
           <div className="mt-8 text-center">
-            <Link
-              to="/products"
+            <Link href="/products"
               className="text-blue-600 hover:underline font-semibold"
             >
               ← Continuer mes achats
@@ -177,5 +173,6 @@ const WishlistPage = () => {
 };
 
 export default WishlistPage;
+
 
 
