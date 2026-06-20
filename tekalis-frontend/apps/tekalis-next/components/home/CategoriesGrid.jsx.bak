@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { 
   FaLaptop, 
   FaMobileAlt, 
@@ -120,7 +120,7 @@ const CategoriesGrid = ({ categories, columns = 6, showAll = false }) => {
         {categoriesToShow.map((category, index) => (
           <Link
             key={category.slug}
-            href={`/category/${category.slug}`}
+            to={`/category/${category.slug}`}
             className="group relative"
           >
             {/* Card avec gradient */}

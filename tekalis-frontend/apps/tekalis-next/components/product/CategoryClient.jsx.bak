@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * tekalis-seo/pages/CategoryPage.optimized.jsx
@@ -15,8 +15,7 @@
  */
 
 import { useEffect, useState, useMemo } from "react";
-import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, Link } /* react-router-dom retire */ from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProducts } from "@/store/slices/productSlice";
 import ProductCard from "@/components/product/ProductCard";

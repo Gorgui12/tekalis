@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 /**
  * CheckoutForm.jsx — Tunnel de commande Tekalis
@@ -80,7 +80,7 @@ const CheckoutForm = () => {
       };
 
       // Log dev pour vérifier le payload
-      if ((process.env.NODE_ENV === "development")) {
+      if (import.meta.env.DEV) {
         console.log("📦 Payload commande →", JSON.stringify(orderPayload, null, 2));
       }
 

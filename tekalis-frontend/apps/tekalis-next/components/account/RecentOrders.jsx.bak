@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { FaArrowRight, FaBox, FaEye } from "react-icons/fa";
 import StatusBadge from "../shared/StatusBadge";
 
@@ -128,7 +128,7 @@ const RecentOrders = ({ orders = [], loading = false }) => {
             {orders.slice(0, 5).map((order) => (
               <Link
                 key={order._id}
-                href={`/dashboard/orders/${order._id}`}
+                to={`/dashboard/orders/${order._id}`}
                 className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition"
               >
                 <div>

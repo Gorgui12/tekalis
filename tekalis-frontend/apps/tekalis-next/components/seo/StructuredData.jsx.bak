@@ -1,4 +1,4 @@
-// Helmet supprime - utiliser metadata export de Next.js
+﻿// Helmet supprime - utiliser metadata export de Next.js
 
 /**
  * Composant Schema.org pour rich snippets Google
@@ -82,5 +82,10 @@ export const StructuredData = ({ type, data }) => {
   }
 
   return (
-    );
+    <Helmet>
+      <script type="application/ld+json">
+        {JSON.stringify(schema)}
+      </script>
+    </Helmet>
+  );
 };

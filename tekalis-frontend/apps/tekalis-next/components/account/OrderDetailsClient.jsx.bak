@@ -1,8 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, Link, useNavigate, useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import StatusBadge from "@/components/shared/StatusBadge";
 

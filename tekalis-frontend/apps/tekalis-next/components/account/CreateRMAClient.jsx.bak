@@ -1,8 +1,7 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useNavigate, useSearchParams, Link, useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { FaTools, FaUpload, FaTimes } from "react-icons/fa";
 import api from "@/lib/api";
@@ -11,7 +10,7 @@ import { useToast } from '@/components/shared/ToastProvider';
 const CreateRMA = () => {
   const router = useRouter();
   const navigate = (path) => router.push(path);
-  const searchParams = useSearchParams();
+  const [searchParams] = useSearchParams();
   const { user } = useSelector((state) => state.auth);
   
   const [loading, setLoading] = useState(false);

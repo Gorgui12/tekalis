@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useNavigate, useRouter } from "next/navigation";
 import { FaCheckCircle, FaSpinner } from "react-icons/fa";
 import axios from "axios";
 
