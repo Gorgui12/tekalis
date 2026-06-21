@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   FaSearch,
   FaList,
@@ -15,6 +15,7 @@ import useProducts from "@/lib/hooks/useProducts";
 import useDebounce from "@/lib/hooks/useDebounce";
 import usePagination from "@/lib/hooks/usePagination";
 import Pagination from "@/components/shared/Pagination";
+
 // ─── Helper : normalise une catégorie (objet OU string) en string ─────────────
 const getCatName = (cat) => {
   if (!cat) return null;
@@ -24,11 +25,8 @@ const getCatName = (cat) => {
 };
 
 const Products = () => {
-  const pathname = usePathname();
   const router = useRouter();
-  const navigate = (path) => router.push(path);
-
-  const searchParams = new URLSearchParams(location.search);
+  const searchParams = useSearchParams();
   const urlQuery = searchParams.get("search") || "";
 
   const [searchTerm, setSearchTerm] = useState(urlQuery);
@@ -42,7 +40,7 @@ const Products = () => {
     autoFetch: true,
   });
 
-  // ✅ Garantir que products est toujours un tableau
+  // Garantir que products est toujours un tableau
   const products = Array.isArray(rawProducts)
     ? rawProducts
     : rawProducts?.data
@@ -51,16 +49,17 @@ const Products = () => {
     ? rawProducts.products
     : [];
 
-  // Mettre à jour l'URL quand recherche change
+  // Mettre a jour l'URL quand la recherche change (remplace l'historique, pas de nouvelle entree)
   useEffect(() => {
     if (debouncedSearch) {
-      navigate(`/products?search=${debouncedSearch}`, { replace: true });
+      router.replace(`/products?search=${encodeURIComponent(debouncedSearch)}`);
     } else {
-      navigate("/products", { replace: true });
+      router.replace("/products");
     }
-  }, [debouncedSearch, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearch]);
 
-  // ─── Extraire catégories uniques en STRINGS ───────────────────────────────
+  // ─── Extraire categories uniques en STRINGS ───────────────────────────────
   const allCategories = useMemo(() => {
     const categoriesSet = new Set();
 
@@ -72,7 +71,7 @@ const Products = () => {
         : [];
 
       categories.forEach((cat) => {
-        const name = getCatName(cat);      // ✅ toujours une string
+        const name = getCatName(cat);
         if (name) categoriesSet.add(name);
       });
     });
@@ -84,7 +83,6 @@ const Products = () => {
   const filteredProducts = useMemo(() => {
     let filtered = [...products];
 
-    // Recherche
     if (debouncedSearch) {
       filtered = filtered.filter((item) => {
         const query = debouncedSearch.toLowerCase();
@@ -96,7 +94,6 @@ const Products = () => {
       });
     }
 
-    // Catégorie — compare des strings des deux côtés
     if (selectedCategory !== "all") {
       filtered = filtered.filter((item) => {
         const categories = Array.isArray(item.category)
@@ -106,7 +103,7 @@ const Products = () => {
           : [];
 
         return categories.some(
-          (cat) => getCatName(cat) === selectedCategory  // ✅ comparaison string
+          (cat) => getCatName(cat) === selectedCategory
         );
       });
     }
@@ -119,7 +116,7 @@ const Products = () => {
     12
   );
 
-  // ─── Grouper par catégorie (strings uniquement) ───────────────────────────
+  // ─── Grouper par categorie (strings uniquement) ───────────────────────────
   const productsByCategory = useMemo(() => {
     const grouped = {};
 
@@ -130,7 +127,6 @@ const Products = () => {
         ? [product.category]
         : [];
 
-      // ✅ On prend le nom de la première catégorie (string)
       const catName = getCatName(categories[0]) || "Autres";
 
       if (!grouped[catName]) grouped[catName] = [];
@@ -153,7 +149,7 @@ const Products = () => {
       <div className="container mx-auto px-4 max-w-7xl">
         {/* Header */}
         <h1 className="text-4xl font-bold text-gray-900 mb-6">
-          🛍️ Tous les Produits
+          Tous les Produits
         </h1>
 
         {/* Search */}
@@ -178,7 +174,6 @@ const Products = () => {
 
         {/* Filters */}
         <div className="flex flex-wrap justify-between gap-4 mb-8">
-          {/* Category select — ✅ key et value sont des strings */}
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
@@ -186,20 +181,20 @@ const Products = () => {
           >
             {allCategories.map((cat) => (
               <option key={cat} value={cat}>
-                {cat === "all" ? "Toutes les catégories" : cat}
+                {cat === "all" ? "Toutes les categories" : cat}
               </option>
             ))}
           </select>
 
           {/* View mode */}
           <div className="flex gap-2">
-            <button onClick={() => setViewMode("grid")}>
+            <button onClick={() => setViewMode("grid")} aria-label="Vue grille">
               <FaThLarge />
             </button>
-            <button onClick={() => setViewMode("compact")}>
+            <button onClick={() => setViewMode("compact")} aria-label="Vue compacte">
               <FaTh />
             </button>
-            <button onClick={() => setViewMode("list")}>
+            <button onClick={() => setViewMode("list")} aria-label="Vue liste">
               <FaList />
             </button>
           </div>
@@ -209,7 +204,7 @@ const Products = () => {
         {filteredProducts.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-600 dark:text-gray-400">
-              Aucun produit trouvé.
+              Aucun produit trouve.
             </p>
           </div>
         ) : selectedCategory === "all" ? (
@@ -268,4 +263,3 @@ const Products = () => {
 };
 
 export default Products;
-

@@ -6,14 +6,15 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { FaTools, FaUpload, FaTimes } from "react-icons/fa";
 import api from "@/lib/api";
-import { useToast } from '@/components/shared/ToastProvider';
+import { useToast } from "@/components/shared/ToastProvider";
 
 const CreateRMA = () => {
   const router = useRouter();
   const navigate = (path) => router.push(path);
   const searchParams = useSearchParams();
   const { user } = useSelector((state) => state.auth);
-  
+  const toast = useToast();
+
   const [loading, setLoading] = useState(false);
   const [orders, setOrders] = useState([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -33,14 +34,15 @@ const CreateRMA = () => {
       return;
     }
 
-    // Charger les commandes éligibles au SAV (livrées)
+    // Charger les commandes eligibles au SAV (livrees)
     const fetchOrders = async () => {
       try {
         const { data } = await api.get("/orders/my-orders");
-        const deliveredOrders = data.filter(o => o.status === "delivered");
+        const list = Array.isArray(data) ? data : (data?.orders || data?.data || []);
+        const deliveredOrders = list.filter(o => o.status === "delivered");
         setOrders(deliveredOrders);
 
-        // Si orderId fourni dans l'URL, sélectionner la commande
+        // Si orderId fourni dans l'URL, selectionner la commande
         if (formData.orderId) {
           const order = deliveredOrders.find(o => o._id === formData.orderId);
           setSelectedOrder(order);
@@ -51,9 +53,10 @@ const CreateRMA = () => {
     };
 
     fetchOrders();
-  }, [user, navigate, formData.orderId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
-  // Gérer changement de commande
+  // Gerer changement de commande
   const handleOrderChange = (e) => {
     const orderId = e.target.value;
     const order = orders.find(o => o._id === orderId);
@@ -61,15 +64,14 @@ const CreateRMA = () => {
     setFormData({ ...formData, orderId, productId: "" });
   };
 
-  // Gérer upload photos
+  // Gerer upload photos
   const handlePhotoUpload = (e) => {
     const files = Array.from(e.target.files);
     if (uploadedPhotos.length + files.length > 5) {
-      alert("Maximum 5 photos autorisées");
+      toast.error("Maximum 5 photos autorisees");
       return;
     }
 
-    // Simuler upload (à remplacer par vraie logique)
     const newPhotos = files.map(file => ({
       file,
       preview: URL.createObjectURL(file),
@@ -90,33 +92,33 @@ const CreateRMA = () => {
     e.preventDefault();
 
     if (!formData.orderId || !formData.productId) {
-      alert("Veuillez sélectionner une commande et un produit");
+      toast.error("Veuillez selectionner une commande et un produit");
       return;
     }
 
     if (!formData.reason.trim()) {
-      alert("Veuillez indiquer le motif de votre demande");
+      toast.error("Veuillez indiquer le motif de votre demande");
       return;
     }
 
     setLoading(true);
 
     try {
-      // Upload photos d'abord (si besoin)
-      const photoUrls = []; // À implémenter selon votre backend
-      
+      // Upload photos d'abord (a implementer selon le backend)
+      const photoUrls = [];
+
       const rmaData = {
         ...formData,
         photos: photoUrls
       };
 
       const { data } = await api.post("/rma", rmaData);
-      
-      useToast().success("✅ Demande SAV créée avec succès !");
+
+      toast.success("Demande SAV creee avec succes !");
       navigate(`/rma/${data.rma._id}`);
     } catch (error) {
-      console.error("Erreur création RMA:", error);
-      useToast().error(error.response?.data?.message || "Erreur lors de la création de la demande");
+      console.error("Erreur creation RMA:", error);
+      toast.error(error.response?.data?.message || "Erreur lors de la creation de la demande");
     } finally {
       setLoading(false);
     }
@@ -129,7 +131,7 @@ const CreateRMA = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-8 mt-20">
       <div className="container mx-auto px-4 max-w-4xl">
-        {/* En-tête */}
+        {/* En-tete */}
         <div className="mb-8">
           <Link href="/rma"
             className="text-blue-600 hover:text-blue-700 font-semibold mb-4 inline-block"
@@ -137,19 +139,19 @@ const CreateRMA = () => {
             ← Retour aux demandes SAV
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            🔧 Nouvelle Demande SAV
+            Nouvelle Demande SAV
           </h1>
           <p className="text-gray-600">
-            Remplissez le formulaire ci-dessous pour créer votre demande
+            Remplissez le formulaire ci-dessous pour creer votre demande
           </p>
         </div>
 
         {/* Formulaire */}
         <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6">
-          {/* Sélection commande */}
+          {/* Selection commande */}
           <div className="mb-6">
             <label className="block text-sm font-semibold text-gray-900 mb-2">
-              Commande concernée *
+              Commande concernee *
             </label>
             <select
               value={formData.orderId}
@@ -157,7 +159,7 @@ const CreateRMA = () => {
               className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             >
-              <option value="">Sélectionnez une commande</option>
+              <option value="">Selectionnez une commande</option>
               {orders.map(order => (
                 <option key={order._id} value={order._id}>
                   #{order._id.slice(-8).toUpperCase()} - {new Date(order.createdAt).toLocaleDateString("fr-FR")} - {order.totalPrice?.toLocaleString()} FCFA
@@ -166,16 +168,16 @@ const CreateRMA = () => {
             </select>
             {orders.length === 0 && (
               <p className="text-sm text-gray-500 mt-2">
-                Aucune commande éligible au SAV. Seules les commandes livrées sont disponibles.
+                Aucune commande eligible au SAV. Seules les commandes livrees sont disponibles.
               </p>
             )}
           </div>
 
-          {/* Sélection produit */}
+          {/* Selection produit */}
           {selectedOrder && (
             <div className="mb-6">
               <label className="block text-sm font-semibold text-gray-900 mb-2">
-                Produit concerné *
+                Produit concerne *
               </label>
               <div className="space-y-3">
                 {selectedOrder.products?.map((item) => (
@@ -203,7 +205,7 @@ const CreateRMA = () => {
                     />
                     <div className="flex-1">
                       <p className="font-semibold text-gray-900">{item.product.name}</p>
-                      <p className="text-sm text-gray-600">Qté: {item.quantity}</p>
+                      <p className="text-sm text-gray-600">Qte: {item.quantity}</p>
                     </div>
                   </label>
                 ))}
@@ -231,8 +233,8 @@ const CreateRMA = () => {
                   className="text-blue-600"
                 />
                 <div>
-                  <p className="font-semibold text-gray-900">🔧 Réparation</p>
-                  <p className="text-xs text-gray-600">Produit défectueux</p>
+                  <p className="font-semibold text-gray-900">Reparation</p>
+                  <p className="text-xs text-gray-600">Produit defectueux</p>
                 </div>
               </label>
 
@@ -250,8 +252,8 @@ const CreateRMA = () => {
                   className="text-blue-600"
                 />
                 <div>
-                  <p className="font-semibold text-gray-900">🔄 Remplacement</p>
-                  <p className="text-xs text-gray-600">Échange du produit</p>
+                  <p className="font-semibold text-gray-900">Remplacement</p>
+                  <p className="text-xs text-gray-600">Echange du produit</p>
                 </div>
               </label>
 
@@ -269,7 +271,7 @@ const CreateRMA = () => {
                   className="text-blue-600"
                 />
                 <div>
-                  <p className="font-semibold text-gray-900">💰 Remboursement</p>
+                  <p className="font-semibold text-gray-900">Remboursement</p>
                   <p className="text-xs text-gray-600">Retour produit</p>
                 </div>
               </label>
@@ -288,7 +290,7 @@ const CreateRMA = () => {
                   className="text-blue-600"
                 />
                 <div>
-                  <p className="font-semibold text-gray-900">💡 Support technique</p>
+                  <p className="font-semibold text-gray-900">Support technique</p>
                   <p className="text-xs text-gray-600">Aide & assistance</p>
                 </div>
               </label>
@@ -304,27 +306,27 @@ const CreateRMA = () => {
               type="text"
               value={formData.reason}
               onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
-              placeholder="Ex: Écran ne s'allume plus, bouton défectueux..."
+              placeholder="Ex: Ecran ne s'allume plus, bouton defectueux..."
               className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
           </div>
 
-          {/* Description détaillée */}
+          {/* Description detaillee */}
           <div className="mb-6">
             <label className="block text-sm font-semibold text-gray-900 mb-2">
-              Description détaillée *
+              Description detaillee *
             </label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="Décrivez le problème en détail, quand il est apparu, les circonstances..."
+              placeholder="Decrivez le probleme en detail, quand il est apparu, les circonstances..."
               rows={6}
               className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
             />
             <p className="text-xs text-gray-500 mt-2">
-              Plus vous êtes précis, plus nous pourrons traiter votre demande rapidement.
+              Plus vous etes precis, plus nous pourrons traiter votre demande rapidement.
             </p>
           </div>
 
@@ -356,7 +358,6 @@ const CreateRMA = () => {
               </label>
             </div>
 
-            {/* Prévisualisation des photos */}
             {uploadedPhotos.length > 0 && (
               <div className="grid grid-cols-3 sm:grid-cols-5 gap-3 mt-4">
                 {uploadedPhotos.map((photo, idx) => (
@@ -382,8 +383,8 @@ const CreateRMA = () => {
           {/* Message info */}
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
             <p className="text-sm text-blue-800">
-              <strong>ℹ️ À savoir :</strong> Notre équipe analysera votre demande sous 48h ouvrées. 
-              Vous serez notifié par email et SMS à chaque étape du traitement.
+              <strong>A savoir :</strong> Notre equipe analysera votre demande sous 48h ouvrees.
+              Vous serez notifie par email et SMS a chaque etape du traitement.
             </p>
           </div>
 
@@ -406,7 +407,7 @@ const CreateRMA = () => {
                 </>
               )}
             </button>
-            
+
             <Link href="/rma"
               className="flex-1 sm:flex-none bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 px-6 rounded-lg font-semibold transition text-center"
             >
@@ -420,5 +421,3 @@ const CreateRMA = () => {
 };
 
 export default CreateRMA;
-
-
