@@ -45,9 +45,14 @@ const Navbar = () => {
   const [isScrolled,       setIsScrolled]       = useState(false);
   const [categoriesOpen,   setCategoriesOpen]   = useState(false);
   const [mobileCatOpen,    setMobileCatOpen]    = useState(false);
+  const [mounted,          setMounted]          = useState(false);
 
   const userDropdownRef = useRef(null);
   const categoriesRef   = useRef(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const handler = (e) => {
@@ -173,7 +178,7 @@ const Navbar = () => {
                 )}
               </Link>
 
-              {!user ? (
+              {!mounted || !user ? (
                 <Link href="/login" className="hidden sm:flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition text-sm">
                   <FaUser size={13} /> Connexion
                 </Link>
@@ -229,7 +234,7 @@ const Navbar = () => {
 
         <div className="px-4 py-4 space-y-1">
 
-          {user && (
+          {mounted && user && (
             <div className="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 mb-4 flex items-center gap-3">
               <div className="w-11 h-11 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
                 {user.name?.charAt(0).toUpperCase()}
@@ -274,7 +279,7 @@ const Navbar = () => {
           </nav>
 
           <div className="border-t border-gray-200 dark:border-gray-700 pt-3 mt-1">
-            {user ? (
+            {mounted && user ? (
               <nav className="space-y-0.5">
                 <p className="px-3 py-1 text-[11px] font-bold text-gray-400 uppercase tracking-wider">Mon compte</p>
                 <Link href="/dashboard"          className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 font-semibold text-sm transition hover:bg-blue-100 dark:hover:bg-blue-900/40"><FaTachometerAlt className="w-4" /> Mon espace</Link>

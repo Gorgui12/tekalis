@@ -58,7 +58,8 @@ const ClientDashboard = () => {
       });
       setLastOrder(d.lastOrder || null);
     } catch (err) {
-      console.error("Dashboard stats:", err);
+      console.error("Dashboard stats error:", err.response?.status, err.message);
+      // Keep default stats on error
     } finally {
       setLoading(false);
     }
@@ -73,7 +74,7 @@ const ClientDashboard = () => {
         : [];
       setRecentOrders(orders.slice(0, 5));
     } catch (err) {
-      console.error("Recent orders:", err);
+      console.error("Recent orders error:", err.response?.status, err.message);
       setRecentOrders([]);
     } finally {
       setOrdersLoading(false);

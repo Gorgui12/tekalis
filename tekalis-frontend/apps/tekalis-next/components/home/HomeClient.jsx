@@ -76,7 +76,7 @@ const HOME_SCHEMA = {
 
 const Home = () => {
   const dispatch = useDispatch();
-  const { items: products, isLoading } = useSelector((state) => state.products);
+  const { allProducts: products, loading: isLoading } = useSelector((state) => state.products);
   
   const [currentSlide, setCurrentSlide] = useState(0);
   const [featuredProducts, setFeaturedProducts] = useState([]);
@@ -90,7 +90,13 @@ const Home = () => {
         const { data } = await api.get("/articles");
         setArticles(data.articles || []);
       } catch (error) {
-        console.error("Erreur chargement articles :", error);
+        // Handle 429 rate limiting and other errors gracefully
+        if (error.response?.status === 429) {
+          console.warn("Articles API rate limited, using fallback articles");
+        } else {
+          console.error("Erreur chargement articles :", error);
+        }
+        // Use fallback articles on any error
         setArticles([
           {
             _id: "1",
@@ -133,12 +139,12 @@ const Home = () => {
   }, [dispatch]);
 
   useEffect(() => {
-    if (products.length > 0) {
+    if (products && products.length > 0) {
       const featured = products.filter(p => p.isFeatured).slice(0, 8);
       setFeaturedProducts(featured.length > 0 ? featured : products.slice(0, 8));
-      
-      const sorted = [...products].sort((a, b) => 
-        (b.salesCount || 0) - (a.salesCount || 0) || 
+
+      const sorted = [...products].sort((a, b) =>
+        (b.salesCount || 0) - (a.salesCount || 0) ||
         (b.rating?.average || 0) - (a.rating?.average || 0)
       );
       setBestSellers(sorted.slice(0, 8));
@@ -179,12 +185,12 @@ const Home = () => {
   ];
 
   const categories = [
-    { name: "Smartphones", icon: <FaMobileAlt />, slug: "smartphones", color: "from-blue-500 to-cyan-500" },
-    { name: "Gaming", icon: <FaGamepad />, slug: "gaming", color: "from-purple-500 to-pink-500" },
-    { name: "Home Cinema", icon: <FaDesktop />, slug: "home-cinema", color: "from-red-500 to-orange-500" },
-    { name: "Caméras", icon: <FaCamera />, slug: "cameras", color: "from-green-500 to-teal-500" },
-    { name: "Laptops", icon: <FaLaptop />, slug: "laptops", color: "from-indigo-500 to-purple-500" },
-    { name: "Accessoires", icon: <FaKeyboard />, slug: "accessories", color: "from-yellow-500 to-orange-500" }
+    { name: "Smartphones", icon: <FaMobileAlt />, slug: "smartphones", color: "from-blue-500 to-cyan-500", image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop" },
+    { name: "Gaming", icon: <FaGamepad />, slug: "gaming", color: "from-purple-500 to-pink-500", image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&h=400&fit=crop" },
+    { name: "Home Cinema", icon: <FaDesktop />, slug: "home-cinema", color: "from-red-500 to-orange-500", image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=400&h=400&fit=crop" },
+    { name: "Caméras", icon: <FaCamera />, slug: "cameras", color: "from-green-500 to-teal-500", image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400&h=400&fit=crop" },
+    { name: "Laptops", icon: <FaLaptop />, slug: "laptops", color: "from-indigo-500 to-purple-500", image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&h=400&fit=crop" },
+    { name: "Accessoires", icon: <FaKeyboard />, slug: "accessories", color: "from-yellow-500 to-orange-500", image: "https://images.unsplash.com/photo-1587829741301-dc798b91add1?w=400&h=400&fit=crop" }
   ];
 
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
@@ -257,14 +263,22 @@ const Home = () => {
         <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
           Parcourir par catégorie
         </h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 lg:gap-6">
           {categories.map((category) => (
             <Link key={category.slug} href={`/category/${category.slug}`} className="group">
-              <div className={`bg-gradient-to-br ${category.color} rounded-lg shadow-md hover:shadow-xl transition-all p-8 text-center text-white aspect-square flex flex-col items-center justify-center`}>
-                <div className="text-5xl mb-3 group-hover:scale-110 transition-transform">
-                  {category.icon}
+              <div className="relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all overflow-hidden aspect-square sm:aspect-auto sm:h-48">
+                <img
+                  src={category.image}
+                  alt={category.name}
+                  className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
+                <div className={`absolute inset-0 bg-gradient-to-t ${category.color} opacity-80 group-hover:opacity-90 transition-opacity`}></div>
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-white p-3 sm:p-4">
+                  <div className="text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition-transform">
+                    {category.icon}
+                  </div>
+                  <h3 className="font-bold text-sm sm:text-base text-center">{category.name}</h3>
                 </div>
-                <h3 className="font-bold text-lg">{category.name}</h3>
               </div>
             </Link>
           ))}
