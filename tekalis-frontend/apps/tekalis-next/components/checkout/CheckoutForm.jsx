@@ -38,7 +38,9 @@ const CheckoutForm = () => {
   const handleDeliveryNext = (data) => {
     setDeliveryData(data);
     setStep(3);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
   };
 
   // ── Soumission finale ─────────────────────────────────────────────────────

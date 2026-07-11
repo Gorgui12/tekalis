@@ -83,7 +83,7 @@ class ErrorBoundary extends React.Component {
             {/* Actions */}
             <div className="space-y-3 mb-8">
               <button
-                onClick={() => window.location.reload()}
+                onClick={() => typeof window !== "undefined" && window.location.reload()}
                 className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-4 px-6 rounded-lg transition shadow-md hover:shadow-lg flex items-center justify-center gap-2"
               >
                 <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

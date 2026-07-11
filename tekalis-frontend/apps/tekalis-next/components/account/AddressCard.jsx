@@ -34,7 +34,7 @@ const AddressCard = ({
   if (!address) return null;
 
   const handleDelete = async () => {
-    if (!window.confirm("Supprimer cette adresse ?")) return;
+    if (typeof window !== "undefined" && !window.confirm("Supprimer cette adresse ?")) return;
     setDeleting(true);
     try {
       await onDelete?.(address._id);
