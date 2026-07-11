@@ -9,7 +9,7 @@
  *   - Le total s'appelle `totalPrice` côté backend
  */
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { clearCart } from "@/store/slices/cartSlice";
@@ -33,6 +33,13 @@ const CheckoutForm = () => {
   const [step,           setStep]           = useState(2);
   const [deliveryData,   setDeliveryData]   = useState(null);
   const [paymentLoading, setPaymentLoading] = useState(false);
+
+  // ── Guard panier vide ─────────────────────────────────────────────────────
+  useEffect(() => {
+    if (!items || items.length === 0) {
+      navigate("/cart");
+    }
+  }, [items, navigate]);
 
   // ── Étape 2 → 3 ──────────────────────────────────────────────────────────
   const handleDeliveryNext = (data) => {
@@ -110,12 +117,6 @@ const CheckoutForm = () => {
       setPaymentLoading(false);
     }
   };
-
-  // ── Guard panier vide ─────────────────────────────────────────────────────
-  if (!items || items.length === 0) {
-    navigate("/cart");
-    return null;
-  }
 
   const deliveryFee       = deliveryData?.deliveryMode?.price ?? 0;
   const totalWithDelivery = totalAmount + deliveryFee;
