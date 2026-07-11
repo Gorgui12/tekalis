@@ -20,10 +20,14 @@ const nextConfig = {
 
   // ── Proxy API → évite CORS en dev ────────────────────────────────────────
   async rewrites() {
+    const apiBase = process.env.NEXT_PUBLIC_API_BASE;
+    if (!apiBase) {
+      return [];
+    }
     return [
       {
         source: '/api/v1/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_BASE}/api/v1/:path*`,
+        destination: `${apiBase}/api/v1/:path*`,
       },
     ];
   },

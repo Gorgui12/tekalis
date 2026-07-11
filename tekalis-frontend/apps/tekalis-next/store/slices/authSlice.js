@@ -10,7 +10,9 @@ export const loginUser = createAsyncThunk("auth/login", async (credentials, { re
     }
     return data.user;
   } catch (err) {
-    return rejectWithValue(err.response?.data?.message || "Erreur de connexion");
+    console.error("Login error:", err.response?.status, err.message);
+    const errorMessage = err.response?.data?.message || err.response?.data?.error || "Erreur de connexion";
+    return rejectWithValue({ message: errorMessage, status: err.response?.status });
   }
 });
 
@@ -23,7 +25,9 @@ export const registerUser = createAsyncThunk("auth/register", async (userData, {
     }
     return data.user;
   } catch (err) {
-    return rejectWithValue(err.response?.data?.message || "Erreur d inscription");
+    console.error("Register error:", err.response?.status, err.message);
+    const errorMessage = err.response?.data?.message || err.response?.data?.error || "Erreur d'inscription";
+    return rejectWithValue({ message: errorMessage, status: err.response?.status });
   }
 });
 

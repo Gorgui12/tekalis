@@ -301,7 +301,7 @@ const Blog = () => {
                     <div>
                       <p className="font-semibold text-gray-900">{featuredArticle.author.name}</p>
                       <p className="text-xs text-gray-500">
-                        {new Date(featuredArticle.publishedAt).toLocaleDateString("fr-FR")}
+                        {new Date(featuredArticle.publishedAt || 0).toLocaleDateString("fr-FR")}
                       </p>
                     </div>
                   </div>
@@ -375,7 +375,7 @@ const Blog = () => {
                       <div className="flex-1">
                         <p className="text-xs font-semibold text-gray-900">{article.author.name}</p>
                         <p className="text-xs text-gray-500">
-                          {new Date(article.publishedAt).toLocaleDateString("fr-FR")}
+                          {new Date(article.publishedAt || 0).toLocaleDateString("fr-FR")}
                         </p>
                       </div>
                     </div>

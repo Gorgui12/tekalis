@@ -101,6 +101,7 @@ const SearchBarLive = ({
 
   /* Charger recherches récentes depuis localStorage */
   useEffect(() => {
+    if (typeof window === "undefined") return;
     try {
       const stored = JSON.parse(localStorage.getItem('tekalis_recent_searches') || '[]');
       setRecentSearches(stored.slice(0, 5));
@@ -108,6 +109,7 @@ const SearchBarLive = ({
   }, []);
 
   const saveRecentSearch = (term) => {
+    if (typeof window === "undefined") return;
     try {
       const current = JSON.parse(localStorage.getItem('tekalis_recent_searches') || '[]');
       const updated = [term, ...current.filter(t => t !== term)].slice(0, 5);
@@ -346,7 +348,9 @@ const SearchBarLive = ({
                 </span>
                 <button
                   onClick={() => {
-                    localStorage.removeItem('tekalis_recent_searches');
+                    if (typeof window !== "undefined") {
+                      localStorage.removeItem('tekalis_recent_searches');
+                    }
                     setRecentSearches([]);
                     setOpen(false);
                   }}

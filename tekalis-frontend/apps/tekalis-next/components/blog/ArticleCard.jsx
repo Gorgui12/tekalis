@@ -28,7 +28,7 @@ const ArticleCard = ({ article, variant = "default", featured = false }) => {
             <FaClock size={10} />
             <span>{article.readTime} min</span>
             <span>•</span>
-            <span>{new Date(article.publishedAt).toLocaleDateString("fr-FR")}</span>
+            <span>{new Date(article.publishedAt || 0).toLocaleDateString("fr-FR")}</span>
           </div>
         </div>
       </Link>
@@ -153,7 +153,7 @@ const ArticleCard = ({ article, variant = "default", featured = false }) => {
               {article.author?.name || "Auteur"}
             </p>
             <p className="text-xs text-gray-500">
-              {new Date(article.publishedAt).toLocaleDateString("fr-FR")}
+              {new Date(article.publishedAt || 0).toLocaleDateString("fr-FR")}
             </p>
           </div>
         </div>

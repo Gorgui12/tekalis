@@ -22,7 +22,7 @@ const ReviewCard = ({ review, onHelpful }) => {
   };
 
   const initials = review.user?.name
-    ? review.user.name.split(" ").map(n => n[0]).join("").toUpperCase().slice(0, 2)
+    ? review.user.name.split(" ").map(n => n?.[0]).filter(Boolean).join("").toUpperCase().slice(0, 2)
     : "?";
 
   return (
@@ -55,7 +55,7 @@ const ReviewCard = ({ review, onHelpful }) => {
             </div>
             <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
               {review.createdAt
-                ? new Date(review.createdAt).toLocaleDateString("fr-FR", {
+                ? new Date(review.createdAt || 0).toLocaleDateString("fr-FR", {
                     day: "2-digit", month: "long", year: "numeric"
                   })
                 : "—"}

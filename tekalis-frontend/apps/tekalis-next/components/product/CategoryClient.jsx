@@ -142,7 +142,7 @@ const CategoryPage = () => {
   const params = useParams();
   const slug = params.slug ?? params.categoryName ?? params.category ?? params.categorySlug ?? params.id ?? null;
   const dispatch = useDispatch();
-  const { items, isLoading } = useSelector((state) => state.products);
+  const { allProducts: items, isLoading } = useSelector((state) => state.products);
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState("grid");
   const [filters, setFilters] = useState({
@@ -160,6 +160,7 @@ const CategoryPage = () => {
 
   // Filtrage des produits
   const filteredProducts = useMemo(() => {
+    if (!items || !Array.isArray(items)) return [];
     let result = [...items];
 
     if (slug) {
@@ -181,7 +182,7 @@ const CategoryPage = () => {
       case "price-asc": return sorted.sort((a, b) => a.price - b.price);
       case "price-desc": return sorted.sort((a, b) => b.price - a.price);
       case "rating": return sorted.sort((a, b) => (b.rating?.average || 0) - (a.rating?.average || 0));
-      default: return sorted.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      default: return sorted.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
     }
   }, [items, slug, filters]);
 

@@ -63,7 +63,7 @@ const Accordion = ({
 
   return (
     <div className={styles.container}>
-      {items.map((item, index) => {
+      {Array.isArray(items) && items.map((item, index) => {
         const itemOpen = isOpen(index);
 
         return (

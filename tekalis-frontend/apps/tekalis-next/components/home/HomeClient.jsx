@@ -389,7 +389,7 @@ const Home = () => {
                     <h3 className="font-bold text-lg mt-2 mb-2 group-hover:text-blue-400 transition">{article.title}</h3>
                     <p className="text-sm text-gray-400 mb-3">{article.excerpt}</p>
                     <p className="text-xs text-gray-500">
-                      {new Date(article.publishedAt).toLocaleDateString("fr-FR")} • {article.readTime} min de lecture
+                      {new Date(article.publishedAt || 0).toLocaleDateString("fr-FR")} • {article.readTime} min de lecture
                     </p>
                   </div>
                 </Link>

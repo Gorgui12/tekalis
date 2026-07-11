@@ -33,7 +33,7 @@ import { useToast } from "@/components/shared/ToastProvider";
 const ProductDetails = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
-  const { items, isLoading } = useSelector((state) => state.products);
+  const { allProducts: items, isLoading } = useSelector((state) => state.products);
   const { user } = useSelector((state) => state.auth);
   const wishlistItems = useSelector((state) => state.wishlist?.items || []);
   const toast = useToast();
@@ -41,13 +41,13 @@ const ProductDetails = () => {
   const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
-    if (items.length === 0) {
+    if (!items || items.length === 0) {
       dispatch(fetchProducts());
     }
     window.scrollTo(0, 0);
-  }, [dispatch, items.length]);
+  }, [dispatch, items?.length]);
 
-  const product = items.find((item) => item._id === id);
+  const product = items?.find((item) => item._id === id);
 
   if (isLoading || !product) {
     return (

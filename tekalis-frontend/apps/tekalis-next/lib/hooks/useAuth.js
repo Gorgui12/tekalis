@@ -54,7 +54,7 @@ const useAuth = () => {
 
   const hasRole = (role) => user?.role === role;
 
-  const getToken = () => token || localStorage.getItem("token");
+  const getToken = () => token || (typeof window !== "undefined" ? localStorage.getItem("token") : null);
 
   const isTokenValid = () => {
     const storedToken = getToken();

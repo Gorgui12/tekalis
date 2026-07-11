@@ -139,6 +139,7 @@ const useProducts = (options = {}) => {
    * @returns {Array} Produits filtrés
    */
   const filterProducts = useCallback((filterFn) => {
+    if (!Array.isArray(products)) return [];
     return products.filter(filterFn);
   }, [products]);
 
@@ -166,7 +167,7 @@ const useProducts = (options = {}) => {
         return sorted.sort((a, b) => (b.sold || 0) - (a.sold || 0));
       case "newest":
       default:
-        return sorted.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        return sorted.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
     }
   }, []);
 
@@ -177,6 +178,7 @@ const useProducts = (options = {}) => {
    * @returns {Array} Produits filtrés
    */
   const filterByPrice = useCallback((min, max) => {
+    if (!Array.isArray(products)) return [];
     return products.filter(p => p.price >= min && p.price <= max);
   }, [products]);
 
@@ -186,6 +188,7 @@ const useProducts = (options = {}) => {
    * @returns {Array} Produits filtrés
    */
   const filterByRating = useCallback((minRating) => {
+    if (!Array.isArray(products)) return [];
     return products.filter(p => (p.rating?.average || 0) >= minRating);
   }, [products]);
 
@@ -194,6 +197,7 @@ const useProducts = (options = {}) => {
    * @returns {Array} Produits en stock
    */
   const getInStock = useCallback(() => {
+    if (!Array.isArray(products)) return [];
     return products.filter(p => p.stock > 0);
   }, [products]);
 
@@ -202,6 +206,7 @@ const useProducts = (options = {}) => {
    * @returns {Array} Produits en promotion
    */
   const getOnSale = useCallback(() => {
+    if (!Array.isArray(products)) return [];
     return products.filter(p => p.comparePrice && p.comparePrice > p.price);
   }, [products]);
 
@@ -211,6 +216,7 @@ const useProducts = (options = {}) => {
    * @returns {Array} Produits de la marque
    */
   const getByBrand = useCallback((brand) => {
+    if (!Array.isArray(products)) return [];
     return products.filter(p => p.brand === brand);
   }, [products]);
 
@@ -246,7 +252,7 @@ const useProducts = (options = {}) => {
    * @returns {Object} Statistiques
    */
   const getStats = useCallback(() => {
-    if (products.length === 0) {
+    if (!Array.isArray(products) || products.length === 0) {
       return {
         total: 0,
         inStock: 0,

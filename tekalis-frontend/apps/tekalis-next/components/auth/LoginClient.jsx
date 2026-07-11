@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
+import Link from "next/link";
 import {
   FaEnvelope, FaLock, FaEye, FaEyeSlash, FaSpinner,
   FaShieldAlt, FaTruck, FaHeadset
@@ -60,8 +61,17 @@ const navigate = (path) => router.push(path);
         navigate(user.isAdmin ? "/admin" : from, { replace: true });
       }, 300);
     } else {
-      const msg = result.error || "Identifiants incorrects";
-      toast.error(msg);
+      const errorObj = typeof result.error === 'object' ? result.error : { message: result.error };
+      const msg = errorObj.message || "Identifiants incorrects";
+      const status = errorObj.status;
+
+      if (status === 500) {
+        toast.error("Erreur serveur. Veuillez réessayer plus tard.");
+      } else if (status === 429) {
+        toast.error("Trop de tentatives. Attendez quelques minutes.");
+      } else {
+        toast.error(msg);
+      }
       setErrors({ password: " " }); // highlight sans texte dupliqué
     }
   };
