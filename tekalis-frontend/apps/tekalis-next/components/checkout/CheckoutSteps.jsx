@@ -1,3 +1,5 @@
+"use client";
+
 import { FaCheckCircle, FaTruck, FaCreditCard, FaShoppingCart } from "react-icons/fa";
 
 /**
