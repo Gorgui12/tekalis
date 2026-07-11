@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { serverFetch } from '@/lib/api';
+import { serverFetch } from '@/lib/serverFetch';
 import ArticleDetailClient from '@/components/blog/ArticleDetailClient';
 
 const SITE_URL = 'https://tekalis.com';

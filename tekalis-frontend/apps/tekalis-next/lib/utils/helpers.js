@@ -290,6 +290,7 @@ export const scrollToElement = (elementId, offset = 0) => {
 
 // 🔥 Get query params from URL
 export const getQueryParams = () => {
+  if (typeof window === "undefined") return {};
   const params = new URLSearchParams(window.location.search);
   const result = {};
   for (const [key, value] of params) {
@@ -300,6 +301,7 @@ export const getQueryParams = () => {
 
 // 🔥 Update query params in URL
 export const updateQueryParams = (params) => {
+  if (typeof window === "undefined") return;
   const url = new URL(window.location);
   Object.keys(params).forEach(key => {
     if (params[key]) {
