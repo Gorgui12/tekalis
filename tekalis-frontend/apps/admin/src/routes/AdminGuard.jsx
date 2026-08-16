@@ -30,7 +30,7 @@ const AdminGuard = () => {
             Vous n'avez pas les permissions nécessaires pour accéder à cette page.
           </p>
           <a
-            href={import.meta.env.VITE_CLIENT_URL || "http://localhost:5173"}
+            href={import.meta.env.VITE_CLIENT_URL || "https://tekalis.com"}
             className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-semibold transition"
           >
             Retour au site

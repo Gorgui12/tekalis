@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useCallback } from "react";
 import Link from "next/link"; import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { 
@@ -16,70 +16,77 @@ import {
 import api from "@/lib/api";
 import DashboardStats from "@/components/account/DashboardStats";
 import RecentOrders from "@/components/account/RecentOrders";
+import useFetchOnce from "@/lib/hooks/useFetchOnce";
 
 const ClientDashboard = () => {
   const router = useRouter();
-  const navigate = (path) => router.push(path);
-  const { user } = useSelector((state) => state.auth);
-  
-  const [loading, setLoading] = useState(true);
-  const [ordersLoading, setOrdersLoading] = useState(true);
-  const [stats, setStats] = useState({
-    orders: 0,
-    wishlist: 0,
-    warranties: 0,
-    rma: 0,
-    totalSpent: 0,
-    loyaltyPoints: 0
-  });
-  const [recentOrders, setRecentOrders] = useState([]);
-  const [lastOrder, setLastOrder] = useState(null);
+  // ✅ Sélectionner uniquement les primitives stables (ID, name) au lieu de
+  // l'objet user entier pour éviter que l'effet ne se re-déclenche à chaque
+  // re-render / rehydration redux-persist.
+  const userId = useSelector((state) => state.auth?.user?._id);
+  const userName = useSelector((state) => state.auth?.user?.name);
 
+  // ✅ Redirection /login isolée du fetch — ne déclenche aucune requête réseau
   useEffect(() => {
-    if (!user) {
-      navigate("/login");
-      return;
+    if (!userId) {
+      router.push("/login");
     }
-    fetchDashboardData();
-  }, [user, navigate]);
+  }, [userId, router]);
 
-  const fetchDashboardData = async () => {
-    // Charger les stats dashboard
-    try {
-      const { data } = await api.get("/users/dashboard");
-      const d = data?.dashboard || data || {};
-      setStats({
+  // ✅ Fetch #1 : stats dashboard — fonction stable (useCallback), un seul appel
+  const fetchDashboardStats = useCallback(async (signal) => {
+    const { data } = await api.get("/users/dashboard", { signal });
+    const d = data?.dashboard || data || {};
+    return {
+      stats: {
         orders: d.stats?.totalOrders ?? 0,
         wishlist: d.stats?.wishlistCount ?? 0,
         warranties: d.stats?.activeWarranties ?? 0,
         rma: d.stats?.openRMA ?? 0,
         totalSpent: d.stats?.totalSpent ?? 0,
-        loyaltyPoints: d.stats?.loyaltyPoints ?? 0
-      });
-      setLastOrder(d.lastOrder || null);
-    } catch (err) {
-      console.error("Dashboard stats error:", err.response?.status, err.message);
-      // Keep default stats on error
-    } finally {
-      setLoading(false);
-    }
+        loyaltyPoints: d.stats?.loyaltyPoints ?? 0,
+      },
+      lastOrder: d.lastOrder || null,
+    };
+  }, []);
 
-    // Charger les commandes récentes séparément
-    try {
-      const { data } = await api.get("/orders/my-orders");
-      const orders = Array.isArray(data)
-        ? data
-        : Array.isArray(data?.orders)
-        ? data.orders
-        : [];
-      setRecentOrders(orders.slice(0, 5));
-    } catch (err) {
-      console.error("Recent orders error:", err.response?.status, err.message);
-      setRecentOrders([]);
-    } finally {
-      setOrdersLoading(false);
-    }
+  // ✅ Fetch #2 : commandes récentes — fonction stable (useCallback), un seul appel
+  const fetchRecentOrders = useCallback(async (signal) => {
+    const { data } = await api.get("/orders/my-orders", { signal });
+    const orders = Array.isArray(data)
+      ? data
+      : Array.isArray(data?.orders)
+      ? data.orders
+      : Array.isArray(data?.data)
+      ? data.data
+      : [];
+    return orders.slice(0, 5);
+  }, []);
+
+  // ✅ Deux hooks useFetchOnce indépendants — un seul appel par endpoint au montage
+  //    Déduplication intégrée (StrictMode, Fast Refresh, re-renders) + AbortController
+  const { data: dashboardData, loading } = useFetchOnce(
+    fetchDashboardStats,
+    [userId],
+    !!userId
+  );
+
+  const { data: recentOrders, loading: ordersLoading } = useFetchOnce(
+    fetchRecentOrders,
+    [userId],
+    !!userId
+  );
+
+  // ✅ Extraire stats et lastOrder du résultat, avec valeurs par défaut
+  const stats = dashboardData?.stats || {
+    orders: 0,
+    wishlist: 0,
+    warranties: 0,
+    rma: 0,
+    totalSpent: 0,
+    loyaltyPoints: 0,
   };
+  const lastOrder = dashboardData?.lastOrder || null;
 
   const menuItems = [
     {
@@ -142,7 +149,7 @@ const ClientDashboard = () => {
         {/* En-tête */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-1">
-            Bonjour, {user?.name} 👋
+            Bonjour, {userName} 👋
           </h1>
           <p className="text-gray-600">
             Bienvenue dans votre espace personnel Tekalis
@@ -180,7 +187,7 @@ const ClientDashboard = () => {
                   </span>
                 </div>
               </div>
-              <Link href={`/orders/${lastOrder._id}`}
+              <Link href={`/dashboard/orders/${lastOrder._id}`}
                 className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition"
               >
                 Voir les détails →
@@ -219,7 +226,7 @@ const ClientDashboard = () => {
 
           {/* Commandes récentes — utilise le composant dédié */}
           <div className="lg:col-span-2 space-y-6">
-            <RecentOrders orders={recentOrders} loading={ordersLoading} />
+            <RecentOrders orders={recentOrders || []} loading={ordersLoading} />
 
             {/* Programme fidélité */}
             <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl shadow-lg p-6 text-white">

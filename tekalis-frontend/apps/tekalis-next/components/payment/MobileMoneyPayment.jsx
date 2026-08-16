@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import axios from "axios";
+import api from "@/lib/api";
 
 const MobileMoneyPayment = ({ orderId }) => {
   const [reference, setReference] = useState("");
@@ -16,12 +16,12 @@ const MobileMoneyPayment = ({ orderId }) => {
     setLoading(true);
 
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/payments/mobile-money",
+      const { data } = await api.post(
+        "/payments/mobile-money",
         { orderId, reference, provider }, // Ajout du provider
         { headers: { Authorization: `Bearer ${token}` } }
       );
-      setMessage(res.data.message);
+      setMessage(data.message);
     } catch (error) {
       setMessage(error.response?.data?.message || "Erreur lors du paiement");
     }

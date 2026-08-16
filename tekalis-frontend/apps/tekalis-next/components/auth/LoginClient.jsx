@@ -56,9 +56,9 @@ const navigate = (path) => router.push(path);
 
     if (result.success) {
       const { user } = result.data;
-      toast.success(`Bienvenue ${user.name} ! 👋`);
+      toast.success(`Bienvenue ${user?.name || 'utilisateur'} ! 👋`);
       setTimeout(() => {
-        navigate(user.isAdmin ? "/admin" : from, { replace: true });
+        navigate(user?.isAdmin ? "/admin" : from, { replace: true });
       }, 300);
     } else {
       const errorObj = typeof result.error === 'object' ? result.error : { message: result.error };

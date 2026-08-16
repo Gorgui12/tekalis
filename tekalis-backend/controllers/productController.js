@@ -191,6 +191,8 @@ exports.bulkCreateProducts = async (req, res) => {
   try {
     const { products } = req.body;
 
+    console.log(`📦 Bulk import: ${products.length} produits à importer`);
+
     if (!Array.isArray(products) || products.length === 0) {
       return res.status(400).json({ success: false, message: "Aucun produit fourni" });
     }
@@ -201,7 +203,8 @@ exports.bulkCreateProducts = async (req, res) => {
 
     const results = { success: [], failed: [] };
 
-    for (const data of products) {
+    for (let i = 0; i < products.length; i++) {
+      const data = products[i];
       try {
         const categoryIds = await resolveCategoryIds(data.category || []);
         const images = (data.images || []).filter(img => img.url?.trim());
@@ -226,13 +229,17 @@ exports.bulkCreateProducts = async (req, res) => {
 
         const product = await Product.create(productData);
         results.success.push({ name: product.name, id: product._id });
+        console.log(`✅ [${i+1}/${products.length}] Importé: ${product.name}`);
       } catch (err) {
+        console.error(`❌ [${i+1}/${products.length}] Échec: ${data.name || "?"} - ${err.message}`);
         results.failed.push({
           name: data.name || "?",
           error: err.code === 11000 ? "Slug dupliqué" : err.message
         });
       }
     }
+
+    console.log(`📊 Résumé import: ${results.success.length} succès, ${results.failed.length} échecs`);
 
     res.status(207).json({
       success: true,

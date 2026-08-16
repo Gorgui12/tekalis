@@ -60,7 +60,7 @@ const PaymentCancel = () => {
           </button>
 
           <button
-            onClick={() => navigate("/orders")}
+            onClick={() => navigate("/dashboard/orders")}
             className="w-full bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 rounded-lg font-semibold transition"
           >
             Voir mes commandes

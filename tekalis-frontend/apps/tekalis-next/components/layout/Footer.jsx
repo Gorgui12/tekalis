@@ -80,8 +80,9 @@ const Footer = () => {
               Tekalis
             </h3>
             <p className="text-gray-300 mb-4 leading-relaxed">
-              Votre boutique en ligne de confiance au Sénégal. 
-              Produits de qualité, livraison rapide et service client exceptionnel.
+              Votre boutique en ligne de confiance au Sénégal, située à <strong>Fann, Dakar</strong>. 
+              Produits de qualité, livraison rapide dans toute la région de Dakar et service client exceptionnel.
+              Spécialiste en électronique, informatique et high-tech depuis 2024.
             </p>
             
             {/* Badges de confiance */}
@@ -114,111 +115,90 @@ const Footer = () => {
               </a>
               <div className="flex items-start gap-2 text-gray-300">
                 <FaMapMarkerAlt className="text-red-400 mt-1 flex-shrink-0" />
-                <span>Dakar, Sénégal<br/>Plateau, Rue X</span>
+                <span>Fann, Rue 14<br/>Dakar, Sénégal<br/>BP 12345</span>
               </div>
             </div>
           </div>
 
-          {/* Colonne 2 : Liens rapides */}
+          {/* Colonne 2 : Catégories populaires */}
           <div>
             <h4 className="text-lg font-bold mb-4 flex items-center gap-2">
               <span className="w-1 h-6 bg-gradient-to-b from-blue-400 to-purple-400 rounded"></span>
-              Liens rapides
+              Catégories
             </h4>
             <ul className="space-y-2.5">
               <li>
-                <Link href="/" 
+                <Link href="/category/smartphones" 
                   className="text-gray-300 hover:text-blue-400 transition hover:translate-x-1 inline-block"
                 >
-                  Accueil
+                  Smartphones Dakar
                 </Link>
               </li>
               <li>
-                <Link href="/products" 
+                <Link href="/category/laptops" 
                   className="text-gray-300 hover:text-blue-400 transition hover:translate-x-1 inline-block"
                 >
-                  Tous les produits
+                  Ordinateurs portables
                 </Link>
               </li>
               <li>
-                <Link href="/products?filter=nouveautes" 
+                <Link href="/category/gaming" 
                   className="text-gray-300 hover:text-blue-400 transition hover:translate-x-1 inline-block"
                 >
-                  Nouveautés
+                  Gaming & Consoles
                 </Link>
               </li>
               <li>
-                <Link href="/products?filter=promotions" 
+                <Link href="/category/tv" 
                   className="text-gray-300 hover:text-blue-400 transition hover:translate-x-1 inline-block"
                 >
-                  Promotions
+                  Téléviseurs
                 </Link>
               </li>
               <li>
-                <Link href="/blog" 
+                <Link href="/category/electromenager" 
                   className="text-gray-300 hover:text-blue-400 transition hover:translate-x-1 inline-block"
                 >
-                  Blog
+                  Électroménager
                 </Link>
               </li>
               <li>
-                <Link href="/apropos" 
+                <Link href="/category/climatiseurs" 
                   className="text-gray-300 hover:text-blue-400 transition hover:translate-x-1 inline-block"
                 >
-                  À propos de nous
+                  Climatiseurs
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Colonne 3 : Service client */}
+          {/* Colonne 3 : Zones de livraison */}
           <div>
             <h4 className="text-lg font-bold mb-4 flex items-center gap-2">
               <span className="w-1 h-6 bg-gradient-to-b from-blue-400 to-purple-400 rounded"></span>
-              Service client
+              Zones de livraison
             </h4>
             <ul className="space-y-2.5">
               <li>
-                <Link href="/contact" 
-                  className="text-gray-300 hover:text-blue-400 transition hover:translate-x-1 inline-block"
-                >
-                  Nous contacter
-                </Link>
+                <span className="text-gray-300">Dakar Centre</span>
               </li>
               <li>
-                <Link href="/faq" 
-                  className="text-gray-300 hover:text-blue-400 transition hover:translate-x-1 inline-block"
-                >
-                  FAQ - Questions fréquentes
-                </Link>
+                <span className="text-gray-300">Dakar Plateau</span>
               </li>
               <li>
-                <Link href="/livraison" 
-                  className="text-gray-300 hover:text-blue-400 transition hover:translate-x-1 inline-block"
-                >
-                  Livraison & Expédition
-                </Link>
+                <span className="text-gray-300">Fann - Mermoz</span>
               </li>
               <li>
-                <Link href="/retours" 
-                  className="text-gray-300 hover:text-blue-400 transition hover:translate-x-1 inline-block"
-                >
-                  Retours & Remboursements
-                </Link>
+                <span className="text-gray-300">SICAP - Liberté</span>
               </li>
               <li>
-                <Link href="/garanties" 
-                  className="text-gray-300 hover:text-blue-400 transition hover:translate-x-1 inline-block"
-                >
-                  Garanties
-                </Link>
+                <span className="text-gray-300">Almadies - Yoff</span>
               </li>
               <li>
-                <Link href="/cgv" 
-                  className="text-gray-300 hover:text-blue-400 transition hover:translate-x-1 inline-block"
-                >
-                  Conditions générales
-                </Link>
+                <span className="text-gray-300">Parcelles Assainies</span>
+              </li>
+              <li>
+                <span className="text-gray-300">Toute la région de Dakar</span>
               </li>
             </ul>
 
@@ -226,11 +206,11 @@ const Footer = () => {
             <div className="mt-6 bg-white/10 backdrop-blur-sm rounded-lg p-4">
               <div className="flex items-center gap-2 mb-2">
                 <FaClock className="text-yellow-400" />
-                <h5 className="font-semibold">Horaires</h5>
+                <h5 className="font-semibold">Horaires Fann</h5>
               </div>
               <p className="text-sm text-gray-300">
-                Lun - Ven: 9h - 18h<br/>
-                Sam: 9h - 13h<br/>
+                Lun - Ven: 8h - 19h<br/>
+                Sam: 9h - 17h<br/>
                 Dim: Fermé
               </p>
             </div>

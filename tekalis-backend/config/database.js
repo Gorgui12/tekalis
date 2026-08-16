@@ -11,10 +11,9 @@ const connectDB = async () => {
   try {
     // Options de connexion MongoDB
     const options = {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      serverSelectionTimeoutMS: 5000, // Timeout après 5 secondes
+      serverSelectionTimeoutMS: 10000, // Timeout après 10 secondes
       socketTimeoutMS: 45000, // Timeout socket après 45 secondes
+      connectTimeoutMS: 10000, // Timeout de connexion après 10 secondes
     };
 
     // Connexion à MongoDB

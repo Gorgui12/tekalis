@@ -115,7 +115,7 @@ const CreateRMA = () => {
       const { data } = await api.post("/rma", rmaData);
 
       toast.success("Demande SAV creee avec succes !");
-      navigate(`/rma/${data.rma._id}`);
+      navigate(`/dashboard/rma/${data.rma._id}`);
     } catch (error) {
       console.error("Erreur creation RMA:", error);
       toast.error(error.response?.data?.message || "Erreur lors de la creation de la demande");
@@ -133,7 +133,7 @@ const CreateRMA = () => {
       <div className="container mx-auto px-4 max-w-4xl">
         {/* En-tete */}
         <div className="mb-8">
-          <Link href="/rma"
+          <Link href="/dashboard/rma"
             className="text-blue-600 hover:text-blue-700 font-semibold mb-4 inline-block"
           >
             ← Retour aux demandes SAV
@@ -408,7 +408,7 @@ const CreateRMA = () => {
               )}
             </button>
 
-            <Link href="/rma"
+            <Link href="/dashboard/rma"
               className="flex-1 sm:flex-none bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 px-6 rounded-lg font-semibold transition text-center"
             >
               Annuler

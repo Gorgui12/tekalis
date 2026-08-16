@@ -94,7 +94,7 @@ const MyWarranties = () => {
                 className="w-20 h-20 object-contain rounded border"
               />
               <div>
-                <Link href={`/product/${warranty.product?._id}`}
+                <Link href={`/products/${warranty.product?._id}`}
                   className="font-bold text-gray-900 hover:text-blue-600 block mb-1"
                 >
                   {warranty.product?.name || "Produit"}
@@ -192,7 +192,7 @@ const MyWarranties = () => {
             </button>
 
             {!isExpired && (
-              <Link href={`/rma/create?productId=${warranty.product?._id}&warrantyId=${warranty._id}`}
+              <Link href={`/dashboard/rma/create?productId=${warranty.product?._id}&warrantyId=${warranty._id}`}
                 className="flex-1 sm:flex-none bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center justify-center gap-2 transition text-sm"
               >
                 Demande SAV

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { 
@@ -11,13 +11,16 @@ import {
 } from "react-icons/fa";
 import api from "../../../../packages/shared/api/api";
 import { useToast } from '../../../../packages/shared/context/ToastContext';
+import useFetchOnce from "../../../../packages/shared/hooks/useFetchOnce";
+
 const Addresses = () => {
   const toast = useToast();
   const navigate = useNavigate();
-  const { user } = useSelector((state) => state.auth);
+  // ✅ Sélectionner uniquement l'ID (primitive stable) au lieu de l'objet user entier
+  // pour éviter que l'effet ne se re-déclenche à chaque re-render / rehydration.
+  const userId = useSelector((state) => state.auth?.user?._id);
+  const userName = useSelector((state) => state.auth?.user?.name);
   
-  const [addresses, setAddresses] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingAddress, setEditingAddress] = useState(null);
   const [formData, setFormData] = useState({
@@ -30,37 +33,37 @@ const Addresses = () => {
     isDefault: false
   });
 
+  // ✅ Redirection /login isolée du fetch — ne déclenche aucune requête réseau
   useEffect(() => {
-    if (!user) {
+    if (!userId) {
       navigate("/login");
-      return;
     }
+  }, [userId, navigate]);
 
-    fetchAddresses();
-  }, [user, navigate]);
+  // ✅ Fetch unique au montage avec déduplication + AbortController.
+  //    La fonction est stable (useCallback) et ne dépend que de userId (primitive).
+  const fetchAddresses = useCallback(async (signal) => {
+    const { data } = await api.get("/addresses", { signal });
+    return data.addresses || [];
+  }, []);
 
-  const fetchAddresses = async () => {
-    try {
-      const { data } = await api.get("/addresses");
-      setAddresses(data.addresses || []);
-    } catch (error) {
-      console.error("Erreur chargement adresses:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data: addresses, loading, refetch } = useFetchOnce(
+    fetchAddresses,
+    [userId],
+    !!userId // ne fetch que si l'utilisateur est connecté
+  );
 
   // Ouvrir modal ajout
   const openAddModal = () => {
     setEditingAddress(null);
     setFormData({
       label: "",
-      fullName: user?.name || "",
+      fullName: userName || "",
       phone: "",
       address: "",
       city: "Dakar",
       region: "Dakar",
-      isDefault: addresses.length === 0
+      isDefault: (addresses || []).length === 0
     });
     setShowModal(true);
   };
@@ -102,7 +105,7 @@ const Addresses = () => {
       }
       
       closeModal();
-      fetchAddresses();
+      refetch();
     } catch (error) {
       toast.error(error.response?.data?.message || "Erreur lors de l'opération");
     }
@@ -117,7 +120,7 @@ const Addresses = () => {
     try {
       await api.delete(`/addresses/${id}`);
       toast.success("Adresse supprimée avec succès !");
-      fetchAddresses();
+      refetch();
     } catch (error) {
       toast.error("Erreur lors de la suppression");
     }
@@ -127,7 +130,7 @@ const Addresses = () => {
   const setDefaultAddress = async (id) => {
     try {
       await api.put(`/addresses/${id}/set-default`);
-      fetchAddresses();
+      refetch();
     } catch (error) {
       toast.error("Erreur lors de la mise à jour de l'adresse par défaut");
     }
@@ -174,7 +177,7 @@ const Addresses = () => {
         </div>
 
         {/* Liste des adresses */}
-        {addresses.length === 0 ? (
+        {(addresses || []).length === 0 ? (
           <div className="bg-white rounded-lg shadow-md p-12 text-center">
             <FaMapMarkerAlt className="text-6xl text-gray-400 mx-auto mb-4" />
             <h3 className="text-xl font-bold text-gray-900 mb-2">
@@ -192,7 +195,7 @@ const Addresses = () => {
           </div>
         ) : (
           <div className="grid md:grid-cols-2 gap-6">
-            {addresses.map((address) => (
+            {(addresses || []).map((address) => (
               <div
                 key={address._id}
                 className={`bg-white rounded-lg shadow-md hover:shadow-lg transition p-6 ${

@@ -48,7 +48,11 @@ const Addresses = () => {
       const { data } = await api.get("/addresses");
       setAddresses(data.addresses || []);
     } catch (error) {
-      console.error("Erreur chargement adresses:", error);
+      if (error.response?.status === 404) {
+        setAddresses([]);
+      } else {
+        console.error("Erreur chargement adresses:", error);
+      }
     } finally {
       setLoading(false);
     }

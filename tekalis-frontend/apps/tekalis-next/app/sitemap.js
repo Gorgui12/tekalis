@@ -4,9 +4,8 @@ const STATIC_PAGES = [
   { url: '/', priority: 1.0, changeFrequency: 'daily' },
   { url: '/products', priority: 0.9, changeFrequency: 'daily' },
   { url: '/blog', priority: 0.8, changeFrequency: 'weekly' },
-  { url: '/configurator', priority: 0.7, changeFrequency: 'monthly' },
-  { url: '/apropos', priority: 0.5, changeFrequency: 'monthly' },
-  { url: '/contact', priority: 0.5, changeFrequency: 'monthly' },
+  { url: '/apropos', priority: 0.6, changeFrequency: 'monthly' },
+  { url: '/contact', priority: 0.6, changeFrequency: 'monthly' },
 ];
 
 const CATEGORY_SLUGS = [

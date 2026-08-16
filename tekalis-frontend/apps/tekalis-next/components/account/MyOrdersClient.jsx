@@ -266,7 +266,7 @@ const MyOrders = () => {
 
                     {order.status === "delivered" && (
                       <button
-                        onClick={() => navigate(`/rma/create?orderId=${order._id}`)}
+                        onClick={() => navigate(`/dashboard/rma/create?orderId=${order._id}`)}
                         className="flex-1 sm:flex-none bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center justify-center gap-2 transition"
                       >
                         <FaRedo />

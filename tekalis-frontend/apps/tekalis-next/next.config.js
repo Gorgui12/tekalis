@@ -20,10 +20,8 @@ const nextConfig = {
 
   // ── Proxy API → évite CORS en dev ────────────────────────────────────────
   async rewrites() {
-    const apiBase = process.env.NEXT_PUBLIC_API_BASE;
-    if (!apiBase) {
-      return [];
-    }
+    const isDev = process.env.NODE_ENV === 'development';
+    const apiBase = isDev ? 'http://localhost:5000' : (process.env.NEXT_PUBLIC_API_BASE || 'https://tekalis.onrender.com');
     return [
       {
         source: '/api/v1/:path*',

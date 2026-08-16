@@ -128,6 +128,47 @@ const AddProduct = () => {
         isFeatured: "Non",
         metaTitle: "HP Pavilion Gaming 15 - PC Portable Gaming",
         metaDescription: "Découvrez le HP Pavilion Gaming 15 avec RTX 3060"
+      },
+      {
+        name: "iPhone 15 Pro",
+        slug: "iphone-15-pro",
+        description: "iPhone 15 Pro avec puce A17 Pro",
+        price: 1200000,
+        comparePrice: 1300000,
+        stock: 5,
+        brand: "Apple",
+        category: "Smartphones",
+        tags: "Apple,iPhone,Smartphone",
+        imageUrl1: "https://example.com/iphone.jpg",
+        imageUrl2: "",
+        imageUrl3: "",
+        processor: "A17 Pro",
+        processorBrand: "Apple",
+        processorGeneration: "",
+        ram: "8 GB",
+        ramType: "",
+        storage: "256 GB",
+        storageType: "",
+        screen: "6.1 pouces",
+        screenTech: "OLED",
+        refreshRate: "120Hz",
+        graphics: "",
+        graphicsMemory: "",
+        connectivity: "WiFi 6E,Bluetooth 5.3,5G",
+        ports: "USB-C",
+        os: "iOS 17",
+        battery: "3274 mAh",
+        weight: "187 g",
+        dimensions: "146.6 x 70.6 x 8.25 mm",
+        color: "Titane",
+        rgb: "Non",
+        coolingSystem: "",
+        warrantyDuration: 12,
+        warrantyType: "constructeur",
+        status: "available",
+        isFeatured: "Oui",
+        metaTitle: "iPhone 15 Pro - Apple",
+        metaDescription: "Le nouveau iPhone 15 Pro avec puce A17 Pro"
       }
     ];
     const ws = XLSX.utils.json_to_sheet(template);
@@ -141,6 +182,17 @@ const AddProduct = () => {
     if (row.imageUrl1?.trim()) images.push({ url: row.imageUrl1.trim(), alt: row.name || "", isPrimary: true });
     if (row.imageUrl2?.trim()) images.push({ url: row.imageUrl2.trim(), alt: row.name || "", isPrimary: false });
     if (row.imageUrl3?.trim()) images.push({ url: row.imageUrl3.trim(), alt: row.name || "", isPrimary: false });
+
+    // ✅ Normaliser le status selon les valeurs valides du modèle
+    const normalizeStatus = (status) => {
+      if (!status) return "available";
+      const s = String(status).toLowerCase().trim();
+      if (["available", "disponible", "oui", "yes", "true", "1"].includes(s)) return "available";
+      if (["preorder", "précommande", "pre-order"].includes(s)) return "preorder";
+      if (["outofstock", "rupture", "épuisé", "no", "false", "0"].includes(s)) return "outofstock";
+      if (["discontinued", "arrêté"].includes(s)) return "discontinued";
+      return "available"; // Valeur par défaut
+    };
 
     return {
       name: row.name || "",
@@ -158,7 +210,7 @@ const AddProduct = () => {
       category: row.category
         ? row.category.split(",").map(c => c.trim()).filter(Boolean)
         : [],
-      brand: row.brand || "",
+      brand: row.brand || "Générique", // ✅ Valeur par défaut pour éviter l'erreur required
       specs: {
         processor: row.processor || "",
         processorBrand: row.processorBrand || "",
@@ -195,7 +247,7 @@ const AddProduct = () => {
       tags: row.tags
         ? row.tags.split(",").map(t => t.trim()).filter(Boolean)
         : [],
-      status: row.status || "available",
+      status: normalizeStatus(row.status),
       isFeatured: row.isFeatured === "Oui" || row.isFeatured === "Yes" || row.isFeatured === true,
       metaTitle: row.metaTitle || row.name || "",
       metaDescription: row.metaDescription || ""

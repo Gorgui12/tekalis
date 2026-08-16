@@ -627,7 +627,7 @@ const fetchAllProducts = async () => {
                                   {product.stock > 0 ? 'Ajouter au panier' : 'Rupture de stock'}
                                 </button>
                                 <button
-                                  onClick={() => navigate(`/product/${product._id || product.id}`)}
+                                  onClick={() => navigate(`/products/${product._id || product.id}`)}
                                   className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold transition"
                                 >
                                   Voir détails

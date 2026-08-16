@@ -115,7 +115,7 @@ const MyRMA = () => {
                 Suivez vos demandes de service après-vente
               </p>
             </div>
-            <Link href="/rma/create"
+            <Link href="/dashboard/rma/create"
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition"
             >
               <FaPlus />
@@ -226,7 +226,7 @@ const MyRMA = () => {
                 : "Essayez un autre filtre"}
             </p>
             {filter === "all" && (
-              <Link href="/rma/create"
+              <Link href="/dashboard/rma/create"
                 className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold"
               >
                 Créer une demande
@@ -268,7 +268,7 @@ const MyRMA = () => {
                       className="w-20 h-20 object-contain rounded border"
                     />
                     <div className="flex-1">
-                      <Link href={`/product/${rma.product?._id}`}
+                      <Link href={`/products/${rma.product?._id}`}
                         className="font-semibold text-gray-900 hover:text-blue-600 block mb-1"
                       >
                         {rma.product?.name || "Produit"}
@@ -312,7 +312,7 @@ const MyRMA = () => {
 
                   {/* Actions */}
                   <div className="flex flex-wrap gap-2">
-                    <Link href={`/rma/${rma._id}`}
+                    <Link href={`/dashboard/rma/${rma._id}`}
                       className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center justify-center gap-2 transition"
                     >
                       <FaEye />
@@ -321,7 +321,7 @@ const MyRMA = () => {
 
                     {rma.status !== "completed" && rma.status !== "rejected" && (
                       <button
-                        onClick={() => navigate(`/rma/${rma._id}#comments`)}
+                        onClick={() => navigate(`/dashboard/rma/${rma._id}#comments`)}
                         className="flex-1 sm:flex-none bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center justify-center gap-2 transition"
                       >
                         <FaCommentDots />

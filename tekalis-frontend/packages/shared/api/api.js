@@ -14,7 +14,7 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 15000,
+  timeout: 60000, // 60 secondes pour les imports en masse
 });
 
 // 🔐 Ajoute automatiquement le token à chaque requête
@@ -25,13 +25,12 @@ api.interceptors.request.use(
     // Fallback : Redux Persist stocke sous persist:auth -> JSON.user.token
     if (!token) {
       try {
-// Dans api.js, remplacer le fallback persist par :
-const persistedAuth = localStorage.getItem("persist:auth");
-if (persistedAuth) {
-  const parsed = JSON.parse(persistedAuth);
-  const authState = parsed.auth ? JSON.parse(parsed.auth) : null;
-  token = authState?.token || null;
-}
+        const persistedAuth = localStorage.getItem("persist:auth");
+        if (persistedAuth) {
+          const parsed = JSON.parse(persistedAuth);
+          const authState = parsed.auth ? JSON.parse(parsed.auth) : null;
+          token = authState?.token || null;
+        }
       } catch (_) { /* silencieux */ }
     }
 

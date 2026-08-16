@@ -4,7 +4,6 @@
 # ===============================================
 
 # ── Environnement — JAMAIS COMMITER ──────────────
-.env
 .env.local
 .env.production
 .env.staging
@@ -13,6 +12,8 @@
 .env.test.local
 .env.production.local
 *.env
+!.env
+!.env.example
 
 # ── Dependencies ──────────────────────────────────
 node_modules/

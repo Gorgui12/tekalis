@@ -1,12 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { FaCheckCircle, FaSpinner } from "react-icons/fa";
-import axios from "axios";
+import api from "@/lib/api";
 
-const PaymentSuccess = () => {
-  const { orderId } = useParams();
+const PaymentSuccess = ({ orderId }) => {
   const router = useRouter();
   const navigate = (path) => router.push(path);
   const [status, setStatus] = useState("verifying"); // verifying, success, failed
@@ -14,16 +13,16 @@ const PaymentSuccess = () => {
 
   useEffect(() => {
     verifyPayment();
-  }, []);
+  }, [orderId]);
 
   const verifyPayment = async () => {
     try {
       // Vérifier le statut du paiement via votre backend
-      const response = await axios.get(`/api/orders/${orderId}`);
+      const { data } = await api.get(`/orders/${orderId}`);
       
-      if (response.data.paymentStatus === "paid") {
+      if (data.paymentStatus === "paid") {
         setStatus("success");
-        setOrderDetails(response.data);
+        setOrderDetails(data);
       } else {
         // Attendre quelques secondes puis revérifier (webhook peut prendre du temps)
         setTimeout(() => {
@@ -92,7 +91,7 @@ const PaymentSuccess = () => {
 
           <div className="space-y-3">
             <button
-              onClick={() => navigate(`/orders/${orderId}`)}
+              onClick={() => navigate(`/dashboard/orders/${orderId}`)}
               className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition"
             >
               Voir ma commande
@@ -129,7 +128,7 @@ const PaymentSuccess = () => {
         </p>
 
         <button
-          onClick={() => navigate("/orders")}
+          onClick={() => navigate("/dashboard/orders")}
           className="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition"
         >
           Voir mes commandes

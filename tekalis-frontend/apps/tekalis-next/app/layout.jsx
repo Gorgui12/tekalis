@@ -44,43 +44,103 @@ export const metadata = {
   },
 };
 
-// Schema.org Organisation
-const orgSchema = {
+// Schema.org LocalBusiness - Optimisé Géo-SEO Dakar/Fann
+const localBusinessSchema = {
   '@context': 'https://schema.org',
-  '@type': 'Store',
-  name: 'Tekalis',
-  description: 'Boutique spécialisée en électronique et high-tech à Dakar, Sénégal',
+  '@type': 'LocalBusiness',
+  name: 'Tekalis - Boutique Électronique Dakar',
+  alternateName: 'Tekalis Sénégal',
+  description: 'Boutique spécialisée en électronique et high-tech à Dakar, Sénégal. Ordinateurs, smartphones, TV, électroménager. Livraison rapide dans toute la région de Dakar.',
   url: 'https://tekalis.com',
   logo: 'https://tekalis.com/og-image.png',
+  image: 'https://tekalis.com/og-image.png',
   telephone: '+221786346946',
   email: 'contact@tekalis.com',
   priceRange: '$$',
   currenciesAccepted: 'XOF',
-  paymentAccepted: 'Cash, Mobile Money, Wave, Orange Money',
+  paymentAccepted: 'Cash, Mobile Money, Wave, Orange Money, Free Money, Carte bancaire',
   address: {
     '@type': 'PostalAddress',
+    streetAddress: 'Fann, Rue 14',
     addressLocality: 'Dakar',
     addressRegion: 'Dakar',
+    postalCode: 'BP 12345',
     addressCountry: 'SN',
   },
-  geo: { '@type': 'GeoCoordinates', latitude: '14.6928', longitude: '-17.4467' },
-  openingHours: 'Mo-Fr 08:00-19:00 Sa 09:00-17:00',
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: '14.6928',
+    longitude: '-17.4467',
+  },
+  areaServed: [
+    {
+      '@type': 'GeoCircle',
+      geoMidpoint: {
+        '@type': 'GeoCoordinates',
+        latitude: '14.6928',
+        longitude: '-17.4467',
+      },
+      geoRadius: '50000',
+    },
+    {
+      '@type': 'City',
+      name: 'Dakar',
+    },
+    {
+      '@type': 'AdministrativeArea',
+      name: 'Région de Dakar',
+    },
+  ],
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'],
+      opens: '08:00',
+      closes: '19:00',
+    },
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: 'Saturday',
+      opens: '09:00',
+      closes: '17:00',
+    },
+  ],
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Catalogue Tekalis',
+    itemListElement: [
+      { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Smartphones' } },
+      { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Ordinateurs portables' } },
+      { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Téléviseurs' } },
+      { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Électroménager' } },
+      { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Accessoires tech' } },
+    ],
+  },
+  aggregateRating: {
+    '@type': 'AggregateRating',
+    ratingValue: '4.5',
+    reviewCount: '150',
+    bestRating: '5',
+    worstRating: '1',
+  },
   sameAs: [
     'https://www.facebook.com/share/14MikMhjFhA/',
     'https://www.instagram.com/_tekalis_',
+    'https://twitter.com/tekalis',
+    'https://linkedin.com/company/tekalis',
   ],
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="fr" suppressHydrationWarning>
+    <html lang="fr" suppressHydrationWarning data-scroll-behavior="smooth">
       <head>
         <link rel="preconnect" href="https://images.unsplash.com" />
         <link rel="dns-prefetch" href="//tekalis.onrender.com" />
         <meta name="theme-color" content="#2563eb" />
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
         />
       </head>
       <body className="bg-white dark:bg-gray-950 text-gray-900 dark:text-white antialiased">

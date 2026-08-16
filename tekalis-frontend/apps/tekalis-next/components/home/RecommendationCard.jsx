@@ -52,7 +52,7 @@ const RecommendationCard = ({
           >
             <FaShoppingCart />
           </button>
-          <Link href={`/product/${product.id}`}
+          <Link href={`/products/${product.id}`}
             className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-semibold transition flex items-center justify-center gap-2"
           >
             <FaEye />
@@ -189,7 +189,7 @@ const RecommendationCard = ({
               Ajouter au panier
             </button>
             
-            <Link href={`/product/${product.id}`}
+            <Link href={`/products/${product.id}`}
               className="flex-1 sm:flex-none bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2"
             >
               <FaEye />
