@@ -3,8 +3,7 @@
  * Pas de directive "use client".
  */
 
-const BASE =
-  (process.env.NEXT_PUBLIC_API_BASE || "https://tekalis.onrender.com") + "/api/v1";
+const BASE = process.env.NEXT_PUBLIC_API_BASE || "https://tekalis.onrender.com/api/v1";
 
 export async function serverFetch(path, options = {}) {
   const { revalidate = 3600, ...rest } = options;

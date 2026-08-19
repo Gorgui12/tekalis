@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useCallback } from "react";
+import { useEffect, useCallback, useState } from "react";
 import Link from "next/link"; import { useRouter } from "next/navigation";
 import { useSelector } from "react-redux";
 import { 
@@ -25,13 +25,7 @@ const ClientDashboard = () => {
   // re-render / rehydration redux-persist.
   const userId = useSelector((state) => state.auth?.user?._id);
   const userName = useSelector((state) => state.auth?.user?.name);
-
-  // ✅ Redirection /login isolée du fetch — ne déclenche aucune requête réseau
-  useEffect(() => {
-    if (!userId) {
-      router.push("/login");
-    }
-  }, [userId, router]);
+  const [isChecking, setIsChecking] = useState(true);
 
   // ✅ Fetch #1 : stats dashboard — fonction stable (useCallback), un seul appel
   const fetchDashboardStats = useCallback(async (signal) => {
@@ -68,14 +62,35 @@ const ClientDashboard = () => {
   const { data: dashboardData, loading } = useFetchOnce(
     fetchDashboardStats,
     [userId],
-    !!userId
+    !!userId && !isChecking
   );
 
   const { data: recentOrders, loading: ordersLoading } = useFetchOnce(
     fetchRecentOrders,
     [userId],
-    !!userId
+    !!userId && !isChecking
   );
+
+  // ✅ Redirection /login isolée du fetch — ne déclenche aucune requête réseau
+  useEffect(() => {
+    // Petit délai pour laisser Redux s'initialiser depuis localStorage
+    const timer = setTimeout(() => {
+      setIsChecking(false);
+      if (!userId) {
+        router.push("/login");
+      }
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, [userId, router]);
+
+  if (isChecking) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-600"></div>
+      </div>
+    );
+  }
 
   // ✅ Extraire stats et lastOrder du résultat, avec valeurs par défaut
   const stats = dashboardData?.stats || {

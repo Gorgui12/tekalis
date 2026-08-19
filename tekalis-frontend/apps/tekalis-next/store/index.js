@@ -4,11 +4,19 @@
 "use client";
 
 import { configureStore, combineReducers } from "@reduxjs/toolkit";
+import { persistStore, persistReducer } from "redux-persist";
+import storage from "redux-persist/lib/storage";
 import authReducer     from "./slices/authSlice";
 import cartReducer     from "./slices/cartSlice";
 import wishlistReducer from "./slices/wishlistSlice";
 import productReducer  from "./slices/productSlice";
 import uiReducer       from "./slices/uiSlice";
+
+const persistConfig = {
+  key: 'root',
+  storage,
+  whitelist: ['auth', 'cart', 'wishlist'],
+};
 
 const rootReducer = combineReducers({
   auth:     authReducer,
@@ -18,10 +26,19 @@ const rootReducer = combineReducers({
   ui:       uiReducer,
 });
 
-export const makeStore = () =>
-  configureStore({
-    reducer: rootReducer,
+const persistedReducer = persistReducer(persistConfig, rootReducer);
+
+export const makeStore = () => {
+  const store = configureStore({
+    reducer: persistedReducer,
     middleware: (get) => get({ serializableCheck: false }),
   });
+  
+  if (typeof window !== 'undefined') {
+    store.__persistor = persistStore(store);
+  }
+  
+  return store;
+};
 
 export const store = makeStore();

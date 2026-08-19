@@ -30,7 +30,7 @@ import {
 } from "react-icons/fa";
 import { useToast } from "@/components/shared/ToastProvider";
 
-const ProductDetails = () => {
+const ProductDetails = ({ product: initialProduct }) => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const { allProducts: items, isLoading } = useSelector((state) => state.products);
@@ -41,24 +41,26 @@ const ProductDetails = () => {
   const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
-    if (!items || items.length === 0) {
-      dispatch(fetchProducts());
-    }
     window.scrollTo(0, 0);
-  }, [dispatch, items?.length]);
+  }, []);
 
-  const product = items?.find((item) => item._id === id);
+  // Use SSR product
+  const product = initialProduct;
 
-  if (isLoading || !product) {
+  if (!product) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Chargement du produit...</p>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">Produit introuvable</h1>
+          <p className="text-gray-600 mb-6">Ce produit n'existe pas ou a été supprimé.</p>
+          <a href="/products" className="text-blue-600 hover:underline">Voir tous les produits</a>
         </div>
       </div>
     );
   }
+
+  // Log product structure for debugging
+  console.log('ProductDetailClient - Rendering product:', product);
 
   // ── Images ────────────────────────────────────────────────────────────────
   const productImages = product.images?.length
@@ -214,7 +216,7 @@ const ProductDetails = () => {
           <div className="mb-6">
             <div className="flex items-baseline gap-3">
               <span className="text-4xl font-bold text-blue-600">
-                {product.price.toLocaleString()} FCFA
+                {(product.price || 0).toLocaleString()} FCFA
               </span>
               {product.comparePrice && discount > 0 && (
                 <span className="text-xl text-gray-400 line-through">

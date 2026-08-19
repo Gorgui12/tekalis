@@ -56,13 +56,7 @@ const nextConfig = {
 
   // ── Redirections ancienne URLs ─────────────────────────────────────────────
   async redirects() {
-    return [
-      {
-        source: '/products/:id',
-        destination: '/products/:id',
-        permanent: false,
-      },
-    ];
+    return [];
   },
 
   // ── Perf ─────────────────────────────────────────────────────────────────

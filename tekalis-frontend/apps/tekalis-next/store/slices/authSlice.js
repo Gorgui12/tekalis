@@ -42,7 +42,14 @@ export const updateProfile = createAsyncThunk("auth/updateProfile", async (userD
 
 const getUserFromStorage = () => {
   if (typeof window === "undefined") return null;
-  try { return JSON.parse(localStorage.getItem("user")); } catch { return null; }
+  try {
+    const userStr = localStorage.getItem("user");
+    const token = localStorage.getItem("token");
+    if (!userStr || !token) return null;
+    return JSON.parse(userStr);
+  } catch {
+    return null;
+  }
 };
 
 const authSlice = createSlice({

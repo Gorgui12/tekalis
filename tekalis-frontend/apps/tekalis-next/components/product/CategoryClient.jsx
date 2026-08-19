@@ -137,12 +137,12 @@ const getCatName = (cat) => {
 };
 
 // ── Composant principal ───────────────────────────────────────────────────────
-const CategoryPage = () => {
+const CategoryPage = ({ products: initialProducts = [], seo: initialSeo, slug: initialSlug }) => {
   // Compatibilité : le param peut s'appeler slug, category, categorySlug, etc.
   const params = useParams();
-  const slug = params.slug ?? params.categoryName ?? params.category ?? params.categorySlug ?? params.id ?? null;
+  const slug = initialSlug ?? params.slug ?? params.categoryName ?? params.category ?? params.categorySlug ?? params.id ?? null;
   const dispatch = useDispatch();
-  const { allProducts: items, isLoading } = useSelector((state) => state.products);
+  const { allProducts: reduxItems, isLoading } = useSelector((state) => state.products);
   const [showFilters, setShowFilters] = useState(false);
   const [viewMode, setViewMode] = useState("grid");
   const [filters, setFilters] = useState({
@@ -152,9 +152,13 @@ const CategoryPage = () => {
     sort: "newest",
   });
 
-  const seo = CATEGORY_SEO[slug] || DEFAULT_SEO(slug);
+  const seo = initialSeo ?? CATEGORY_SEO[slug] ?? DEFAULT_SEO(slug);
+  
+  // Utiliser les produits SSR initiaux, puis Redux si disponible
+  const items = initialProducts.length > 0 ? initialProducts : reduxItems;
 
   useEffect(() => {
+    // Charger les produits via Redux pour les interactions client
     dispatch(fetchProducts());
   }, [dispatch]);
 

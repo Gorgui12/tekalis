@@ -74,29 +74,28 @@ const HOME_SCHEMA = {
   ],
 };
 
-const Home = () => {
+const Home = ({ initialProducts = [], initialArticles = [] }) => {
   const dispatch = useDispatch();
-  const { allProducts: products, loading: isLoading } = useSelector((state) => state.products);
+  const { allProducts: reduxProducts, loading: isLoading } = useSelector((state) => state.products);
   
   const [currentSlide, setCurrentSlide] = useState(0);
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [bestSellers, setBestSellers] = useState([]);
-  const [articles, setArticles] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [articles, setArticles] = useState(initialArticles);
+  const [loading, setLoading] = useState(false);
+  
+  // Utiliser les données SSR initiales, puis Redux si disponible
+  const products = initialProducts.length > 0 ? initialProducts : reduxProducts;
    
   useEffect(() => {
     const fetchArticles = async () => {
+      if (initialArticles.length > 0) return;
+      
       try {
         const { data } = await api.get("/articles");
         setArticles(data.articles || []);
       } catch (error) {
-        // Handle 429 rate limiting and other errors gracefully
-        if (error.response?.status === 429) {
-          console.warn("Articles API rate limited, using fallback articles");
-        } else {
-          console.error("Erreur chargement articles :", error);
-        }
-        // Use fallback articles on any error
+        console.error("Erreur chargement articles :", error);
         setArticles([
           {
             _id: "1",
@@ -132,9 +131,10 @@ const Home = () => {
     };
 
     fetchArticles();
-  }, []);
+  }, [initialArticles]);
 
   useEffect(() => {
+    // Charger les produits via Redux pour les interactions client
     dispatch(fetchProducts());
   }, [dispatch]);
 
@@ -142,14 +142,15 @@ const Home = () => {
     if (products && products.length > 0) {
       const featured = products.filter(p => p.isFeatured).slice(0, 8);
       setFeaturedProducts(featured.length > 0 ? featured : products.slice(0, 8));
-
-      const sorted = [...products].sort((a, b) =>
-        (b.salesCount || 0) - (a.salesCount || 0) ||
+      
+      const sorted = [...products].sort((a, b) => 
+        (b.salesCount || 0) - (a.salesCount || 0) || 
         (b.rating?.average || 0) - (a.rating?.average || 0)
       );
       setBestSellers(sorted.slice(0, 8));
     }
   }, [products]);
+
 
   const slides = [
     {
