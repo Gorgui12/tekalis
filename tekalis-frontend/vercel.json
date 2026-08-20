@@ -1,6 +1,4 @@
 {
-  "installCommand": "cd apps/tekalis-next && npm install",
-  "buildCommand": "cd apps/tekalis-next && npm run build",
-  "outputDirectory": "apps/tekalis-next/.next",
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "outputDirectory": ".next"
 }
