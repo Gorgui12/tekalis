@@ -1,11 +1,12 @@
 ﻿"use client";
 
 import Link from "next/link";
+import Script from "next/script";
 import { useState } from "react";
 import { 
   FaFacebook, FaInstagram, FaLinkedin, FaTwitter,
   FaEnvelope, FaPhone, FaMapMarkerAlt, FaClock,
-  FaArrowUp, FaHeart, FaShieldAlt, FaTruck, FaUndo
+  FaArrowUp, FaHeart, FaShieldAlt, FaTruck
 } from "react-icons/fa";
 import { useToast } from "@/components/shared/ToastProvider";
 import { validateEmail } from "@/lib/utils/validators";
@@ -107,11 +108,11 @@ const Footer = () => {
                 contact@tekalis.com
               </a>
               <a 
-                href="tel:+221771234567" 
+                href="tel:+221786346946" 
                 className="flex items-center gap-2 text-gray-300 hover:text-blue-400 transition"
               >
                 <FaPhone className="text-green-400" />
-                +221 77 123 45 67
+                +221 78 634 69 46
               </a>
               <div className="flex items-start gap-2 text-gray-300">
                 <FaMapMarkerAlt className="text-red-400 mt-1 flex-shrink-0" />
@@ -369,24 +370,25 @@ const Footer = () => {
         <FaArrowUp size={20} />
       </button>
 
-      {/* Schema.org SEO - Données structurées */}
-      <script type="application/ld+json">
-        {JSON.stringify({
+      <Script
+        id="footer-organization-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify({
           "@context": "https://schema.org",
           "@type": "Organization",
           "name": "Tekalis",
           "url": "https://tekalis.com",
-          "logo": "https://tekalis.com/logo.png",
+          "logo": "https://tekalis.com/og-image.png",
           "description": "Boutique en ligne au Sénégal - Produits de qualité, livraison rapide",
           "address": {
             "@type": "PostalAddress",
-            "streetAddress": "Plateau, Rue X",
+            "streetAddress": "Fann, Rue 14",
             "addressLocality": "Dakar",
             "addressCountry": "SN"
           },
           "contactPoint": {
             "@type": "ContactPoint",
-            "telephone": "+221-77-123-45-67",
+            "telephone": "+221-78-634-69-46",
             "contactType": "Customer Service",
             "email": "contact@tekalis.com",
             "availableLanguage": ["fr", "wo"]
@@ -397,8 +399,8 @@ const Footer = () => {
             "https://twitter.com/tekalis",
             "https://linkedin.com/company/tekalis"
           ]
-        })}
-      </script>
+        }) }}
+      />
     </footer>
   );
 };

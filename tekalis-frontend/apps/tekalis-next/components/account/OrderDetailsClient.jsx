@@ -206,7 +206,7 @@ const OrderDetails = () => {
                           Quantité: <span className="font-semibold">{item.quantity}</span>
                         </span>
                         <span className="font-bold text-blue-600">
-                          {(item.price * item.quantity).toLocaleString()} FCFA
+                          {((item.price || 0) * (item.quantity || 1)).toLocaleString()} FCFA
                         </span>
                       </div>
                     </div>
@@ -219,7 +219,7 @@ const OrderDetails = () => {
                 <div className="flex justify-between text-gray-700">
                   <span>Sous-total</span>
                   <span className="font-semibold">
-                    {order.products?.reduce((sum, item) => sum + (item.price * item.quantity), 0).toLocaleString()} FCFA
+                    {(order.products?.reduce((sum, item) => sum + ((item.price || 0) * (item.quantity || 1)), 0) || 0).toLocaleString()} FCFA
                   </span>
                 </div>
                 <div className="flex justify-between text-gray-700">
@@ -232,7 +232,7 @@ const OrderDetails = () => {
                   <div className="flex justify-between text-green-600">
                     <span>Réduction</span>
                     <span className="font-semibold">
-                      -{order.discount.toLocaleString()} FCFA
+                      -{(order.discount || 0).toLocaleString()} FCFA
                     </span>
                   </div>
                 )}

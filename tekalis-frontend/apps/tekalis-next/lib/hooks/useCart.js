@@ -7,7 +7,7 @@ import {
   increaseQuantity, 
   decreaseQuantity, 
   clearCart 
-} from "../redux/slices/cartSlice";
+} from "@/store/slices/cartSlice";
 
 /**
  * Hook personnalisé pour gérer le panier

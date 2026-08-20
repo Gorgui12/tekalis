@@ -233,7 +233,7 @@ const ProductCard = ({ product, showSpecs = false }) => {
         <div className="mt-auto mb-2 md:mb-3">
           <div className="flex items-baseline gap-1.5">
             <span className="text-base md:text-lg font-bold text-blue-600 dark:text-blue-400">
-              {product.price.toLocaleString()}
+              {(product.price || 0).toLocaleString()}
             </span>
             <span className="text-[10px] md:text-xs text-gray-600 dark:text-gray-400">
               FCFA
@@ -242,11 +242,11 @@ const ProductCard = ({ product, showSpecs = false }) => {
           {product.comparePrice && discount > 0 && (
             <div className="flex flex-col md:flex-row md:items-center md:gap-2">
               <span className="text-[10px] md:text-xs text-gray-400 dark:text-gray-500 line-through">
-                {product.comparePrice.toLocaleString()} FCFA
+                {(product.comparePrice || 0).toLocaleString()} FCFA
               </span>
               <span className="text-[10px] md:text-xs text-red-500 dark:text-red-400 font-semibold">
-                Économisez{" "}
-                {(product.comparePrice - product.price).toLocaleString()} FCFA
+                Economisez{" "}
+                {((product.comparePrice || 0) - (product.price || 0)).toLocaleString()} FCFA
               </span>
             </div>
           )}

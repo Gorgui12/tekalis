@@ -2,20 +2,17 @@
 
 import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
-// ✅ FIX : import registerUser (et non "register" qui n'existe pas)
 import { loginUser, registerUser, updateProfile, logout } from "@/store/slices/authSlice";
 
-/**
- * Hook personnalisé pour gérer l'authentification
- */
 const useAuth = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const navigate = (path) => router.push(path);
 
-  const { user, token, isAuthenticated, isLoading: loading, error } = useSelector(
-    (state) => state.auth
-  );
+  const { user, loading, error } = useSelector((state) => state.auth);
+
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const isAuthenticated = !!(user && token);
 
   const handleLogin = async (credentials) => {
     try {
@@ -26,7 +23,6 @@ const useAuth = () => {
     }
   };
 
-  // ✅ FIX : utilise registerUser au lieu de register
   const handleRegister = async (userData) => {
     try {
       const result = await dispatch(registerUser(userData)).unwrap();
@@ -54,7 +50,7 @@ const useAuth = () => {
 
   const hasRole = (role) => user?.role === role;
 
-  const getToken = () => token || (typeof window !== "undefined" ? localStorage.getItem("token") : null);
+  const getToken = () => localStorage.getItem("token");
 
   const isTokenValid = () => {
     const storedToken = getToken();
@@ -70,7 +66,7 @@ const useAuth = () => {
   return {
     user,
     token,
-    isAuthenticated: !!(user && token),
+    isAuthenticated,
     loading,
     error,
     login: handleLogin,

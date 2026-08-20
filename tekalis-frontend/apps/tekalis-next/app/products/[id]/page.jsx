@@ -3,8 +3,10 @@ import ProductDetailClient from '@/components/product/ProductDetailClient';
 
 export async function generateMetadata({ params }) {
   try {
-    const product = await serverFetch(`/products/${params.id}`);
-    
+    const { id } = await params;
+    const res = await serverFetch(`/products/${id}`);
+    const product = res?.data || res;
+
     if (!product) {
       return {
         title: 'Produit introuvable | Tekalis',
@@ -27,8 +29,10 @@ export const revalidate = 3600;
 
 export default async function ProductPage({ params }) {
   try {
-    const product = await serverFetch(`/products/${params.id}`);
-    
+    const { id } = await params;
+    const res = await serverFetch(`/products/${id}`);
+    const product = res?.data || res;
+
     if (!product) {
       return (
         <div className="min-h-screen flex items-center justify-center">

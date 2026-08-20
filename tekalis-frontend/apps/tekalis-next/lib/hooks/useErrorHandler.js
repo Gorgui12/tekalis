@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import { useRouter } from "next/navigation";
+import { useToast } from "@/components/shared/ToastProvider";
 
 /**
  * Hook pour gérer les erreurs de manière centralisée
@@ -11,6 +12,7 @@ const useErrorHandler = () => {
   const [error, setError] = useState(null);
   const router = useRouter();
   const navigate = (path) => router.push(path);
+  const toast = useToast();
 
   /**
    * Gérer une erreur
@@ -94,9 +96,8 @@ const useErrorHandler = () => {
       timestamp: new Date()
     });
 
-    // Afficher une notification toast
-    if (showToast && window.toast) {
-      window.toast.error(message);
+    if (showToast && toast) {
+      toast.error(message);
     }
 
     // Rediriger si nécessaire
@@ -130,8 +131,8 @@ const useErrorHandler = () => {
         timestamp: new Date()
       });
 
-      if (window.toast) {
-        window.toast.error(message);
+      if (toast) {
+        toast.error(message);
       }
 
       return true;

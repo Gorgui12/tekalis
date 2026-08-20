@@ -42,7 +42,7 @@ const ReviewList = ({ productId, rating = {}, showForm = true }) => {
         ...(filterRating > 0 && { rating: filterRating })
       });
 
-      const { data } = await api.get(`/products/${productId}/reviews?${params}`);
+      const { data } = await api.get(`/reviews/${productId}?${params}`);
       setReviews(data.reviews || []);
       setTotalPages(data.totalPages || 1);
     } catch (err) {

@@ -1,0 +1,507 @@
+Very thorough exploration of the tekalis-frontend project. I need a complete audit of the codebase.
+
+1. Start by reading the root directory of C:\Users\hp\projets\tekalis\tekalis-frontend
+2. Read package.json to understand dependencies and scripts
+3. Explore apps/tekalis-next directory structure (this is the main app)
+4. Read all configuration files (tsconfig.json, next.config.js/ts, tailwind.config.js/ts, etc.)
+5. Explore the src/ or app/ directory structure to understand the app architecture
+6. Look at key files: layout.tsx, page.tsx, middleware.ts, etc.
+7. Check for API routes, components, hooks, utils, lib directories
+8. Look at the package.json for apps/tekalis-next specifically
+9. Check for any packages/ or libs/ directories (monorepo structure)
+10. Check for environment files (.env, .env.local, .env.example)
+11. Look for any docker files or deployment configs
+12. Check for testing setup (jest.config, vitest.config, cypress, etc.)
+13. Look at eslint.config.js
+
+Return a comprehensive report including:
+- Project structure (directory tree)
+- Dependencies (dependencies + devDependencies)
+- Scripts available
+- Architecture (app router vs pages router, state management, UI library)
+- Configuration files and their contents
+- Environment variables needed
+- Testing setup
+- Any issues or concerns you notice (security, performance, best practices)
+- TypeScript configuration
+- Styling approach (CSS modules, Tailwind, etc.)
++ Thought: 228ms
+I'll start with a broad exploration of the project. Let me read the root directory and key configuration files in parallel.
+→Read tekalis-frontend 
+→Read tekalis-frontend\package.json 
+✱Glob "**/*" in tekalis-frontend (100 matches)
++ Thought: 304ms
+Let me read the configuration files and explore both apps in parallel.
+→Read tekalis-frontend\.env 
+→Read tekalis-frontend\.gitignore 
+→Read tekalis-frontend\vercel.json 
+→Read tekalis-frontend\eslint.config.js 
+→Read tekalis-frontend\README.md 
+→Read tekalis-frontend\apps\tekalis-next 
+→Read tekalis-frontend\packages 
+→Read tekalis-frontend\apps 
++ Thought: 348ms
+Good. Now let me dive deep into all apps, the shared package, and the key config files.
+→Read tekalis-frontend\apps\tekalis-next\package.json 
+↳ Loaded tekalis-frontend\apps\tekalis-next\AGENTS.md
+→Read tekalis-frontend\apps\tekalis-next\next.config.js 
+→Read tekalis-frontend\apps\tekalis-next\tsconfig.json 
+→Read tekalis-frontend\apps\tekalis-next\tailwind.config.js 
+→Read tekalis-frontend\apps\tekalis-next\postcss.config.mjs 
+→Read tekalis-frontend\apps\tekalis-next\eslint.config.mjs 
+→Read tekalis-frontend\apps\tekalis-next\.env.local 
+→Read tekalis-frontend\apps\tekalis-next\.gitignore 
+→Read tekalis-frontend\apps\tekalis-next\CLAUDE.md 
+→Read tekalis-frontend\apps\tekalis-next\AGENTS.md 
+→Read tekalis-frontend\apps\tekalis-next\README.md 
++ Thought: 288ms
+Now let me explore the app structure, components, lib, store, api, dashboard, and the other apps.
+→Read tekalis-frontend\apps\tekalis-next\app 
+→Read tekalis-frontend\apps\tekalis-next\components 
+→Read tekalis-frontend\apps\tekalis-next\lib 
+→Read tekalis-frontend\apps\tekalis-next\store 
+→Read tekalis-frontend\apps\tekalis-next\api 
+→Read tekalis-frontend\apps\tekalis-next\dashboard 
+→Read tekalis-frontend\apps\tekalis-next\public 
+→Read tekalis-frontend\apps\admin 
+→Read tekalis-frontend\apps\client 
+→Read tekalis-frontend\packages\shared 
++ Thought: 514ms
+Let me now read the core files - layout, main page, store, api layer, and explore deeper into the component structure.
+→Read tekalis-frontend\apps\tekalis-next\app\layout.jsx 
+→Read tekalis-frontend\apps\tekalis-next\app\page.jsx 
+→Read tekalis-frontend\apps\tekalis-next\app\error.jsx 
+→Read tekalis-frontend\apps\tekalis-next\app\not-found.jsx 
+→Read tekalis-frontend\apps\tekalis-next\app\loading.jsx 
+→Read tekalis-frontend\apps\tekalis-next\app\globals.css 
+→Read tekalis-frontend\apps\tekalis-next\app\robots.js 
+→Read tekalis-frontend\apps\tekalis-next\app\sitemap.js 
+→Read tekalis-frontend\apps\tekalis-next\store\index.js 
+→Read tekalis-frontend\apps\tekalis-next\lib\api.jsx 
+→Read tekalis-frontend\apps\tekalis-next\lib\serverFetch.js 
++ Thought: 441ms
+Let me explore the components directory, store slices, API routes, dashboard, and other apps deeper.
+✱Glob "**/*" in tekalis-frontend\apps\tekalis-next\components (100 matches)
+→Read tekalis-frontend\apps\tekalis-next\store\slices 
+✱Glob "**/*" in tekalis-frontend\apps\tekalis-next\api 
+✱Glob "**/*" in tekalis-frontend\apps\tekalis-next\dashboard (1 match)
+→Read tekalis-frontend\apps\admin\package.json 
+→Read tekalis-frontend\apps\client\package.json 
+✱Glob "**/*" in tekalis-frontend\apps\tekalis-next\app (32 matches)
++ Thought: 762ms
+Now let me read the key component files, store slices, hooks, utils, and the Providers component.
+→Read tekalis-frontend\apps\tekalis-next\components\shared\Providers.jsx 
+→Read tekalis-frontend\apps\tekalis-next\store\slices\authSlice.js 
+→Read tekalis-frontend\apps\tekalis-next\store\slices\cartSlice.js 
+→Read tekalis-frontend\apps\tekalis-next\store\slices\productSlice.js 
+→Read tekalis-frontend\apps\tekalis-next\store\slices\wishlistSlice.js 
+→Read tekalis-frontend\apps\tekalis-next\store\slices\uiSlice.js 
+→Read tekalis-frontend\apps\tekalis-next\lib\utils\constants.js 
+→Read tekalis-frontend\apps\tekalis-next\lib\utils\formatters.js 
+→Read tekalis-frontend\apps\tekalis-next\lib\utils\helpers.js 
+→Read tekalis-frontend\apps\tekalis-next\lib\utils\validators.js 
++ Thought: 495ms
+Let me now read the hooks, key pages, Navbar, Footer, and some remaining important files.
+→Read tekalis-frontend\apps\tekalis-next\lib\hooks\useAuth.js 
+→Read tekalis-frontend\apps\tekalis-next\lib\hooks\useCart.js 
+→Read tekalis-frontend\apps\tekalis-next\lib\hooks\useProducts.js 
+→Read tekalis-frontend\apps\tekalis-next\components\layout\Navbar.jsx 
+→Read tekalis-frontend\apps\tekalis-next\components\layout\Footer.jsx 
+→Read tekalis-frontend\apps\tekalis-next\app\products\page.jsx 
+→Read tekalis-frontend\apps\tekalis-next\app\products\[id]\page.jsx 
+→Read tekalis-frontend\apps\tekalis-next\app\dashboard\page.jsx 
+→Read tekalis-frontend\apps\tekalis-next\app\checkout\page.jsx 
+→Read tekalis-frontend\apps\tekalis-next\app\login\page.jsx 
++ Thought: 490ms
+Let me check for middleware, Docker files, testing configs, and explore the remaining parts.
+✱Glob "**/middleware.*" in tekalis-frontend 
+✱Glob "**/Dockerfile*" in tekalis-frontend 
+✱Glob "**/.dockerignore" in tekalis-frontend 
+✱Glob "**/docker-compose*" in tekalis-frontend 
+✱Glob "**/*jest*" in tekalis-frontend 
+✱Glob "**/*vitest*" in tekalis-frontend 
+✱Glob "**/*cypress*" in tekalis-frontend 
+✱Glob "**/*.test.*" in tekalis-frontend 
+✱Glob "**/*.spec.*" in tekalis-frontend 
+✱Glob "**/__tests__/**" in tekalis-frontend 
++ Thought: 474ms
+Now let me read the remaining shared package files and the other apps' key configurations.
+→Read tekalis-frontend\packages\shared\redux\store.js 
+→Read tekalis-frontend\packages\shared\context\ToastContext.jsx 
+→Read tekalis-frontend\packages\shared\context\ThemeContext.jsx 
+→Read tekalis-frontend\packages\shared\ErrorBoundary.jsx 
+→Read tekalis-frontend\packages\shared\styles\index.css 
+→Read tekalis-frontend\packages\shared\styles\tailwind.css 
+→Read tekalis-frontend\packages\shared\styles\custom.css 
+→Read tekalis-frontend\apps\client\vite.config.js 
+→Read tekalis-frontend\apps\client\.env 
+→Read tekalis-frontend\apps\admin\.env 
++ Thought: 599ms
+Let me check the shared package hooks and the remaining components for completeness.
+✱Glob "**/*" in tekalis-frontend\packages\shared (49 matches)
+→Read tekalis-frontend\apps\tekalis-next\components\shared\ToastProvider.jsx 
+→Read tekalis-frontend\apps\tekalis-next\components\shared\ThemeProvider.jsx 
+→Read tekalis-frontend\apps\tekalis-next\lib\utils\constants.js.bak [limit=10]
++ Thought: 622ms
+Let me read the remaining hooks and a few more key components.
+→Read tekalis-frontend\apps\tekalis-next\lib\hooks\useErrorHandler.js 
+→Read tekalis-frontend\apps\tekalis-next\lib\hooks\useFetchOnce.js 
+→Read tekalis-frontend\apps\tekalis-next\lib\hooks\usePagination.js 
+→Read tekalis-frontend\apps\tekalis-next\lib\hooks\useLocalStorage.js 
+→Read tekalis-frontend\apps\tekalis-next\lib\hooks\useFilters.js 
+→Read tekalis-frontend\apps\tekalis-next\lib\hooks\useDebounce.js 
+→Read tekalis-frontend\apps\tekalis-next\components\ui\Button.jsx 
+→Read tekalis-frontend\apps\tekalis-next\components\shared\Button.jsx 
+→Read tekalis-frontend\apps\tekalis-next\public\robots.txt 
+→Read tekalis-frontend\apps\tekalis-next\public\sitemap.xml 
++ Thought: 788ms
+Let me check a few final items for completeness - the review components and the admin app structure.
+✱Glob "**/*" in tekalis-frontend\apps\tekalis-next\components\review (6 matches)
+✱Glob "**/*" in tekalis-frontend\apps\admin\src (42 matches)
+✱Glob "**/*" in tekalis-frontend\apps\client\src (89 matches)
+✱Glob "**/.env.example" in tekalis-frontend 
++ Thought: 308ms
+Now I have all the data I need. Here is the comprehensive audit report.
+Tekalis Frontend -- Complete Codebase Audit Report
+1. Project Overview
+Tekalis is an e-commerce platform for an electronics/high-tech boutique located in Dakar, Senegal. The product catalog includes smartphones, laptops, gaming, TV, appliances, solar energy, accessories, and air conditioning. The site is French-language (fr_SN locale), with currency in FCFA.
+2. Project Structure (Directory Tree)
+tekalis-frontend/                          # Root (npm workspaces monorepo)
+├── package.json                           # Root workspace config
+├── package-lock.json
+├── vercel.json                            # Vercel deployment config
+├── eslint.config.js                       # Root ESLint (for shared/client)
+├── .env                                   # VITE_API_URL=http://localhost:5000
+├── .gitignore
+├── README.md
+│
+├── apps/
+│   ├── tekalis-next/                      # *** MAIN APP (Next.js 15) ***
+│   │   ├── package.json
+│   │   ├── next.config.js
+│   │   ├── tsconfig.json
+│   │   ├── tailwind.config.js
+│   │   ├── postcss.config.mjs
+│   │   ├── eslint.config.mjs
+│   │   ├── .env.local
+│   │   ├── .gitignore
+│   │   ├── next-env.d.ts
+│   │   ├── CLAUDE.md / AGENTS.md
+│   │   ├── fix-tekalis-next.ps1          # PowerShell fix scripts
+│   │   ├── fix-tekalis-next-corrected.ps1
+│   │   │
+│   │   ├── app/                           # Next.js App Router
+│   │   │   ├── layout.jsx                 # Root layout (Providers, Navbar, Footer)
+│   │   │   ├── page.jsx                   # Homepage (SSR)
+│   │   │   ├── globals.css
+│   │   │   ├── error.jsx                  # Error boundary
+│   │   │   ├── not-found.jsx
+│   │   │   ├── loading.jsx
+│   │   │   ├── robots.js                  # Dynamic robots.txt
+│   │   │   ├── sitemap.js                 # Dynamic sitemap
+│   │   │   ├── favicon.ico
+│   │   │   ├── apropos/page.jsx
+│   │   │   ├── blog/page.jsx
+│   │   │   ├── blog/[slug]/page.jsx
+│   │   │   ├── cart/page.jsx
+│   │   │   ├── category/[slug]/page.jsx
+│   │   │   ├── checkout/page.jsx
+│   │   │   ├── configurator/page.jsx
+│   │   │   ├── contact/page.jsx
+│   │   │   ├── login/page.jsx
+│   │   │   ├── register/page.jsx
+│   │   │   ├── politique/page.jsx
+│   │   │   ├── products/page.jsx
+│   │   │   ├── products/[id]/page.jsx
+│   │   │   ├── wishlist/page.jsx
+│   │   │   └── dashboard/
+│   │   │       ├── page.jsx
+│   │   │       ├── addresses/page.jsx
+│   │   │       ├── orders/page.jsx
+│   │   │       ├── orders/[id]/page.jsx
+│   │   │       ├── rma/page.jsx
+│   │   │       ├── warranties/page.jsx
+│   │   │       └── wishlist/page.jsx
+│   │   │
+│   │   ├── components/
+│   │   │   ├── account/          # DashboardClient, ProfileClient, OrdersClient, etc.
+│   │   │   ├── auth/             # LoginClient, RegisterClient
+│   │   │   ├── blog/             # BlogClient, ArticleCard, ArticleDetailClient, etc.
+│   │   │   ├── cart/             # CartClient, CartSummary, PromoCodeInput
+│   │   │   ├── checkout/         # CheckoutClient, CheckoutForm, PaymentMethods, etc.
+│   │   │   ├── configurator/     # ConfiguratorClient
+│   │   │   ├── home/             # HomeClient, HeroSection, CategoriesGrid, etc.
+│   │   │   ├── layout/           # Navbar, Footer, MobileMenu, WhatsAppButton, Breadcrumb
+│   │   │   ├── payment/          # PaymentSuccessClient, PaymentCancelClient, MobileMoneyPayment
+│   │   │   ├── product/          # ProductsClient, ProductDetailClient, ProductCard, etc.
+│   │   │   ├── review/           # ReviewCard, ReviewForm, ReviewList, StarRating
+│   │   │   ├── seo/              # StructuredData, PageMeta, Breadcrumb
+│   │   │   ├── shared/           # Providers, ToastProvider, ThemeProvider, Button, Pagination, etc.
+│   │   │   ├── static/           # AproposClient, ContactClient, PolitiqueClient
+│   │   │   └── ui/               # Tabs, Skeleton, Modal, Loader, Accordion
+│   │   │
+│   │   ├── lib/
+│   │   │   ├── api.jsx           # Axios instance (client-side)
+│   │   │   ├── serverFetch.js    # Fetch for Server Components
+│   │   │   ├── hooks/            # useAuth, useCart, useProducts, useFilters, useDebounce, etc.
+│   │   │   └── utils/            # constants, formatters, helpers, validators
+│   │   │
+│   │   ├── store/
+│   │   │   ├── index.js          # Redux store (with redux-persist)
+│   │   │   └── slices/           # authSlice, cartSlice, productSlice, wishlistSlice, uiSlice
+│   │   │
+│   │   ├── dashboard/            # Legacy/unused pages dir (contains orders/[id]/page.jsx)
+│   │   ├── api/                  # (Empty or unused - no API route files found)
+│   │   └── public/               # robots.txt, sitemap.xml, og-image.png, SVGs
+│   │
+│   ├── client/                   # LEGACY APP (Vite + React Router SPA)
+│   │   ├── package.json
+│   │   ├── vite.config.js
+│   │   ├── tailwind.config.js
+│   │   ├── postcss.config.js
+│   │   ├── index.html
+│   │   ├── .env
+│   │   └── src/                  # Full SPA with React Router, pages/, components/, hooks/
+│   │
+│   └── admin/                    # ADMIN PANEL (Vite + React Router SPA)
+│       ├── package.json
+│       ├── vite.config.js
+│       ├── tailwind.config.js
+│       ├── postcss.config.js
+│       ├── index.html
+│       ├── .env
+│       ├── dist/                 # Pre-built dist
+│       └── src/                  # Admin pages, components, layout
+│
+└── packages/
+    └── shared/                   # Shared package (used by client & admin)
+        ├── api/                  # api.js, interceptors.js, endpoints/
+        ├── assets/images/        # logo-tekalis.jpg
+        ├── context/              # ToastContext.jsx, ThemeContext.jsx
+        ├── hooks/                # useAuth, useCart, useProducts, usePagination, etc.
+        ├── outils/               # constants, formatters, helpers, validators (French naming)
+        ├── redux/                # store.js, slices/ (11 slices), routes/ (React Router)
+        ├── routes/               # AdminRoutes, ClientRoutes, ProtectedRoute (React Router)
+        ├── styles/               # Empty CSS files (index.css, tailwind.css, custom.css)
+        └── ErrorBoundary.jsx
+3. Dependencies
+Root package.json
+Type	Package	Version
+dep	lucide-react	^0.575.0
+dep	prop-types	^15.8.1
+dep	react-is	^19.2.4
+dev	concurrently	^8.2.2
+dev	terser	^5.46.0
+apps/tekalis-next/package.json (Main App)
+Type	Package	Version
+dep	@reduxjs/toolkit	^2.3.0
+dep	axios	^1.7.0
+dep	next	^15.3.3
+dep	prop-types	^15.8.1
+dep	react	^19.0.0
+dep	react-dom	^19.0.0
+dep	react-icons	^5.3.0
+dep	react-redux	^9.1.0
+dep	redux-persist	^6.0.0
+dev	@eslint/js	^9.0.0
+dev	@tailwindcss/postcss	^4.0.0
+dev	@types/node	^20
+dev	@types/react	^19
+dev	@types/react-dom	^19
+dev	eslint	^9.0.0
+dev	eslint-config-next	^15.3.3
+dev	eslint-plugin-react-refresh	^0.5.3
+dev	tailwindcss	^4.0.0
+dev	typescript	^5
+apps/client/package.json (Legacy SPA)
+Additional notable deps: @stripe/react-stripe-js, @stripe/stripe-js, framer-motion, react-ga4, react-helmet-async, react-router-dom, swiper. Uses react-snap for pre-rendering and vite.
+apps/admin/package.json (Admin Panel)
+Additional notable deps: framer-motion, lucide-react, recharts, xlsx, react-router-dom. Uses vite.
+4. Scripts Available
+Root
+Script	Command
+dev	concurrently "npm run dev:client" "npm run dev:admin"
+dev:client	npm run dev --workspace=apps/client
+dev:admin	npm run dev --workspace=apps/admin
+build	npm run build:client && npm run build:admin
+build:client	npm run build --workspace=apps/client
+build:admin	npm run build --workspace=apps/admin
+apps/tekalis-next
+Script	Command
+dev	next dev
+build	next build
+start	next start
+lint	next lint
+5. Architecture
+Primary App: apps/tekalis-next (Next.js 15 + App Router)
+- Routing: Next.js App Router (file-based, app/ directory)
+- Rendering: Hybrid SSR + client components (Server Components fetch data, pass to Client Components)
+- State Management: Redux Toolkit + Redux Persist (persisted slices: auth, cart, wishlist)
+- API Layer: Dual approach:
+- lib/serverFetch.js -- Server Components (native fetch with Next.js revalidation)
+- lib/api.jsx -- Client Components (Axios instance with interceptors, goes through /api/v1 proxy)
+- Styling: Tailwind CSS v4 (via @tailwindcss/postcss), dark mode via class strategy
+- Icons: react-icons (FontAwesome subset via react-icons/fa)
+- SEO: Excellent -- dynamic sitemap.js, robots.js, OpenGraph, Twitter cards, Schema.org JSON-LD (LocalBusiness, WebSite, CollectionPage), Google verification, canonical URLs, metadata per page
+- Deployment: Vercel (configured in vercel.json)
+Legacy App: apps/client (Vite + React Router SPA)
+- Routing: React Router v7 (SPA)
+- State Management: Redux Toolkit + Redux Persist
+- Styling: Tailwind CSS v3
+- Build: Vite with advanced chunking strategy, console removal in production
+- SEO: react-helmet-async for meta tags, react-snap for pre-rendering
+- Payment: Stripe integration (@stripe/react-stripe-js)
+- Analytics: Google Analytics 4 (react-ga4)
+Admin App: apps/admin (Vite + React Router SPA)
+- Routing: React Router v7
+- State Management: Redux Toolkit + Redux Persist
+- Styling: Tailwind CSS v3
+- Charts: Recharts v3
+- Export: XLSX (Excel export)
+- Pages: Dashboard, Orders, Products, Articles, Users, Reviews, Warranties, RMA, Payments, Categories, Settings, Analytics, Hero Slides, Promo Codes
+Shared Package: packages/shared
+Contains reusable code for the legacy client and admin apps (NOT the Next.js app). Includes API clients, Redux store/slices, hooks, contexts, validators, formatters, helpers, routes (React Router-based), and an ErrorBoundary. The Next.js app has its own duplicated copies of these utilities under lib/ and store/.
+6. TypeScript Configuration
+File: apps/tekalis-next/tsconfig.json
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,           // JS files are allowed (project is mostly .jsx)
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [{ "name": "next" }],
+    "paths": { "@/*": ["./*"] }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "**/*.mts", "next.config.js"],
+  "exclude": ["node_modules"]
+}
+Key observation: TypeScript is configured but the project is written almost entirely in JavaScript (.jsx/.js). TypeScript is available but not actively used for type safety.
+7. Styling Approach
+- Primary: Tailwind CSS v4 (in the Next.js app via @tailwindcss/postcss)
+- Dark mode: Class-based (darkMode: 'class' in tailwind.config.js, toggled via ThemeProvider)
+- Custom CSS: app/globals.css contains:
+- CSS custom properties for navbar height, colors
+- Accessibility: 44px minimum touch targets, prefers-reduced-motion support
+- Focus-visible outlines for keyboard navigation
+- Scrollbar styling
+- Skeleton loading animations
+- Hero progress bar animation
+- Print styles (hide nav/footer)
+- Safe area insets for mobile (notch support)
+- Line-clamp utilities
+- No CSS Modules -- everything is Tailwind utility classes
+8. Environment Variables
+.env (Root)
+VITE_API_URL=http://localhost:5000
+apps/tekalis-next/.env.local
+VITE_API_URL=https://tekalis.onrender.com/api/v1
+VITE_APP_NAME=Tekalis
+VITE_CLIENT_URL=https://tekalis.com
+NEXT_PUBLIC_API_BASE=https://tekalis.onrender.com/api/v1
+NEXT_PUBLIC_SITE_URL=https://tekalis.com
+NEXT_PUBLIC_ADMIN_URL=https://admin.tekalis.com
+apps/client/.env
+VITE_API_URL=http://localhost:5000
+VITE_APP_NAME=Tekalis
+VITE_CLIENT_URL=http://localhost:3000
+apps/admin/.env
+VITE_API_URL=http://localhost:5000/api/v1
+VITE_APP_NAME=Tekalis Admin
+VITE_ADMIN_URL=http://localhost:5175
+VITE_CLIENT_URL=http://localhost:3001
+No .env.example file exists anywhere in the project.
+9. Testing Setup
+There is NO testing infrastructure at all. No Jest, Vitest, Cypress, Playwright, React Testing Library, or any test files (.test.*, .spec.*, __tests__/) were found anywhere in the project. This is a significant gap.
+10. Docker / Deployment
+- No Docker files (no Dockerfile, docker-compose, .dockerignore)
+- Deployment: Vercel (configured via vercel.json)
+- installCommand: cd apps/tekalis-next && npm install
+- buildCommand: cd apps/tekalis-next && npm run build
+- outputDirectory: apps/tekalis-next/.next
+- framework: nextjs
+- Backend: Hosted on Render (https://tekalis.onrender.com)
+11. Security Headers
+Configured in next.config.js:
+- X-Content-Type-Options: nosniff
+- X-Frame-Options: DENY
+- X-XSS-Protection: 1; mode=block
+- Referrer-Policy: strict-origin-when-cross-origin
+- poweredByHeader: false (hides X-Powered-By)
+12. Issues and Concerns
+CRITICAL
+1. .env file is committed to the root repo -- The root .gitignore excludes .env but explicitly allows !.env is NOT in the ignore list, AND !.env.local is explicitly included. The root .env file with VITE_API_URL is tracked. Meanwhile, apps/admin/.env is explicitly allowed to be tracked via !.apps/admin/.env. This could lead to accidental secret exposure.
+2. .env.local for tekalis-next contains API base URL as plaintext -- While NEXT_PUBLIC_* variables are meant to be client-exposed, the value is used both server-side and client-side, which could be confusing.
+3. No authentication middleware -- There is NO middleware.ts file in the Next.js app. Dashboard pages (/dashboard/*) have robots: { index: false } in metadata but are NOT protected by any route guard. Any unauthenticated user can access /dashboard, /checkout, /wishlist, etc.
+4. JWT token stored in localStorage -- Authentication tokens are stored in localStorage (accessible to XSS). The useAuth hook manually parses JWT to check expiry. This is less secure than httpOnly cookies.
+HIGH
+5. Massive code duplication between apps -- The shared package (packages/shared/) contains Redux store, slices, hooks, utilities, and contexts that are ALSO duplicated inside apps/tekalis-next/ with their own copies. The Next.js app does NOT import from packages/shared/. This creates maintenance burden and consistency risk.
+6. Vite env variables used in Next.js -- The .env.local file contains VITE_API_URL and VITE_APP_NAME, which are Vite-specific and NOT used by Next.js. These are dead configuration. The Next.js app actually uses NEXT_PUBLIC_API_BASE.
+7. constants.js.bak file present -- A backup of constants.js uses import.meta.env.VITE_API_URL (Vite syntax), which was replaced with process.env.NEXT_PUBLIC_API_URL (Next.js syntax). This .bak file is still tracked in the repo.
+8. Inconsistent cart state shape -- The useCart hook reads state.cart.totalAmount but the cart slice defines state.cart.total. This would cause the hook to return undefined for totalAmount.
+9. useAuth hook reads non-existent state.auth.token and state.auth.isAuthenticated -- The auth slice does not have token or isAuthenticated fields in Redux state. Token is only in localStorage. The hook works because isAuthenticated is computed as !!(user && token) where token comes from the hook's selector which returns undefined.
+MEDIUM
+10. No testing whatsoever -- Zero tests in the entire codebase. No unit tests, integration tests, or E2E tests.
+11. .bak files throughout the codebase -- Multiple .bak files are tracked in git:
+- app/globals.css.bak, app/index.source.css.bak
+- components/home/HomeClient.jsx.bak, CategoriesGrid.jsx.bak
+- components/product/ProductsClient.jsx.bak, ProductDetailClient.jsx.bak, CategoryClient.jsx.bak
+- components/blog/BlogClient.jsx.bak, ArticleDetailClient.jsx.bak
+- components/account/DashboardClient.jsx.bak, OrderDetailsClient.jsx.bak, CreateRMAClient.jsx.bak, RecentOrders.jsx.bak
+- components/checkout/CheckoutForm.jsx.bak
+- components/payment/PaymentSuccessClient.jsx.bak, PaymentCancelClient.jsx.bak
+- components/seo/StructuredData.jsx.bak
+- components/review/ReviewForm.jsx.bak, ReviewList.jsx.bak
+- components/static/ContactClient.jsx.bak
+12. dangerouslySetInnerHTML for JSON-LD -- Used in layout.jsx, page.jsx, and Footer.jsx. While necessary for inline scripts, the Footer uses <script> tags directly in JSX which won't work properly in Next.js (scripts in components should use next/script or be in <head>).
+13. Hardcoded phone number in Footer -- Footer shows +221 77 123 45 67 which differs from the Schema.org data (+221786346946). These are inconsistent business data.
+14. Footer Schema.org address inconsistency -- The Footer has "streetAddress": "Plateau, Rue X" while the layout has "streetAddress": "Fann, Rue 14". These are inconsistent.
+15. Product detail uses MongoDB _id in URLs -- The product route is /products/[id] using MongoDB ObjectIDs. This is not SEO-friendly. The robots.js also blocks product pages from SEO crawlers via the sitemap.js using IDs instead of slugs.
+16. No middleware.ts for auth or redirects -- Protected routes (dashboard, checkout, wishlist) have no server-side protection.
+17. Shared styles are empty -- packages/shared/styles/index.css, tailwind.css, and custom.css are all 0-byte files.
+18. dashboard/ directory at root of tekalis-next app -- Contains a single file orders/[id]/page.jsx, which duplicates the app/dashboard/orders/[id]/page.jsx. This appears to be a leftover.
+LOW
+19. PowerShell fix scripts in repo -- fix-tekalis-next.ps1 and fix-tekalis-next-corrected.ps1 are committed to the repository. These are development artifacts.
+20. useDebouncedCallback uses useState for timer -- The useDebouncedCallback hook stores the timer ID in useState, which triggers re-renders. useRef would be more appropriate.
+21. useErrorHandler references window.toast -- A global toast function that likely doesn't exist. The actual toast system uses a React context.
+22. Large Navbar component -- 333 lines with inline JSX. Could be split into DesktopNav and MobileNav components.
+23. Footer is 406 lines -- Contains inline schema.org JSON in <script> tags. Should use next/script with type="application/ld+json".
+24. prop-types used alongside TypeScript setup -- The project has TypeScript configured but uses PropTypes for runtime validation in some components (Button, ErrorBoundary). These serve different purposes but it's a code smell in a TS-configured project.
+25. Missing pages linked in footer/navigation -- /mentions-legales, /cgv, /cookies pages are linked in the Footer but have no corresponding route in the app/ directory.
+26. .next/ directory tracked -- The apps/tekalis-next/.next/ directory appears in the glob results, suggesting it may be tracked in git despite being in .gitignore.
+27. react-snap for pre-rendering -- The legacy client app uses react-snap (Puppeteer-based), which is unmaintained and has known issues.
+13. Summary of Architecture Decisions
+Aspect	Decision
+Framework	Next.js 15.3.3 (App Router) -- primary
+Legacy apps	Vite + React Router SPAs (client, admin)
+Language	JavaScript (.jsx/.js), TypeScript configured but unused
+State	Redux Toolkit + Redux Persist
+Styling	Tailwind CSS v4, dark mode via class strategy
+Icons	react-icons (FontAwesome), lucide-react (admin)
+HTTP client	Axios (client-side), native fetch (server-side)
+Deployment	Vercel for Next.js, Render for API backend
+SEO	Comprehensive (dynamic sitemap, robots, OG, Schema.org, canonical)
+Testing	NONE
+i18n	French only (no internationalization framework)
+Monorepo	npm workspaces (apps/, packages/)
+14. Recommendations (Priority Order)
+ 1. Add middleware.ts for authentication protection on /dashboard/*, /checkout, /wishlist
+ 2. Add testing -- at minimum: Vitest for unit tests, Playwright for E2E
+ 3. Clean up .bak files from the repository
+ 4. Remove dead .env variables (VITE_* in Next.js app)
+ 5. Fix cart state mismatch (total vs totalAmount)
+ 6. Fix auth hook to not read non-existent Redux state properties
+ 7. Add .env.example documenting all required environment variables
+ 8. Resolve the code duplication between packages/shared/ and apps/tekalis-next/lib/
+ 9. Add missing legal pages (/mentions-legales, /cgv, /cookies)
+10. Fix inconsistent business data (phone numbers, addresses in Schema.org)
+11. Move product URLs from MongoDB IDs to slugs for better SEO
+12. Use next/script for JSON-LD instead of inline <script> tags in components

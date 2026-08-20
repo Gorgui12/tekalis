@@ -71,18 +71,15 @@ const ClientDashboard = () => {
     !!userId && !isChecking
   );
 
-  // ✅ Redirection /login isolée du fetch — ne déclenche aucune requête réseau
   useEffect(() => {
-    // Petit délai pour laisser Redux s'initialiser depuis localStorage
-    const timer = setTimeout(() => {
-      setIsChecking(false);
-      if (!userId) {
-        router.push("/login");
-      }
-    }, 100);
-    
-    return () => clearTimeout(timer);
-  }, [userId, router]);
+    const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
+    if (!token || !user) {
+      router.push("/login");
+      return;
+    }
+    setIsChecking(false);
+  }, [router]);
 
   if (isChecking) {
     return (

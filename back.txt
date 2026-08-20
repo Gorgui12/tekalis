@@ -1,0 +1,467 @@
+TEKALIS-BACKEND -- COMPLETE CODEBASE AUDIT
+1. PROJECT STRUCTURE (Directory Tree)
+tekalis-backend/
+├── .env                          # Environment variables (SET, not empty)
+├── .env.example                  # Documented env template
+├── .gitignore                    # Comprehensive ignore rules
+├── package.json                  # Project manifest
+├── package-lock.json             # Lock file
+├── server.js                     # Main entry point (661 lines -- monolithic)
+├── test-env.js                   # Env verification script
+│
+├── config/
+│   ├── database.js               # Mongoose connection
+│   ├── redis.js                  # Redis client (lazy, optional)
+│   ├── stripe.js                 # Stripe integration (lazy, optional)
+│   └── cloudinary.js             # Cloudinary image upload (lazy, optional)
+│
+├── controllers/
+│   ├── authController.js         # Register, login, forgot/reset password
+│   ├── productController.js      # CRUD products, bulk import
+│   ├── categoryController.js     # Category listing, product filtering
+│   ├── articleController.js      # Blog CRUD, publish toggle
+│   ├── cartController.js         # Cart CRUD, promo codes
+│   ├── orderController.js        # Order creation, status, admin ops
+│   ├── paymentController.js      # PayDunya integration, webhook
+│   ├── reviewController.js       # Reviews, moderation, helpful votes
+│   ├── rmaController.js          # SAV/RMA workflows
+│   ├── warrantyController.js     # Warranty CRUD, auto-creation
+│   ├── dashboardController.js    # Admin dashboard stats (UNUSED)
+│   └── configuratorController.js # Product recommender
+│
+├── middlewares/
+│   ├── authMiddleware.js         # JWT verification, admin check, optional auth
+│   ├── errorHandler.js           # AppError class, error handler, asyncHandler
+│   ├── validation.js             # express-validator chains
+│   ├── upload.js                 # Multer file upload
+│   └── cache.js                  # Redis caching middleware
+│
+├── models/
+│   ├── User.js                   # User + addresses, bcrypt hash
+│   ├── Product.js                # Product with specs, multi-images
+│   ├── Order.js                  # Order with crypto orderNumber
+│   ├── Cart.js                   # Cart per user, pre-save total calc
+│   ├── Category.js               # Hierarchical categories
+│   ├── Article.js                # Blog articles
+│   ├── Review.js                 # Reviews (product or article)
+│   ├── Warranty.js               # Warranty tracking
+│   ├── RMA.js                    # Return/Repair/Exchange requests
+│   ├── Settings.js               # Singleton site settings
+│   ├── HeroSlide.js              # Homepage hero carousel
+│   ├── PromoCode.js              # Discount codes
+│   └── notification.js           # User notifications
+│
+├── routes/
+│   ├── authRoutes.js             # /api/v1/auth/*
+│   ├── productRoutes.js          # /api/v1/products/*
+│   ├── categoryRoutes.js         # /api/v1/categories/*
+│   ├── articleRoutes.js          # /api/v1/articles/*
+│   ├── userRoutes.js             # /api/v1/users/* (inline handlers)
+│   ├── cartRoutes.js             # /api/v1/cart/*
+│   ├── orderRoutes.js            # /api/v1/orders/*
+│   ├── reviewRoutes.js           # /api/v1/reviews/*
+│   ├── warrantyRoutes.js         # /api/v1/warranties/* (inline handlers)
+│   ├── rmaRoutes.js              # /api/v1/rma/*
+│   ├── paymentRoutes.js          # /api/v1/payment/*
+│   ├── heroRoutes.js             # /api/v1/hero/* (inline handlers)
+│   ├── configuratorRoutes.js     # /api/v1/configurator/*
+│   ├── stats.js                  # /api/v1/admin/stats/*
+│   └── sitemap.js                # /api/v1/sitemap.xml
+│
+├── services/
+│   ├── emailService.js           # Singleton nodemailer transporter
+│   ├── pricingService.js         # Order total, loyalty points
+│   ├── savService.js             # RMA workflow service
+│   └── configuratorService.js    # Product recommendation engine
+│
+├── utils/
+│   ├── sendEmail.js              # Legacy email sender (DUPLICATE)
+│   ├── emailTemplates.js         # HTML email templates
+│   ├── helpers.js                # Utility functions
+│   └── pagination.js             # PaginationHelper class
+│
+└── node_modules/                 # Dependencies
+2. DEPENDENCIES
+Production Dependencies (17)
+Package	Version	Purpose
+express	^4.22.1	Web framework
+mongoose	^8.20.2	MongoDB ODM
+bcryptjs	^3.0.3	Password hashing
+jsonwebtoken	^9.0.3	JWT auth
+cors	^2.8.6	Cross-origin requests
+helmet	^8.1.0	Security headers
+express-mongo-sanitize	^2.2.0	NoSQL injection prevention
+express-rate-limit	^8.2.1	Rate limiting
+express-validator	^7.2.1	Input validation
+dotenv	^16.6.1	Environment variables
+body-parser	^2.2.1	Body parsing (redundant with express.json)
+morgan	^1.10.1	HTTP logging
+multer	^1.4.5-lts.2	File upload
+nodemailer	^6.10.1	Email sending
+paydunya	^1.0.12	Senegal mobile money payments
+moment-timezone	^0.6.0	Timezone handling
+node-cron	^4.2.1	Scheduled tasks
+Dev Dependencies (1)
+Package	Version	Purpose
+nodemon	^3.1.9	Auto-restart dev server
+Missing Dependencies (referenced in code but not in package.json)
+- cloudinary -- imported in config/cloudinary.js but not in package.json (lazy init prevents crash)
+- redis (v4 client) -- imported in config/redis.js and middlewares/cache.js but not in package.json (lazy init prevents crash)
+- stripe -- referenced in config/stripe.js but not in package.json (lazy init prevents crash)
+3. SCRIPTS
+"dev": "nodemon server.js",     // Development with auto-reload
+"start": "node server.js",      // Production start
+"test": "echo \"Error: no test specified\" && exit 1"  // No tests
+4. ARCHITECTURE
+Framework & Runtime
+- Runtime: Node.js (plain JavaScript, no TypeScript)
+- Framework: Express.js 4.x
+- Architecture style: MVC (Model-View-Controller) with service layer
+- Entry point: server.js (661 lines -- monolithic, mixes config with inline admin routes)
+Database
+- Primary: MongoDB (via Mongoose 8.x)
+- Optional: Redis (for caching -- cache.js middleware, config/redis.js)
+- Connection: Atlas or local, configurable via MONGODB_URI
+- Cloud Storage: Cloudinary (optional, lazy-init for images)
+Authentication
+- Method: JWT (JSON Web Tokens)
+- Token storage: Authorization: Bearer <token> header
+- Password hashing: bcryptjs with salt rounds = 12
+- Token expiry: JWT_EXPIRE env var, defaults to 7 days
+- Password reset: Crypto-based token (SHA-256 hashed), 10-minute expiry
+Payment
+- Primary: PayDunya (Senegalese mobile money -- Wave, Orange Money, Free Money)
+- Secondary: Stripe (lazy-init, configured but not in package.json)
+API Versioning
+- All routes prefixed with /api/v1
+5. DATABASE MODELS & SCHEMAS
+User
+- name (String, required, 2-50 chars)
+- email (String, required, unique, lowercase, validated)
+- password (String, required, min 6 chars, select: false)
+- phone (String)
+- avatar (String)
+- addresses (embedded subdocument array with label, fullAddress, city, postalCode, country, phone, isDefault)
+- isAdmin (Boolean, default: false)
+- isActive (Boolean, default: true)
+- resetPasswordToken, resetPasswordExpires
+- lastLogin (Date)
+- Indexes: email, isAdmin, createdAt
+Product
+- name (String, required), slug (String, unique)
+- description (String, required)
+- price (Number, required), comparePrice (Number)
+- stock (Number, required, default: 0)
+- images (Array of {url, alt, isPrimary})
+- category (Array of ObjectId refs to Category)
+- brand (String, required)
+- specs (deeply nested subdocument: processor, ram, storage, screen, graphics, connectivity, ports, etc.)
+- rating ({average, count})
+- warranty ({duration, type})
+- tags (String)
+- status (enum: available, preorder, outofstock, discontinued)
+- isFeatured, viewCount, salesCount
+- metaTitle, metaDescription
+- Indexes: text (name, description, brand), price+rating, category+stock
+Order
+- user (ObjectId ref User), products (Array of {product, quantity, price})
+- totalPrice, shippingCost
+- paymentMethod (enum: cash, online, wave, om, free, card)
+- paymentStatus (enum: pending, awaiting, paid, failed, refunded)
+- isPaid, paidAt, paymentToken, transactionId
+- customerInfo ({name, phone, email})
+- status (enum: pending, processing, shipped, delivered, cancelled)
+- deliveryName, deliveryPhone, deliveryAddress, deliveryCity, deliveryRegion
+- orderNumber (unique, auto-generated: ORD-YYMMDD-XXXXXXXX)
+- refundAmount, refundedAt, stripePaymentIntentId, mobileMoneyReference
+- Indexes: user+createdAt, orderNumber, paymentStatus, status
+Cart
+- user (ObjectId, unique -- one cart per user)
+- items (Array of {product, quantity, price, addedAt})
+- promoCode ({code, discount, type})
+- subtotal, discount, shippingCost, total (computed via pre-save hook)
+- expiresAt (30-day expiry)
+Category
+- name (String, unique), slug (unique, auto-generated)
+- seoDescription, seoTitle
+- parent (self-referencing ObjectId for hierarchy)
+- banner, icon
+- order (Number for display order)
+- isActive, productCount
+Article (Blog)
+- title, slug (auto-generated)
+- author (ObjectId ref User)
+- content (String, required), excerpt
+- coverImage ({url, alt})
+- category (enum: test, comparatif, tutoriel, actualite)
+- tags, isTest, relatedProducts
+- status (enum: draft, published, archived)
+- viewCount, readTime, isFeatured
+Review
+- product OR article (ObjectId refs)
+- user (ObjectId, required)
+- rating (Number, 1-5)
+- title, comment
+- media (Array of {type, url})
+- isVerified (Boolean)
+- response (admin reply)
+- helpful ({count, users[]})
+- isApproved, isReported
+- Unique compound indexes: (product, user) and (article, user)
+Warranty
+- product, user, order (ObjectId refs)
+- purchaseDate, startDate, endDate
+- warrantyType (enum: constructeur, extension, commerciale)
+- duration (months)
+- status (enum: active, expired, suspended, claimed)
+- serialNumber, proofOfPurchase, notes
+RMA (Return/Repair/Exchange)
+- rmaNumber (unique, auto-generated: RMA-YYMMDD-XXXXXXXX)
+- user, order, product (ObjectId refs)
+- type (enum: retour, reparation, echange)
+- reason (enum: defectueux, non_conforme, erreur_commande, change_avis, garantie, autre)
+- description, images
+- status (enum: pending, approved, rejected, in_transit, received, processing, resolved, cancelled)
+- trackingNumber, resolution, refundAmount, internalNotes
+- statusHistory (Array of {status, updatedBy, updatedAt, note})
+Settings (Singleton)
+- _id hardcoded to "site_settings"
+- siteName, siteDescription, logo, favicon
+- contactEmail, contactPhone, contactAddress
+- socialLinks (facebook, instagram, twitter, linkedin, youtube)
+- shipping ({standardCost, freeShippingThreshold, expressAvailable, expressCost, regions[]})
+- tax ({enabled, rate, included})
+- loyalty ({enabled, pointsPerFCFA, redemptionRate, minPointsToRedeem})
+- warranty ({defaultDuration, extensionAvailable, extensionCost})
+- returns ({enabled, periodDays, conditions})
+- paymentMethods ({cash, wave, orangeMoney, freeMoney, stripe})
+- maintenance ({enabled, message})
+- seo ({metaTitle, metaDescription, metaKeywords, googleAnalyticsId, facebookPixelId})
+HeroSlide
+- title, subtitle, description, badge
+- image, mobileImage
+- overlay, gradient
+- primaryCta ({text, link, style}), secondaryCta
+- order, isActive
+- textPosition, textColor
+- stats ({value, label}), tags
+PromoCode
+- code (String, unique, uppercase)
+- description, type (enum: percentage, fixed)
+- discount, minAmount, maxDiscount
+- startDate, endDate
+- usageLimit, usageCount, usageLimitPerUser
+- usedBy (Array of {user, usedAt, orderAmount})
+- applicableCategories, applicableProducts
+- isActive, createdBy
+- Methods: isValid(), calculateDiscount(amount)
+Notification
+- user (ObjectId), type (enum of 10 types), title, message
+- link, data ({orderId, rmaId, productId})
+- isRead, readAt, emailSent
+6. API ROUTES & CONTROLLERS
+Public Routes
+Method	Path	Handler
+GET	/health	server.js
+GET	/	server.js
+GET	/api/v1/sitemap.xml	sitemap.js
+POST	/api/v1/auth/register	authController.register
+POST	/api/v1/auth/login	authController.login
+POST	/api/v1/auth/forgot-password	authController.forgotPassword
+POST	/api/v1/auth/reset-password/:token	authController.resetPassword
+GET	/api/v1/products	productController.getProducts
+GET	/api/v1/products/:id	productController.getProductById
+GET	/api/v1/categories	categoryController.getAllCategories
+GET	/api/v1/categories/:slug	categoryController.getProductsByCategory
+GET	/api/v1/articles	articleController.getAllArticles
+GET	/api/v1/articles/featured	articleController.getFeaturedArticles
+GET	/api/v1/articles/categories	articleController.getCategories
+GET	/api/v1/articles/:slug	articleController.getArticleBySlug
+GET	/api/v1/hero	heroRoutes inline
+POST	/api/v1/configurator	configuratorController
+GET	/api/v1/reviews/:productId	reviewController.getProductReviews
+POST	/api/v1/payment/paydunya/callback	paymentController.paydunyaCallback
+Authenticated Routes (verifyToken)
+Method	Path
+GET	/api/v1/auth/me
+GET	/api/v1/users/me
+PUT	/api/v1/users/me
+PUT	/api/v1/users/me/password
+GET	/api/v1/users/me/stats
+POST	/api/v1/users/me/addresses
+DELETE	/api/v1/users/me/addresses/:addressId
+GET/POST/PUT/DELETE	/api/v1/cart/*
+POST	/api/v1/orders
+GET	/api/v1/orders/my-orders
+GET	/api/v1/orders/:id
+POST	/api/v1/reviews
+PUT	/api/v1/reviews/:id/helpful
+DELETE	/api/v1/reviews/:id
+GET	/api/v1/warranties/*
+GET	/api/v1/rma/*, POST, DELETE
+POST	/api/v1/payment/paydunya/create
+GET	/api/v1/payment/paydunya/status/:token
+GET	/api/v1/payment/paydunya/confirm/:orderId
+GET	/api/v1/payment/paydunya/receipt/:orderId
+Admin Routes (/api/v1/admin/* -- verifyToken + isAdmin)
+Method	Path
+GET	/admin/articles
+POST	/admin/articles
+PUT	/admin/articles/:id/publish
+PUT	/admin/articles/:id
+DELETE	/admin/articles/:id
+GET	/admin/reviews
+PATCH	/admin/reviews/:id/approve
+DELETE	/admin/reviews/:id
+GET	/admin/rma
+PUT	/admin/rma/:id/status
+GET	/admin/orders
+PUT	/admin/orders/:id/status
+PUT	/admin/orders/:id/pay
+DELETE	/admin/orders/:id
+GET/POST/PUT/DELETE	/admin/products/*
+GET/PUT	/admin/settings
+GET/POST/PUT/DELETE	/admin/categories
+GET/POST/PUT/DELETE	/admin/promo-codes
+GET	/admin/analytics
+GET/PUT/DELETE	/admin/users/*
+GET	/admin/stats
+GET	/admin/stats/sales-chart
+GET	/admin/stats/top-products
+GET	/admin/stats/recent-orders
+GET	/admin/stats/alerts
+GET	/admin/stats/growth
+GET	/admin/stats/geography
+Admin Routes (/api/v1/users/* -- also admin, in userRoutes.js)
+Method	Path	Handler
+GET	/users	userRoutes inline (admin list)
+GET	/users/analytics/overview	userRoutes inline
+GET	/users/:id	userRoutes inline
+PUT	/users/:id	userRoutes inline
+DELETE	/users/:id	userRoutes inline
+7. MIDDLEWARE STACK
+Applied in order:
+1. Helmet -- Security HTTP headers (cross-origin resource policy)
+2. CORS -- Whitelist-based origin validation
+3. express.json() -- Body parsing (10MB limit)
+4. express.urlencoded() -- URL-encoded body parsing (10MB limit)
+5. express-mongo-sanitize -- Prevents NoSQL injection via $ operators
+6. Morgan (dev only) -- Request logging
+7. Rate Limiting (production only):
+- Global API: 100 req / 15 min
+- Auth (login/register): 10 req / 15 min
+- Admin: 200 req / 15 min
+Custom middleware:
+- authMiddleware.verifyToken -- JWT verification + user lookup
+- authMiddleware.isAdmin -- Admin role check
+- authMiddleware.optionalAuth -- Non-blocking auth
+- validation.validate -- express-validator error handling
+- upload.uploadSingle/uploadMultiple -- Multer (memory storage, 5MB limit, image-only filter)
+- cache.cacheMiddleware -- Redis response caching
+- errorHandler -- Global error handler (not actually mounted -- see issues)
+- errorHandler.asyncHandler -- Promise wrapper for route handlers
+8. CONFIGURATION FILES
+File	Purpose
+config/database.js	Mongoose connection with timeouts, event handlers, graceful shutdown
+config/redis.js	Redis client with retry strategy, promisified helpers
+config/stripe.js	Lazy-init Stripe wrapper (PaymentIntent, Checkout, Refund, Webhook)
+config/cloudinary.js	Lazy-init Cloudinary wrapper (upload, delete with transformations)
+Not present: tsconfig.json, .eslintrc, prettier, nodemon.json, jest.config, Dockerfile, docker-compose, swagger/openapi spec
+9. ENVIRONMENT VARIABLES NEEDED
+Required (app will not start without these)
+- MONGODB_URI -- MongoDB connection string
+- JWT_SECRET -- JWT signing secret (blocked if insecure in production)
+Optional but strongly recommended
+- NODE_ENV -- development/production
+- PORT -- Default 5000
+- JWT_EXPIRE -- Token expiry (default 7d)
+- CORS_ORIGIN -- Comma-separated allowed origins
+- FRONTEND_URL, BACKEND_URL, CLIENT_URL, API_URL
+- ADMIN_EMAIL -- For admin order notifications
+- RATE_LIMIT_WINDOW_MS, RATE_LIMIT_MAX_REQUESTS
+Email (SMTP)
+- EMAIL_HOST, EMAIL_PORT, EMAIL_USER, EMAIL_PASS
+PayDunya (Payment)
+- PAYDUNYA_MASTER_KEY, PAYDUNYA_PRIVATE_KEY, PAYDUNYA_PUBLIC_KEY, PAYDUNYA_TOKEN
+- PAYDUNYA_MODE (test/live)
+- STORE_NAME, STORE_TAGLINE, STORE_PHONE, STORE_ADDRESS, STORE_WEBSITE, STORE_LOGO
+Optional integrations
+- CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET
+- REDIS_HOST, REDIS_PORT, REDIS_PASSWORD
+- STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, CLIENT_URL
+- BLOCKED_EMAIL_DOMAINS -- Comma-separated disposable email domains
+- SITE_NAME, SITE_URL
+- DEBUG_MODE
+10. SECURITY PRACTICES
+Implemented well
+ 1. JWT secret validation -- Server refuses to start in production with weak secrets
+ 2. Timing attack prevention -- 200ms delay on failed login/register to prevent user enumeration
+ 3. Password hashing -- bcryptjs with 12 salt rounds
+ 4. Password field exclusion -- select: false on password field, .toSafeObject() helper
+ 5. NoSQL injection prevention -- express-mongo-sanitize
+ 6. Rate limiting -- Separate limits for API, auth, and admin routes (disabled in dev)
+ 7. CORS -- Whitelist-based with origin callback (allows null origin for server-to-server)
+ 8. Security headers -- Helmet with cross-origin resource policy
+ 9. Payment webhook verification -- Double verification (hash + re-confirm with PayDunya API)
+10. Amount verification -- Webhook checks received amount against order total
+11. Constant-time hash comparison -- crypto.timingSafeEqual for webhook hash
+12. Self-deletion prevention -- Admin cannot delete their own account
+13. RMA ownership verification -- Users can only see/cancel their own RMAs
+14. Order ownership verification -- Order details check user ID match
+11. ISSUES AND CONCERNS
+CRITICAL
+1. errorHandler.js is never mounted. The errorHandler and notFound middlewares exported from middlewares/errorHandler.js are never app.use()'d in server.js. Instead, server.js has its own inline error handler at lines 604-640. The asyncHandler wrapper is also never used in any controller -- all handlers use raw try/catch. This means the AppError class and asyncHandler utility are dead code.
+2. Duplicate admin routes. Admin user routes exist in TWO places:
+- /api/v1/users/* in userRoutes.js (lines 279-454) with isAdmin middleware
+- /api/v1/admin/users/* in server.js (lines 404-601) with isAdmin middleware
+Both serve the same purpose. Similarly, admin product routes exist in both productRoutes.js and server.js adminRouter. This creates confusion and maintenance burden.
+3. Duplicate email utilities. utils/sendEmail.js and services/emailService.js both configure nodemailer independently. The legacy utils/sendEmail.js is a simpler version that creates a new transporter on every call (no singleton). It does not appear to be imported anywhere, but it creates confusion about which is the canonical email implementation.
+4. Stock decrement is not atomic with order creation. In orderController.createOrder (line 73-84), the order is saved first, then stock is decremented via Product.bulkWrite. If the server crashes between these two operations, the order exists but stock is not decremented. There is no transaction or compensating logic. The reverse (cancellation restocking at lines 255-262) has the same issue.
+HIGH
+5. Regex injection in product search. In productController.getProducts (line 49), user-provided search is passed directly into $regex:
+{ name: { $regex: search, $options: "i" } }
+Special regex characters in user input (e.g., .*, ()+) could craft expensive regex patterns (ReDoS) or alter the query semantics. The same issue exists in orderController.getAllOrders (line 158), userRoutes.js admin search (lines 417-419), and categoryController brand filter (line 44). User input should be escaped with a regex-safe function before use.
+6. body-parser is redundant. body-parser is listed as a dependency but express.json() and express.urlencoded() are used directly (which include body-parser since Express 4.16). The dependency should be removed.
+7. Missing authorization checks on admin inline routes. The admin category CRUD routes in server.js (lines 280-303) directly pass req.body to Category.create() and findByIdAndUpdate() without any input validation. An admin could inject arbitrary fields into a category document.
+8. forgotPassword token is never emailed. The forgotPassword handler in authController.js (line 205) logs the reset URL to console with console.log and has a // TODO: envoyer l'email comment. The email is never actually sent, making the password reset flow non-functional in practice.
+9. Missing redis package in package.json. Both config/redis.js and middlewares/cache.js call require("redis") at module load time. If Redis is not installed, this will crash the server. Unlike Cloudinary/Stripe which use lazy init, Redis connects eagerly.
+10. Cache middleware creates its own Redis client. middlewares/cache.js (line 5) creates a completely separate Redis connection instead of importing from config/redis.js. This means two Redis connections exist, and the cache middleware will fail if Redis is not installed even though config/redis.js has retry logic.
+MEDIUM
+11. server.js is monolithic (661 lines). The admin router with ~400 lines of inline handlers is defined directly in server.js. This should be extracted to a dedicated adminRoutes.js file with proper controller delegation.
+12. No input validation on many admin routes. Routes like POST/PUT for categories, settings, promo-codes, and admin user management pass req.body directly to Mongoose without express-validator or manual sanitization.
+13. No Swagger/OpenAPI documentation. No API documentation exists. For a project of this size, this makes frontend integration harder.
+14. No test suite. The test script is a placeholder. There are zero test files in the project. No testing framework (Jest, Mocha, etc.) is installed.
+15. No Docker configuration. No Dockerfile or docker-compose exists for containerized deployment.
+16. No linter or formatter configuration. No .eslintrc, .prettierrc, or equivalent exists.
+17. Sitemap has a bug. In routes/sitemap.js (line 74), Articles are queried with { stock: { $gt: 0 } }. Articles do not have a stock field -- this filter is from a copy-paste of the products query and will return all articles regardless (since undefined > 0 is never true in MongoDB, this might actually return zero articles).
+18. dashboardController.js is dead code. It is never imported or used anywhere. The functionality is duplicated in routes/stats.js.
+19. moment-timezone and node-cron are unused. These are listed as dependencies but are never imported in any source file. They should be removed or their usage documented.
+20. helpers.js has a generateOrderNumber function that is unused. The Order model uses its own crypto.randomBytes approach. Similarly, helpers.js exports many utilities that are never imported elsewhere.
+LOW
+21. No graceful shutdown. process.on("unhandledRejection") exists but there is no SIGTERM handler (only SIGINT in database.js). In a production container (Docker/Kubernetes), SIGTERM is the standard shutdown signal.
+22. moment-timezone could be replaced. Intl.DateTimeFormat is already used in helpers.js. Having both moment and Intl is unnecessary bloat.
+23. notification.js model is lowercase while all other models use PascalCase filenames. This is a consistency issue.
+24. No request ID / correlation ID. Error logs have no request ID to help trace issues across multiple concurrent requests.
+25. Sitemap categories are hardcoded (lines 30-40 of sitemap.js). If categories change in the database, the sitemap will be stale. Should query from the Category model.
+26. Rate limiting is entirely disabled in development. The createLimiter function (line 94-98) returns a no-op middleware when NODE_ENV !== "production". This means any dev environment testing is unprotected, which could mask rate-limiting-related issues.
+27. The analytics admin endpoint (line 396-398 in `server.js) is a stub returning empty data.
+SUMMARY
+Tekalis-backend is a functional Express.js e-commerce backend for the Senegalese market, built with MongoDB/Mongoose, JWT auth, PayDunya mobile money, and Cloudinary image hosting. The codebase shows good awareness of security concerns (timing attacks, NoSQL injection, JWT validation, webhook verification) but suffers from several architectural and quality issues.
+Strengths:
+- Solid security foundations (bcrypt, JWT, helmet, mongo-sanitize, rate limiting, timing-safe comparison)
+- Well-designed Mongoose schemas with proper indexes, validation, and pre-save hooks
+- Race-condition-safe order/RMA number generation using crypto.randomBytes
+- Lazy-init pattern for optional services (Cloudinary, Stripe)
+- Comprehensive email template system
+- PayDunya webhook with double verification (hash + API re-confirm)
+Priority fixes needed:
+ 1. Remove dead code (errorHandler, dashboardController, sendEmail.js, unused dependencies)
+ 2. Extract admin routes from server.js into dedicated files
+ 3. Fix regex injection in search queries (escape user input)
+ 4. Implement email sending in forgotPassword flow
+ 5. Add atomic stock management (transactions or compensating logic)
+ 6. Remove Redis eager loading or install the redis package
+ 7. Add input validation on all admin routes
+ 8. Add tests (at minimum integration tests for critical flows)
+ 9. Add Docker support for production deployment
+10. Add API documentation (Swagger/OpenAPI)

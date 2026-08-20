@@ -1,4 +1,5 @@
 import './globals.css';
+import Script from 'next/script';
 import Providers from '@/components/shared/Providers';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
@@ -138,11 +139,12 @@ export default function RootLayout({ children }) {
         <link rel="preconnect" href="https://images.unsplash.com" />
         <link rel="dns-prefetch" href="//tekalis.onrender.com" />
         <meta name="theme-color" content="#2563eb" />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
-        />
       </head>
+      <Script
+        id="local-business-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+      />
       <body className="bg-white dark:bg-gray-950 text-gray-900 dark:text-white antialiased">
         <Providers>
           <div className="pt-[100px]">

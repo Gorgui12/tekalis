@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 /**
  * Hook pour débouncer une valeur (utile pour les recherches)
@@ -48,32 +48,24 @@ const useDebounce = (value, delay = 500) => {
  * const debouncedSearch = useDebouncedCallback(handleSearch, 500);
  */
 export const useDebouncedCallback = (callback, delay = 500) => {
-  const [timer, setTimer] = useState(null);
+  const timerRef = useRef(null);
 
-  const debouncedCallback = (...args) => {
-    // Annuler le timer précédent
-    if (timer) {
-      clearTimeout(timer);
-    }
-
-    // Créer un nouveau timer
-    const newTimer = setTimeout(() => {
-      callback(...args);
-    }, delay);
-
-    setTimer(newTimer);
-  };
-
-  // Nettoyer au démontage
   useEffect(() => {
     return () => {
-      if (timer) {
-        clearTimeout(timer);
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
       }
     };
-  }, [timer]);
+  }, []);
 
-  return debouncedCallback;
+  return useCallback((...args) => {
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+    timerRef.current = setTimeout(() => {
+      callback(...args);
+    }, delay);
+  }, [callback, delay]);
 };
 
 /**

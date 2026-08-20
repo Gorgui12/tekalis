@@ -6,7 +6,8 @@ const SITE_URL = 'https://tekalis.com';
 
 export async function generateMetadata({ params }) {
   try {
-    const data = await serverFetch(`/articles/${params.slug}`);
+    const { slug } = await params;
+    const data = await serverFetch(`/articles/${slug}`);
     const article = data?.article || data;
     if (!article) return {};
 
@@ -42,7 +43,8 @@ async function getArticle(slug) {
 }
 
 export default async function ArticlePage({ params }) {
-  const data = await getArticle(params.slug);
+  const { slug } = await params;
+  const data = await getArticle(slug);
   if (!data) notFound();
 
   const article = data?.article || data;

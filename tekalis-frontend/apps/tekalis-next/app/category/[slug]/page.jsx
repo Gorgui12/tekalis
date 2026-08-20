@@ -62,18 +62,19 @@ const CATEGORY_SEO = {
 };
 
 export async function generateMetadata({ params }) {
-  const seo = CATEGORY_SEO[params.slug];
-  if (!seo) return { title: `${params.slug} | Tekalis` };
+  const { slug } = await params;
+  const seo = CATEGORY_SEO[slug];
+  if (!seo) return { title: `${slug} | Tekalis` };
 
   return {
     title: seo.title,
     description: seo.description,
     keywords: seo.keywords,
-    alternates: { canonical: `${SITE_URL}/category/${params.slug}` },
+    alternates: { canonical: `${SITE_URL}/category/${slug}` },
     openGraph: {
       title: seo.title,
       description: seo.description,
-      url: `${SITE_URL}/category/${params.slug}`,
+      url: `${SITE_URL}/category/${slug}`,
     },
   };
 }
@@ -95,7 +96,7 @@ export async function generateStaticParams() {
 }
 
 export default async function CategoryPage({ params }) {
-  const { slug } = params;
+  const { slug } = await params;
   const seo = CATEGORY_SEO[slug] || {
     title: slug,
     h1: slug.replace(/-/g, ' '),

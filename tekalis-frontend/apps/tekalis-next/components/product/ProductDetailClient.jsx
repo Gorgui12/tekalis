@@ -220,13 +220,13 @@ const ProductDetails = ({ product: initialProduct }) => {
               </span>
               {product.comparePrice && discount > 0 && (
                 <span className="text-xl text-gray-400 line-through">
-                  {product.comparePrice.toLocaleString()} FCFA
+                  {(product.comparePrice || 0).toLocaleString()} FCFA
                 </span>
               )}
             </div>
             {discount > 0 && (
               <p className="text-sm text-red-500 font-semibold mt-1">
-                Économisez {(product.comparePrice - product.price).toLocaleString()} FCFA (-{discount}%)
+                Economisez {((product.comparePrice || 0) - (product.price || 0)).toLocaleString()} FCFA (-{discount}%)
               </p>
             )}
           </div>

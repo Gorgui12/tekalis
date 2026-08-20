@@ -1,5 +1,3 @@
-// Helmet supprime - utiliser metadata export de Next.js
-
 /**
  * Composant Schema.org pour rich snippets Google
  * Usage: <StructuredData type="Product" data={productData} />
@@ -82,5 +80,9 @@ export const StructuredData = ({ type, data }) => {
   }
 
   return (
-    );
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+    />
+  );
 };

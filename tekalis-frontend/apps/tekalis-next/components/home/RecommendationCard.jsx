@@ -34,7 +34,7 @@ const RecommendationCard = ({
             {product.name}
           </h3>
           <p className="text-2xl font-bold text-blue-600 mb-2">
-            {product.price.toLocaleString()} FCFA
+            {(product.price || 0).toLocaleString()} FCFA
           </p>
           {showScore && (
             <div className="flex items-center gap-2 text-sm">
@@ -121,7 +121,7 @@ const RecommendationCard = ({
           </h3>
           
           <p className="text-3xl font-bold text-blue-600 mb-4">
-            {product.price.toLocaleString()} FCFA
+            {(product.price || 0).toLocaleString()} FCFA
           </p>
 
           {/* Specs Grid */}

@@ -37,7 +37,6 @@ const ArticleDetails = () => {
       setRelatedProducts(data.relatedProducts || []);
     } catch (error) {
       console.error("Erreur chargement article:", error);
-      // Article de démo
       setArticle(getDemoArticle());
       setRelatedArticles(getDemoRelatedArticles());
     } finally {
@@ -145,22 +144,18 @@ const ArticleDetails = () => {
     }
   ];
 
-  // Partage social
   const shareArticle = (platform) => {
     const url = window.location.href;
     const text = article.title;
-
     const shareUrls = {
       facebook: `https://www.facebook.com/sharer/sharer.php?u=${url}`,
       twitter: `https://twitter.com/intent/tweet?url=${url}&text=${text}`,
       linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${url}`,
       whatsapp: `https://wa.me/?text=${text} ${url}`
     };
-
     window.open(shareUrls[platform], '_blank', 'width=600,height=400');
   };
 
-  // Badge de catégorie
   const categories = {
     test: { label: "Test", icon: "🧪", color: "bg-green-100 text-green-700" },
     guide: { label: "Guide", icon: "📖", color: "bg-purple-100 text-purple-700" },
@@ -191,69 +186,88 @@ const ArticleDetails = () => {
   }
 
   const cat = categories[article.category] || categories.test;
+  const authorName = article.author?.name || "Équipe Tekalis";
+  const authorBio = article.author?.bio || "";
+  const authorAvatar = article.author?.avatar;
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {article && (
-    <PageMeta
-      title={`${article.title} | Blog Tekalis`}
-      description={article.excerpt || article.title}
-      image={article.image ? `https://tekalis.com${article.image}` : undefined}
-      keywords={[
-        ...(article.tags || []),
-        'blog tech Sénégal',
-        'guide achat Dakar',
-        'tekalis blog',
-      ]}
-      type="article"
-      canonical={`https://tekalis.com/blog/${article.slug}`}
-      breadcrumbs={[
-        { name: 'Blog', url: '/blog' },
-        { name: article.title, url: `/blog/${article.slug}` },
-      ]}
-      articleData={{
-        publishedAt: article.publishedAt,
-        modifiedAt: article.updatedAt,
-        author: article.author?.name || 'Équipe Tekalis',
-      }}
-    />
-  )}
-      {/* Header Image */}
-      <div className="relative h-96 bg-gray-900 mt-20">
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent"></div>
-        <div className="absolute bottom-0 left-0 right-0 p-8">
-          <div className="container mx-auto">
-            <Link href="/blog"
-              className="inline-flex items-center gap-2 text-white/80 hover:text-white mb-4 transition"
+      <PageMeta
+        title={`${article.title} | Blog Tekalis`}
+        description={article.excerpt || article.title}
+        image={article.image ? `https://tekalis.com${article.image}` : undefined}
+        keywords={[
+          ...(article.tags || []),
+          'blog tech Sénégal',
+          'guide achat Dakar',
+          'tekalis blog',
+        ]}
+        type="article"
+        canonical={`https://tekalis.com/blog/${article.slug}`}
+        breadcrumbs={[
+          { name: 'Blog', url: '/blog' },
+          { name: article.title, url: `/blog/${article.slug}` },
+        ]}
+        articleData={{
+          publishedAt: article.publishedAt,
+          modifiedAt: article.updatedAt,
+          author: authorName,
+        }}
+      />
+
+      {/* Hero Image */}
+      <div className="relative h-[32rem] bg-gray-900 mt-20">
+        {article.image && (
+          <img
+            src={article.image}
+            alt={article.title}
+            className="w-full h-full object-cover opacity-80"
+          />
+        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
+          <div className="container mx-auto max-w-4xl">
+            <Link
+              href="/blog"
+              className="inline-flex items-center gap-2 text-white/70 hover:text-white mb-6 transition text-sm font-medium"
             >
-              <FaArrowLeft />
+              <FaArrowLeft size={14} />
               Retour au blog
             </Link>
-            <span className={`${cat.color} px-3 py-1 rounded-full text-xs font-bold uppercase inline-flex items-center gap-1`}>
+            <span className={`${cat.color} px-3 py-1 rounded-full text-xs font-bold uppercase inline-flex items-center gap-1 mb-4`}>
               <span>{cat.icon}</span>
               {cat.label}
             </span>
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mt-4 leading-tight max-w-3xl">
+              {article.title}
+            </h1>
+            {article.excerpt && (
+              <p className="text-lg text-white/70 mt-4 max-w-2xl leading-relaxed">
+                {article.excerpt}
+              </p>
+            )}
           </div>
         </div>
       </div>
 
-      <div className="container mx-auto px-4 -mt-32 relative z-10 pb-12">
-        <div className="max-w-4xl mx-auto">
-          {/* Article Card */}
-          <article className="bg-white rounded-lg shadow-xl overflow-hidden mb-8">
-            {/* Header */}
+      {/* Content */}
+      <div className="container mx-auto px-4 -mt-16 relative z-10 pb-16">
+        <div className="max-w-3xl mx-auto">
+          <article className="bg-white rounded-2xl shadow-xl overflow-hidden">
             <div className="p-8 md:p-12">
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6 leading-tight">
-                {article.title}
-              </h1>
-
-              {/* Meta */}
-              <div className="flex flex-wrap items-center gap-4 mb-6 pb-6 border-b">
+              {/* Meta bar */}
+              <div className="flex flex-wrap items-center justify-between gap-4 mb-8 pb-6 border-b border-gray-100">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 bg-gray-300 rounded-full"></div>
+                  {authorAvatar ? (
+                    <img src={authorAvatar} alt={authorName} className="w-11 h-11 rounded-full object-cover ring-2 ring-white shadow" />
+                  ) : (
+                    <div className="w-11 h-11 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow">
+                      {authorName.charAt(0)}
+                    </div>
+                  )}
                   <div>
-                    <p className="font-semibold text-gray-900">{article.author.name}</p>
-                    <p className="text-sm text-gray-500">
+                    <p className="font-semibold text-gray-900 text-sm">{authorName}</p>
+                    <p className="text-xs text-gray-500">
                       {new Date(article.publishedAt || 0).toLocaleDateString("fr-FR", {
                         day: "numeric",
                         month: "long",
@@ -263,66 +277,41 @@ const ArticleDetails = () => {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4 text-sm text-gray-600 ml-auto">
-                  <span className="flex items-center gap-1">
-                    <FaClock />
+                <div className="flex items-center gap-4 text-sm text-gray-500">
+                  <span className="flex items-center gap-1.5">
+                    <FaClock size={13} />
                     {article.readTime} min
                   </span>
-                  <span className="flex items-center gap-1">
-                    <FaEye />
-                    {article.views} vues
+                  <span className="flex items-center gap-1.5">
+                    <FaEye size={13} />
+                    {article.views?.toLocaleString() ?? 0} vues
                   </span>
                 </div>
               </div>
 
-              {/* Share */}
-              <div className="flex items-center gap-3 mb-8">
-                <span className="text-sm font-semibold text-gray-700 flex items-center gap-2">
-                  <FaShare />
-                  Partager :
-                </span>
-                <button
-                  onClick={() => shareArticle('facebook')}
-                  className="w-10 h-10 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center transition"
-                >
-                  <FaFacebook />
-                </button>
-                <button
-                  onClick={() => shareArticle('twitter')}
-                  className="w-10 h-10 bg-sky-500 hover:bg-sky-600 text-white rounded-full flex items-center justify-center transition"
-                >
-                  <FaTwitter />
-                </button>
-                <button
-                  onClick={() => shareArticle('linkedin')}
-                  className="w-10 h-10 bg-blue-700 hover:bg-blue-800 text-white rounded-full flex items-center justify-center transition"
-                >
-                  <FaLinkedin />
-                </button>
-                <button
-                  onClick={() => shareArticle('whatsapp')}
-                  className="w-10 h-10 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center transition"
-                >
-                  <FaWhatsapp />
-                </button>
-              </div>
-
-              {/* Content */}
-              <div 
-                className="prose prose-lg max-w-none"
+              {/* Prose content */}
+              <div
+                className="prose max-w-none
+                  prose-headings:font-bold prose-headings:text-gray-900
+                  prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-h2:border-b prose-h2:border-gray-100 prose-h2:pb-3
+                  prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
+                  prose-p:text-gray-600 prose-p:leading-relaxed prose-p:text-base
+                  prose-ul:my-5 prose-li:text-gray-600 prose-li:leading-relaxed
+                  prose-strong:text-gray-900 prose-strong:font-semibold
+                  prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline"
                 dangerouslySetInnerHTML={{ __html: article.content }}
               />
 
               {/* Tags */}
-              {article.tags && article.tags.length > 0 && (
-                <div className="mt-8 pt-8 border-t">
+              {article.tags?.length > 0 && (
+                <div className="mt-10 pt-6 border-t border-gray-100">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <FaTag className="text-gray-500" />
+                    <FaTag className="text-gray-400" size={13} />
                     {article.tags.map((tag, index) => (
                       <Link
                         key={index}
                         href={`/blog?tag=${tag}`}
-                        className="bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1 rounded-full text-sm font-medium transition"
+                        className="bg-gray-100 hover:bg-blue-50 hover:text-blue-600 text-gray-600 px-3 py-1 rounded-full text-xs font-medium transition"
                       >
                         {tag}
                       </Link>
@@ -331,13 +320,43 @@ const ArticleDetails = () => {
                 </div>
               )}
 
+              {/* Share */}
+              <div className="mt-8 pt-6 border-t border-gray-100">
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-gray-500 flex items-center gap-2">
+                    <FaShare size={13} />
+                    Partager
+                  </span>
+                  <div className="flex gap-2">
+                    <button onClick={() => shareArticle('facebook')} className="w-9 h-9 bg-blue-600 hover:bg-blue-700 text-white rounded-full flex items-center justify-center transition text-sm">
+                      <FaFacebook size={14} />
+                    </button>
+                    <button onClick={() => shareArticle('twitter')} className="w-9 h-9 bg-sky-500 hover:bg-sky-600 text-white rounded-full flex items-center justify-center transition text-sm">
+                      <FaTwitter size={14} />
+                    </button>
+                    <button onClick={() => shareArticle('linkedin')} className="w-9 h-9 bg-blue-700 hover:bg-blue-800 text-white rounded-full flex items-center justify-center transition text-sm">
+                      <FaLinkedin size={14} />
+                    </button>
+                    <button onClick={() => shareArticle('whatsapp')} className="w-9 h-9 bg-green-500 hover:bg-green-600 text-white rounded-full flex items-center justify-center transition text-sm">
+                      <FaWhatsapp size={14} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               {/* Author Bio */}
-              <div className="mt-8 p-6 bg-gray-50 rounded-lg">
+              <div className="mt-8 p-5 bg-gray-50 rounded-xl">
                 <div className="flex gap-4">
-                  <div className="w-16 h-16 bg-gray-300 rounded-full flex-shrink-0"></div>
+                  {authorAvatar ? (
+                    <img src={authorAvatar} alt={authorName} className="w-14 h-14 rounded-full object-cover flex-shrink-0" />
+                  ) : (
+                    <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                      {authorName.charAt(0)}
+                    </div>
+                  )}
                   <div>
-                    <h3 className="font-bold text-gray-900 mb-1">À propos de {article.author.name}</h3>
-                    <p className="text-sm text-gray-600">{article.author.bio}</p>
+                    <h3 className="font-bold text-gray-900 text-sm mb-1">À propos de {authorName}</h3>
+                    <p className="text-sm text-gray-500 leading-relaxed">{authorBio}</p>
                   </div>
                 </div>
               </div>
@@ -346,14 +365,11 @@ const ArticleDetails = () => {
 
           {/* Related Products */}
           {relatedProducts.length > 0 && (
-            <div className="bg-white rounded-lg shadow-lg p-6 md:p-8 mb-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                🛒 Produits mentionnés
-              </h2>
+            <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 mt-8">
+              <h2 className="text-xl font-bold text-gray-900 mb-6">Produits mentionnés</h2>
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-                {/* Placeholder pour produits reliés */}
-                <div className="text-center text-gray-500 col-span-full">
-                  Les produits mentionnés dans l'article apparaîtront ici
+                <div className="text-center text-gray-400 col-span-full text-sm py-6">
+                  Les produits mentionnés dans l&apos;article apparaîtront ici
                 </div>
               </div>
             </div>
@@ -361,23 +377,21 @@ const ArticleDetails = () => {
 
           {/* Related Articles */}
           {relatedArticles.length > 0 && (
-            <div className="bg-white rounded-lg shadow-lg p-6 md:p-8">
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
-                📚 Articles similaires
-              </h2>
+            <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 mt-8">
+              <h2 className="text-xl font-bold text-gray-900 mb-6">Articles similaires</h2>
               <div className="grid md:grid-cols-3 gap-6">
                 {relatedArticles.map(related => (
-                  <Link
-                    key={related._id}
-                    href={`/blog/${related.slug}`}
-                    className="group"
-                  >
-                    <div className="aspect-video bg-gray-200 rounded-lg mb-3"></div>
-                    <h3 className="font-bold text-gray-900 group-hover:text-blue-600 transition line-clamp-2 mb-2">
+                  <Link key={related._id} href={`/blog/${related.slug}`} className="group">
+                    <div className="aspect-video bg-gray-200 rounded-xl mb-3 overflow-hidden">
+                      {related.image && (
+                        <img src={related.image} alt={related.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
+                      )}
+                    </div>
+                    <h3 className="font-bold text-gray-900 group-hover:text-blue-600 transition line-clamp-2 mb-2 text-sm">
                       {related.title}
                     </h3>
-                    <p className="text-sm text-gray-600 flex items-center gap-2">
-                      <FaClock size={12} />
+                    <p className="text-xs text-gray-500 flex items-center gap-1.5">
+                      <FaClock size={11} />
                       {related.readTime} min de lecture
                     </p>
                   </Link>
@@ -388,59 +402,19 @@ const ArticleDetails = () => {
         </div>
       </div>
 
-      {/* Custom styles pour le contenu de l'article */}
       <style>{`
-        .prose h2 {
-          font-size: 1.875rem;
-          font-weight: bold;
-          margin-top: 2rem;
-          margin-bottom: 1rem;
-          color: #1f2937;
-        }
-        .prose h3 {
-          font-size: 1.5rem;
-          font-weight: bold;
-          margin-top: 1.5rem;
-          margin-bottom: 0.75rem;
-          color: #374151;
-        }
-        .prose p {
-          margin-bottom: 1rem;
-          line-height: 1.75;
-          color: #4b5563;
-        }
-        .prose ul {
-          list-style: disc;
-          margin-left: 1.5rem;
-          margin-bottom: 1rem;
-        }
-        .prose li {
-          margin-bottom: 0.5rem;
-          color: #4b5563;
-        }
-        .prose strong {
-          font-weight: 600;
-          color: #1f2937;
-        }
         .prose .rating-box {
           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           color: white;
-          padding: 2rem;
-          border-radius: 0.5rem;
+          padding: 1.5rem 2rem;
+          border-radius: 0.75rem;
           margin-top: 2rem;
         }
-        .prose .rating-box h3 {
-          color: white;
-          margin: 0 0 0.5rem 0;
-        }
-        .prose .rating-box p {
-          color: rgba(255, 255, 255, 0.9);
-          margin: 0;
-        }
+        .prose .rating-box h3 { color: white; margin: 0 0 0.5rem 0; font-size: 1.25rem; }
+        .prose .rating-box p { color: rgba(255,255,255,0.9); margin: 0; }
       `}</style>
     </div>
   );
 };
 
 export default ArticleDetails;
-

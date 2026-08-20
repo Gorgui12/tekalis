@@ -16,8 +16,8 @@ const Cart = () => {
   const navigate = (path) => router.push(path);
   const { items, totalAmount } = useSelector((state) => state.cart);
 
-  const shippingCost = 0; // Livraison gratuite pour l'instant
-  const total = totalAmount + shippingCost;
+  const shippingCost = 0;
+  const total = (totalAmount || 0) + shippingCost;
 
   // ── Panier vide ───────────────────────────────────────────────────────────
   if (items.length === 0) {
@@ -53,7 +53,7 @@ const Cart = () => {
         {/* ── Liste des produits ───────────────────────────────────────── */}
         <div className="lg:col-span-2 space-y-4">
           {items.map((item) => {
-            // Image : tableau d'objets ou string directe
+            const price = item.price || 0;
             const imageUrl =
               item.images?.find((img) => img.isPrimary)?.url ||
               item.images?.[0]?.url ||
@@ -89,7 +89,7 @@ const Cart = () => {
                       {item.name}
                     </h3>
                     <p className="text-blue-600 dark:text-blue-400 font-bold text-xl">
-                      {item.price.toLocaleString()} FCFA
+                      {price.toLocaleString()} FCFA
                     </p>
                   </div>
 
@@ -133,7 +133,7 @@ const Cart = () => {
                     Sous-total
                   </span>
                   <span className="font-bold text-lg text-gray-900 dark:text-white">
-                    {(item.price * (item.quantity || 1)).toLocaleString()} FCFA
+                    {(price * (item.quantity || 1)).toLocaleString()} FCFA
                   </span>
                 </div>
               </div>
@@ -169,7 +169,7 @@ const Cart = () => {
                   {items.length > 1 ? "s" : ""})
                 </span>
                 <span className="font-semibold text-gray-900 dark:text-white">
-                  {totalAmount.toLocaleString()} FCFA
+                  {(totalAmount || 0).toLocaleString()} FCFA
                 </span>
               </div>
 
