@@ -6,6 +6,13 @@ const STATIC_PAGES = [
   { url: '/blog', priority: 0.8, changeFrequency: 'weekly' },
   { url: '/apropos', priority: 0.6, changeFrequency: 'monthly' },
   { url: '/contact', priority: 0.6, changeFrequency: 'monthly' },
+  { url: '/faq', priority: 0.6, changeFrequency: 'monthly' },
+  { url: '/livraison', priority: 0.6, changeFrequency: 'monthly' },
+  { url: '/retours', priority: 0.5, changeFrequency: 'monthly' },
+  { url: '/garanties', priority: 0.5, changeFrequency: 'monthly' },
+  { url: '/mentions-legales', priority: 0.3, changeFrequency: 'yearly' },
+  { url: '/cgv', priority: 0.3, changeFrequency: 'yearly' },
+  { url: '/cookies', priority: 0.3, changeFrequency: 'yearly' },
 ];
 
 const CATEGORY_SLUGS = [

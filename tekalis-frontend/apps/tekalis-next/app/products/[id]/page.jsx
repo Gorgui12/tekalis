@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { serverFetch } from "@/lib/serverFetch";
 import ProductDetailClient from '@/components/product/ProductDetailClient';
 
@@ -10,17 +11,19 @@ export async function generateMetadata({ params }) {
     if (!product) {
       return {
         title: 'Produit introuvable | Tekalis',
+        robots: { index: false },
       };
     }
 
     return {
       title: `${product.name || 'Produit'} | Tekalis Sénégal`,
       description: product.description?.substring(0, 160) || 'Achetez au meilleur prix au Sénégal. Livraison rapide à Dakar.',
+      alternates: { canonical: `https://tekalis.com/products/${id}` },
     };
   } catch {
     return {
-      title: 'Produit | Tekalis Sénégal',
-      description: 'Achetez au meilleur prix au Sénégal. Livraison rapide à Dakar.',
+      title: 'Produit introuvable | Tekalis',
+      robots: { index: false },
     };
   }
 }
@@ -28,33 +31,17 @@ export async function generateMetadata({ params }) {
 export const revalidate = 3600;
 
 export default async function ProductPage({ params }) {
+  let product;
+
   try {
     const { id } = await params;
     const res = await serverFetch(`/products/${id}`);
-    const product = res?.data || res;
-
-    if (!product) {
-      return (
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <h1 className="text-2xl font-bold text-gray-900 mb-4">Produit introuvable</h1>
-            <p className="text-gray-600 mb-6">Ce produit n'existe pas ou a été supprimé.</p>
-            <a href="/products" className="text-blue-600 hover:underline">Voir tous les produits</a>
-          </div>
-        </div>
-      );
-    }
-
-    return <ProductDetailClient product={product} />;
-  } catch (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Erreur de chargement</h1>
-          <p className="text-gray-600 mb-6">Une erreur est survenue lors du chargement du produit.</p>
-          <a href="/products" className="text-blue-600 hover:underline">Voir tous les produits</a>
-        </div>
-      </div>
-    );
+    product = res?.data || res;
+  } catch {
+    product = null;
   }
+
+  if (!product) notFound();
+
+  return <ProductDetailClient product={product} />;
 }

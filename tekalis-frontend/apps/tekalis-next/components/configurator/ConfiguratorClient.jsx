@@ -1,12 +1,13 @@
 ﻿"use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useDispatch } from "react-redux";
 import { addToCart } from "@/store/slices/cartSlice";
-import { 
-  FaCheckCircle, 
-  FaArrowRight, 
+import {
+  FaCheckCircle,
+  FaArrowRight,
   FaArrowLeft,
   FaGamepad,
   FaBriefcase,
@@ -15,263 +16,242 @@ import {
   FaDesktop,
   FaInfoCircle,
   FaShoppingCart,
-  FaSpinner
+  FaSpinner,
+  FaLaptop,
 } from "react-icons/fa";
-import { useToast } from '@/components/shared/ToastProvider';
+import { useToast } from "@/components/shared/ToastProvider";
 import api from "@/lib/api";
+
+/* ── Helpers ──────────────────────────────────────────────────────────── */
+
+const formatPrice = (price) =>
+  `${new Intl.NumberFormat("fr-FR").format(price || 0)} FCFA`;
+
+const getImageUrl = (product) =>
+  product.images?.[0]?.url ||
+  product.image ||
+  "/placeholder.jpg";
+
+const PC_CATEGORY_SLUGS = ["laptops", "ordinateurs", "pc", "informatique"];
+
+const usageOptions = [
+  {
+    id: "gaming",
+    label: "Gaming",
+    icon: <FaGamepad />,
+    description: "Jeux vidéo haute performance, streaming",
+    keywords: ["gaming", "gamer", "rtx", "gtx", "legion", "rog", "predator", "katana"],
+  },
+  {
+    id: "work",
+    label: "Travail / Bureau",
+    icon: <FaBriefcase />,
+    description: "Bureautique, multitâche, visioconférences",
+    keywords: ["business", "pro", "thinkpad", "latitude", "elitebook", "vostro", "expertbook"],
+  },
+  {
+    id: "creation",
+    label: "Création de contenu",
+    icon: <FaPaintBrush />,
+    description: "Montage vidéo, design graphique, 3D",
+    keywords: ["creator", "studio", "precision", "zbook", "workstation", "quadro"],
+  },
+  {
+    id: "student",
+    label: "Étudiant",
+    icon: <FaGraduationCap />,
+    description: "Prise de notes, recherches, léger multimédia",
+    keywords: ["vivobook", "ideapad", "inspiron", "aspire", "chromebook", "15s", "250 g"],
+  },
+  {
+    id: "multimedia",
+    label: "Multimédia",
+    icon: <FaDesktop />,
+    description: "Streaming, navigation web, réseaux sociaux",
+    keywords: ["pavilion", "essential", "everyday", "home"],
+  },
+];
+
+const budgetRanges = [
+  { min: 0, max: 500000, label: "Moins de 500 000 FCFA" },
+  { min: 500000, max: 800000, label: "500 000 - 800 000 FCFA" },
+  { min: 800000, max: 1200000, label: "800 000 - 1 200 000 FCFA" },
+  { min: 1200000, max: 2000000, label: "1 200 000 - 2 000 000 FCFA" },
+  { min: 2000000, max: Infinity, label: "Plus de 2 000 000 FCFA" },
+];
+
+const steps = [
+  { number: 1, label: "Usage" },
+  { number: 2, label: "Budget" },
+  { number: 3, label: "Marque" },
+  { number: 4, label: "Résultats" },
+];
+
+const emptyConfig = {
+  usage: "",
+  budget: null,
+  brand: "any",
+};
+
+/* ── Scoring ──────────────────────────────────────────────────────────── */
+
+function buildSearchText(product) {
+  const specsText = product.specs ? Object.values(product.specs).filter(Boolean).join(" ") : "";
+  return [product.name, product.brand, product.description, specsText]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+}
+
+function scoreProduct(product, config) {
+  let score = 0;
+  const price = product.price || 0;
+
+  // Budget (30 pts)
+  if (config.budget) {
+    if (price >= config.budget.min && price <= config.budget.max) score += 30;
+    else if (price <= config.budget.max * 1.1) score += 20;
+    else if (price < config.budget.min) score += 10;
+  }
+
+  // Usage (40 pts)
+  const usage = usageOptions.find((u) => u.id === config.usage);
+  if (usage) {
+    const text = buildSearchText(product);
+    const matches = usage.keywords.filter((k) => text.includes(k)).length;
+    score += Math.min(matches / Math.max(usage.keywords.length / 3, 1), 1) * 40;
+  }
+
+  // Marque (15 pts)
+  if (config.brand && config.brand !== "any") {
+    if ((product.brand || "").toLowerCase().includes(config.brand.toLowerCase())) score += 15;
+  } else {
+    score += 8;
+  }
+
+  // Disponibilité (15 pts)
+  if ((product.stock || 0) > 0) score += 15;
+
+  return Math.min(Math.round(score), 100);
+}
+
+function getMatchReasons(product, config) {
+  const reasons = [];
+  const price = product.price || 0;
+
+  if (config.budget && price >= config.budget.min && price <= config.budget.max) {
+    reasons.push("Dans votre budget");
+  }
+
+  const usage = usageOptions.find((u) => u.id === config.usage);
+  if (usage) {
+    const name = (product.name || "").toLowerCase();
+    if (usage.keywords.some((k) => name.includes(k))) {
+      reasons.push(`Adapté ${usage.id === "gaming" ? "au gaming" : `à un usage ${usage.label.toLowerCase()}`}`);
+    }
+  }
+
+  if ((product.stock || 0) > 0) reasons.push("En stock");
+
+  return reasons.slice(0, 3);
+}
+
+/* ── Composant ────────────────────────────────────────────────────────── */
 
 const Configurator = () => {
   const router = useRouter();
-  const navigate = (path) => router.push(path);
   const dispatch = useDispatch();
   const toast = useToast();
 
-  // États
   const [currentStep, setCurrentStep] = useState(1);
-  const [config, setConfig] = useState({
-    usage: "",
-    budget: { min: 0, max: 0 },
-    preferences: {
-      brand: "",
-      portability: "",
-      category: ""
-    }
-  });
+  const [config, setConfig] = useState(emptyConfig);
   const [allProducts, setAllProducts] = useState([]);
+  const [brands, setBrands] = useState([]);
   const [recommendations, setRecommendations] = useState([]);
-  const [loading, setLoading] = useState(false);
   const [loadingProducts, setLoadingProducts] = useState(true);
 
-  // Charger tous les produits au montage du composant
   useEffect(() => {
-    fetchAllProducts();
+    let cancelled = false;
+
+    const load = async () => {
+      try {
+        setLoadingProducts(true);
+
+        // Cibler la catégorie PC/laptops si elle existe
+        let categoryId;
+        try {
+          const { data: catData } = await api.get("/categories");
+          const flat = [
+            ...(catData.categories || []),
+            ...(catData.categories || []).flatMap((c) => c.children || []),
+          ];
+          categoryId = flat.find((c) =>
+            PC_CATEGORY_SLUGS.includes((c.slug || "").toLowerCase())
+          )?._id;
+        } catch {
+          // catégories indisponibles : on continue sans filtre catégorie
+        }
+
+        const query = categoryId
+          ? `/products?limit=100&sort=price_asc&category=${categoryId}`
+          : "/products?limit=100&sort=price_asc";
+        const { data } = await api.get(query);
+        const products = (Array.isArray(data) ? data : data.data || []).filter(
+          (p) => typeof p.price === "number"
+        );
+
+        if (!cancelled) {
+          setAllProducts(products);
+          setBrands([
+            ...new Set(products.map((p) => p.brand).filter(Boolean)),
+          ].sort());
+        }
+      } catch (error) {
+        console.error("Erreur lors du chargement des produits:", error);
+        if (!cancelled) {
+          toast.error(error.response?.data?.message || "Impossible de charger les produits");
+        }
+      } finally {
+        if (!cancelled) setLoadingProducts(false);
+      }
+    };
+
+    load();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-const fetchAllProducts = async () => {
-  try {
-    setLoadingProducts(true);
+  const priceRange = useMemo(() => {
+    if (allProducts.length === 0) return null;
+    const prices = allProducts.map((p) => p.price);
+    return { min: Math.min(...prices), max: Math.max(...prices) };
+  }, [allProducts]);
 
-    const { data } = await api.get("/products");
-
-    // si ton backend renvoie { products: [...] }
-    setAllProducts(data.products || data);
-
-  } catch (error) {
-    console.error("Erreur lors du chargement des produits:", error);
-    toast.error(
-      error.response?.data?.message || 
-      "Impossible de charger les produits"
-    );
-  } finally {
-    setLoadingProducts(false);
-  }
-};
-
-  // Étape 1: Usage principal
-  const usageOptions = [
-    {
-      id: "gaming",
-      label: "Gaming",
-      icon: <FaGamepad />,
-      description: "Jeux vidéo haute performance, streaming",
-      color: "from-purple-500 to-pink-500",
-      requirements: ["GPU puissant", "Écran 120Hz+", "Refroidissement efficace"],
-      keywords: ["gaming", "gamer", "rtx", "gtx", "jeu", "legion", "rog", "predator"]
-    },
-    {
-      id: "work",
-      label: "Travail / Bureau",
-      icon: <FaBriefcase />,
-      description: "Bureautique, multitâche, visioconférences",
-      color: "from-blue-500 to-indigo-500",
-      requirements: ["Processeur efficace", "RAM 16GB+", "SSD rapide"],
-      keywords: ["business", "pro", "thinkpad", "latitude", "elitebook", "vostro"]
-    },
-    {
-      id: "creation",
-      label: "Création de contenu",
-      icon: <FaPaintBrush />,
-      description: "Montage vidéo, design graphique, 3D",
-      color: "from-orange-500 to-red-500",
-      requirements: ["GPU pour encodage", "RAM 32GB+", "Écran calibré"],
-      keywords: ["creator", "studio", "precision", "zbook", "quadro", "workstation"]
-    },
-    {
-      id: "student",
-      label: "Étudiant",
-      icon: <FaGraduationCap />,
-      description: "Prise de notes, recherches, léger multimédia",
-      color: "from-green-500 to-teal-500",
-      requirements: ["Autonomie longue", "Portable léger", "Prix abordable"],
-      keywords: ["vivobook", "ideapad", "inspiron", "aspire", "chromebook"]
-    },
-    {
-      id: "multimedia",
-      label: "Multimédia",
-      icon: <FaDesktop />,
-      description: "Netflix, navigation web, réseaux sociaux",
-      color: "from-cyan-500 to-blue-500",
-      requirements: ["Écran qualité", "Audio correct", "Autonomie moyenne"],
-      keywords: ["entertainment", "media", "pavilion"]
-    }
-  ];
-
-  // Étape 2: Budget (dynamique basé sur les prix réels)
-  const budgetRanges = [
-    { min: 0, max: 500000, label: "Moins de 500 000 FCFA", tier: "entry" },
-    { min: 500000, max: 800000, label: "500 000 - 800 000 FCFA", tier: "mid" },
-    { min: 800000, max: 1200000, label: "800 000 - 1 200 000 FCFA", tier: "high" },
-    { min: 1200000, max: 2000000, label: "1 200 000 - 2 000 000 FCFA", tier: "premium" },
-    { min: 2000000, max: 9999999, label: "Plus de 2 000 000 FCFA", tier: "ultra" }
-  ];
-
-  // Étape 3: Préférences (marques dynamiques)
-  const brandOptions = [
-    { id: "any", label: "Pas de préférence" },
-    { id: "hp", label: "HP" },
-    { id: "dell", label: "Dell" },
-    { id: "lenovo", label: "Lenovo" },
-    { id: "asus", label: "Asus" },
-    { id: "acer", label: "Acer" },
-    { id: "msi", label: "MSI" },
-    { id: "apple", label: "Apple (MacBook)" },
-    { id: "microsoft", label: "Microsoft Surface" }
-  ];
-
-  const portabilityOptions = [
-    { id: "very_portable", label: "Très portable (< 1.5kg)", description: "Ultrabook, déplacements fréquents", weight: 1.5 },
-    { id: "portable", label: "Portable (1.5-2.5kg)", description: "Bon équilibre mobilité/performance", weight: 2.5 },
-    { id: "desktop_replacement", label: "Remplace un PC fixe (> 2.5kg)", description: "Performance maximale, peu mobile", weight: 10 }
-  ];
-
-  // Fonction de scoring intelligente
-  const calculateProductScore = (product, config) => {
-    let score = 0;
-    const maxScore = 100;
-
-    // 1. Score de budget (30 points)
-    const price = product.price || 0;
-    if (price >= config.budget.min && price <= config.budget.max) {
-      score += 30;
-    } else if (price < config.budget.min) {
-      score += 15; // Moins cher peut être intéressant
-    } else if (price <= config.budget.max * 1.1) {
-      score += 20; // Légèrement au-dessus du budget
-    }
-
-    // 2. Score d'usage (40 points)
-    const selectedUsage = usageOptions.find(u => u.id === config.usage);
-    if (selectedUsage) {
-      const productName = (product.name || '').toLowerCase();
-      const productDesc = (product.description || '').toLowerCase();
-      const productCategory = (product.category || '').toLowerCase();
-      const combinedText = `${productName} ${productDesc} ${productCategory}`;
-
-      // Vérifier les mots-clés
-      const matchingKeywords = selectedUsage.keywords.filter(keyword => 
-        combinedText.includes(keyword.toLowerCase())
-      );
-      
-      score += (matchingKeywords.length / selectedUsage.keywords.length) * 40;
-
-      // Bonus pour catégorie exacte
-      if (config.usage === "gaming" && productCategory.includes("gaming")) {
-        score += 10;
-      }
-      if (config.usage === "work" && (productCategory.includes("business") || productCategory.includes("pro"))) {
-        score += 10;
-      }
-    }
-
-    // 3. Score de marque (15 points)
-    if (config.preferences.brand && config.preferences.brand !== "any") {
-      const productBrand = (product.brand || product.name || '').toLowerCase();
-      if (productBrand.includes(config.preferences.brand.toLowerCase())) {
-        score += 15;
-      }
-    } else {
-      score += 10; // Bonus si pas de préférence
-    }
-
-    // 4. Score de disponibilité (15 points)
-    if (product.stock > 0) {
-      score += 15;
-    } else if (product.stock === 0) {
-      score -= 20; // Pénalité forte si rupture
-    }
-
-    return Math.min(Math.round(score), maxScore);
-  };
-
-  // Générer les recommandations à partir des vrais produits
   const generateRecommendations = () => {
-    setLoading(true);
-
-    setTimeout(() => {
-      // Filtrer et scorer les produits
-      let filteredProducts = allProducts.filter(product => {
-        // Filtre budget
-        const inBudget = product.price >= config.budget.min && product.price <= config.budget.max * 1.2;
-        
-        // Filtre marque
-        const brandMatch = !config.preferences.brand || 
-                          config.preferences.brand === "any" ||
-                          (product.brand || product.name || '').toLowerCase().includes(config.preferences.brand.toLowerCase());
-        
-        return inBudget && brandMatch;
-      });
-
-      // Calculer le score pour chaque produit
-      const scoredProducts = filteredProducts.map(product => ({
+    const scored = allProducts
+      .map((product) => ({
         ...product,
-        score: calculateProductScore(product, config),
-        matchReason: generateMatchReason(product, config)
-      }));
-
-      // Trier par score et prendre les 5 meilleurs
-      const topRecommendations = scoredProducts
-        .sort((a, b) => b.score - a.score)
-        .slice(0, 5);
-
-      setRecommendations(topRecommendations);
-      setLoading(false);
-    }, 1500);
-  };
-
-  // Générer une explication du match
-  const generateMatchReason = (product, config) => {
-    const reasons = [];
-    
-    if (product.price >= config.budget.min && product.price <= config.budget.max) {
-      reasons.push("Dans votre budget");
-    }
-    
-    const selectedUsage = usageOptions.find(u => u.id === config.usage);
-    if (selectedUsage) {
-      const hasKeyword = selectedUsage.keywords.some(keyword => 
-        (product.name || '').toLowerCase().includes(keyword)
-      );
-      if (hasKeyword) {
-        reasons.push(`Optimisé pour ${selectedUsage.label.toLowerCase()}`);
-      }
-    }
-
-    if (product.stock > 5) {
-      reasons.push("En stock immédiat");
-    }
-
-    return reasons.join(" • ");
+        score: scoreProduct(product, config),
+        reasons: getMatchReasons(product, config),
+      }))
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 6);
+    setRecommendations(scored);
   };
 
   const handleAddToCart = (product) => {
-    dispatch(addToCart({
-      id: product._id || product.id,
-      name: product.name,
-      price: product.price,
-      image: product.images?.[0] || product.image || '/placeholder.jpg',
-      quantity: 1
-    }));
-    toast.success(`${product.name} ajouté au panier !`);
+    dispatch(
+      addToCart({
+        _id: product._id,
+        name: product.name,
+        price: product.price,
+        image: getImageUrl(product),
+        quantity: 1,
+      })
+    );
+    toast.success(`${product.name} ajouté au panier`);
   };
 
   const nextStep = () => {
@@ -279,91 +259,100 @@ const fetchAllProducts = async () => {
       toast.warning("Veuillez sélectionner un usage");
       return;
     }
-    if (currentStep === 2 && config.budget.max === 0) {
-      toast.warning("Veuillez sélectionner un budget");
+    if (currentStep === 2 && !config.budget) {
+      toast.warning("Veuillez sélectionner une tranche de budget");
       return;
     }
-
-    
-    if (currentStep === 3) {
-      generateRecommendations();
-    }
-    
-    setCurrentStep(currentStep + 1);
+    if (currentStep === 3) generateRecommendations();
+    setCurrentStep((s) => s + 1);
   };
 
-  const prevStep = () => {
-    setCurrentStep(Math.max(1, currentStep - 1));
+  const restart = () => {
+    setConfig(emptyConfig);
+    setRecommendations([]);
+    setCurrentStep(1);
   };
 
   if (loadingProducts) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-950 flex items-center justify-center">
         <div className="text-center">
-          <FaSpinner className="animate-spin text-6xl text-blue-600 mx-auto mb-4" />
-          <p className="text-gray-600 text-lg">Chargement des produits...</p>
+          <FaSpinner className="animate-spin text-5xl text-blue-600 mx-auto mb-4" />
+          <p className="text-gray-600 dark:text-gray-300">Chargement du catalogue…</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-950 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
-            🎯 Configurateur Intelligent
-          </h1>
-          <p className="text-xl text-gray-600 mb-6">
-            Trouvez le PC parfait parmi <strong>{allProducts.length} produits</strong> disponibles
-          </p>
 
-          {/* Progress Bar */}
-          <div className="max-w-2xl mx-auto">
-            <div className="flex items-center justify-between mb-2">
-              {[1, 2, 3, 4].map((step) => (
-                <div
-                  key={step}
-                  className={`flex items-center ${step < 4 ? 'flex-1' : ''}`}
-                >
+        {/* ── Header ─────────────────────────────────────────────────── */}
+        <div className="text-center mb-10">
+          <div className="inline-flex items-center justify-center w-16 h-16 bg-blue-100 dark:bg-blue-900/40 rounded-full mb-5">
+            <FaLaptop className="text-3xl text-blue-600 dark:text-blue-400" />
+          </div>
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-3">
+            Configurateur PC
+          </h1>
+          <p className="text-lg text-gray-600 dark:text-gray-400">
+            Décrivez vos besoins, nous sélectionnons les machines adaptées parmi{" "}
+            <strong>{allProducts.length}</strong> modèles disponibles.
+          </p>
+        </div>
+
+        {/* ── Progression ────────────────────────────────────────────── */}
+        <div className="max-w-2xl mx-auto mb-10">
+          <div className="flex items-start">
+            {steps.map((step, index) => (
+              <div key={step.number} className={`flex items-center ${index < steps.length - 1 ? "flex-1" : ""}`}>
+                <div className="flex flex-col items-center">
                   <div
-                    className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
-                      currentStep >= step
+                    className={`w-9 h-9 rounded-full flex items-center justify-center text-sm font-bold transition-colors ${
+                      currentStep > step.number
                         ? "bg-blue-600 text-white"
-                        : "bg-gray-200 text-gray-500"
+                        : currentStep === step.number
+                          ? "bg-blue-600 text-white ring-4 ring-blue-100 dark:ring-blue-900/50"
+                          : "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400"
                     }`}
                   >
-                    {currentStep > step ? <FaCheckCircle /> : step}
+                    {currentStep > step.number ? <FaCheckCircle /> : step.number}
                   </div>
-                  {step < 4 && (
-                    <div
-                      className={`h-1 flex-1 mx-2 ${
-                        currentStep > step ? "bg-blue-600" : "bg-gray-200"
-                      }`}
-                    ></div>
-                  )}
+                  <span
+                    className={`mt-2 text-xs font-medium ${
+                      currentStep >= step.number
+                        ? "text-blue-600 dark:text-blue-400"
+                        : "text-gray-500 dark:text-gray-400"
+                    }`}
+                  >
+                    {step.label}
+                  </span>
                 </div>
-              ))}
-            </div>
-            <div className="flex justify-between text-xs text-gray-600 mt-2">
-              <span>Usage</span>
-              <span>Budget</span>
-              <span>Préférences</span>
-              <span>Résultats</span>
-            </div>
+                {index < steps.length - 1 && (
+                  <div
+                    className={`flex-1 h-0.5 mt-[18px] mx-2 ${
+                      currentStep > step.number
+                        ? "bg-blue-600"
+                        : "bg-gray-200 dark:bg-gray-700"
+                    }`}
+                  />
+                )}
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Main Card */}
-        <div className="bg-white rounded-xl shadow-lg p-8">
-          {/* ÉTAPE 1: USAGE */}
+        {/* ── Carte principale ───────────────────────────────────────── */}
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-100 dark:border-gray-700 p-6 sm:p-8">
+
+          {/* ÉTAPE 1 : USAGE */}
           {currentStep === 1 && (
             <div>
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 text-center">
-                Pour quel usage principal ?
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 text-center">
+                Quel est votre usage principal ?
               </h2>
-              <p className="text-gray-600 text-center mb-8">
+              <p className="text-gray-600 dark:text-gray-400 text-center mb-8">
                 Sélectionnez l'utilisation qui correspond le mieux à vos besoins
               </p>
 
@@ -372,76 +361,74 @@ const fetchAllProducts = async () => {
                   <button
                     key={option.id}
                     onClick={() => setConfig({ ...config, usage: option.id })}
-                    className={`relative p-6 rounded-xl border-2 text-left transition-all hover:scale-105 ${
+                    className={`relative p-5 rounded-xl border-2 text-left transition-all ${
                       config.usage === option.id
-                        ? "border-blue-600 bg-blue-50 shadow-lg"
-                        : "border-gray-200 hover:border-blue-300"
+                        ? "border-blue-600 bg-blue-50 dark:bg-blue-900/30 shadow-md"
+                        : "border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-500"
                     }`}
                   >
-                    <div className={`absolute top-0 left-0 w-full h-1 rounded-t-xl bg-gradient-to-r ${option.color}`}></div>
-                    
                     <div className="flex items-start gap-4">
-                      <div className={`text-4xl bg-gradient-to-r ${option.color} bg-clip-text text-transparent`}>
+                      <div
+                        className={`w-11 h-11 rounded-lg flex items-center justify-center text-xl flex-shrink-0 ${
+                          config.usage === option.id
+                            ? "bg-blue-600 text-white"
+                            : "bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400"
+                        }`}
+                      >
                         {option.icon}
                       </div>
                       <div className="flex-1">
-                        <h3 className="text-xl font-bold text-gray-900 mb-2">{option.label}</h3>
-                        <p className="text-sm text-gray-600 mb-3">{option.description}</p>
-                        <div className="flex flex-wrap gap-2">
-                          {option.requirements.map((req, idx) => (
-                            <span key={idx} className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
-                              {req}
-                            </span>
-                          ))}
-                        </div>
+                        <h3 className="font-bold text-gray-900 dark:text-white mb-1">{option.label}</h3>
+                        <p className="text-sm text-gray-600 dark:text-gray-400">{option.description}</p>
                       </div>
+                      {config.usage === option.id && (
+                        <FaCheckCircle className="text-blue-600 dark:text-blue-400 text-xl flex-shrink-0" />
+                      )}
                     </div>
-
-                    {config.usage === option.id && (
-                      <div className="absolute top-4 right-4">
-                        <FaCheckCircle className="text-blue-600 text-2xl" />
-                      </div>
-                    )}
                   </button>
                 ))}
               </div>
             </div>
           )}
 
-          {/* ÉTAPE 2: BUDGET */}
+          {/* ÉTAPE 2 : BUDGET */}
           {currentStep === 2 && (
             <div>
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 text-center">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 text-center">
                 Quel est votre budget ?
               </h2>
-              <p className="text-gray-600 text-center mb-8">
-                {allProducts.length > 0 && (
-                  <>Prix disponibles : {Math.min(...allProducts.map(p => p.price)).toLocaleString()} - {Math.max(...allProducts.map(p => p.price)).toLocaleString()} FCFA</>
-                )}
+              <p className="text-gray-600 dark:text-gray-400 text-center mb-8">
+                {priceRange
+                  ? `Prix disponibles : ${formatPrice(priceRange.min)} à ${formatPrice(priceRange.max)}`
+                  : "Sélectionnez une tranche"}
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-3xl mx-auto">
                 {budgetRanges.map((range) => {
-                  const productsInRange = allProducts.filter(
-                    p => p.price >= range.min && p.price <= range.max
+                  const count = allProducts.filter(
+                    (p) => p.price >= range.min && p.price <= range.max
                   ).length;
+                  const selected = config.budget?.min === range.min;
 
                   return (
                     <button
-                      key={range.tier}
+                      key={range.label}
                       onClick={() => setConfig({ ...config, budget: range })}
-                      className={`p-6 rounded-lg border-2 text-left transition ${
-                        config.budget.min === range.min
-                          ? "border-blue-600 bg-blue-50"
-                          : "border-gray-200 hover:border-blue-300"
+                      disabled={count === 0}
+                      className={`relative p-5 rounded-xl border-2 text-left transition-all ${
+                        count === 0
+                          ? "opacity-40 cursor-not-allowed border-gray-200 dark:border-gray-700"
+                          : selected
+                            ? "border-blue-600 bg-blue-50 dark:bg-blue-900/30 shadow-md"
+                            : "border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-500"
                       }`}
                     >
-                      <p className="font-bold text-lg text-gray-900 mb-2">{range.label}</p>
-                      <p className="text-sm text-gray-600">
-                        {productsInRange} produit{productsInRange > 1 ? 's' : ''} disponible{productsInRange > 1 ? 's' : ''}
+                      <p className="font-bold text-gray-900 dark:text-white mb-1">{range.label}</p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {count} modèle{count > 1 ? "s" : ""} disponible{count > 1 ? "s" : ""}
                       </p>
-                      {config.budget.min === range.min && (
-                        <FaCheckCircle className="text-blue-600 text-xl mt-2" />
+                      {selected && (
+                        <FaCheckCircle className="absolute top-4 right-4 text-blue-600 dark:text-blue-400 text-lg" />
                       )}
                     </button>
                   );
@@ -450,249 +437,234 @@ const fetchAllProducts = async () => {
             </div>
           )}
 
-          {/* ÉTAPE 3: PRÉFÉRENCES */}
+          {/* ÉTAPE 3 : MARQUE */}
           {currentStep === 3 && (
             <div>
-              <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 text-center">
-                Préférences supplémentaires
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 text-center">
+                Une marque en particulier ?
               </h2>
-              <p className="text-gray-600 text-center mb-8">
-                Affinez votre recherche (optionnel)
+              <p className="text-gray-600 dark:text-gray-400 text-center mb-8">
+                Optionnel — laissez « Pas de préférence » pour voir toutes les marques
               </p>
 
-              <div className="space-y-8">
-                {/* Marque préférée */}
-                <div>
-                  <label className="block text-lg font-semibold text-gray-900 mb-4">
-                    Marque préférée
-                  </label>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                    {brandOptions.map((brand) => (
-                      <button
-                        key={brand.id}
-                        onClick={() => setConfig({ 
-                          ...config, 
-                          preferences: { ...config.preferences, brand: brand.id }
-                        })}
-                        className={`p-3 rounded-lg border-2 font-semibold transition ${
-                          config.preferences.brand === brand.id
-                            ? "border-blue-600 bg-blue-50 text-blue-600"
-                            : "border-gray-200 text-gray-700 hover:border-blue-300"
-                        }`}
-                      >
-                        {brand.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Portabilité */}
-                <div>
-                  <label className="block text-lg font-semibold text-gray-900 mb-4">
-                    Portabilité
-                  </label>
-                  <div className="space-y-3">
-                    {portabilityOptions.map((option) => (
-                      <button
-                        key={option.id}
-                        onClick={() => setConfig({ 
-                          ...config, 
-                          preferences: { ...config.preferences, portability: option.id }
-                        })}
-                        className={`w-full p-4 rounded-lg border-2 text-left transition ${
-                          config.preferences.portability === option.id
-                            ? "border-blue-600 bg-blue-50"
-                            : "border-gray-200 hover:border-blue-300"
-                        }`}
-                      >
-                        <p className="font-semibold text-gray-900 mb-1">{option.label}</p>
-                        <p className="text-sm text-gray-600">{option.description}</p>
-                      </button>
-                    ))}
-                  </div>
-                </div>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-w-3xl mx-auto">
+                <button
+                  onClick={() => setConfig({ ...config, brand: "any" })}
+                  className={`p-3 rounded-xl border-2 font-semibold transition ${
+                    config.brand === "any"
+                      ? "border-blue-600 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                      : "border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-blue-300 dark:hover:border-blue-500"
+                  }`}
+                >
+                  Pas de préférence
+                </button>
+                {brands.map((brand) => (
+                  <button
+                    key={brand}
+                    onClick={() => setConfig({ ...config, brand })}
+                    className={`p-3 rounded-xl border-2 font-semibold transition ${
+                      config.brand === brand
+                        ? "border-blue-600 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400"
+                        : "border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-blue-300 dark:hover:border-blue-500"
+                    }`}
+                  >
+                    {brand}
+                  </button>
+                ))}
               </div>
             </div>
           )}
 
-          {/* ÉTAPE 4: RÉSULTATS */}
+          {/* ÉTAPE 4 : RÉSULTATS */}
           {currentStep === 4 && (
             <div>
-              {loading ? (
-                <div className="text-center py-12">
-                  <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-600 mx-auto mb-4"></div>
-                  <p className="text-gray-600">Analyse de {allProducts.length} produits en cours...</p>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2 text-center">
+                Nos recommandations
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 text-center mb-8">
+                Les {recommendations.length} modèles les mieux adaptés à vos critères
+              </p>
+
+              {recommendations.length === 0 ? (
+                <div className="text-center py-12 bg-gray-50 dark:bg-gray-900 rounded-xl">
+                  <p className="text-lg font-semibold text-gray-800 dark:text-gray-200 mb-2">
+                    Aucun produit ne correspond à vos critères
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-400 mb-6">
+                    Essayez d'élargir votre budget ou de modifier vos critères.
+                  </p>
+                  <button
+                    onClick={restart}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-semibold transition"
+                  >
+                    Recommencer
+                  </button>
                 </div>
               ) : (
-                <>
-                  <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-4 text-center">
-                    🎉 Nos recommandations pour vous
-                  </h2>
-                  <p className="text-gray-600 text-center mb-8">
-                    {recommendations.length > 0 
-                      ? `Voici les ${recommendations.length} meilleurs PC pour ${config.usage}` 
-                      : "Aucun produit ne correspond exactement à vos critères"}
-                  </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {recommendations.map((product, index) => {
+                    const inStock = (product.stock || 0) > 0;
+                    const specChips = [
+                      product.specs?.processor,
+                      product.specs?.ram,
+                      product.specs?.storage,
+                      product.specs?.graphics,
+                    ].filter(Boolean).slice(0, 3);
 
-                  {recommendations.length === 0 ? (
-                    <div className="text-center py-12 bg-gray-50 rounded-lg">
-                      <p className="text-xl text-gray-700 mb-4">😔 Aucun produit trouvé</p>
-                      <p className="text-gray-600 mb-6">
-                        Essayez d'élargir votre budget ou de modifier vos critères
-                      </p>
-                      <button
-                        onClick={() => setCurrentStep(1)}
-                        className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold"
+                    return (
+                      <div
+                        key={product._id}
+                        className={`relative rounded-xl border-2 overflow-hidden flex flex-col ${
+                          index === 0
+                            ? "border-blue-600 shadow-lg"
+                            : "border-gray-200 dark:border-gray-700"
+                        }`}
                       >
-                        Recommencer
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="space-y-6">
-                      {recommendations.map((product, index) => (
-                        <div
-                          key={product._id || product.id}
-                          className={`border-2 rounded-lg p-6 ${
-                            index === 0 ? "border-yellow-400 bg-yellow-50" : "border-gray-200"
-                          }`}
-                        >
-                          {index === 0 && (
-                            <div className="flex items-center gap-2 text-yellow-600 font-bold mb-4">
-                              <span className="text-2xl">🏆</span>
-                              <span>Meilleur choix pour vous</span>
-                            </div>
-                          )}
+                        {index === 0 && (
+                          <div className="bg-blue-600 text-white text-xs font-bold uppercase tracking-wide px-4 py-1.5">
+                            Meilleur choix
+                          </div>
+                        )}
 
-                          <div className="flex flex-col md:flex-row gap-6">
-                            <div className="md:w-1/3">
-                              <img 
-                                src={product.images?.[0] || product.image || '/placeholder.jpg'} 
-                                alt={product.name}
-                                className="w-full aspect-video object-cover rounded-lg mb-4"
-                                onError={(e) => e.target.src = '/placeholder.jpg'}
-                              />
-                              <div className="flex items-center justify-between">
-                                <span className="text-sm text-gray-600">Score de compatibilité</span>
-                                <span className="text-2xl font-bold text-blue-600">{product.score}/100</span>
+                        <div className="flex gap-4 p-5 flex-1">
+                          {/* Image */}
+                          <Link
+                            href={`/products/${product._id}`}
+                            className="w-28 h-28 flex-shrink-0 rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-700"
+                          >
+                            <img
+                              src={getImageUrl(product)}
+                              alt={product.name}
+                              className="w-full h-full object-cover"
+                              loading="lazy"
+                              onError={(e) => { e.target.src = "/placeholder.jpg"; }}
+                            />
+                          </Link>
+
+                          {/* Infos */}
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-2">
+                              <Link href={`/products/${product._id}`}>
+                                <h3 className="font-bold text-gray-900 dark:text-white leading-snug line-clamp-2 hover:text-blue-600 dark:hover:text-blue-400 transition">
+                                  {product.name}
+                                </h3>
+                              </Link>
+                              <span
+                                className={`flex-shrink-0 text-xs font-bold px-2 py-1 rounded-full ${
+                                  product.score >= 70
+                                    ? "bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400"
+                                    : product.score >= 40
+                                      ? "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400"
+                                      : "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                                }`}
+                              >
+                                {product.score}%
+                              </span>
+                            </div>
+
+                            <p className="text-xl font-extrabold text-blue-600 dark:text-blue-400 mt-1.5">
+                              {formatPrice(product.price)}
+                            </p>
+
+                            {specChips.length > 0 && (
+                              <div className="flex flex-wrap gap-1.5 mt-2">
+                                {specChips.map((chip) => (
+                                  <span
+                                    key={chip}
+                                    className="text-xs bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-2 py-0.5 rounded truncate max-w-full"
+                                  >
+                                    {chip}
+                                  </span>
+                                ))}
                               </div>
-                              {product.matchReason && (
-                                <p className="text-xs text-gray-600 mt-2">{product.matchReason}</p>
-                              )}
-                            </div>
+                            )}
 
-                            <div className="md:w-2/3">
-                              <h3 className="text-2xl font-bold text-gray-900 mb-2">{product.name}</h3>
-                              <p className="text-3xl font-bold text-blue-600 mb-2">
-                                {product.price?.toLocaleString()} FCFA
+                            {product.reasons.length > 0 && (
+                              <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                                {product.reasons.join(" · ")}
                               </p>
-                              
-                              {product.stock !== undefined && (
-                                <p className={`text-sm font-semibold mb-4 ${
-                                  product.stock > 0 ? 'text-green-600' : 'text-red-600'
-                                }`}>
-                                  {product.stock > 0 ? `✓ En stock (${product.stock} unités)` : '✗ Rupture de stock'}
-                                </p>
-                              )}
-
-                              {product.description && (
-                                <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                                  {product.description}
-                                </p>
-                              )}
-
-                              {/* Specs si disponibles */}
-                              {product.specs && (
-                                <div className="grid grid-cols-2 gap-3 mb-4">
-                                  {Object.entries(product.specs).slice(0, 4).map(([key, value]) => (
-                                    <div key={key} className="bg-gray-50 rounded p-3">
-                                      <p className="text-xs text-gray-600 capitalize">{key}</p>
-                                      <p className="font-semibold text-sm">{value}</p>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
-
-                              {/* Actions */}
-                              <div className="flex gap-3 mt-4">
-                                <button
-                                  onClick={() => handleAddToCart(product)}
-                                  disabled={product.stock === 0}
-                                  className={`flex-1 py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2 ${
-                                    product.stock > 0
-                                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                  }`}
-                                >
-                                  <FaShoppingCart />
-                                  {product.stock > 0 ? 'Ajouter au panier' : 'Rupture de stock'}
-                                </button>
-                                <button
-                                  onClick={() => navigate(`/products/${product._id || product.id}`)}
-                                  className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold transition"
-                                >
-                                  Voir détails
-                                </button>
-                              </div>
-                            </div>
+                            )}
                           </div>
                         </div>
-                      ))}
-                    </div>
-                  )}
 
-                  {/* Recommencer */}
-                  <div className="text-center mt-8">
-                    <button
-                      onClick={() => {
-                        setCurrentStep(1);
-                        setConfig({ usage: "", budget: { min: 0, max: 0 }, preferences: { brand: "", portability: "" }});
-                        setRecommendations([]);
-                      }}
-                      className="text-blue-600 hover:text-blue-700 font-semibold"
-                    >
-                      🔄 Recommencer la configuration
-                    </button>
-                  </div>
-                </>
+                        {/* Actions */}
+                        <div className="flex gap-3 px-5 pb-5">
+                          <button
+                            onClick={() => handleAddToCart(product)}
+                            disabled={!inStock}
+                            className={`flex-1 py-2.5 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2 ${
+                              inStock
+                                ? "bg-blue-600 hover:bg-blue-700 text-white"
+                                : "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                            }`}
+                          >
+                            <FaShoppingCart />
+                            {inStock ? "Ajouter au panier" : "Rupture de stock"}
+                          </button>
+                          <button
+                            onClick={() => router.push(`/products/${product._id}`)}
+                            className="px-4 py-2.5 rounded-xl font-semibold text-sm bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 transition"
+                          >
+                            Détails
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
+              {recommendations.length > 0 && (
+                <div className="text-center mt-8">
+                  <button
+                    onClick={restart}
+                    className="inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 hover:underline font-semibold"
+                  >
+                    <FaArrowLeft size={12} /> Recommencer la configuration
+                  </button>
+                </div>
               )}
             </div>
           )}
 
-          {/* Navigation Buttons */}
+          {/* ── Navigation ───────────────────────────────────────────── */}
           {currentStep < 4 && (
-            <div className="flex justify-between mt-8 pt-8 border-t">
+            <div className="flex justify-between mt-8 pt-6 border-t border-gray-100 dark:border-gray-700">
               <button
-                onClick={prevStep}
+                onClick={() => setCurrentStep((s) => Math.max(1, s - 1))}
                 disabled={currentStep === 1}
-                className="flex items-center gap-2 px-6 py-3 bg-gray-200 hover:bg-gray-300 disabled:bg-gray-100 disabled:text-gray-400 text-gray-700 rounded-lg font-semibold transition"
+                className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600 disabled:opacity-40 disabled:cursor-not-allowed transition"
               >
-                <FaArrowLeft />
-                Précédent
+                <FaArrowLeft size={13} /> Précédent
               </button>
 
               <button
                 onClick={nextStep}
-                className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold transition"
+                className="flex items-center gap-2 px-6 py-3 rounded-xl font-semibold bg-blue-600 hover:bg-blue-700 text-white transition"
               >
                 {currentStep === 3 ? "Voir les recommandations" : "Suivant"}
-                <FaArrowRight />
+                <FaArrowRight size={13} />
               </button>
             </div>
           )}
         </div>
 
-        {/* Info Box */}
-        <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <div className="flex items-start gap-3">
-            <FaInfoCircle className="text-blue-600 text-2xl flex-shrink-0 mt-1" />
+        {/* ── Aide ─────────────────────────────────────────────────────── */}
+        <div className="mt-8 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6">
+          <div className="flex items-start gap-4">
+            <FaInfoCircle className="text-blue-600 dark:text-blue-400 text-xl flex-shrink-0 mt-0.5" />
             <div>
-              <h3 className="font-bold text-gray-900 mb-2">💡 Besoin d'aide ?</h3>
-              <p className="text-sm text-gray-700 mb-3">
-                Notre configurateur analyse en temps réel <strong>{allProducts.length} produits</strong> disponibles 
-                pour vous proposer les meilleurs PC adaptés à vos besoins.
-              </p>
-              <p className="text-sm text-gray-700">
-                Contactez nos experts au <strong>+221 33 823 45 67</strong> ou via WhatsApp pour un conseil personnalisé.
+              <h3 className="font-bold text-gray-900 dark:text-white mb-1">Besoin d'aide ?</h3>
+              <p className="text-sm text-gray-700 dark:text-gray-300">
+                Nos experts vous conseillent au{" "}
+                <a href="tel:+221786346946" className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">
+                  +221 78 634 69 46
+                </a>{" "}
+                ou via notre{" "}
+                <Link href="/contact" className="font-semibold text-blue-600 dark:text-blue-400 hover:underline">
+                  page contact
+                </Link>
+                .
               </p>
             </div>
           </div>
@@ -703,4 +675,3 @@ const fetchAllProducts = async () => {
 };
 
 export default Configurator;
-
