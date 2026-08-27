@@ -82,7 +82,7 @@ img {
 
 /* Fallback system fonts pendant le chargement custom fonts */
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-family: "Inter", -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -164,6 +164,32 @@ body {
 /* Ne pas transitionner les transforms (perfs) */
 *:hover, *:active {
   transition-property: background-color, border-color, color, fill, stroke, opacity, box-shadow;
+}
+
+/* ────────────────────────────────────────────────────────
+   10b. DESIGN SYSTEM — utilitaires de marque
+   ──────────────────────────────────────────────────────── */
+
+/* Typographie display (titres de sections) */
+.font-display { font-family: "Sora", "Inter", system-ui, sans-serif; }
+
+/* Titre de section standardisé (desktop + mobile) */
+.section-title {
+  @apply font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight;
+}
+
+.section-eyebrow {
+  @apply inline-flex items-center gap-2 text-[11px] sm:text-xs font-bold uppercase tracking-[0.18em] text-brand-600 dark:text-brand-400;
+}
+
+/* Container large standardisé */
+.container-tk {
+  @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+}
+
+/* Carte produit — cohérence visuelle */
+.tk-card {
+  @apply bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700/60 shadow-soft;
 }
 
 /* ────────────────────────────────────────────────────────

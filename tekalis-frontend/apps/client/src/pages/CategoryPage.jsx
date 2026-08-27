@@ -228,7 +228,7 @@ const CategoryPage = () => {
     return (
       <div className="min-h-screen flex items-center justify-center mt-20">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-600 mx-auto mb-4" />
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-brand-600 mx-auto mb-4" />
           <p className="text-gray-600">Chargement des produits...</p>
         </div>
       </div>
@@ -261,20 +261,20 @@ const CategoryPage = () => {
         />
 
         {/* ── HERO SEO (visible + indexable) ───────────────────────────── */}
-        <div className="bg-white rounded-xl shadow-sm p-6 md:p-8 mb-8 border border-gray-100">
+        <div className="bg-white rounded-2xl shadow-soft p-6 md:p-8 mb-8 border border-gray-100">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
             <div>
               {/* H1 avec mots-clés — CRITIQUE pour le SEO */}
-              <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-gray-900 mb-2">
                 {seo.h1}
-                <span className="text-blue-600"> à Dakar</span>
+                <span className="text-brand-600"> à Dakar</span>
               </h1>
               <p className="text-gray-600 text-sm md:text-base leading-relaxed max-w-2xl">
                 {seo.description}
               </p>
             </div>
-            <div className="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-lg shrink-0">
-              <span className="text-2xl font-bold text-blue-600">{filteredProducts.length}</span>
+            <div className="flex items-center gap-2 bg-brand-50 px-4 py-2 rounded-xl shrink-0">
+              <span className="text-2xl font-bold text-brand-600">{filteredProducts.length}</span>
               <span className="text-gray-600 text-sm">produit{filteredProducts.length > 1 ? 's' : ''}</span>
             </div>
           </div>
@@ -285,7 +285,7 @@ const CategoryPage = () => {
               <FaTruck size={12} />
               <span>Livraison rapide Dakar</span>
             </div>
-            <div className="flex items-center gap-2 text-sm text-blue-700 bg-blue-50 px-3 py-1.5 rounded-full">
+            <div className="flex items-center gap-2 text-sm text-brand-700 bg-brand-50 px-3 py-1.5 rounded-full">
               <FaShieldAlt size={12} />
               <span>Garantie constructeur</span>
             </div>
@@ -300,8 +300,8 @@ const CategoryPage = () => {
 
           {/* ── FILTRES SIDEBAR ───────────────────────────────────────── */}
           <aside className={`lg:w-60 flex-shrink-0 ${showFilters ? "block" : "hidden lg:block"}`}>
-            <div className="bg-white rounded-xl shadow-sm p-5 sticky top-24 border border-gray-100">
-              <h2 className="text-base font-bold text-gray-900 mb-4">Filtres</h2>
+            <div className="bg-white rounded-2xl shadow-soft p-5 sticky top-24 border border-gray-100">
+              <h2 className="text-base font-display font-bold text-gray-900 mb-4">Filtres</h2>
 
               {/* Prix */}
               <div className="mb-5">
@@ -312,14 +312,14 @@ const CategoryPage = () => {
                     placeholder="Min"
                     value={filters.minPrice}
                     onChange={(e) => setFilters((p) => ({ ...p, minPrice: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-600/20 focus:border-brand-600"
                   />
                   <input
                     type="number"
                     placeholder="Max"
                     value={filters.maxPrice}
                     onChange={(e) => setFilters((p) => ({ ...p, maxPrice: e.target.value }))}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-600/20 focus:border-brand-600"
                   />
                 </div>
               </div>
@@ -330,12 +330,12 @@ const CategoryPage = () => {
                   <p className="text-sm font-semibold text-gray-700 mb-2">Marque</p>
                   <div className="space-y-1.5 max-h-48 overflow-y-auto">
                     {availableBrands.map((brand) => (
-                      <label key={brand} className="flex items-center gap-2 cursor-pointer text-sm text-gray-700 hover:text-blue-600">
+                      <label key={brand} className="flex items-center gap-2 cursor-pointer text-sm text-gray-700 hover:text-brand-600">
                         <input
                           type="checkbox"
                           checked={filters.brands.includes(brand)}
                           onChange={() => toggleBrand(brand)}
-                          className="rounded text-blue-600"
+                          className="rounded text-brand-600"
                         />
                         {brand}
                       </label>
@@ -350,7 +350,7 @@ const CategoryPage = () => {
                 <select
                   value={filters.sort}
                   onChange={(e) => setFilters((p) => ({ ...p, sort: e.target.value }))}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand-600/20 focus:border-brand-600"
                 >
                   <option value="newest">Plus récents</option>
                   <option value="price-asc">Prix croissant</option>
@@ -363,7 +363,7 @@ const CategoryPage = () => {
               {(filters.minPrice || filters.maxPrice || filters.brands.length > 0) && (
                 <button
                   onClick={() => setFilters({ minPrice: "", maxPrice: "", brands: [], sort: "newest" })}
-                  className="mt-4 w-full text-sm text-red-600 hover:text-red-700 font-semibold"
+                  className="mt-4 w-full min-h-[44px] text-sm text-red-600 hover:text-red-700 font-semibold"
                 >
                   Réinitialiser les filtres
                 </button>
@@ -375,10 +375,10 @@ const CategoryPage = () => {
           <main className="flex-1">
 
             {/* Barre d'outils */}
-            <div className="bg-white rounded-xl shadow-sm p-4 mb-4 flex items-center justify-between border border-gray-100">
+            <div className="bg-white rounded-2xl shadow-soft p-3 sm:p-4 mb-4 flex items-center justify-between border border-gray-100 gap-3">
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="lg:hidden bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold text-sm flex items-center gap-2"
+                className="lg:hidden bg-brand-600 hover:bg-brand-700 text-white px-4 min-h-[44px] rounded-xl font-semibold text-sm flex items-center gap-2"
               >
                 <FaFilter size={12} />
                 Filtres
@@ -386,11 +386,11 @@ const CategoryPage = () => {
               <p className="text-sm text-gray-600 hidden lg:block">
                 <span className="font-semibold text-gray-900">{filteredProducts.length}</span> produit{filteredProducts.length > 1 ? "s" : ""}
               </p>
-              <div className="flex gap-2">
-                <button onClick={() => setViewMode("grid")} className={`p-2 rounded ${viewMode === "grid" ? "bg-blue-600 text-white" : "text-gray-500 hover:bg-gray-100"}`}>
+              <div className="flex gap-1.5 bg-gray-100 rounded-xl p-1.5 ml-auto lg:ml-0">
+                <button onClick={() => setViewMode("grid")} aria-label="Vue grille" className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg transition ${viewMode === "grid" ? "bg-brand-600 text-white shadow-soft" : "text-gray-500 hover:bg-gray-200"}`}>
                   <FaThLarge size={14} />
                 </button>
-                <button onClick={() => setViewMode("list")} className={`p-2 rounded ${viewMode === "list" ? "bg-blue-600 text-white" : "text-gray-500 hover:bg-gray-100"}`}>
+                <button onClick={() => setViewMode("list")} aria-label="Vue liste" className={`min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg transition ${viewMode === "list" ? "bg-brand-600 text-white shadow-soft" : "text-gray-500 hover:bg-gray-200"}`}>
                   <FaList size={14} />
                 </button>
               </div>
@@ -398,14 +398,14 @@ const CategoryPage = () => {
 
             {/* Produits */}
             {filteredProducts.length === 0 ? (
-              <div className="bg-white rounded-xl shadow-sm p-12 text-center border border-gray-100">
+              <div className="bg-white rounded-2xl shadow-soft p-12 text-center border border-gray-100">
                 <div className="text-5xl mb-4">🔍</div>
-                <h3 className="text-lg font-bold text-gray-900 mb-2">Aucun produit trouvé</h3>
-                <p className="text-gray-600 mb-6">Essayez de modifier vos filtres ou <Link to="/products" className="text-blue-600 hover:underline">voir tous les produits</Link></p>
+                <h3 className="text-lg font-display font-bold text-gray-900 mb-2">Aucun produit trouvé</h3>
+                <p className="text-gray-600 mb-6">Essayez de modifier vos filtres ou <Link to="/products" className="text-brand-600 hover:underline font-semibold">voir tous les produits</Link></p>
               </div>
             ) : (
               <div className={viewMode === "grid"
-                ? "grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4"
+                ? "grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4"
                 : "space-y-4"
               }>
                 {filteredProducts.map((product) => (
@@ -416,8 +416,8 @@ const CategoryPage = () => {
 
             {/* ── CONTENU TEXTUEL SEO (bas de page, indexable) ─────────── */}
             {seo.descriptionLong && (
-              <div className="mt-8 bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                <h2 className="text-lg font-bold text-gray-900 mb-3">
+              <div className="mt-8 bg-white rounded-2xl shadow-soft p-6 border border-gray-100">
+                <h2 className="text-lg font-display font-bold text-gray-900 mb-3">
                   {seo.h1} au Sénégal — Pourquoi choisir Tekalis ?
                 </h2>
                 <p className="text-gray-600 text-sm leading-relaxed">
@@ -428,8 +428,8 @@ const CategoryPage = () => {
 
             {/* ── FAQ SEO ───────────────────────────────────────────────── */}
             {seo.faqs && seo.faqs.length > 0 && (
-              <div className="mt-6 bg-white rounded-xl shadow-sm p-6 border border-gray-100">
-                <h2 className="text-lg font-bold text-gray-900 mb-4">Questions fréquentes</h2>
+              <div className="mt-6 bg-white rounded-2xl shadow-soft p-6 border border-gray-100">
+                <h2 className="text-lg font-display font-bold text-gray-900 mb-4">Questions fréquentes</h2>
                 <div className="space-y-4">
                   {seo.faqs.map((faq, index) => (
                     <div key={index} className="border-b border-gray-100 pb-4 last:border-0 last:pb-0">

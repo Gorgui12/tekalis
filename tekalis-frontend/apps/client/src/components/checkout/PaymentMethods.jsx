@@ -37,8 +37,8 @@ const PaymentMethods = ({ onPay, totalAmount = 0, loading = false }) => {
 
       {/* ── Titre ─────────────────────────────────────────────────────── */}
       <div>
-        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1 flex items-center gap-2">
-          <FaMoneyBillWave className="text-green-600" />
+        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1 flex items-center gap-2 font-display">
+          <FaMoneyBillWave className="text-brand-600" />
           Mode de paiement
         </h3>
         <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -47,20 +47,20 @@ const PaymentMethods = ({ onPay, totalAmount = 0, loading = false }) => {
       </div>
 
       {/* ── Carte paiement livraison ───────────────────────────────────── */}
-      <div className="border-2 border-green-500 bg-green-50 dark:bg-green-900/20 rounded-xl p-5">
+      <div className="border-2 border-brand-500 bg-brand-50 dark:bg-brand-900/20 rounded-xl p-5">
         <div className="flex items-start gap-4">
           {/* Icône */}
-          <div className="w-14 h-14 bg-green-100 dark:bg-green-900/40 rounded-xl flex items-center justify-center flex-shrink-0 text-2xl shadow-sm">
+          <div className="w-14 h-14 bg-white dark:bg-gray-900 rounded-xl flex items-center justify-center flex-shrink-0 text-2xl shadow-sm">
             💵
           </div>
 
           {/* Texte */}
-          <div className="flex-1">
-            <div className="flex items-center gap-2 mb-1">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
               <p className="font-bold text-gray-900 dark:text-white">
                 Paiement à la livraison
               </p>
-              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400">
+              <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-brand-100 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300">
                 Disponible
               </span>
             </div>
@@ -70,8 +70,8 @@ const PaymentMethods = ({ onPay, totalAmount = 0, loading = false }) => {
           </div>
 
           {/* Radio indicator */}
-          <div className="w-5 h-5 rounded-full border-2 border-green-500 bg-green-500 flex items-center justify-center flex-shrink-0 mt-1">
-            <div className="w-2 h-2 bg-white rounded-full" />
+          <div className="w-6 h-6 rounded-full border-2 border-brand-500 bg-brand-500 flex items-center justify-center flex-shrink-0 mt-1">
+            <div className="w-2.5 h-2.5 bg-white rounded-full" />
           </div>
         </div>
       </div>
@@ -115,7 +115,7 @@ const PaymentMethods = ({ onPay, totalAmount = 0, loading = false }) => {
       </div>
 
       {/* ── Confirmation ──────────────────────────────────────────────── */}
-      <label className="flex items-start gap-3 cursor-pointer group">
+      <label className="flex items-start gap-3 cursor-pointer group p-2 -m-2 min-h-[44px]">
         <div className="relative mt-0.5">
           <input
             type="checkbox"
@@ -127,13 +127,13 @@ const PaymentMethods = ({ onPay, totalAmount = 0, loading = false }) => {
             className="sr-only"
           />
           <div
-            className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
+            className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${
               confirmed
-                ? "border-green-500 bg-green-500"
-                : "border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 group-hover:border-green-400"
+                ? "border-brand-500 bg-brand-500"
+                : "border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 group-hover:border-brand-400"
             }`}
           >
-            {confirmed && <FaCheckCircle className="text-white text-xs" />}
+            {confirmed && <FaCheckCircle className="text-white text-sm" />}
           </div>
         </div>
         <span className="text-sm text-gray-700 dark:text-gray-300 leading-snug">

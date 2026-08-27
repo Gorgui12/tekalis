@@ -204,24 +204,24 @@ const Profile = () => {
     ${formErrors[field] 
       ? 'border-red-500 bg-red-50 focus:border-red-500' 
       : editMode 
-        ? 'border-gray-200 focus:border-blue-500' 
+        ? 'border-gray-200 focus:border-brand-500' 
         : 'border-gray-100 bg-gray-50'
     }
     ${!editMode && 'cursor-not-allowed'}
-    focus:outline-none
+    focus:outline-none focus:ring-2 focus:ring-brand-500/40
   `;
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4 max-w-4xl">
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-xl p-8 mb-8 text-white">
+        <div className="bg-gradient-to-r from-brand-600 to-purple-600 rounded-2xl shadow-card p-8 mb-8 text-white">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-6">
-              <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center text-4xl font-bold text-blue-600">
+              <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center text-4xl font-bold text-brand-600">
                 {userData.name?.charAt(0).toUpperCase()}
               </div>
               <div>
-                <h1 className="text-3xl font-bold mb-2">{userData.name}</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold mb-2 font-display">{userData.name}</h1>
                 <p className="opacity-90">{userData.email}</p>
                 <span className="inline-block mt-2 px-3 py-1 bg-white bg-opacity-20 rounded-full text-sm font-semibold">
                   {userData.role === 'admin' ? "👑 Administrateur" : "👤 Client"}
@@ -249,7 +249,7 @@ const Profile = () => {
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex-1 flex items-center justify-center gap-2 py-4 font-semibold transition ${
                   activeTab === tab.id
-                    ? "text-blue-600 border-b-2 border-blue-600"
+                    ? "text-brand-600 border-b-2 border-brand-600"
                     : "text-gray-600 hover:text-gray-900"
                 }`}
                 aria-current={activeTab === tab.id ? 'page' : undefined}
@@ -264,7 +264,7 @@ const Profile = () => {
           {activeTab === "info" && (
             <div>
               <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
-                <h2 className="text-2xl font-bold text-gray-900">
+                <h2 className="text-2xl font-bold text-gray-900 font-display">
                   Informations personnelles
                 </h2>
                 {!editMode ? (
@@ -392,7 +392,7 @@ const Profile = () => {
 
           {activeTab === "security" && (
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6 font-display">
                 Sécurité du compte
               </h2>
               
@@ -408,7 +408,7 @@ const Profile = () => {
                     className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none transition ${
                       passwordErrors.currentPassword 
                         ? 'border-red-500 bg-red-50' 
-                        : 'border-gray-200 focus:border-blue-500'
+                        : 'border-gray-200 focus:border-brand-500'
                     }`}
                   />
                   {/* ✅ AJOUTÉ */}
@@ -430,7 +430,7 @@ const Profile = () => {
                     className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none transition ${
                       passwordErrors.newPassword 
                         ? 'border-red-500 bg-red-50' 
-                        : 'border-gray-200 focus:border-blue-500'
+                        : 'border-gray-200 focus:border-brand-500'
                     }`}
                   />
                   {/* ✅ AJOUTÉ */}
@@ -452,7 +452,7 @@ const Profile = () => {
                     type="password"
                     value={passwordData.confirmPassword}
                     onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition"
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-brand-500 transition"
                   />
                 </div>
 
@@ -470,7 +470,7 @@ const Profile = () => {
 
           {activeTab === "notifications" && (
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6 font-display">
                 Préférences de notifications
               </h2>
               
@@ -483,7 +483,7 @@ const Profile = () => {
                   <input 
                     type="checkbox" 
                     defaultChecked 
-                    className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500" 
+                    className="w-5 h-5 text-brand-600 rounded focus:ring-2 focus:ring-brand-500" 
                   />
                 </label>
 
@@ -495,7 +495,7 @@ const Profile = () => {
                   <input 
                     type="checkbox" 
                     defaultChecked 
-                    className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500" 
+                    className="w-5 h-5 text-brand-600 rounded focus:ring-2 focus:ring-brand-500" 
                   />
                 </label>
 
@@ -506,7 +506,7 @@ const Profile = () => {
                   </div>
                   <input 
                     type="checkbox" 
-                    className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500" 
+                    className="w-5 h-5 text-brand-600 rounded focus:ring-2 focus:ring-brand-500" 
                   />
                 </label>
               </div>

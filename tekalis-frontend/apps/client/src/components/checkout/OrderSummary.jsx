@@ -17,16 +17,16 @@ const OrderSummary = ({ deliveryFee = 0, promoDiscount = 0, promoCode = "" }) =>
   const total = subtotal - discountAmount + deliveryFee;
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 sticky top-24">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card p-6 lg:sticky lg:top-24">
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
-        <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2">
-          <FaShoppingCart className="text-blue-600" />
+        <h3 className="text-lg font-bold text-gray-900 dark:text-white flex items-center gap-2 font-display">
+          <FaShoppingCart className="text-brand-600" />
           Récapitulatif
         </h3>
         <Link
           to="/cart"
-          className="text-xs text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+          className="text-xs text-brand-600 dark:text-brand-400 hover:underline flex items-center gap-1"
         >
           <FaEdit size={11} />
           Modifier
@@ -102,7 +102,7 @@ const OrderSummary = ({ deliveryFee = 0, promoDiscount = 0, promoCode = "" }) =>
           <div className="flex items-center justify-between">
             <span className="font-bold text-gray-900 dark:text-white">Total</span>
             <div className="text-right">
-              <p className="text-xl font-bold text-blue-600 dark:text-blue-400">
+              <p className="text-xl font-bold text-brand-600 dark:text-brand-400">
                 {total.toLocaleString()} FCFA
               </p>
             </div>

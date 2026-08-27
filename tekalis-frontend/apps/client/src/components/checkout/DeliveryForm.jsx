@@ -21,7 +21,7 @@ const DELIVERY_MODES = [
     price: 0,
     priceLabel: "Gratuit",
     icon: <FaTruck />,
-    color: "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+    iconColor: "text-brand-600"
   },
   {
     id: "express",
@@ -30,7 +30,7 @@ const DELIVERY_MODES = [
     price: 2500,
     priceLabel: "2 500 FCFA",
     icon: <FaMotorcycle />,
-    color: "border-orange-500 bg-orange-50 dark:bg-orange-900/20"
+    iconColor: "text-orange-600"
   }
 ];
 
@@ -95,8 +95,8 @@ const DeliveryForm = ({ onNext, savedAddresses = [], loading = false }) => {
 
       {/* ─── Adresse de livraison ────────────────────────────────────────── */}
       <div>
-        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-          <FaMapMarkerAlt className="text-blue-600" />
+        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2 font-display">
+          <FaMapMarkerAlt className="text-brand-600" />
           Adresse de livraison
         </h3>
 
@@ -124,12 +124,12 @@ const DeliveryForm = ({ onNext, savedAddresses = [], loading = false }) => {
               onClick={() => setMode("new")}
               className={`w-full flex items-center gap-3 p-4 rounded-xl border-2 border-dashed transition ${
                 mode === "new"
-                  ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                  : "border-gray-300 dark:border-gray-600 hover:border-blue-400"
+                  ? "border-brand-500 bg-brand-50 dark:bg-brand-900/20"
+                  : "border-gray-300 dark:border-gray-600 hover:border-brand-400"
               }`}
             >
-              <div className="w-9 h-9 bg-blue-100 dark:bg-blue-900/40 rounded-lg flex items-center justify-center">
-                <FaPlus className="text-blue-600" />
+              <div className="w-10 h-10 bg-brand-100 dark:bg-brand-900/40 rounded-lg flex items-center justify-center">
+                <FaPlus className="text-brand-600" />
               </div>
               <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                 Utiliser une nouvelle adresse
@@ -154,8 +154,8 @@ const DeliveryForm = ({ onNext, savedAddresses = [], loading = false }) => {
 
       {/* ─── Mode de livraison ───────────────────────────────────────────── */}
       <div>
-        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-          <FaTruck className="text-blue-600" />
+        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2 font-display">
+          <FaTruck className="text-brand-600" />
           Mode de livraison
         </h3>
         <div className="space-y-3">
@@ -163,20 +163,20 @@ const DeliveryForm = ({ onNext, savedAddresses = [], loading = false }) => {
             <button
               key={dm.id}
               onClick={() => setDeliveryMode(dm.id)}
-              className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 text-left transition-all ${
+              className={`w-full min-h-[72px] flex items-center gap-4 px-4 py-3 rounded-xl border-2 text-left transition-all ${
                 deliveryMode === dm.id
-                  ? dm.color + " border-opacity-100 shadow-sm"
+                  ? "border-brand-500 bg-brand-50 dark:bg-brand-900/20 shadow-sm"
                   : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-300"
               }`}
             >
               <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 text-xl ${
-                deliveryMode === dm.id ? "bg-white dark:bg-gray-800 shadow" : "bg-gray-100 dark:bg-gray-700 text-gray-500"
-              } ${deliveryMode === dm.id && dm.id === "express" ? "text-orange-600" : ""}
-                ${deliveryMode === dm.id && dm.id === "standard" ? "text-blue-600" : ""}
-              `}>
+                deliveryMode === dm.id
+                  ? "bg-white dark:bg-gray-800 shadow " + dm.iconColor
+                  : "bg-gray-100 dark:bg-gray-700 text-gray-500"
+              }`}>
                 {dm.icon}
               </div>
-              <div className="flex-1">
+              <div className="flex-1 min-w-0">
                 <p className="font-semibold text-gray-900 dark:text-white text-sm">
                   {dm.label}
                 </p>

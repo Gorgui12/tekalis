@@ -137,7 +137,7 @@ const ClientDashboard = () => {
 
         {/* En-tête */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-1">
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-1 font-display">
             Bonjour, {user?.name} 👋
           </h1>
           <p className="text-gray-600">
@@ -150,12 +150,12 @@ const ClientDashboard = () => {
 
         {/* Dernière commande */}
         {!loading && lastOrder && (
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-700 rounded-xl shadow-lg p-6 mb-8 text-white">
+          <div className="bg-gradient-to-r from-brand-600 to-indigo-700 rounded-xl shadow-card p-6 mb-8 text-white">
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
               <div>
                 <div className="flex items-center gap-2 mb-2">
                   <FaTruck className="text-2xl" />
-                  <h3 className="text-xl font-bold">Dernière commande</h3>
+                  <h3 className="text-xl font-bold font-display">Dernière commande</h3>
                 </div>
                 <p className="text-blue-100 mb-2">
                   Commande #{lastOrder._id?.slice(-8).toUpperCase()} &middot;{" "}
@@ -178,7 +178,7 @@ const ClientDashboard = () => {
               </div>
               <Link
                 to={`/orders/${lastOrder._id}`}
-                className="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition"
+                className="bg-white text-brand-600 px-6 py-3 rounded-xl font-semibold hover:bg-brand-50 transition w-full sm:w-auto text-center"
               >
                 Voir les détails →
               </Link>
@@ -191,7 +191,7 @@ const ClientDashboard = () => {
           {/* Menu d'actions rapides */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl shadow-md p-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">
+              <h3 className="text-lg font-bold text-gray-900 mb-4 font-display">
                 Actions rapides
               </h3>
               <div className="space-y-2">
@@ -199,7 +199,7 @@ const ClientDashboard = () => {
                   <Link
                     key={item.to}
                     to={item.to}
-                    className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition group"
+                    className="flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 transition group"
                   >
                     <div className={`rounded-full p-2 transition ${colorMap[item.color]}`}>
                       {item.icon}
@@ -219,10 +219,10 @@ const ClientDashboard = () => {
             <RecentOrders orders={recentOrders} loading={ordersLoading} />
 
             {/* Programme fidélité */}
-            <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl shadow-lg p-6 text-white">
+            <div className="bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl shadow-card p-6 text-white">
               <div className="flex items-center justify-between mb-4">
                 <div>
-                  <h3 className="text-xl font-bold mb-1">Programme fidélité</h3>
+                  <h3 className="text-xl font-bold mb-1 font-display">Programme fidélité</h3>
                   <p className="text-purple-100 text-sm">Gagnez des points à chaque achat !</p>
                 </div>
                 <div className="bg-white/20 rounded-full p-4">

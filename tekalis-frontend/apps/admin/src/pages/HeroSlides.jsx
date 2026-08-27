@@ -64,6 +64,22 @@ const SlidePreview = ({ slide }) => (
   </div>
 );
 
+/* ── Champ de formulaire ───────────────────────────────────────────────────── */
+const Input = ({ label, value, onChange, placeholder, type = 'text', required }) => (
+  <div>
+    <label className="block text-xs font-semibold text-gray-400 mb-1.5">
+      {label}{required && <span className="text-red-400 ml-1">*</span>}
+    </label>
+    <input
+      type={type}
+      value={value}
+      onChange={e => onChange(e.target.value)}
+      placeholder={placeholder}
+      className="w-full h-9 px-3 text-sm rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-gray-600 focus:outline-none focus:border-blue-500/60 transition"
+    />
+  </div>
+);
+
 /* ── Formulaire d'édition ─────────────────────────────────────────────────── */
 const SlideForm = ({ slide, onSave, onCancel, isNew }) => {
   const [form, setForm] = useState(slide);
@@ -109,21 +125,6 @@ const SlideForm = ({ slide, onSave, onCancel, isNew }) => {
   const removeStat = (idx) => {
     setForm(p => ({ ...p, stats: p.stats.filter((_, i) => i !== idx) }));
   };
-
-  const Input = ({ label, value, onChange, placeholder, type = 'text', required }) => (
-    <div>
-      <label className="block text-xs font-semibold text-gray-400 mb-1.5">
-        {label}{required && <span className="text-red-400 ml-1">*</span>}
-      </label>
-      <input
-        type={type}
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="w-full h-9 px-3 text-sm rounded-lg bg-white/5 border border-white/10 text-white placeholder:text-gray-600 focus:outline-none focus:border-blue-500/60 transition"
-      />
-    </div>
-  );
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">

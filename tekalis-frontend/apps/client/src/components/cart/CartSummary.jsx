@@ -33,8 +33,8 @@ const CartSummary = ({ onCheckout }) => {
   if (items.length === 0) return null;
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 sticky top-24 space-y-5">
-      <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-card p-6 lg:sticky lg:top-24 space-y-5">
+      <h3 className="text-lg font-bold text-gray-900 dark:text-white font-display">
         Récapitulatif
       </h3>
 
@@ -77,7 +77,7 @@ const CartSummary = ({ onCheckout }) => {
         <div className="flex items-center justify-between">
           <span className="font-bold text-gray-900 dark:text-white">Total estimé</span>
           <div className="text-right">
-            <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+            <p className="text-2xl font-bold text-brand-600 dark:text-brand-400">
               {total.toLocaleString()} FCFA
             </p>
           </div>

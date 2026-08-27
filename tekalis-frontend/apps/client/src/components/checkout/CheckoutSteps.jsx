@@ -28,19 +28,19 @@ const CheckoutSteps = ({ currentStep = 1 }) => {
                 {/* Circle */}
                 <div
                   className={`
-                    w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold transition-all
+                    w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center text-base sm:text-lg font-bold transition-all
                     ${isDone    ? "bg-green-500 text-white shadow-md shadow-green-200"  : ""}
-                    ${isActive  ? "bg-blue-600 text-white shadow-md shadow-blue-200 ring-4 ring-blue-100" : ""}
+                    ${isActive  ? "bg-brand-600 text-white shadow-md shadow-brand-200 ring-4 ring-brand-100" : ""}
                     ${isPending ? "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400" : ""}
                   `}
                 >
-                  {isDone ? <FaCheckCircle /> : step.icon}
+                  {isDone ? <FaCheckCircle /> : step.number}
                 </div>
 
                 {/* Labels */}
                 <div className="mt-2 text-center">
-                  <p className={`text-sm font-semibold transition ${
-                    isActive  ? "text-blue-600 dark:text-blue-400" :
+                  <p className={`text-xs sm:text-sm font-semibold transition whitespace-nowrap ${
+                    isActive  ? "text-brand-600 dark:text-brand-400" :
                     isDone    ? "text-green-600 dark:text-green-400" :
                     "text-gray-500 dark:text-gray-400"
                   }`}>
@@ -54,7 +54,7 @@ const CheckoutSteps = ({ currentStep = 1 }) => {
 
               {/* Connecteur */}
               {index < STEPS.length - 1 && (
-                <div className={`w-24 lg:w-32 h-1 mx-3 rounded-full transition-all ${
+                <div className={`w-12 lg:w-32 h-1 mx-2 lg:mx-3 rounded-full transition-all ${
                   currentStep > step.number
                     ? "bg-green-400"
                     : "bg-gray-200 dark:bg-gray-700"
@@ -71,13 +71,13 @@ const CheckoutSteps = ({ currentStep = 1 }) => {
           <p className="text-sm font-semibold text-gray-900 dark:text-white">
             Étape {currentStep} sur {STEPS.length}
           </p>
-          <p className="text-sm text-blue-600 dark:text-blue-400 font-semibold">
+          <p className="text-sm text-brand-600 dark:text-brand-400 font-semibold">
             {STEPS[currentStep - 1]?.label}
           </p>
         </div>
         <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
           <div
-            className="h-full bg-blue-600 rounded-full transition-all duration-500"
+            className="h-full bg-brand-600 rounded-full transition-all duration-500"
             style={{ width: `${((currentStep) / STEPS.length) * 100}%` }}
           />
         </div>

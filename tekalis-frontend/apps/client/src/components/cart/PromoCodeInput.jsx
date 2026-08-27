@@ -84,10 +84,10 @@ const PromoCodeInput = ({ onApplied, onRemoved, appliedCode = "" }) => {
             onKeyDown={handleKeyDown}
             placeholder="Code promo"
             maxLength={20}
-            className={`w-full pl-9 pr-4 py-2.5 border rounded-lg text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 transition ${
+            className={`w-full pl-9 pr-4 py-3 border-2 rounded-xl text-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 transition ${
               error
                 ? "border-red-400 focus:ring-red-400"
-                : "border-gray-300 dark:border-gray-600 focus:ring-blue-500"
+                : "border-gray-300 dark:border-gray-600 focus:ring-brand-500 focus:border-brand-500"
             }`}
           />
         </div>
@@ -95,7 +95,7 @@ const PromoCodeInput = ({ onApplied, onRemoved, appliedCode = "" }) => {
         <button
           onClick={handleApply}
           disabled={loading || !code.trim()}
-          className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white text-sm font-semibold rounded-lg transition flex items-center gap-2 flex-shrink-0"
+          className="px-4 py-3 bg-brand-600 hover:bg-brand-700 disabled:bg-gray-300 dark:disabled:bg-gray-700 text-white text-sm font-semibold rounded-xl transition flex items-center gap-2 flex-shrink-0"
         >
           {loading ? (
             <FaSpinner className="animate-spin" size={14} />

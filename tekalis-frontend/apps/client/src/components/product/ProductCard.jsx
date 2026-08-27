@@ -93,7 +93,7 @@ const ProductCard = ({ product, showSpecs = false }) => {
   return (
     <Link
       to={`/products/${product._id}`}
-      className="group bg-white dark:bg-gray-800 rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col h-full"
+      className="group tk-card rounded-xl hover:shadow-lift hover:border-gray-200 dark:hover:border-gray-600 hover:-translate-y-1 transition-all duration-300 overflow-hidden flex flex-col h-full"
     >
       {/* ─── Image ─────────────────────────────────────────────────────────── */}
       <div className="relative overflow-hidden bg-gray-50 dark:bg-gray-900 aspect-square">
@@ -151,7 +151,7 @@ const ProductCard = ({ product, showSpecs = false }) => {
             onClick={handleAddToCart}
             disabled={isOutOfStock}
             aria-label="Ajouter au panier"
-            className="bg-blue-600 hover:bg-blue-700 text-white p-3 rounded-full transition disabled:bg-gray-400 disabled:cursor-not-allowed shadow-lg"
+            className="bg-brand-600 hover:bg-brand-700 text-white p-3 rounded-full transition disabled:bg-gray-400 disabled:cursor-not-allowed shadow-lg"
           >
             <FaShoppingCart size={18} />
           </button>
@@ -174,7 +174,7 @@ const ProductCard = ({ product, showSpecs = false }) => {
         )}
 
         {/* Nom */}
-        <h3 className="text-xs md:text-sm font-semibold text-gray-900 dark:text-white mb-1.5 md:mb-2 line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition min-h-[2rem] md:min-h-[2.5rem]">
+        <h3 className="text-xs md:text-sm font-semibold text-gray-900 dark:text-white mb-1.5 md:mb-2 line-clamp-2 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition min-h-[2rem] md:min-h-[2.5rem]">
           {product.name}
         </h3>
 
@@ -231,9 +231,9 @@ const ProductCard = ({ product, showSpecs = false }) => {
         {/* Prix */}
         <div className="mt-auto mb-2 md:mb-3">
           <div className="flex items-baseline gap-1.5">
-            <span className="text-base md:text-lg font-bold text-blue-600 dark:text-blue-400">
-              {product.price.toLocaleString()}
-            </span>
+          <span className={`text-base md:text-lg font-bold text-brand-600 dark:text-brand-400`}>
+            {product.price.toLocaleString()}
+          </span>
             <span className="text-[10px] md:text-xs text-gray-600 dark:text-gray-400">
               FCFA
             </span>
@@ -258,7 +258,7 @@ const ProductCard = ({ product, showSpecs = false }) => {
           className={`w-full py-2 md:py-2.5 px-2 rounded-lg font-semibold text-xs md:text-sm transition-all flex items-center justify-center gap-1.5 active:scale-95 ${
             isOutOfStock
               ? "bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed"
-              : "bg-blue-600 hover:bg-blue-700 text-white"
+              : "bg-brand-600 hover:bg-brand-700 text-white"
           }`}
         >
           <FaShoppingCart size={12} className="md:w-[14px] md:h-[14px]" />

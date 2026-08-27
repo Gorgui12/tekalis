@@ -5,14 +5,14 @@ import { fetchProducts } from "../../../../packages/shared/redux/slices/productS
 import PageMeta from '../components/seo/PageMeta';
 import DynamicHero from '../components/DynamicHero';
 import { 
-  FaChevronLeft, 
-  FaChevronRight, 
   FaTruck, 
   FaShieldAlt, 
   FaHeadset,
   FaCreditCard,
   FaStar,
   FaArrowRight,
+  FaTag,
+  FaBolt,
   FaLaptop,
   FaMobileAlt,
   FaGamepad,
@@ -72,11 +72,27 @@ const HOME_SCHEMA = {
   ],
 };
 
+/* Rail de produits — défilement horizontal fluide (mobile + desktop) */
+const ProductRail = ({ products }) => {
+  if (!products?.length) return null;
+  return (
+    <div className="flex gap-3 sm:gap-4 md:gap-5 overflow-x-auto px-4 sm:px-6 lg:px-0 pb-4 scrollbar-hide snap-x snap-mandatory touch-pan-x -mx-4 sm:-mx-6 lg:mx-0">
+      {products.map((product) => (
+        <div
+          key={product._id}
+          className="shrink-0 w-[150px] sm:w-[190px] md:w-[220px] snap-start"
+        >
+          <ProductCard product={product} />
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const Home = () => {
   const dispatch = useDispatch();
   const { items: products, isLoading } = useSelector((state) => state.products);
-  
-  const [currentSlide, setCurrentSlide] = useState(0);
+
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [bestSellers, setBestSellers] = useState([]);
   const [articles, setArticles] = useState([]);
@@ -143,39 +159,6 @@ const Home = () => {
     }
   }, [products]);
 
-  const slides = [
-    {
-      id: 1,
-      title: "EXCLUSIVITÉS & NOUVEAUTÉS",
-      subtitle: "Découvrez nos derniers PC Gaming haute performance",
-      image: "/banner-gaming.jpg",
-      badge: "NOUVEAU",
-      cta: "Découvrir",
-      link: "/products?category=gaming",
-      bg: "from-purple-600 to-pink-600"
-    },
-    {
-      id: 2,
-      title: "FLASH SALES - 30% DE RÉDUCTION",
-      subtitle: "Profitez de nos offres limitées sur une sélection de produits",
-      image: "/banner-deals.jpg",
-      badge: "PROMO",
-      cta: "Voir les offres",
-      link: "/products?sort=discount",
-      bg: "from-red-600 to-orange-600"
-    },
-    {
-      id: 3,
-      title: "CONFIGURATEUR PC SUR MESURE",
-      subtitle: "Créez le PC de vos rêves en 3 étapes simples",
-      image: "/banner-config.jpg",
-      badge: "OUTIL",
-      cta: "Configurer",
-      link: "/configurator",
-      bg: "from-blue-600 to-indigo-600"
-    }
-  ];
-
   const categories = [
     { name: "Smartphones", icon: <FaMobileAlt />, slug: "smartphones", color: "from-blue-500 to-cyan-500" },
     { name: "Gaming", icon: <FaGamepad />, slug: "gaming", color: "from-purple-500 to-pink-500" },
@@ -184,14 +167,6 @@ const Home = () => {
     { name: "Laptops", icon: <FaLaptop />, slug: "laptops", color: "from-indigo-500 to-purple-500" },
     { name: "Accessoires", icon: <FaKeyboard />, slug: "accessories", color: "from-yellow-500 to-orange-500" }
   ];
-
-  const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
-  const prevSlide = () => setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
-
-  useEffect(() => {
-    const timer = setInterval(nextSlide, 5000);
-    return () => clearInterval(timer);
-  }, []);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -211,38 +186,38 @@ const Home = () => {
 
       {/* Quick Actions */}
       <section className="container mx-auto px-4 -mt-16 relative z-10 mb-16">
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <Link to="/products" className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition group">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+          <Link to="/products" className="bg-white rounded-xl shadow-card p-5 sm:p-6 hover:shadow-lift hover:-translate-y-0.5 transition group">
             <div className="flex items-center gap-4">
-              <div className="bg-blue-100 rounded-full p-4 group-hover:bg-blue-200 transition">
-                <FaLaptop className="text-blue-600 text-2xl" />
+              <div className="bg-brand-50 rounded-2xl p-3.5 group-hover:bg-brand-100 transition">
+                <FaLaptop className="text-brand-600 text-2xl" />
               </div>
               <div>
-                <h3 className="font-bold text-gray-900 text-lg">Tous les produits</h3>
+                <h3 className="font-display font-bold text-gray-900 text-base sm:text-lg">Tous les produits</h3>
                 <p className="text-sm text-gray-600">Explorez notre catalogue</p>
               </div>
             </div>
           </Link>
 
-          <Link to="/configurator" className="bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg shadow-lg p-6 hover:shadow-xl transition text-white group">
+          <Link to="/configurator" className="bg-gradient-to-br from-brand-600 to-accent-600 rounded-xl shadow-lift p-5 sm:p-6 hover:shadow-lift hover:-translate-y-0.5 transition text-white group">
             <div className="flex items-center gap-4">
-              <div className="bg-white/20 rounded-full p-4 group-hover:bg-white/30 transition">
+              <div className="bg-white/20 rounded-2xl p-3.5 group-hover:bg-white/30 transition">
                 <FaDesktop className="text-white text-2xl" />
               </div>
               <div>
-                <h3 className="font-bold text-lg">PC Configurator</h3>
+                <h3 className="font-display font-bold text-base sm:text-lg">PC Configurator</h3>
                 <p className="text-sm text-white/90">Créez votre PC sur mesure</p>
               </div>
             </div>
           </Link>
 
-          <Link to="/blog" className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition group">
+          <Link to="/blog" className="bg-white rounded-xl shadow-card p-5 sm:p-6 hover:shadow-lift hover:-translate-y-0.5 transition group">
             <div className="flex items-center gap-4">
-              <div className="bg-orange-100 rounded-full p-4 group-hover:bg-orange-200 transition">
-                <FaStar className="text-orange-600 text-2xl" />
+              <div className="bg-accent-50 rounded-2xl p-3.5 group-hover:bg-accent-100 transition">
+                <FaStar className="text-accent-600 text-2xl" />
               </div>
               <div>
-                <h3 className="font-bold text-gray-900 text-lg">Labo Tech</h3>
+                <h3 className="font-display font-bold text-gray-900 text-base sm:text-lg">Labo Tech</h3>
                 <p className="text-sm text-gray-600">Tests & guides d'achat</p>
               </div>
             </div>
@@ -252,111 +227,114 @@ const Home = () => {
 
       {/* Catégories */}
       <section className="container mx-auto px-4 mb-16">
-        <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-          Parcourir par catégorie
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <div className="text-center mb-8">
+          <span className="section-eyebrow justify-center"><FaTag size={11} /> Nos univers</span>
+          <h2 className="section-title mt-2">Parcourir par catégorie</h2>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
           {categories.map((category) => (
             <Link key={category.slug} to={`/category/${category.slug}`} className="group">
-              <div className={`bg-gradient-to-br ${category.color} rounded-lg shadow-md hover:shadow-xl transition-all p-8 text-center text-white aspect-square flex flex-col items-center justify-center`}>
-                <div className="text-5xl mb-3 group-hover:scale-110 transition-transform">
+              <div className={`bg-gradient-to-br ${category.color} rounded-xl shadow-md hover:shadow-lift transition-all duration-300 p-6 sm:p-8 text-center text-white aspect-square flex flex-col items-center justify-center group-hover:scale-[1.03]`}>
+                <div className="text-4xl sm:text-5xl mb-3 group-hover:scale-110 transition-transform">
                   {category.icon}
                 </div>
-                <h3 className="font-bold text-lg">{category.name}</h3>
+                <h3 className="font-bold text-sm sm:text-lg">{category.name}</h3>
               </div>
             </Link>
           ))}
         </div>
       </section>
 
-      {/* Nouveautés */}
-      <section className="container mx-auto px-4 mb-16">
-        <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">⚡ Nouveautés</h2>
-          <Link to="/products?sort=newest" className="text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-2">
+      {/* Nouveautés — rail défilant sur mobile, grille sur desktop */}
+      <section className="container mx-auto mb-16">
+        <div className="container-tk flex items-end justify-between mb-6">
+          <div>
+            <span className="section-eyebrow"><FaBolt size={11} /> Fraîchement arrivé</span>
+            <h2 className="section-title mt-1.5">Nouveautés</h2>
+          </div>
+          <Link to="/products?sort=newest" className="hidden sm:inline-flex items-center gap-2 text-brand-600 hover:text-brand-700 font-semibold text-sm">
             Voir tout <FaArrowRight />
           </Link>
         </div>
 
         {isLoading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="bg-white rounded-lg shadow-md p-4 animate-pulse">
-                <div className="bg-gray-200 aspect-square rounded mb-4"></div>
-                <div className="bg-gray-200 h-4 rounded mb-2"></div>
-                <div className="bg-gray-200 h-4 rounded w-2/3"></div>
+          <div className="flex gap-3 overflow-x-auto px-4 pb-2 scrollbar-hide snap-x snap-mandatory">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="shrink-0 w-[46%] sm:w-[30%] lg:w-[20%] bg-white rounded-2xl border border-gray-100 p-4 animate-pulse snap-start">
+                <div className="bg-gray-200 aspect-square rounded-xl mb-4"></div>
+                <div className="bg-gray-200 h-3.5 rounded mb-2"></div>
+                <div className="bg-gray-200 h-3.5 rounded w-2/3"></div>
               </div>
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product._id} product={product} />
-            ))}
-          </div>
+          <ProductRail products={featuredProducts} />
         )}
       </section>
 
       {/* Best-sellers */}
-      <section className="bg-gradient-to-br from-blue-50 to-indigo-50 py-16">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold text-gray-900">🔥 Meilleures ventes</h2>
-            <Link to="/products?sort=popular" className="text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-2">
+      <section className="bg-gradient-to-br from-brand-50 to-accent-50 dark:from-gray-800 dark:to-gray-900 py-14 sm:py-16">
+        <div className="container-tk">
+          <div className="flex items-end justify-between mb-6">
+            <div>
+              <span className="section-eyebrow">⚡ Populaires</span>
+              <h2 className="section-title mt-1.5">Meilleures ventes</h2>
+            </div>
+            <Link to="/products?sort=popular" className="hidden sm:inline-flex items-center gap-2 text-brand-600 hover:text-brand-700 font-semibold text-sm">
               Voir tout <FaArrowRight />
             </Link>
           </div>
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {bestSellers.map((product) => (
-              <ProductCard key={product._id} product={product} />
-            ))}
-          </div>
+          <ProductRail products={bestSellers} />
         </div>
       </section>
 
       {/* Features */}
-      <section className="container mx-auto px-4 py-16">
-        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
+      <section className="container mx-auto px-4 py-14 sm:py-16">
+        <div className="text-center mb-10">
+          <span className="section-eyebrow justify-center"><FaShieldAlt size={11} /> Pourquoi nous choisir</span>
+          <h2 className="section-title mt-2">Une expérience d'achat sereine</h2>
+        </div>
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
           <div className="text-center">
-            <div className="bg-blue-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
-              <FaTruck className="text-blue-600 text-3xl" />
+            <div className="bg-brand-50 rounded-full w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center mx-auto mb-4">
+              <FaTruck className="text-brand-600 text-2xl sm:text-3xl" />
             </div>
-            <h3 className="font-bold text-gray-900 mb-2">Livraison rapide</h3>
-            <p className="text-sm text-gray-600">Livraison gratuite à Dakar sous 2-3 jours</p>
+            <h3 className="font-display font-bold text-gray-900 mb-1.5">Livraison rapide</h3>
+            <p className="text-xs sm:text-sm text-gray-600">Livraison gratuite à Dakar sous 2-3 jours</p>
           </div>
           <div className="text-center">
-            <div className="bg-green-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
-              <FaShieldAlt className="text-green-600 text-3xl" />
+            <div className="bg-green-50 rounded-full w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center mx-auto mb-4">
+              <FaShieldAlt className="text-green-600 text-2xl sm:text-3xl" />
             </div>
-            <h3 className="font-bold text-gray-900 mb-2">Garantie constructeur</h3>
-            <p className="text-sm text-gray-600">Tous nos produits sont garantis 12 mois minimum</p>
+            <h3 className="font-display font-bold text-gray-900 mb-1.5">Garantie constructeur</h3>
+            <p className="text-xs sm:text-sm text-gray-600">Tous nos produits sont garantis 12 mois minimum</p>
           </div>
           <div className="text-center">
-            <div className="bg-purple-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
-              <FaHeadset className="text-purple-600 text-3xl" />
+            <div className="bg-accent-50 rounded-full w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center mx-auto mb-4">
+              <FaHeadset className="text-accent-600 text-2xl sm:text-3xl" />
             </div>
-            <h3 className="font-bold text-gray-900 mb-2">Support 24/7</h3>
-            <p className="text-sm text-gray-600">Notre équipe est disponible pour vous aider</p>
+            <h3 className="font-display font-bold text-gray-900 mb-1.5">Support 24/7</h3>
+            <p className="text-xs sm:text-sm text-gray-600">Notre équipe est disponible pour vous aider</p>
           </div>
           <div className="text-center">
-            <div className="bg-orange-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
-              <FaCreditCard className="text-orange-600 text-3xl" />
+            <div className="bg-orange-50 rounded-full w-16 h-16 sm:w-20 sm:h-20 flex items-center justify-center mx-auto mb-4">
+              <FaCreditCard className="text-orange-600 text-2xl sm:text-3xl" />
             </div>
-            <h3 className="font-bold text-gray-900 mb-2">Paiement sécurisé</h3>
-            <p className="text-sm text-gray-600">Wave, OM, Free Money ou paiement à la livraison</p>
+            <h3 className="font-display font-bold text-gray-900 mb-1.5">Paiement sécurisé</h3>
+            <p className="text-xs sm:text-sm text-gray-600">Wave, OM, Free Money ou paiement à la livraison</p>
           </div>
         </div>
       </section>
 
       {/* Blog Preview */}
-      <section className="bg-gray-900 text-white py-16">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between mb-8">
+      <section className="bg-gray-900 dark:bg-gray-950 text-white py-14 sm:py-16">
+        <div className="container-tk">
+          <div className="flex items-end justify-between mb-8">
             <div>
-              <h2 className="text-3xl font-bold mb-2">📝 Le Labo Tech</h2>
+              <h2 className="text-2xl sm:text-3xl font-display font-extrabold mb-2">Le Labo Tech</h2>
               <p className="text-gray-400">Tests, guides d'achat et actualités tech</p>
             </div>
-            <Link to="/blog" className="bg-white text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition flex items-center gap-2">
+            <Link to="/blog" className="hidden sm:inline-flex items-center gap-2 text-white px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 font-semibold text-sm transition">
               Voir le blog <FaArrowRight />
             </Link>
           </div>
@@ -364,14 +342,14 @@ const Home = () => {
           {loading ? (
             <div className="text-center py-12 text-gray-400">Chargement des articles...</div>
           ) : (
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="flex gap-4 overflow-x-auto scrollbar-hide snap-x snap-mandatory -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-3 sm:gap-6">
               {articles.slice(0, 3).map(article => (
-                <Link key={article._id} to={`/blog/${article.slug}`} className="bg-gray-800 rounded-lg overflow-hidden hover:bg-gray-750 transition group">
-                  <div className="bg-gray-700 aspect-video"></div>
-                  <div className="p-6">
-                    <span className="text-xs text-blue-400 font-semibold uppercase">{article.category}</span>
-                    <h3 className="font-bold text-lg mt-2 mb-2 group-hover:text-blue-400 transition">{article.title}</h3>
-                    <p className="text-sm text-gray-400 mb-3">{article.excerpt}</p>
+                <Link key={article._id} to={`/blog/${article.slug}`} className="shrink-0 w-[80%] sm:w-auto snap-start bg-gray-800 dark:bg-gray-900 rounded-2xl overflow-hidden hover:bg-gray-700/70 transition group">
+                  <div className="bg-gradient-to-br from-gray-700 to-gray-800 aspect-video"></div>
+                  <div className="p-5 sm:p-6">
+                    <span className="text-xs text-brand-400 font-semibold uppercase tracking-wide">{article.category}</span>
+                    <h3 className="font-display font-bold text-base sm:text-lg mt-2 mb-2 group-hover:text-brand-300 transition line-clamp-2">{article.title}</h3>
+                    <p className="text-sm text-gray-400 mb-3 line-clamp-2">{article.excerpt}</p>
                     <p className="text-xs text-gray-500">
                       {new Date(article.publishedAt).toLocaleDateString("fr-FR")} • {article.readTime} min de lecture
                     </p>
@@ -380,23 +358,30 @@ const Home = () => {
               ))}
             </div>
           )}
+
+          {/* CTA mobile uniquement */}
+          <div className="sm:hidden mt-6 text-center">
+            <Link to="/blog" className="inline-flex items-center gap-2 text-white px-6 py-3 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 font-semibold text-sm transition">
+              Voir le blog <FaArrowRight />
+            </Link>
+          </div>
         </div>
       </section>
 
       {/* CTA Final */}
-      <section className="container mx-auto px-4 py-16">
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl shadow-2xl p-12 text-center text-white">
-          <h2 className="text-4xl font-bold mb-4">Besoin d'aide pour choisir ?</h2>
-          <p className="text-xl mb-8 text-blue-100">Notre équipe d'experts est là pour vous conseiller</p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link to="/configurator" className="bg-white text-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition">
+      <section className="container mx-auto px-4 py-12 sm:py-16">
+        <div className="bg-gradient-to-r from-brand-600 to-accent-600 rounded-2xl sm:rounded-4xl shadow-lift p-7 sm:p-12 text-center text-white overflow-hidden">
+          <h2 className="text-2xl sm:text-4xl font-display font-extrabold mb-3 text-balance">Besoin d'aide pour choisir ?</h2>
+          <p className="text-base sm:text-xl mb-8 text-white/90">Notre équipe d'experts est là pour vous conseiller</p>
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+            <Link to="/configurator" className="bg-white text-brand-600 px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl font-bold text-base sm:text-lg hover:bg-gray-100 active:scale-95 transition">
               Configurer mon PC
             </Link>
             <a
               href="https://wa.me/221786346946"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-lg font-bold text-lg transition"
+              className="bg-green-500 hover:bg-green-600 text-white px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl font-bold text-base sm:text-lg active:scale-95 transition"
             >
               💬 Contacter sur WhatsApp
             </a>

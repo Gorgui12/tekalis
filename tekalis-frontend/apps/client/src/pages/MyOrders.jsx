@@ -94,7 +94,7 @@ const MyOrders = () => {
     return (
       <div className="min-h-screen flex items-center justify-center mt-20">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-brand-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Chargement de vos commandes...</p>
         </div>
       </div>
@@ -107,11 +107,11 @@ const MyOrders = () => {
         {/* En-tête */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-2">
-            <Link to="/dashboard" className="text-blue-600 hover:text-blue-700 font-semibold">
+            <Link to="/dashboard" className="text-brand-600 hover:text-brand-700 font-semibold">
               ← Retour au dashboard
             </Link>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">📦 Mes Commandes</h1>
+          <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2 font-display">📦 Mes Commandes</h1>
           <p className="text-gray-600">Suivez et gérez toutes vos commandes</p>
         </div>
 
@@ -125,7 +125,7 @@ const MyOrders = () => {
             { label: "Livrées", value: stats.delivered, color: "bg-green-50" },
             { label: "Annulées", value: stats.cancelled, color: "bg-red-50" },
           ].map((s) => (
-            <div key={s.label} className={`${s.color} rounded-lg shadow-md p-4 text-center`}>
+            <div key={s.label} className={`${s.color} rounded-xl shadow-soft p-4 text-center`}>
               <p className="text-2xl font-bold text-gray-900">{s.value}</p>
               <p className="text-xs text-gray-600">{s.label}</p>
             </div>
@@ -133,7 +133,7 @@ const MyOrders = () => {
         </div>
 
         {/* Barre de recherche et filtres */}
-        <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+        <div className="bg-white rounded-xl shadow-soft p-4 mb-6">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1 relative">
               <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -142,7 +142,7 @@ const MyOrders = () => {
                 placeholder="Rechercher par numéro ou produit..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-10 pr-4 py-2.5 border-2 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
               />
               {searchTerm && (
                 <button
@@ -156,7 +156,7 @@ const MyOrders = () => {
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="border-2 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
             >
               <option value="all">Tous les statuts</option>
               <option value="pending">En attente</option>
@@ -170,9 +170,9 @@ const MyOrders = () => {
 
         {/* Liste des commandes */}
         {filteredOrders.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-md p-12 text-center">
+          <div className="bg-white rounded-xl shadow-soft p-12 text-center">
             <div className="text-6xl mb-4">📦</div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
+            <h3 className="text-xl font-bold text-gray-900 mb-2 font-display">
               {searchTerm || statusFilter !== "all"
                 ? "Aucune commande trouvée"
                 : "Vous n'avez pas encore de commande"}
@@ -185,7 +185,7 @@ const MyOrders = () => {
             {!searchTerm && statusFilter === "all" && (
               <Link
                 to="/products"
-                className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold"
+                className="inline-block bg-brand-600 hover:bg-brand-700 text-white px-6 py-3 rounded-xl font-semibold"
               >
                 Découvrir nos produits
               </Link>
@@ -196,12 +196,12 @@ const MyOrders = () => {
             {filteredOrders.map((order) => (
               <div
                 key={order._id}
-                className="bg-white rounded-lg shadow-md hover:shadow-lg transition overflow-hidden"
+                className="bg-white rounded-xl shadow-soft hover:shadow-card transition overflow-hidden"
               >
                 {/* En-tête de commande */}
                 <div className="bg-gray-50 px-6 py-4 border-b flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div>
-                    <div className="flex items-center gap-3 mb-2">
+                    <div className="flex items-center gap-3 mb-2 flex-wrap">
                       <h3 className="font-bold text-gray-900">
                         Commande #{order._id?.slice(-8).toUpperCase()}
                       </h3>
@@ -217,7 +217,7 @@ const MyOrders = () => {
                     </p>
                   </div>
                   <div className="text-right">
-                    <p className="text-2xl font-bold text-blue-600">
+                    <p className="text-2xl font-bold text-brand-600">
                       {order.totalPrice?.toLocaleString()} FCFA
                     </p>
                     <p className="text-sm text-gray-600">
@@ -257,7 +257,7 @@ const MyOrders = () => {
                   <div className="flex flex-wrap gap-2">
                     <Link
                       to={`/orders/${order._id}`}
-                      className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold text-center flex items-center justify-center gap-2 transition"
+                      className="flex-1 sm:flex-none bg-brand-600 hover:bg-brand-700 text-white px-4 py-2.5 rounded-xl font-semibold text-center flex items-center justify-center gap-2 transition"
                     >
                       <FaEye />
                       Voir détails
@@ -266,7 +266,7 @@ const MyOrders = () => {
                     {order.status === "delivered" && (
                       <button
                         onClick={() => navigate(`/rma/create?orderId=${order._id}`)}
-                        className="flex-1 sm:flex-none bg-orange-600 hover:bg-orange-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center justify-center gap-2 transition"
+                        className="flex-1 sm:flex-none bg-orange-600 hover:bg-orange-700 text-white px-4 py-2.5 rounded-xl font-semibold flex items-center justify-center gap-2 transition"
                       >
                         <FaRedo />
                         Retour/SAV
@@ -286,7 +286,7 @@ const MyOrders = () => {
                               .catch(() => toast.error("Erreur lors de l'annulation"));
                           }
                         }}
-                        className="flex-1 sm:flex-none bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center justify-center gap-2 transition"
+                        className="flex-1 sm:flex-none bg-red-600 hover:bg-red-700 text-white px-4 py-2.5 rounded-xl font-semibold flex items-center justify-center gap-2 transition"
                       >
                         <FaTimes />
                         Annuler
@@ -300,13 +300,13 @@ const MyOrders = () => {
         )}
 
         {/* Support */}
-        <div className="mt-8 bg-blue-50 rounded-lg p-6">
-          <h3 className="font-semibold text-gray-900 mb-2">💡 Besoin d'aide ?</h3>
+        <div className="mt-8 bg-brand-50 rounded-xl p-6">
+          <h3 className="font-semibold text-gray-900 mb-2 font-display">💡 Besoin d'aide ?</h3>
           <div className="flex flex-wrap gap-3 text-sm">
-            <a href="tel:+221786346946" className="text-blue-600 hover:underline font-semibold">
+            <a href="tel:+221786346946" className="text-brand-600 hover:underline font-semibold">
               📞 +221 78 634 69 46
             </a>
-            <a href="https://wa.me/221786346946" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-semibold">
+            <a href="https://wa.me/221786346946" target="_blank" rel="noopener noreferrer" className="text-brand-600 hover:underline font-semibold">
               💬 WhatsApp
             </a>
           </div>

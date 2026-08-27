@@ -50,7 +50,7 @@ const ProductDetails = () => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-600 mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-brand-600 mx-auto mb-4"></div>
           <p className="text-gray-600">Chargement du produit...</p>
         </div>
       </div>
@@ -126,7 +126,7 @@ const ProductDetails = () => {
     : 0;
 
   return (
-    <div className="container mx-auto px-4 py-8 mt-32">
+    <div className="container mx-auto px-4 pt-8 pb-32 lg:pb-10 mt-32">
 
       {/* ── SEO HEAD complet ─────────────────────────────────────────────── */}
       <PageMeta
@@ -184,7 +184,7 @@ const ProductDetails = () => {
           )}
 
           {/* H1 produit */}
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+          <h1 className="text-2xl sm:text-3xl font-display font-bold text-gray-900 dark:text-white mb-4">
             {product.name}
           </h1>
 
@@ -209,8 +209,8 @@ const ProductDetails = () => {
 
           {/* Prix */}
           <div className="mb-6">
-            <div className="flex items-baseline gap-3">
-              <span className="text-4xl font-bold text-blue-600">
+            <div className="flex items-baseline gap-3 flex-wrap">
+              <span className="text-3xl sm:text-4xl font-bold text-brand-600">
                 {product.price.toLocaleString()} FCFA
               </span>
               {product.comparePrice && discount > 0 && (
@@ -242,7 +242,7 @@ const ProductDetails = () => {
                 ? `Stock limité (${product.stock} restants)`
                 : `En stock (${product.stock} unités)`}
             </div>
-            <div className="flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-2 rounded-lg text-sm font-medium">
+            <div className="flex items-center gap-2 bg-brand-50 text-brand-700 px-3 py-2 rounded-lg text-sm font-medium">
               <FaShieldAlt />
               Garantie 12 mois
             </div>
@@ -259,20 +259,20 @@ const ProductDetails = () => {
           {!isOutOfStock && (
             <div className="flex items-center gap-4 mb-6">
               <span className="text-sm font-semibold text-gray-700">Quantité :</span>
-              <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+              <div className="flex items-center border border-gray-300 rounded-xl overflow-hidden">
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="px-3 py-2 hover:bg-gray-100 transition"
+                  className="px-4 min-h-[44px] hover:bg-gray-100 transition touch-manipulation"
                   aria-label="Diminuer"
                 >
                   <FaMinus size={12} />
                 </button>
-                <span className="px-5 py-2 font-semibold border-x border-gray-300">
+                <span className="px-5 min-h-[44px] font-semibold border-x border-gray-300 flex items-center">
                   {quantity}
                 </span>
                 <button
                   onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
-                  className="px-3 py-2 hover:bg-gray-100 transition"
+                  className="px-4 min-h-[44px] hover:bg-gray-100 transition touch-manipulation"
                   aria-label="Augmenter"
                 >
                   <FaPlus size={12} />
@@ -282,14 +282,14 @@ const ProductDetails = () => {
           )}
 
           {/* Boutons d'action */}
-          <div className="flex gap-3 mb-6">
+          <div className="hidden lg:flex gap-3 mb-6">
             <button
               onClick={handleAddToCart}
               disabled={isOutOfStock}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-lg font-semibold transition ${
+              className={`flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-xl font-semibold transition ${
                 isOutOfStock
                   ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700 text-white"
+                  : "bg-brand-600 hover:bg-brand-700 text-white"
               }`}
             >
               <FaShoppingCart />
@@ -299,7 +299,7 @@ const ProductDetails = () => {
             <button
               onClick={handleToggleWishlist}
               aria-label={isInWishlist ? "Retirer des favoris" : "Ajouter aux favoris"}
-              className={`px-4 py-3 rounded-lg border-2 transition ${
+              className={`px-4 min-h-[44px] rounded-xl border-2 transition ${
                 isInWishlist
                   ? "bg-red-500 border-red-500 text-white"
                   : "border-gray-300 text-gray-600 hover:border-red-400 hover:text-red-500"
@@ -312,7 +312,7 @@ const ProductDetails = () => {
           {/* Livraison */}
           <div className="border-t pt-4">
             <div className="flex items-start gap-3 text-sm text-gray-700">
-              <FaTruck className="text-blue-600 text-lg mt-0.5" />
+              <FaTruck className="text-brand-600 text-lg mt-0.5" />
               <div>
                 <p className="font-semibold">Livraison gratuite à Dakar</p>
                 <p className="text-gray-500">Estimée sous 2-3 jours ouvrés</p>
@@ -330,7 +330,7 @@ const ProductDetails = () => {
 
       {/* ── Section Avis complète — ReviewList ───────────────────────────── */}
       <div className="mb-12">
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+        <h2 className="text-xl sm:text-2xl font-display font-bold text-gray-900 dark:text-white mb-6">
           Avis clients
         </h2>
         <ReviewList
@@ -343,16 +343,47 @@ const ProductDetails = () => {
       {/* ── Produits similaires ───────────────────────────────────────────── */}
       {similarProducts.length > 0 && (
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+          <h2 className="text-xl sm:text-2xl font-display font-bold text-gray-900 dark:text-white mb-6">
             Produits similaires
           </h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 sm:gap-4">
             {similarProducts.map((item) => (
               <ProductCard key={item._id} product={item} />
             ))}
           </div>
         </div>
       )}
+
+      {/* ── Barre d'action sticky mobile ──────────────────────────────────── */}
+      <div className="lg:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur border-t border-gray-200 px-4 py-3 shadow-card">
+        <div className="flex items-center gap-3 max-w-7xl mx-auto">
+          <div className="flex-1 min-w-0">
+            <span className="block text-[11px] uppercase tracking-wide text-gray-500 font-semibold">
+              Prix
+            </span>
+            <p className="text-lg font-bold text-brand-600 leading-tight truncate">
+              {product.price.toLocaleString()} FCFA
+            </p>
+            {product.comparePrice && discount > 0 && (
+              <span className="text-xs text-gray-400 line-through">
+                {product.comparePrice.toLocaleString()} FCFA
+              </span>
+            )}
+          </div>
+          <button
+            onClick={handleAddToCart}
+            disabled={isOutOfStock}
+            className={`flex-1 max-w-[220px] flex items-center justify-center gap-2 min-h-[48px] px-5 rounded-xl font-semibold transition active:scale-95 ${
+              isOutOfStock
+                ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                : "bg-brand-600 hover:bg-brand-700 text-white"
+            }`}
+          >
+            <FaShoppingCart />
+            {isOutOfStock ? "Rupture de stock" : "Ajouter au panier"}
+          </button>
+        </div>
+      </div>
     </div>
   );
 };

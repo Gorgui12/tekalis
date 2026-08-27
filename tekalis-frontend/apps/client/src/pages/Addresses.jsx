@@ -139,7 +139,7 @@ const Addresses = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center mt-20">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-brand-600"></div>
       </div>
     );
   }
@@ -151,14 +151,14 @@ const Addresses = () => {
         <div className="mb-8">
           <Link
             to="/dashboard"
-            className="text-blue-600 hover:text-blue-700 font-semibold mb-4 inline-block"
+            className="text-brand-600 hover:text-brand-700 font-semibold mb-4 inline-block"
           >
             ← Retour au dashboard
           </Link>
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-3">
-                <FaMapMarkerAlt className="text-blue-600" />
+              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2 flex items-center gap-3 font-display">
+                <FaMapMarkerAlt className="text-brand-600" />
                 Mes Adresses
               </h1>
               <p className="text-gray-600">
@@ -168,7 +168,7 @@ const Addresses = () => {
             
             <button
               onClick={openAddModal}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition"
+              className="bg-brand-600 hover:bg-brand-700 text-white px-6 py-3 rounded-xl font-semibold flex items-center gap-2 transition w-full sm:w-auto justify-center"
             >
               <FaPlus />
               Ajouter une adresse
@@ -178,9 +178,9 @@ const Addresses = () => {
 
         {/* Liste des adresses */}
         {(addresses || []).length === 0 ? (
-          <div className="bg-white rounded-lg shadow-md p-12 text-center">
+          <div className="bg-white rounded-xl shadow-soft p-12 text-center">
             <FaMapMarkerAlt className="text-6xl text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
+            <h3 className="text-xl font-bold text-gray-900 mb-2 font-display">
               Aucune adresse enregistrée
             </h3>
             <p className="text-gray-600 mb-6">
@@ -188,7 +188,7 @@ const Addresses = () => {
             </p>
             <button
               onClick={openAddModal}
-              className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold"
+              className="inline-block bg-brand-600 hover:bg-brand-700 text-white px-6 py-3 rounded-xl font-semibold"
             >
               Ajouter ma première adresse
             </button>
@@ -198,13 +198,13 @@ const Addresses = () => {
             {(addresses || []).map((address) => (
               <div
                 key={address._id}
-                className={`bg-white rounded-lg shadow-md hover:shadow-lg transition p-6 ${
-                  address.isDefault ? "border-2 border-blue-600" : ""
+                className={`bg-white rounded-xl shadow-soft hover:shadow-card transition p-6 ${
+                  address.isDefault ? "border-2 border-brand-600" : ""
                 }`}
               >
                 {/* Badge par défaut */}
                 {address.isDefault && (
-                  <div className="flex items-center gap-2 text-blue-600 font-semibold mb-3">
+                  <div className="flex items-center gap-2 text-brand-600 font-semibold mb-3">
                     <FaStar />
                     <span className="text-sm">Adresse par défaut</span>
                   </div>
@@ -212,8 +212,8 @@ const Addresses = () => {
 
                 {/* Label */}
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                    <FaMapMarkerAlt className="text-blue-600" />
+                  <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2 font-display">
+                    <FaMapMarkerAlt className="text-brand-600" />
                     {address.label || "Sans titre"}
                   </h3>
                 </div>
@@ -240,7 +240,7 @@ const Addresses = () => {
                   {!address.isDefault && (
                     <button
                       onClick={() => setDefaultAddress(address._id)}
-                      className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-600 px-4 py-2 rounded-lg font-semibold text-sm transition flex items-center justify-center gap-2"
+                      className="flex-1 bg-brand-50 hover:bg-brand-100 text-brand-600 px-4 py-2.5 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2"
                     >
                       <FaStar />
                       Définir par défaut
@@ -249,7 +249,7 @@ const Addresses = () => {
                   
                   <button
                     onClick={() => openEditModal(address)}
-                    className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-semibold text-sm transition flex items-center justify-center gap-2"
+                    className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2.5 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2"
                   >
                     <FaEdit />
                     Modifier
@@ -257,7 +257,7 @@ const Addresses = () => {
                   
                   <button
                     onClick={() => deleteAddress(address._id)}
-                    className="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-lg font-semibold text-sm transition flex items-center justify-center gap-2"
+                    className="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2.5 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2"
                   >
                     <FaTrash />
                   </button>
@@ -272,7 +272,7 @@ const Addresses = () => {
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
               <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">
+                <h2 className="text-2xl font-bold text-gray-900 font-display">
                   {editingAddress ? "Modifier l'adresse" : "Nouvelle adresse"}
                 </h2>
                 <button
@@ -295,7 +295,7 @@ const Addresses = () => {
                       value={formData.label}
                       onChange={(e) => setFormData({ ...formData, label: e.target.value })}
                       placeholder="Ex: Maison, Bureau, Chez mes parents..."
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
                       required
                     />
                   </div>
@@ -310,7 +310,7 @@ const Addresses = () => {
                       value={formData.fullName}
                       onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                       placeholder="Ex: Ousmane Diallo"
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
                       required
                     />
                   </div>
@@ -325,7 +325,7 @@ const Addresses = () => {
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       placeholder="Ex: 77 123 45 67"
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
                       required
                     />
                   </div>
@@ -339,7 +339,7 @@ const Addresses = () => {
                       <select
                         value={formData.city}
                         onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
                       >
                         <option value="Dakar">Dakar</option>
                         <option value="Pikine">Pikine</option>
@@ -357,7 +357,7 @@ const Addresses = () => {
                       <select
                         value={formData.region}
                         onChange={(e) => setFormData({ ...formData, region: e.target.value })}
-                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
                       >
                         <option value="Dakar">Dakar</option>
                         <option value="Thiès">Thiès</option>
@@ -378,7 +378,7 @@ const Addresses = () => {
                       onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                       placeholder="Ex: Cité Keur Gorgui, Villa n°123, près de la pharmacie Plateau"
                       rows={3}
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border-2 border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
                       required
                     />
                   </div>
@@ -390,7 +390,7 @@ const Addresses = () => {
                         type="checkbox"
                         checked={formData.isDefault}
                         onChange={(e) => setFormData({ ...formData, isDefault: e.target.checked })}
-                        className="w-5 h-5 text-blue-600 rounded"
+                        className="w-5 h-5 text-brand-600 rounded focus:ring-brand-500"
                       />
                       <span className="text-sm text-gray-700">
                         Définir comme adresse par défaut
@@ -403,14 +403,14 @@ const Addresses = () => {
                 <div className="flex gap-3 mt-6">
                   <button
                     type="submit"
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold transition"
+                    className="flex-1 bg-brand-600 hover:bg-brand-700 text-white py-3 px-6 rounded-xl font-semibold transition"
                   >
                     {editingAddress ? "Enregistrer les modifications" : "Ajouter l'adresse"}
                   </button>
                   <button
                     type="button"
                     onClick={closeModal}
-                    className="bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 px-6 rounded-lg font-semibold transition"
+                    className="bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 px-6 rounded-xl font-semibold transition"
                   >
                     Annuler
                   </button>
@@ -421,8 +421,8 @@ const Addresses = () => {
         )}
 
         {/* Info */}
-        <div className="mt-8 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-lg shadow-lg p-6 text-white">
-          <h3 className="text-xl font-bold mb-4">
+        <div className="mt-8 bg-gradient-to-br from-brand-600 to-indigo-600 rounded-xl shadow-card p-6 text-white">
+          <h3 className="text-xl font-bold mb-4 font-display">
             💡 Pourquoi enregistrer plusieurs adresses ?
           </h3>
           <div className="grid sm:grid-cols-2 gap-4 text-sm">
