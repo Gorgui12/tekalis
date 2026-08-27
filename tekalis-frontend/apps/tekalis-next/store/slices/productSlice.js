@@ -5,7 +5,18 @@ export const fetchProducts = createAsyncThunk("products/fetchAll", async (params
   try {
     const query = new URLSearchParams(params).toString();
     const { data } = await api.get(`/products?${query}`);
-    return data;
+
+    // ✅ Normalise la réponse : l'API renvoie { success, data: [], pagination }
+    //    mais aussi parfois { products: [] } ou un tableau direct.
+    const products = Array.isArray(data)
+      ? data
+      : Array.isArray(data.data)
+      ? data.data
+      : Array.isArray(data.products)
+      ? data.products
+      : [];
+
+    return { products, pagination: data.pagination || null };
   } catch (err) {
     return rejectWithValue(err.response?.data?.message || "Erreur chargement produits");
   }
@@ -37,7 +48,9 @@ const productSlice = createSlice({
       .addCase(fetchProducts.pending, (state) => { state.loading = true; state.error = null; })
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.loading = false;
-        state.allProducts = Array.isArray(action.payload) ? action.payload : [];
+        state.allProducts = Array.isArray(action.payload.products)
+          ? action.payload.products
+          : [];
         if (action.payload.pagination) state.pagination = action.payload.pagination;
       })
       .addCase(fetchProducts.rejected, (state, action) => { state.loading = false; state.error = action.payload; })
