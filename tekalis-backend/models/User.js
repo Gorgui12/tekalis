@@ -89,7 +89,6 @@ userSchema.methods.toSafeObject = function () {
 };
 
 // Index pour les recherches
-userSchema.index({ email: 1 });
 userSchema.index({ isAdmin: 1 });
 userSchema.index({ createdAt: -1 });
 

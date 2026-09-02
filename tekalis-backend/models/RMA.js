@@ -130,7 +130,6 @@ rmaSchema.pre("save", function(next) {
 });
 
 rmaSchema.index({ user: 1, status: 1 });
-rmaSchema.index({ rmaNumber: 1 });
 rmaSchema.index({ order: 1 });
 
 module.exports = mongoose.model("RMA", rmaSchema);
