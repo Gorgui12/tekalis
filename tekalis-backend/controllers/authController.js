@@ -2,6 +2,7 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
+const EmailService = require("../services/emailService");
 
 // ===============================================
 // Générer un token JWT
@@ -202,7 +203,8 @@ exports.forgotPassword = async (req, res) => {
     const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
     console.log("🔑 Reset URL:", resetUrl);
 
-    // TODO: envoyer l'email via EmailService
+    // Envoyer l'email de réinitialisation (via le service consolidé)
+    await EmailService.sendPasswordReset(user, resetToken);
 
     res.status(200).json({
       success: true,

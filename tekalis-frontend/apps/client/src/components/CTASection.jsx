@@ -129,22 +129,6 @@ const CTASection = ({
 
 // Exemples de CTAs prédéfinis
 export const PresetCTAs = {
-  configurator: {
-    title: "Besoin d'aide pour choisir ?",
-    subtitle: "Notre équipe d'experts est là pour vous conseiller",
-    primaryButton: {
-      text: "Configurer mon PC",
-      link: "/configurator"
-    },
-    secondaryButton: {
-      text: "Contacter sur WhatsApp",
-      link: "https://wa.me/221776543210",
-      external: true,
-      icon: <FaWhatsapp />
-    },
-    gradient: "from-blue-600 to-indigo-600"
-  },
-  
   newsletter: {
     title: "Restez informé des nouveautés",
     subtitle: "Recevez nos offres exclusives et les dernières actualités tech",

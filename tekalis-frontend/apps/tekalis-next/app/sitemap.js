@@ -16,7 +16,7 @@ const STATIC_PAGES = [
 ];
 
 const CATEGORY_SLUGS = [
-  'smartphones', 'laptops', 'gaming', 'tv',
+  'smartphones', 'ordinateurs', 'gaming', 'tv',
   'electromenager', 'climatiseurs', 'energie-solaire', 'accessoires', 'audio',
 ];
 

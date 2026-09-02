@@ -164,8 +164,8 @@ const Home = () => {
     { name: "Gaming", icon: <FaGamepad />, slug: "gaming", color: "from-purple-500 to-pink-500" },
     { name: "Home Cinema", icon: <FaDesktop />, slug: "home-cinema", color: "from-red-500 to-orange-500" },
     { name: "Caméras", icon: <FaCamera />, slug: "cameras", color: "from-green-500 to-teal-500" },
-    { name: "Laptops", icon: <FaLaptop />, slug: "laptops", color: "from-indigo-500 to-purple-500" },
-    { name: "Accessoires", icon: <FaKeyboard />, slug: "accessories", color: "from-yellow-500 to-orange-500" }
+    { name: "Laptops", icon: <FaLaptop />, slug: "ordinateurs", color: "from-indigo-500 to-purple-500" },
+    { name: "Accessoires", icon: <FaKeyboard />, slug: "accessoires", color: "from-yellow-500 to-orange-500" }
   ];
 
   return (
@@ -195,18 +195,6 @@ const Home = () => {
               <div>
                 <h3 className="font-display font-bold text-gray-900 text-base sm:text-lg">Tous les produits</h3>
                 <p className="text-sm text-gray-600">Explorez notre catalogue</p>
-              </div>
-            </div>
-          </Link>
-
-          <Link to="/configurator" className="bg-gradient-to-br from-brand-600 to-accent-600 rounded-xl shadow-lift p-5 sm:p-6 hover:shadow-lift hover:-translate-y-0.5 transition text-white group">
-            <div className="flex items-center gap-4">
-              <div className="bg-white/20 rounded-2xl p-3.5 group-hover:bg-white/30 transition">
-                <FaDesktop className="text-white text-2xl" />
-              </div>
-              <div>
-                <h3 className="font-display font-bold text-base sm:text-lg">PC Configurator</h3>
-                <p className="text-sm text-white/90">Créez votre PC sur mesure</p>
               </div>
             </div>
           </Link>
@@ -374,9 +362,6 @@ const Home = () => {
           <h2 className="text-2xl sm:text-4xl font-display font-extrabold mb-3 text-balance">Besoin d'aide pour choisir ?</h2>
           <p className="text-base sm:text-xl mb-8 text-white/90">Notre équipe d'experts est là pour vous conseiller</p>
           <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
-            <Link to="/configurator" className="bg-white text-brand-600 px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl font-bold text-base sm:text-lg hover:bg-gray-100 active:scale-95 transition">
-              Configurer mon PC
-            </Link>
             <a
               href="https://wa.me/221786346946"
               target="_blank"

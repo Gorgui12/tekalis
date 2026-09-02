@@ -24,7 +24,7 @@ const getCatName = (cat) => {
   return String(cat);
 };
 
-const Products = () => {
+const Products = ({ initialProducts = [] }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const urlQuery = searchParams.get("search") || "";
@@ -38,6 +38,8 @@ const Products = () => {
 
   const { products: rawProducts, loading, sortProducts } = useProducts({
     autoFetch: true,
+    limit: 200,
+    initialProducts,
   });
 
   // Garantir que products est toujours un tableau
@@ -136,7 +138,7 @@ const Products = () => {
     return grouped;
   }, [filteredProducts]);
 
-  if (loading) {
+  if (loading && products.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <p className="text-gray-600 text-lg">Chargement des produits...</p>

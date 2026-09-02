@@ -11,7 +11,7 @@ const CATEGORY_SEO = {
     h1: 'Smartphones & Téléphones à Dakar',
     keywords: ['smartphone Dakar Fann', 'acheter iPhone Dakar', 'Samsung Galaxy Sénégal', 'téléphone Dakar livraison', 'Xiaomi Tecno Dakar'],
   },
-  laptops: {
+  ordinateurs: {
     title: 'Ordinateurs Portables Dakar — HP, Dell, Lenovo | Tekalis Sénégal',
     description: 'Ordinateurs portables HP, Dell, Lenovo, Asus à prix compétitifs à Dakar. PC gaming, MacBook et ultrabooks disponibles à Fann. Livraison rapide au Sénégal. Garantie 12 mois.',
     h1: 'Laptops & Ordinateurs Portables',
@@ -108,10 +108,15 @@ export default async function CategoryPage({ params }) {
 
   // Filtrage côté serveur par slug de catégorie
   const products = allProducts.filter((p) => {
-    const cats = Array.isArray(p.category) ? p.category : [p.category];
+    const cats = Array.isArray(p.category) ? p.category : p.category ? [p.category] : [];
     return cats.some((c) => {
-      const name = typeof c === 'object' ? c.name : c;
-      return name?.toLowerCase().includes(slug.toLowerCase());
+      if (typeof c === 'object' && c) {
+        const name = c.name?.toLowerCase() || '';
+        const catSlug = c.slug?.toLowerCase() || '';
+        return name.includes(slug.toLowerCase()) || catSlug.includes(slug.toLowerCase());
+      }
+      const name = String(c || '').toLowerCase();
+      return name.includes(slug.toLowerCase());
     });
   });
 

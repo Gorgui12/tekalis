@@ -48,6 +48,7 @@ const Products = () => {
 
   const { products: rawProducts, loading, sortProducts } = useProducts({
     autoFetch: true,
+    limit: 200,
   });
 
   // ✅ Garantir que products est toujours un tableau

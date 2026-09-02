@@ -136,7 +136,7 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
-                <Link href="/category/laptops" 
+                <Link href="/category/ordinateurs" 
                   className="text-gray-300 hover:text-blue-400 transition hover:translate-x-1 inline-block"
                 >
                   Ordinateurs portables

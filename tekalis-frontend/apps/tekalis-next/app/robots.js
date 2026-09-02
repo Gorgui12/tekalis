@@ -4,7 +4,7 @@ rules: [
 {
 userAgent: '*',
 allow: ['/', '/products', '/products/*', '/blog', '/blog/*', '/category/*', '/category/*/*'],
-disallow: ['/admin', '/api/', '/cart', '/checkout', '/dashboard', '/login', '/register', '/wishlist', '/configurator'],
+disallow: ['/admin', '/api/', '/cart', '/checkout', '/dashboard', '/login', '/register', '/wishlist'],
 },
 {
 userAgent: ['AhrefsBot', 'SemrushBot', 'MJ12bot', 'AhrefsSiteAudit'],

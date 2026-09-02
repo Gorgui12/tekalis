@@ -13,7 +13,6 @@ Allow: /products
 Allow: /products/*
 Allow: /blog
 Allow: /blog/*
-Allow: /configurator
 Allow: /apropos
 Allow: /contact
 

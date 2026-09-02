@@ -172,16 +172,6 @@ const Home = ({ initialProducts = [], initialArticles = [] }) => {
       cta: "Voir les offres",
       link: "/products?sort=discount",
       bg: "from-red-600 to-orange-600"
-    },
-    {
-      id: 3,
-      title: "CONFIGURATEUR PC SUR MESURE",
-      subtitle: "Créez le PC de vos rêves en 3 étapes simples",
-      image: "/banner-config.jpg",
-      badge: "OUTIL",
-      cta: "Configurer",
-      link: "/configurator",
-      bg: "from-blue-600 to-indigo-600"
     }
   ];
 
@@ -190,8 +180,8 @@ const Home = ({ initialProducts = [], initialArticles = [] }) => {
     { name: "Gaming", icon: <FaGamepad />, slug: "gaming", color: "from-purple-500 to-pink-500", image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&h=400&fit=crop" },
     { name: "Home Cinema", icon: <FaDesktop />, slug: "home-cinema", color: "from-red-500 to-orange-500", image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=400&h=400&fit=crop" },
     { name: "Caméras", icon: <FaCamera />, slug: "cameras", color: "from-green-500 to-teal-500", image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400&h=400&fit=crop" },
-    { name: "Laptops", icon: <FaLaptop />, slug: "laptops", color: "from-indigo-500 to-purple-500", image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&h=400&fit=crop" },
-    { name: "Accessoires", icon: <FaKeyboard />, slug: "accessories", color: "from-yellow-500 to-orange-500", image: "https://images.unsplash.com/photo-1587829741301-dc798b91add1?w=400&h=400&fit=crop" }
+    { name: "Laptops", icon: <FaLaptop />, slug: "ordinateurs", color: "from-indigo-500 to-purple-500", image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&h=400&fit=crop" },
+    { name: "Accessoires", icon: <FaKeyboard />, slug: "accessoires", color: "from-yellow-500 to-orange-500", image: "https://images.unsplash.com/photo-1587829741301-dc798b91add1?w=400&h=400&fit=crop" }
   ];
 
   const nextSlide = () => setCurrentSlide((prev) => (prev + 1) % slides.length);
@@ -229,18 +219,6 @@ const Home = ({ initialProducts = [], initialArticles = [] }) => {
               <div>
                 <h3 className="font-bold text-gray-900 text-lg">Tous les produits</h3>
                 <p className="text-sm text-gray-600">Explorez notre catalogue</p>
-              </div>
-            </div>
-          </Link>
-
-          <Link href="/configurator" className="bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg shadow-lg p-6 hover:shadow-xl transition text-white group">
-            <div className="flex items-center gap-4">
-              <div className="bg-white/20 rounded-full p-4 group-hover:bg-white/30 transition">
-                <FaDesktop className="text-white text-2xl" />
-              </div>
-              <div>
-                <h3 className="font-bold text-lg">PC Configurator</h3>
-                <p className="text-sm text-white/90">Créez votre PC sur mesure</p>
               </div>
             </div>
           </Link>
@@ -406,9 +384,6 @@ const Home = ({ initialProducts = [], initialArticles = [] }) => {
           <h2 className="text-4xl font-bold mb-4">Besoin d'aide pour choisir ?</h2>
           <p className="text-xl mb-8 text-blue-100">Notre équipe d'experts est là pour vous conseiller</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/configurator" className="bg-white text-blue-600 px-8 py-4 rounded-lg font-bold text-lg hover:bg-gray-100 transition">
-              Configurer mon PC
-            </Link>
             <a
               href="https://wa.me/221786346946"
               target="_blank"

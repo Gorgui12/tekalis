@@ -17,7 +17,6 @@ import ProductDetails from "./pages/ProductDetails";
 import CategoryPage from "./pages/CategoryPage";
 import Blog from "./pages/Blog";
 import ArticleDetails from "./pages/ArticleDetails";
-import Configurator from "./pages/Configurator";
 import Apropos from "./pages/apropos";
 import Politique from "./pages/Politique";
 import Contact from "./pages/Contact";
@@ -77,8 +76,6 @@ function App() {
         <Route path="/blog/:slug" element={<ArticleDetails />} />
 
         {/* Configurateur */}
-        <Route path="/configurator" element={<Configurator />} />
-
         {/* Pages statiques */}
         <Route path="/apropos" element={<Apropos />} />
         <Route path="/contact" element={<Contact />} />

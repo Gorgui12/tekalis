@@ -320,7 +320,7 @@ const HeroSlides = () => {
           overlay: 'rgba(0,0,0,0.55)',
           gradient: 'from-purple-900/70 to-blue-900/50',
           primaryCta: { text: 'Voir les offres', link: '/category/gaming', style: 'white' },
-          secondaryCta: { text: 'Configurer mon PC', link: '/configurator', style: 'outline' },
+          secondaryCta: { text: '', link: '', style: 'outline' },
           order: 0, isActive: true, textPosition: 'left',
           stats: [{ value: '10K+', label: 'Clients' }, { value: '4.9★', label: 'Avis' }],
         },

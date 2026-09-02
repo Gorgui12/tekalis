@@ -20,7 +20,7 @@ import useAuth from "@/lib/hooks/useAuth";
 
 const CATEGORIES = [
   { name: "Smartphones",     path: "/category/smartphones",     icon: <FaMobileAlt />,      color: "text-blue-500",   bg: "bg-blue-50 dark:bg-blue-900/20" },
-  { name: "Laptops",         path: "/category/laptops",         icon: <FaLaptop />,          color: "text-indigo-500", bg: "bg-indigo-50 dark:bg-indigo-900/20" },
+  { name: "Laptops",         path: "/category/ordinateurs",         icon: <FaLaptop />,          color: "text-indigo-500", bg: "bg-indigo-50 dark:bg-indigo-900/20" },
   { name: "Gaming",          path: "/category/gaming",          icon: <FaGamepad />,         color: "text-purple-500", bg: "bg-purple-50 dark:bg-purple-900/20" },
   { name: "TV & Audio",      path: "/category/tv",              icon: <FaTv />,              color: "text-red-500",    bg: "bg-red-50 dark:bg-red-900/20" },
   { name: "Electromenager",  path: "/category/electromenager",  icon: <FaThermometerHalf />, color: "text-orange-500", bg: "bg-orange-50 dark:bg-orange-900/20" },
@@ -272,7 +272,6 @@ const Navbar = () => {
               )}
             </div>
 
-            <Link href="/configurator" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition font-medium text-sm"><FaCog className="text-purple-500 w-4" /> Configurateur PC</Link>
             <Link href="/blog"         className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition font-medium text-sm"><FaNewspaper className="text-orange-500 w-4" /> Blog & Guides</Link>
             <Link href="/apropos"      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition font-medium text-sm"><FaHome className="text-teal-500 w-4" /> A propos</Link>
             <Link href="/contact"      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition font-medium text-sm"><FaEnvelope className="text-green-500 w-4" /> Contact</Link>

@@ -24,7 +24,7 @@ const FALLBACK_SLIDES = [
     overlay: 'rgba(10,10,30,0.65)',
     gradient: 'from-blue-900/60 via-transparent to-transparent',
     primaryCta: { text: 'Voir les produits', link: '/products', style: 'white' },
-    secondaryCta: { text: 'Configurer mon PC', link: '/configurator', style: 'outline' },
+    secondaryCta: { text: '', link: '', style: 'outline' },
     textPosition: 'left',
     stats: [{ value: '10K+', label: 'Clients' }, { value: '98%', label: 'Satisfaits' }, { value: '48h', label: 'Livraison' }],
   },

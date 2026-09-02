@@ -17,16 +17,31 @@ import {
 import api from "@/lib/api";
 import PageMeta from "@/components/seo/PageMeta";
 
-const ArticleDetails = () => {
+const ArticleDetails = ({ article: initialArticle, related: initialRelated }) => {
   const { slug } = useParams();
-  const [article, setArticle] = useState(null);
-  const [relatedArticles, setRelatedArticles] = useState([]);
-  const [loading, setLoading] = useState(true);
+
+  // Priorité absolue aux données SSR : l'article complet (HTML inclus)
+  // est déjà fourni par la page serveur. On ne refetche côté client que
+  // s'il n'y a aucune donnée SSR (nav. directe sans rendu serveur).
+  const hasInitialData = !!(initialArticle && initialArticle.title);
+
+  const [article, setArticle] = useState(
+    hasInitialData ? initialArticle : null
+  );
+  const [relatedArticles, setRelatedArticles] = useState(
+    hasInitialData && Array.isArray(initialRelated) ? initialRelated : []
+  );
+  const [loading, setLoading] = useState(!hasInitialData);
   const [relatedProducts, setRelatedProducts] = useState([]);
 
   useEffect(() => {
+    if (hasInitialData) {
+      window.scrollTo(0, 0);
+      return;
+    }
     fetchArticle();
     window.scrollTo(0, 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug]);
 
   const fetchArticle = async () => {

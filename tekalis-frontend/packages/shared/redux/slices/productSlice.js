@@ -8,7 +8,7 @@ export const fetchProducts = createAsyncThunk(
   "products/fetchProducts",
   async (_, thunkAPI) => {
     try {
-      const response = await api.get("/products");
+      const response = await api.get("/products", { params: { limit: 200 } });
 
       const data = response.data;
 

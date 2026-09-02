@@ -167,10 +167,12 @@ const AddArticle = () => {
               value={form.content}
               onChange={handleChange}
               rows={14}
-              placeholder="Contenu de l'article (Markdown supporté)..."
+              placeholder="<h2>Titre</h2><p>Votre contenu…</p> — Utilisez du HTML (h2, p, ul, li, strong, a…) pour la mise en forme"
               className={`${inputCls(errors.content)} resize-y font-mono text-xs`}
             />
-            <p className="text-xs text-gray-600 mt-1">{form.content.length} caractères</p>
+            <p className="text-xs text-gray-600 mt-1">
+              {form.content.length} caractères — HTML accepté et rendu sur le site
+            </p>
           </Field>
         </div>
 

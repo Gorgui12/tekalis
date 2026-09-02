@@ -38,7 +38,7 @@ const CATEGORY_SEO = {
       { q: "Livrez-vous en dehors de Dakar ?", a: "Oui, nous livrons partout au Sénégal. Délai de 3-5 jours ouvrés pour les régions." },
     ],
   },
-  laptops: {
+  ordinateurs: {
     title: "Laptops & Ordinateurs Portables à Dakar — Tekalis Sénégal",
     h1: "Laptops & Ordinateurs Portables",
     description: "Ordinateurs portables HP, Dell, Lenovo, Asus à prix compétitifs à Dakar. Livraison rapide au Sénégal. Laptops gaming, bureautique, ultrabooks — garantie 12 mois.",

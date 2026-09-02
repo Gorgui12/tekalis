@@ -157,7 +157,6 @@ loadRoute(`${API_PREFIX}/auth`,         "./routes/authRoutes");
 loadRoute(`${API_PREFIX}/products`,     "./routes/productRoutes");
 loadRoute(`${API_PREFIX}/categories`,   "./routes/categoryRoutes");
 loadRoute(`${API_PREFIX}/articles`,     "./routes/articleRoutes");
-loadRoute(`${API_PREFIX}/configurator`, "./routes/configuratorRoutes");
 loadRoute(`${API_PREFIX}/hero`,         "./routes/heroRoutes");
 loadRoute(`${API_PREFIX}/users`,        "./routes/userRoutes");
 loadRoute(`${API_PREFIX}/cart`,         "./routes/cartRoutes");

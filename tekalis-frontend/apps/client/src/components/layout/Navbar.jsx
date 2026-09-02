@@ -25,7 +25,7 @@ const CATEGORIES = [
   },
   {
     name: "Laptops",
-    path: "/category/laptops",
+    path: "/category/ordinateurs",
     icon: <FaLaptop />,
     color: "text-indigo-500",
     bg: "bg-indigo-50 dark:bg-indigo-900/20",
@@ -417,9 +417,6 @@ const Navbar = () => {
               )}
             </div>
 
-            <Link to="/configurator" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition font-medium text-sm">
-              <FaCog className="text-purple-500 w-4" /> Configurateur PC
-            </Link>
             <Link to="/blog" className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition font-medium text-sm">
               <FaNewspaper className="text-orange-500 w-4" /> Blog & Guides
             </Link>

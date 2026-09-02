@@ -48,14 +48,14 @@ const CategoriesGrid = ({ categories, columns = 6, showAll = false }) => {
     { 
       name: "Laptops", 
       icon: <FaLaptop />, 
-      slug: "laptops", 
+      slug: "ordinateurs", 
       color: "from-indigo-500 to-purple-500",
       count: 0
     },
     { 
       name: "Accessoires", 
       icon: <FaKeyboard />, 
-      slug: "accessories", 
+      slug: "accessoires", 
       color: "from-yellow-500 to-orange-500",
       count: 0
     },

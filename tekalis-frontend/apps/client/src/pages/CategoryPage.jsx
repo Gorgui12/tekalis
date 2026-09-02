@@ -35,7 +35,7 @@ const CATEGORY_SEO = {
       { q: "Livrez-vous en dehors de Dakar ?", a: "Oui, nous livrons partout au Sénégal. Délai de 3-5 jours ouvrés pour les régions." },
     ],
   },
-  laptops: {
+  ordinateurs: {
     title: "Laptops & Ordinateurs Portables à Dakar — Tekalis Sénégal",
     h1: "Laptops & Ordinateurs Portables",
     description: "Ordinateurs portables HP, Dell, Lenovo, Asus à prix compétitifs à Dakar. Livraison rapide au Sénégal. Laptops gaming, bureautique, ultrabooks — garantie 12 mois.",
@@ -125,14 +125,6 @@ const DEFAULT_SEO = (slug) => {
   };
 };
 
-// ── Helper normalisation catégorie ────────────────────────────────────────────
-const getCatName = (cat) => {
-  if (!cat) return null;
-  if (typeof cat === "string") return cat;
-  if (typeof cat === "object") return cat.name || cat._id?.toString() || null;
-  return String(cat);
-};
-
 // ── Composant principal ───────────────────────────────────────────────────────
 const CategoryPage = () => {
   // Compatibilité : le param peut s'appeler slug, category, categorySlug, etc.
@@ -160,11 +152,16 @@ const CategoryPage = () => {
     let result = [...items];
 
     if (slug) {
+      const slugLower = slug.toLowerCase();
       result = result.filter((p) => {
         const categories = Array.isArray(p.category) ? p.category : p.category ? [p.category] : [];
         return categories.some((cat) => {
-          const name = getCatName(cat);
-          return name?.toLowerCase().includes(slug.toLowerCase());
+          if (typeof cat === "object" && cat) {
+            const name = (cat.name || "").toLowerCase();
+            const catSlug = (cat.slug || "").toLowerCase();
+            return name.includes(slugLower) || catSlug.includes(slugLower);
+          }
+          return (cat || "").toString().toLowerCase().includes(slugLower);
         });
       });
     }

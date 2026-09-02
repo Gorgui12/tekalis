@@ -13,16 +13,19 @@ const useProducts = (options = {}) => {
     autoFetch = false,
     category = null,
     limit = null,
-    sortBy = "newest"
+    sortBy = "newest",
+    initialProducts = null
   } = options;
 
-  const [products, setProducts] = useState([]);
+  // Utiliser les produits initiaux (SSR) s'ils sont fournis, sinon tableau vide
+  const seedProducts = Array.isArray(initialProducts) ? initialProducts : [];
+  const [products, setProducts] = useState(seedProducts);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [pagination, setPagination] = useState({
     page: 1,
     limit: limit || 20,
-    total: 0,
+    total: seedProducts.length,
     totalPages: 0
   });
 

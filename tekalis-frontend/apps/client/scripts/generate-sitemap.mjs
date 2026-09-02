@@ -31,7 +31,6 @@ const STATIC_PAGES = [
   { loc: "/",             changefreq: "daily",   priority: "1.0" },
   { loc: "/products",     changefreq: "daily",   priority: "0.9" },
   { loc: "/blog",         changefreq: "weekly",  priority: "0.8" },
-  { loc: "/configurator", changefreq: "monthly", priority: "0.7" },
   { loc: "/apropos",      changefreq: "monthly", priority: "0.5" },
   { loc: "/contact",      changefreq: "monthly", priority: "0.5" },
 ];
@@ -39,7 +38,7 @@ const STATIC_PAGES = [
 // ── Catégories SEO ────────────────────────────────────────────────────────────
 const CATEGORY_SLUGS = [
   "smartphones",
-  "laptops",
+  "ordinateurs",
   "gaming",
   "tv",
   "electromenager",
