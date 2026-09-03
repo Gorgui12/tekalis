@@ -258,6 +258,19 @@ const AddProduct = () => {
     const file = e.target.files[0];
     if (!file) return;
 
+    // Garde-fou 2026-09-03 : XLSX (SheetJS) a 2 CVE non corrigées (ReDoS
+    // + prototype pollution) déclenchables par un fichier malveillant.
+    // Sans correctif upstream disponible, on limite au moins la taille
+    // du fichier accepté pour réduire la surface d'un fichier piégé.
+    // Migration recommandée à terme vers `exceljs`, hors périmètre de
+    // cette passe (réécriture de handleFileUpload nécessaire).
+    const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 Mo
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error("Fichier trop volumineux (5 Mo max)");
+      e.target.value = "";
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = (event) => {
       try {

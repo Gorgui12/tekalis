@@ -1,9 +1,24 @@
 import './globals.css';
+import { Space_Grotesk, DM_Sans } from 'next/font/google';
 import Script from 'next/script';
 import Providers from '@/components/shared/Providers';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import WhatsAppButton from '@/components/layout/WhatsAppButton';
+
+const fontDisplay = Space_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-display',
+  display: 'swap',
+  weight: ['400', '500', '600', '700'],
+});
+
+const fontBody = DM_Sans({
+  subsets: ['latin'],
+  variable: '--font-body',
+  display: 'swap',
+  weight: ['400', '500', '600', '700'],
+});
 
 export const metadata = {
   metadataBase: new URL('https://tekalis.com'),
@@ -134,18 +149,18 @@ const localBusinessSchema = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="fr" suppressHydrationWarning data-scroll-behavior="smooth">
+    <html lang="fr" suppressHydrationWarning data-scroll-behavior="smooth" className={`${fontDisplay.variable} ${fontBody.variable}`}>
       <head>
         <link rel="preconnect" href="https://images.unsplash.com" />
         <link rel="dns-prefetch" href="//tekalis.onrender.com" />
-        <meta name="theme-color" content="#2563eb" />
+        <meta name="theme-color" content="#f59e0b" />
       </head>
       <Script
         id="local-business-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
       />
-      <body className="bg-white dark:bg-gray-950 text-gray-900 dark:text-white antialiased">
+      <body className="bg-white dark:bg-surface-950 text-surface-900 dark:text-surface-50 font-body antialiased">
         <Providers>
           <div className="pt-[100px]">
             <Navbar />

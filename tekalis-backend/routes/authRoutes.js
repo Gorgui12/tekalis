@@ -21,4 +21,7 @@ router.post("/forgot-password", authController.forgotPassword);
 // POST /api/v1/auth/reset-password/:token
 router.post("/reset-password/:token", authController.resetPassword);
 
+// POST /api/v1/auth/logout — efface le cookie httpOnly côté serveur
+router.post("/logout", authController.logout);
+
 module.exports = router;

@@ -8,6 +8,7 @@ const Order = require("../models/Order");
 const Product = require("../models/Product");
 const Cart = require("../models/Cart");
 const PromoCode = require("../models/PromoCode");
+const { escapeRegex } = require("../utils/regexEscape");
 const EmailService = require("../services/emailService");
 const warrantyController = require("./warrantyController");
 
@@ -155,10 +156,11 @@ exports.getAllOrders = async (req, res) => {
     if (status) filter.status = status;
     if (paymentStatus) filter.paymentStatus = paymentStatus;
     if (search) {
+      const safeSearch = escapeRegex(search);
       filter.$or = [
-        { orderNumber: { $regex: search, $options: "i" } },
-        { deliveryName: { $regex: search, $options: "i" } },
-        { deliveryPhone: { $regex: search, $options: "i" } }
+        { orderNumber: { $regex: safeSearch, $options: "i" } },
+        { deliveryName: { $regex: safeSearch, $options: "i" } },
+        { deliveryPhone: { $regex: safeSearch, $options: "i" } }
       ];
     }
 

@@ -35,18 +35,18 @@ const CartSummary = ({ onCheckout }) => {
   if (items.length === 0) return null;
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 sticky top-24 space-y-5">
-      <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+    <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-card p-6 sticky top-24 space-y-5">
+      <h3 className="text-lg font-bold text-surface-900 dark:text-white">
         Récapitulatif
       </h3>
 
       {/* Lignes de prix */}
       <div className="space-y-3">
         <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-600 dark:text-gray-400">
+          <span className="text-surface-600 dark:text-surface-400">
             Sous-total ({items.reduce((s, i) => s + (i.quantity || 1), 0)} article{items.length > 1 ? "s" : ""})
           </span>
-          <span className="font-semibold text-gray-900 dark:text-white">
+          <span className="font-semibold text-surface-900 dark:text-white">
             {subtotal.toLocaleString()} FCFA
           </span>
         </div>
@@ -64,7 +64,7 @@ const CartSummary = ({ onCheckout }) => {
         )}
 
         <div className="flex items-center justify-between text-sm">
-          <span className="text-gray-600 dark:text-gray-400 flex items-center gap-1">
+          <span className="text-surface-600 dark:text-surface-400 flex items-center gap-1">
             <FaTruck size={12} />
             Livraison
           </span>
@@ -75,11 +75,11 @@ const CartSummary = ({ onCheckout }) => {
       </div>
 
       {/* Total */}
-      <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
+      <div className="border-t border-surface-200 dark:border-surface-700 pt-4">
         <div className="flex items-center justify-between">
-          <span className="font-bold text-gray-900 dark:text-white">Total estimé</span>
+          <span className="font-bold text-surface-900 dark:text-white">Total estimé</span>
           <div className="text-right">
-            <p className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+            <p className="text-2xl font-bold text-brand-600 dark:text-brand-400">
               {total.toLocaleString()} FCFA
             </p>
           </div>
@@ -114,15 +114,15 @@ const CartSummary = ({ onCheckout }) => {
 
       {/* Badges de confiance */}
       <div className="space-y-2 pt-1">
-        <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+        <div className="flex items-center gap-2 text-xs text-surface-500 dark:text-surface-400">
           <FaLock className="text-green-500" />
           Paiement 100% sécurisé
         </div>
-        <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
-          <FaTruck className="text-blue-500" />
+        <div className="flex items-center gap-2 text-xs text-surface-500 dark:text-surface-400">
+          <FaTruck className="text-brand-500" />
           Livraison rapide à Dakar & banlieue
         </div>
-        <div className="flex items-center gap-2 text-xs text-gray-500 dark:text-gray-400">
+        <div className="flex items-center gap-2 text-xs text-surface-500 dark:text-surface-400">
           <FaShieldAlt className="text-purple-500" />
           Garantie constructeur incluse
         </div>

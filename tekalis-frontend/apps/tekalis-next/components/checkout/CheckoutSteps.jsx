@@ -31,9 +31,9 @@ const CheckoutSteps = ({ currentStep = 1 }) => {
                 <div
                   className={`
                     w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold transition-all
-                    ${isDone    ? "bg-green-500 text-white shadow-md shadow-green-200"  : ""}
-                    ${isActive  ? "bg-blue-600 text-white shadow-md shadow-blue-200 ring-4 ring-blue-100" : ""}
-                    ${isPending ? "bg-gray-200 dark:bg-gray-700 text-gray-500 dark:text-gray-400" : ""}
+                    ${isDone    ? "bg-emerald-500 text-white shadow-md shadow-emerald-200"  : ""}
+                    ${isActive  ? "bg-brand-500 text-white shadow-md shadow-brand-200 ring-4 ring-brand-100" : ""}
+                    ${isPending ? "bg-surface-200 dark:bg-surface-700 text-surface-500 dark:text-surface-400" : ""}
                   `}
                 >
                   {isDone ? <FaCheckCircle /> : step.icon}
@@ -42,13 +42,13 @@ const CheckoutSteps = ({ currentStep = 1 }) => {
                 {/* Labels */}
                 <div className="mt-2 text-center">
                   <p className={`text-sm font-semibold transition ${
-                    isActive  ? "text-blue-600 dark:text-blue-400" :
-                    isDone    ? "text-green-600 dark:text-green-400" :
-                    "text-gray-500 dark:text-gray-400"
+                    isActive  ? "text-brand-600 dark:text-brand-400" :
+                    isDone    ? "text-emerald-600 dark:text-emerald-400" :
+                    "text-surface-500 dark:text-surface-400"
                   }`}>
                     {step.label}
                   </p>
-                  <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5 hidden lg:block">
+                  <p className="text-xs text-surface-400 dark:text-surface-500 mt-0.5 hidden lg:block">
                     {step.description}
                   </p>
                 </div>
@@ -58,8 +58,8 @@ const CheckoutSteps = ({ currentStep = 1 }) => {
               {index < STEPS.length - 1 && (
                 <div className={`w-24 lg:w-32 h-1 mx-3 rounded-full transition-all ${
                   currentStep > step.number
-                    ? "bg-green-400"
-                    : "bg-gray-200 dark:bg-gray-700"
+                    ? "bg-emerald-400"
+                    : "bg-surface-200 dark:bg-surface-700"
                 }`} />
               )}
             </div>
@@ -70,20 +70,20 @@ const CheckoutSteps = ({ currentStep = 1 }) => {
       {/* Mobile — version simplifiée */}
       <div className="sm:hidden">
         <div className="flex items-center justify-between mb-2">
-          <p className="text-sm font-semibold text-gray-900 dark:text-white">
+          <p className="text-sm font-semibold text-surface-900 dark:text-white">
             Étape {currentStep} sur {STEPS.length}
           </p>
-          <p className="text-sm text-blue-600 dark:text-blue-400 font-semibold">
+          <p className="text-sm text-brand-600 dark:text-brand-400 font-semibold">
             {STEPS[currentStep - 1]?.label}
           </p>
         </div>
-        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+        <div className="w-full bg-surface-200 dark:bg-surface-700 rounded-full h-2 overflow-hidden">
           <div
-            className="h-full bg-blue-600 rounded-full transition-all duration-500"
+            className="h-full bg-brand-500 rounded-full transition-all duration-500"
             style={{ width: `${((currentStep) / STEPS.length) * 100}%` }}
           />
         </div>
-        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+        <p className="text-xs text-surface-500 dark:text-surface-400 mt-1">
           {STEPS[currentStep - 1]?.description}
         </p>
       </div>

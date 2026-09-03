@@ -15,31 +15,31 @@ const RecommendationCard = ({
   // Variant compact (liste horizontale)
   if (variant === "compact") {
     return (
-      <div className={`flex gap-4 bg-white border-2 rounded-lg p-4 ${
-        isTopChoice ? "border-yellow-400 bg-yellow-50" : "border-gray-200"
+      <div className={`flex gap-4 bg-white dark:bg-surface-800 border-2 rounded-xl p-4 ${
+        isTopChoice ? "border-yellow-400 bg-yellow-50" : "border-surface-200"
       }`}>
         {/* Rank Badge */}
         <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl flex-shrink-0 ${
-          isTopChoice ? "bg-yellow-400 text-gray-900" : "bg-gray-200 text-gray-700"
+          isTopChoice ? "bg-yellow-400 text-surface-900" : "bg-surface-200 text-surface-700 dark:text-surface-300"
         }`}>
           {rank}
         </div>
 
         {/* Image */}
-        <div className="w-24 h-24 bg-gray-200 rounded flex-shrink-0"></div>
+            <div className="w-24 h-24 bg-surface-200 rounded-xl flex-shrink-0"></div>
 
         {/* Info */}
         <div className="flex-1 min-w-0">
-          <h3 className="font-bold text-lg text-gray-900 mb-1 truncate">
+          <h3 className="font-bold text-lg text-surface-900 dark:text-white mb-1 truncate">
             {product.name}
           </h3>
-          <p className="text-2xl font-bold text-blue-600 mb-2">
+          <p className="text-2xl font-bold text-brand-500 mb-2">
             {(product.price || 0).toLocaleString()} FCFA
           </p>
           {showScore && (
             <div className="flex items-center gap-2 text-sm">
-              <span className="text-gray-600">Compatibilité:</span>
-              <span className="font-bold text-blue-600">{product.score}/100</span>
+              <span className="text-surface-600 dark:text-surface-400">Compatibilité:</span>
+              <span className="font-bold text-brand-500">{product.score}/100</span>
             </div>
           )}
         </div>
@@ -48,12 +48,12 @@ const RecommendationCard = ({
         <div className="flex flex-col gap-2">
           <button
             onClick={() => onAddToCart && onAddToCart(product)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold transition flex items-center justify-center gap-2"
+            className="bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-xl font-semibold transition flex items-center justify-center gap-2"
           >
             <FaShoppingCart />
           </button>
           <Link href={`/products/${product.id}`}
-            className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg font-semibold transition flex items-center justify-center gap-2"
+            className="bg-surface-200 hover:bg-surface-300 text-surface-700 dark:text-surface-300 px-4 py-2 rounded-xl font-semibold transition flex items-center justify-center gap-2"
           >
             <FaEye />
           </Link>
@@ -64,8 +64,8 @@ const RecommendationCard = ({
 
   // Default variant (carte complète)
   return (
-    <div className={`border-2 rounded-lg p-6 transition hover:shadow-lg ${
-      isTopChoice ? "border-yellow-400 bg-yellow-50" : "border-gray-200 bg-white"
+    <div className={`border-2 rounded-2xl p-6 transition hover:shadow-lg ${
+      isTopChoice ? "border-yellow-400 bg-yellow-50" : "border-surface-200 bg-white dark:bg-surface-800"
     }`}>
       {/* Top Choice Badge */}
       {isTopChoice && (
@@ -77,7 +77,7 @@ const RecommendationCard = ({
 
       {/* Rank Badge (for non-top choices) */}
       {!isTopChoice && (
-        <div className="inline-flex items-center justify-center w-10 h-10 bg-gray-200 text-gray-700 rounded-full font-bold mb-4">
+        <div className="inline-flex items-center justify-center w-10 h-10 bg-surface-200 text-surface-700 dark:text-surface-300 rounded-full font-bold mb-4">
           #{rank}
         </div>
       )}
@@ -85,27 +85,27 @@ const RecommendationCard = ({
       <div className="flex flex-col md:flex-row gap-6">
         {/* Image & Score */}
         <div className="md:w-1/3">
-          <div className="aspect-video bg-gray-200 rounded-lg mb-4">
+          <div className="aspect-video bg-surface-200 rounded-xl mb-4">
             {/* Product image placeholder */}
           </div>
           
           {/* Score */}
           {showScore && (
-            <div className="bg-white rounded-lg p-4 border-2 border-gray-200">
+            <div className="bg-white dark:bg-surface-800 rounded-xl p-4 border-2 border-surface-200">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-sm text-gray-600">Score de compatibilité</span>
-                <span className="text-3xl font-bold text-blue-600">{product.score}/100</span>
+                <span className="text-sm text-surface-600 dark:text-surface-400">Score de compatibilité</span>
+                <span className="text-3xl font-bold text-brand-500">{product.score}/100</span>
               </div>
               
               {/* Score Bar */}
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-surface-200 rounded-full h-2">
                 <div 
-                  className="bg-gradient-to-r from-blue-500 to-green-500 h-2 rounded-full transition-all duration-500"
+                  className="bg-gradient-to-r from-brand-500 to-green-500 h-2 rounded-full transition-all duration-500"
                   style={{ width: `${product.score}%` }}
                 ></div>
               </div>
               
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-surface-500 dark:text-surface-400 mt-2">
                 {product.score >= 80 ? "Excellent choix" :
                  product.score >= 60 ? "Bon choix" :
                  "Acceptable"}
@@ -116,11 +116,11 @@ const RecommendationCard = ({
 
         {/* Details */}
         <div className="md:w-2/3">
-          <h3 className="text-2xl font-bold text-gray-900 mb-2">
+          <h3 className="text-2xl font-bold text-surface-900 dark:text-white mb-2">
             {product.name}
           </h3>
           
-          <p className="text-3xl font-bold text-blue-600 mb-4">
+          <p className="text-3xl font-bold text-brand-500 mb-4">
             {(product.price || 0).toLocaleString()} FCFA
           </p>
 
@@ -128,11 +128,11 @@ const RecommendationCard = ({
           {product.specs && (
             <div className="grid grid-cols-2 gap-3 mb-4">
               {Object.entries(product.specs).map(([key, value]) => (
-                <div key={key} className="bg-gray-50 rounded p-3">
-                  <p className="text-xs text-gray-600 capitalize mb-1">
+                <div key={key} className="bg-surface-50 dark:bg-surface-700/50 rounded-xl p-3">
+                  <p className="text-xs text-surface-600 dark:text-surface-400 capitalize mb-1">
                     {key.replace(/([A-Z])/g, ' $1').trim()}
                   </p>
-                  <p className="font-semibold text-sm text-gray-900">{value}</p>
+                  <p className="font-semibold text-sm text-surface-900 dark:text-white">{value}</p>
                 </div>
               ))}
             </div>
@@ -150,7 +150,7 @@ const RecommendationCard = ({
                   </p>
                   <ul className="text-sm space-y-1">
                     {product.pros.map((pro, idx) => (
-                      <li key={idx} className="text-gray-700 flex items-start gap-2">
+                      <li key={idx} className="text-surface-700 dark:text-surface-300 flex items-start gap-2">
                         <span className="text-green-500 mt-0.5">•</span>
                         <span>{pro}</span>
                       </li>
@@ -168,7 +168,7 @@ const RecommendationCard = ({
                   </p>
                   <ul className="text-sm space-y-1">
                     {product.cons.map((con, idx) => (
-                      <li key={idx} className="text-gray-700 flex items-start gap-2">
+                      <li key={idx} className="text-surface-700 dark:text-surface-300 flex items-start gap-2">
                         <span className="text-orange-500 mt-0.5">•</span>
                         <span>{con}</span>
                       </li>
@@ -183,14 +183,14 @@ const RecommendationCard = ({
           <div className="flex flex-col sm:flex-row gap-3">
             <button
               onClick={() => onAddToCart && onAddToCart(product)}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+              className="flex-1 bg-brand-500 hover:bg-brand-600 text-white py-3 rounded-xl font-semibold transition flex items-center justify-center gap-2 shadow-md hover:shadow-glow"
             >
               <FaShoppingCart />
               Ajouter au panier
             </button>
             
             <Link href={`/products/${product.id}`}
-              className="flex-1 sm:flex-none bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold transition flex items-center justify-center gap-2"
+              className="flex-1 sm:flex-none bg-surface-200 hover:bg-surface-300 text-surface-700 dark:text-surface-300 px-6 py-3 rounded-xl font-semibold transition flex items-center justify-center gap-2"
             >
               <FaEye />
               Voir détails

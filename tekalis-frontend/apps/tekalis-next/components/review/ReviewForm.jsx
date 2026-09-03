@@ -27,11 +27,11 @@ const ReviewForm = ({ productId, onSuccess }) => {
 
   if (!user) {
     return (
-      <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-6 text-center">
-        <p className="text-blue-800 dark:text-blue-300 font-semibold mb-1">
+      <div className="bg-brand-50 dark:bg-brand-900/20 border border-brand-200 dark:border-brand-800 rounded-xl p-6 text-center">
+        <p className="text-brand-800 dark:text-brand-300 font-semibold mb-1">
           Connectez-vous pour laisser un avis
         </p>
-        <p className="text-sm text-blue-600 dark:text-blue-400">
+        <p className="text-sm text-brand-600 dark:text-brand-400">
           Seuls les clients ayant acheté ce produit peuvent le noter.
         </p>
       </div>
@@ -86,21 +86,21 @@ const ReviewForm = ({ productId, onSuccess }) => {
   };
 
   const inputClasses = (field) =>
-    `w-full border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 transition text-gray-900 dark:text-white dark:bg-gray-800 ${
+    `w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 transition text-surface-900 dark:text-white dark:bg-surface-800 ${
       errors[field]
         ? "border-red-400 focus:ring-red-400 bg-red-50 dark:bg-red-900/20"
-        : "border-gray-300 dark:border-gray-600 focus:ring-blue-500 bg-white dark:bg-gray-800"
+        : "border-surface-300 dark:border-surface-600 focus:ring-brand-500 bg-white dark:bg-surface-800"
     }`;
 
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-5">
-      <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+      <h3 className="text-lg font-bold text-surface-900 dark:text-white">
         Donnez votre avis
       </h3>
 
       {/* Note */}
       <div>
-        <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-2">
+        <label className="block text-sm font-semibold text-surface-900 dark:text-white mb-2">
           Note <span className="text-red-500">*</span>
         </label>
         <StarRating
@@ -121,7 +121,7 @@ const ReviewForm = ({ productId, onSuccess }) => {
 
       {/* Titre */}
       <div>
-        <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-1.5">
+        <label className="block text-sm font-semibold text-surface-900 dark:text-white mb-1.5">
           Titre de l'avis <span className="text-red-500">*</span>
         </label>
         <input
@@ -141,7 +141,7 @@ const ReviewForm = ({ productId, onSuccess }) => {
 
       {/* Commentaire */}
       <div>
-        <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-1.5">
+        <label className="block text-sm font-semibold text-surface-900 dark:text-white mb-1.5">
           Commentaire <span className="text-red-500">*</span>
         </label>
         <textarea
@@ -158,7 +158,7 @@ const ReviewForm = ({ productId, onSuccess }) => {
               <FaExclamationCircle size={12} /> {errors.comment}
             </p>
           ) : <span />}
-          <span className={`text-xs ${comment.length < 20 ? "text-gray-400" : "text-green-600"}`}>
+          <span className={`text-xs ${comment.length < 20 ? "text-surface-400" : "text-green-600"}`}>
             {comment.length} / 1000
           </span>
         </div>
@@ -173,7 +173,7 @@ const ReviewForm = ({ productId, onSuccess }) => {
         Publier l'avis
       </Button>
 
-      <p className="text-xs text-gray-500 dark:text-gray-400">
+      <p className="text-xs text-surface-500 dark:text-surface-400">
         Votre avis sera publié sous le nom <strong>{user.name}</strong> après validation.
       </p>
     </form>
@@ -181,5 +181,3 @@ const ReviewForm = ({ productId, onSuccess }) => {
 };
 
 export default ReviewForm;
-
-

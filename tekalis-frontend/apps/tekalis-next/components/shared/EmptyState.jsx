@@ -46,14 +46,14 @@ const EmptyState = ({
 
     const buttonClasses = `
       ${sizeClasses.button}
-      bg-blue-600 
-      hover:bg-blue-700 
+      bg-brand-500 
+      hover:bg-brand-600 
       text-white 
       font-semibold 
-      rounded-lg 
+      rounded-xl 
       transition
       shadow-sm
-      hover:shadow-md
+      hover:shadow-glow
     `;
 
     if (actionLink) {
@@ -81,11 +81,11 @@ const EmptyState = ({
         {icon}
       </div>
       
-      <h3 className={`${sizeClasses.title} font-bold text-gray-900 mb-2`}>
+      <h3 className={`${sizeClasses.title} font-bold text-surface-900 dark:text-white mb-2`}>
         {title}
       </h3>
       
-      <p className={`${sizeClasses.description} text-gray-600 mb-6 max-w-md mx-auto`}>
+      <p className={`${sizeClasses.description} text-surface-700 dark:text-surface-300 mb-6 max-w-md mx-auto`}>
         {description}
       </p>
       

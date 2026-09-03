@@ -129,34 +129,34 @@ const CreateRMA = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 mt-20">
+    <div className="min-h-screen bg-surface-50 py-8 mt-20">
       <div className="container mx-auto px-4 max-w-4xl">
         {/* En-tete */}
         <div className="mb-8">
           <Link href="/dashboard/rma"
-            className="text-blue-600 hover:text-blue-700 font-semibold mb-4 inline-block"
+            className="text-brand-600 hover:text-brand-700 dark:text-brand-400 font-semibold mb-4 inline-block"
           >
             ← Retour aux demandes SAV
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="text-3xl font-bold text-surface-900 dark:text-white mb-2 font-display">
             Nouvelle Demande SAV
           </h1>
-          <p className="text-gray-600">
+          <p className="text-surface-600 dark:text-surface-400">
             Remplissez le formulaire ci-dessous pour creer votre demande
           </p>
         </div>
 
         {/* Formulaire */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow-md p-6">
+        <form onSubmit={handleSubmit} className="bg-white dark:bg-surface-800 rounded-xl shadow-card p-6">
           {/* Selection commande */}
           <div className="mb-6">
-            <label className="block text-sm font-semibold text-gray-900 mb-2">
+            <label className="block text-sm font-semibold text-surface-900 dark:text-white mb-2">
               Commande concernee *
             </label>
             <select
               value={formData.orderId}
               onChange={handleOrderChange}
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-surface-300 dark:border-surface-600 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:bg-surface-700 dark:text-white"
               required
             >
               <option value="">Selectionnez une commande</option>
@@ -167,7 +167,7 @@ const CreateRMA = () => {
               ))}
             </select>
             {orders.length === 0 && (
-              <p className="text-sm text-gray-500 mt-2">
+              <p className="text-sm text-surface-500 dark:text-surface-400 mt-2">
                 Aucune commande eligible au SAV. Seules les commandes livrees sont disponibles.
               </p>
             )}
@@ -176,17 +176,17 @@ const CreateRMA = () => {
           {/* Selection produit */}
           {selectedOrder && (
             <div className="mb-6">
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
+              <label className="block text-sm font-semibold text-surface-900 dark:text-white mb-2">
                 Produit concerne *
               </label>
               <div className="space-y-3">
                 {selectedOrder.products?.map((item) => (
                   <label
                     key={item.product._id}
-                    className={`flex items-center gap-4 p-4 border-2 rounded-lg cursor-pointer transition ${
+                    className={`flex items-center gap-4 p-4 border-2 rounded-xl cursor-pointer transition ${
                       formData.productId === item.product._id
-                        ? "border-blue-600 bg-blue-50"
-                        : "border-gray-200 hover:border-blue-300"
+                        ? "border-brand-500 bg-brand-50 dark:bg-brand-900/20"
+                        : "border-surface-200 dark:border-surface-700 hover:border-brand-300"
                     }`}
                   >
                     <input
@@ -195,7 +195,7 @@ const CreateRMA = () => {
                       value={item.product._id}
                       checked={formData.productId === item.product._id}
                       onChange={(e) => setFormData({ ...formData, productId: e.target.value })}
-                      className="text-blue-600"
+                      className="text-brand-500"
                       required
                     />
                     <img
@@ -204,8 +204,8 @@ const CreateRMA = () => {
                       className="w-16 h-16 object-contain rounded"
                     />
                     <div className="flex-1">
-                      <p className="font-semibold text-gray-900">{item.product.name}</p>
-                      <p className="text-sm text-gray-600">Qte: {item.quantity}</p>
+                      <p className="font-semibold text-surface-900 dark:text-white">{item.product.name}</p>
+                      <p className="text-sm text-surface-600 dark:text-surface-400">Qte: {item.quantity}</p>
                     </div>
                   </label>
                 ))}
@@ -215,14 +215,14 @@ const CreateRMA = () => {
 
           {/* Type de demande */}
           <div className="mb-6">
-            <label className="block text-sm font-semibold text-gray-900 mb-2">
+            <label className="block text-sm font-semibold text-surface-900 dark:text-white mb-2">
               Type de demande *
             </label>
             <div className="grid sm:grid-cols-2 gap-3">
-              <label className={`flex items-center gap-3 p-4 border-2 rounded-lg cursor-pointer transition ${
+              <label className={`flex items-center gap-3 p-4 border-2 rounded-xl cursor-pointer transition ${
                 formData.type === "repair"
-                  ? "border-blue-600 bg-blue-50"
-                  : "border-gray-200 hover:border-blue-300"
+                  ? "border-brand-500 bg-brand-50 dark:bg-brand-900/20"
+                  : "border-surface-200 dark:border-surface-700 hover:border-brand-300"
               }`}>
                 <input
                   type="radio"
@@ -230,18 +230,18 @@ const CreateRMA = () => {
                   value="repair"
                   checked={formData.type === "repair"}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                  className="text-blue-600"
+                  className="text-brand-500"
                 />
                 <div>
-                  <p className="font-semibold text-gray-900">Reparation</p>
-                  <p className="text-xs text-gray-600">Produit defectueux</p>
+                  <p className="font-semibold text-surface-900 dark:text-white">Reparation</p>
+                  <p className="text-xs text-surface-600 dark:text-surface-400">Produit defectueux</p>
                 </div>
               </label>
 
-              <label className={`flex items-center gap-3 p-4 border-2 rounded-lg cursor-pointer transition ${
+              <label className={`flex items-center gap-3 p-4 border-2 rounded-xl cursor-pointer transition ${
                 formData.type === "replacement"
-                  ? "border-blue-600 bg-blue-50"
-                  : "border-gray-200 hover:border-blue-300"
+                  ? "border-brand-500 bg-brand-50 dark:bg-brand-900/20"
+                  : "border-surface-200 dark:border-surface-700 hover:border-brand-300"
               }`}>
                 <input
                   type="radio"
@@ -249,18 +249,18 @@ const CreateRMA = () => {
                   value="replacement"
                   checked={formData.type === "replacement"}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                  className="text-blue-600"
+                  className="text-brand-500"
                 />
                 <div>
-                  <p className="font-semibold text-gray-900">Remplacement</p>
-                  <p className="text-xs text-gray-600">Echange du produit</p>
+                  <p className="font-semibold text-surface-900 dark:text-white">Remplacement</p>
+                  <p className="text-xs text-surface-600 dark:text-surface-400">Echange du produit</p>
                 </div>
               </label>
 
-              <label className={`flex items-center gap-3 p-4 border-2 rounded-lg cursor-pointer transition ${
+              <label className={`flex items-center gap-3 p-4 border-2 rounded-xl cursor-pointer transition ${
                 formData.type === "refund"
-                  ? "border-blue-600 bg-blue-50"
-                  : "border-gray-200 hover:border-blue-300"
+                  ? "border-brand-500 bg-brand-50 dark:bg-brand-900/20"
+                  : "border-surface-200 dark:border-surface-700 hover:border-brand-300"
               }`}>
                 <input
                   type="radio"
@@ -268,18 +268,18 @@ const CreateRMA = () => {
                   value="refund"
                   checked={formData.type === "refund"}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                  className="text-blue-600"
+                  className="text-brand-500"
                 />
                 <div>
-                  <p className="font-semibold text-gray-900">Remboursement</p>
-                  <p className="text-xs text-gray-600">Retour produit</p>
+                  <p className="font-semibold text-surface-900 dark:text-white">Remboursement</p>
+                  <p className="text-xs text-surface-600 dark:text-surface-400">Retour produit</p>
                 </div>
               </label>
 
-              <label className={`flex items-center gap-3 p-4 border-2 rounded-lg cursor-pointer transition ${
+              <label className={`flex items-center gap-3 p-4 border-2 rounded-xl cursor-pointer transition ${
                 formData.type === "technical_support"
-                  ? "border-blue-600 bg-blue-50"
-                  : "border-gray-200 hover:border-blue-300"
+                  ? "border-brand-500 bg-brand-50 dark:bg-brand-900/20"
+                  : "border-surface-200 dark:border-surface-700 hover:border-brand-300"
               }`}>
                 <input
                   type="radio"
@@ -287,11 +287,11 @@ const CreateRMA = () => {
                   value="technical_support"
                   checked={formData.type === "technical_support"}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                  className="text-blue-600"
+                  className="text-brand-500"
                 />
                 <div>
-                  <p className="font-semibold text-gray-900">Support technique</p>
-                  <p className="text-xs text-gray-600">Aide & assistance</p>
+                  <p className="font-semibold text-surface-900 dark:text-white">Support technique</p>
+                  <p className="text-xs text-surface-600 dark:text-surface-400">Aide & assistance</p>
                 </div>
               </label>
             </div>
@@ -299,7 +299,7 @@ const CreateRMA = () => {
 
           {/* Motif */}
           <div className="mb-6">
-            <label className="block text-sm font-semibold text-gray-900 mb-2">
+            <label className="block text-sm font-semibold text-surface-900 dark:text-white mb-2">
               Motif de la demande *
             </label>
             <input
@@ -307,14 +307,14 @@ const CreateRMA = () => {
               value={formData.reason}
               onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
               placeholder="Ex: Ecran ne s'allume plus, bouton defectueux..."
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-surface-300 dark:border-surface-600 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:bg-surface-700 dark:text-white"
               required
             />
           </div>
 
           {/* Description detaillee */}
           <div className="mb-6">
-            <label className="block text-sm font-semibold text-gray-900 mb-2">
+            <label className="block text-sm font-semibold text-surface-900 dark:text-white mb-2">
               Description detaillee *
             </label>
             <textarea
@@ -322,20 +322,20 @@ const CreateRMA = () => {
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Decrivez le probleme en detail, quand il est apparu, les circonstances..."
               rows={6}
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border border-surface-300 dark:border-surface-600 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:bg-surface-700 dark:text-white"
               required
             />
-            <p className="text-xs text-gray-500 mt-2">
+            <p className="text-xs text-surface-500 dark:text-surface-400 mt-2">
               Plus vous etes precis, plus nous pourrons traiter votre demande rapidement.
             </p>
           </div>
 
           {/* Photos */}
           <div className="mb-6">
-            <label className="block text-sm font-semibold text-gray-900 mb-2">
+            <label className="block text-sm font-semibold text-surface-900 dark:text-white mb-2">
               Photos (optionnel)
             </label>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+            <div className="border-2 border-dashed border-surface-300 dark:border-surface-600 rounded-xl p-6 text-center">
               <input
                 type="file"
                 accept="image/*"
@@ -348,11 +348,11 @@ const CreateRMA = () => {
                 htmlFor="photo-upload"
                 className="cursor-pointer flex flex-col items-center"
               >
-                <FaUpload className="text-4xl text-gray-400 mb-3" />
-                <p className="text-sm text-gray-600 mb-1">
+                <FaUpload className="text-4xl text-surface-400 mb-3" />
+                <p className="text-sm text-surface-600 dark:text-surface-400 mb-1">
                   Cliquez pour ajouter des photos
                 </p>
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-surface-500 dark:text-surface-500">
                   Maximum 5 photos (JPG, PNG)
                 </p>
               </label>
@@ -365,7 +365,7 @@ const CreateRMA = () => {
                     <img
                       src={photo.preview}
                       alt={`Photo ${idx + 1}`}
-                      className="w-full h-24 object-cover rounded border"
+                      className="w-full h-24 object-cover rounded border border-surface-200 dark:border-surface-700"
                     />
                     <button
                       type="button"
@@ -381,8 +381,8 @@ const CreateRMA = () => {
           </div>
 
           {/* Message info */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <p className="text-sm text-blue-800">
+          <div className="bg-brand-50 dark:bg-brand-900/20 border border-brand-200 dark:border-brand-800 rounded-xl p-4 mb-6">
+            <p className="text-sm text-brand-800 dark:text-brand-200">
               <strong>A savoir :</strong> Notre equipe analysera votre demande sous 48h ouvrees.
               Vous serez notifie par email et SMS a chaque etape du traitement.
             </p>
@@ -393,7 +393,7 @@ const CreateRMA = () => {
             <button
               type="submit"
               disabled={loading || !formData.orderId || !formData.productId}
-              className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white py-3 px-6 rounded-lg font-semibold transition flex items-center justify-center gap-2"
+              className="flex-1 bg-brand-500 hover:bg-brand-600 disabled:bg-surface-400 text-white py-3 px-6 rounded-xl font-semibold transition flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>
@@ -409,7 +409,7 @@ const CreateRMA = () => {
             </button>
 
             <Link href="/dashboard/rma"
-              className="flex-1 sm:flex-none bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 px-6 rounded-lg font-semibold transition text-center"
+              className="flex-1 sm:flex-none bg-surface-200 hover:bg-surface-300 dark:bg-surface-700 dark:hover:bg-surface-600 text-surface-700 dark:text-surface-300 py-3 px-6 rounded-xl font-semibold transition text-center"
             >
               Annuler
             </Link>

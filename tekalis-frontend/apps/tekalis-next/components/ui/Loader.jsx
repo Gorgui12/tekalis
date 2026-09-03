@@ -22,9 +22,9 @@ const Loader = ({
 
   // Couleurs
   const colorClasses = {
-    blue: "text-blue-600 border-blue-600",
+    blue: "text-brand-500 border-brand-500",
     white: "text-white border-white",
-    gray: "text-gray-600 border-gray-600",
+    gray: "text-surface-600 border-surface-600",
     green: "text-green-600 border-green-600",
     red: "text-red-600 border-red-600"
   };
@@ -180,9 +180,9 @@ export const ButtonLoader = () => {
 export const SkeletonLoader = ({ className = "" }) => {
   return (
     <div className={`animate-pulse space-y-4 ${className}`}>
-      <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-      <div className="h-4 bg-gray-200 rounded w-full"></div>
-      <div className="h-4 bg-gray-200 rounded w-5/6"></div>
+      <div className="h-4 bg-surface-200 rounded w-3/4"></div>
+      <div className="h-4 bg-surface-200 rounded w-full"></div>
+      <div className="h-4 bg-surface-200 rounded w-5/6"></div>
     </div>
   );
 };
@@ -192,17 +192,17 @@ export const ProgressLoader = ({ progress = 0, text }) => {
   return (
     <div className="w-full max-w-md space-y-3">
       {text && (
-        <p className="text-center text-gray-700 font-semibold">{text}</p>
+        <p className="text-center text-surface-700 dark:text-surface-300 font-semibold">{text}</p>
       )}
       
-      <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+      <div className="w-full bg-surface-200 rounded-full h-3 overflow-hidden">
         <div
-          className="bg-blue-600 h-full rounded-full transition-all duration-300"
+          className="bg-brand-500 h-full rounded-full transition-all duration-300"
           style={{ width: `${progress}%` }}
         ></div>
       </div>
       
-      <p className="text-center text-sm text-gray-600">{progress}%</p>
+      <p className="text-center text-sm text-surface-600 dark:text-surface-400">{progress}%</p>
     </div>
   );
 };
@@ -219,7 +219,7 @@ export const CircularProgress = ({
   const offset = circumference - (progress / 100) * circumference;
 
   const colors = {
-    blue: "#2563eb",
+    blue: "#f59e0b",
     green: "#16a34a",
     red: "#dc2626",
     yellow: "#ca8a04"
@@ -249,7 +249,7 @@ export const CircularProgress = ({
           className="transition-all duration-300"
         />
       </svg>
-      <span className="absolute text-xl font-bold text-gray-900">
+      <span className="absolute text-xl font-bold text-surface-900 dark:text-white">
         {Math.round(progress)}%
       </span>
     </div>

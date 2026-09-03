@@ -1,5 +1,6 @@
 const Product = require("../models/Product");
 const Category = require("../models/Category");
+const { escapeRegex } = require("../utils/regexEscape");
 
 // ===============================================
 // Utilitaire : résoudre les catégories
@@ -13,7 +14,7 @@ const resolveCategoryIds = async (categoryInput) => {
       continue;
     }
     let found = await Category.findOne({
-      name: { $regex: new RegExp(`^${cat.trim()}$`, "i") }
+      name: { $regex: new RegExp(`^${escapeRegex(cat.trim())}$`, "i") }
     });
     if (!found) {
       found = await Category.create({
@@ -46,14 +47,15 @@ exports.getProducts = async (req, res) => {
 
     const filter = {};
     if (search) {
+      const safeSearch = escapeRegex(search);
       filter.$or = [
-        { name: { $regex: search, $options: "i" } },
-        { description: { $regex: search, $options: "i" } },
-        { brand: { $regex: search, $options: "i" } }
+        { name: { $regex: safeSearch, $options: "i" } },
+        { description: { $regex: safeSearch, $options: "i" } },
+        { brand: { $regex: safeSearch, $options: "i" } }
       ];
     }
     if (category) filter.category = category;
-    if (brand) filter.brand = { $regex: new RegExp(brand, "i") };
+    if (brand) filter.brand = { $regex: new RegExp(escapeRegex(brand), "i") };
     if (status) filter.status = status;
     if (featured === "true") filter.isFeatured = true;
     if (minPrice || maxPrice) {

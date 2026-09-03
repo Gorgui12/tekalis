@@ -15,8 +15,8 @@ const STATUS_CONFIGS = {
     icon: "⏳" 
   },
   processing: { 
-    bg: "bg-blue-100", 
-    text: "text-blue-700", 
+    bg: "bg-brand-100", 
+    text: "text-brand-700", 
     label: "En traitement", 
     icon: "📦" 
   },
@@ -47,8 +47,8 @@ const STATUS_CONFIGS = {
   
   // 🔧 RMA STATUS
   approved: { 
-    bg: "bg-blue-100", 
-    text: "text-blue-700", 
+    bg: "bg-brand-100", 
+    text: "text-brand-700", 
     label: "Approuvée", 
     icon: "✓" 
   },
@@ -122,8 +122,8 @@ const StatusBadge = ({
 }) => {
   // Utiliser config personnalisée ou config par défaut
   const config = customConfig || STATUS_CONFIGS[status] || {
-    bg: "bg-gray-100",
-    text: "text-gray-700",
+    bg: "bg-surface-200 dark:bg-surface-700",
+    text: "text-surface-700 dark:text-surface-300",
     label: status || "Inconnu",
     icon: "•"
   };

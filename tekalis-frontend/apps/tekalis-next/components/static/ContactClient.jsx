@@ -33,7 +33,7 @@ const CONTACT_INFO = [
     label: "Email",
     value: "contact@tekalis.com",
     href: "mailto:contact@tekalis.com",
-    color: "bg-blue-100 text-blue-600"
+    color: "bg-brand-100 text-brand-600"
   },
   {
     icon: <FaMapMarkerAlt />,
@@ -124,10 +124,10 @@ const ContactForm = () => {
   };
 
   const inputClasses = (field) =>
-    `w-full border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 transition text-gray-900 dark:text-white dark:bg-gray-800 ${
+    `w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 transition text-surface-900 dark:text-white dark:bg-surface-800 ${
       errors[field]
         ? "border-red-400 focus:ring-red-400 bg-red-50 dark:bg-red-900/20"
-        : "border-gray-300 dark:border-gray-600 focus:ring-blue-500 bg-white dark:bg-gray-800"
+        : "border-surface-300 dark:border-surface-600 focus:ring-brand-500 bg-white dark:bg-surface-800"
     }`;
 
   // ─ État succès ─────────────────────────────────────────────────────────────
@@ -137,13 +137,13 @@ const ContactForm = () => {
         <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6">
           <FaCheckCircle className="text-green-600 text-4xl" />
         </div>
-        <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+        <h3 className="text-2xl font-bold text-surface-900 dark:text-white mb-3">
           Message envoyé !
         </h3>
-        <p className="text-gray-600 dark:text-gray-400 mb-2 max-w-md">
+        <p className="text-surface-600 dark:text-surface-400 mb-2 max-w-md">
           Merci <strong>{formData.name}</strong>, nous avons bien reçu votre message et nous vous répondrons dans les plus brefs délais.
         </p>
-        <p className="text-sm text-gray-500 dark:text-gray-500 mb-8">
+        <p className="text-sm text-surface-500 dark:text-surface-500 mb-8">
           Réponse attendue sous <strong>24h ouvrées</strong>
         </p>
         <Button
@@ -165,7 +165,7 @@ const ContactForm = () => {
       {/* Nom + Email */}
       <div className="grid sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-1.5">
+          <label className="block text-sm font-semibold text-surface-900 dark:text-white mb-1.5">
             Nom complet <span className="text-red-500">*</span>
           </label>
           <input
@@ -184,7 +184,7 @@ const ContactForm = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-1.5">
+          <label className="block text-sm font-semibold text-surface-900 dark:text-white mb-1.5">
             Email <span className="text-red-500">*</span>
           </label>
           <input
@@ -206,8 +206,8 @@ const ContactForm = () => {
       {/* Téléphone + Sujet */}
       <div className="grid sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-1.5">
-            Téléphone <span className="text-gray-400 font-normal">(optionnel)</span>
+          <label className="block text-sm font-semibold text-surface-900 dark:text-white mb-1.5">
+            Téléphone <span className="text-surface-400 font-normal">(optionnel)</span>
           </label>
           <input
             type="tel"
@@ -219,7 +219,7 @@ const ContactForm = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-1.5">
+          <label className="block text-sm font-semibold text-surface-900 dark:text-white mb-1.5">
             Sujet <span className="text-red-500">*</span>
           </label>
           <select
@@ -243,7 +243,7 @@ const ContactForm = () => {
 
       {/* Message */}
       <div>
-        <label className="block text-sm font-semibold text-gray-900 dark:text-white mb-1.5">
+        <label className="block text-sm font-semibold text-surface-900 dark:text-white mb-1.5">
           Message <span className="text-red-500">*</span>
         </label>
         <textarea
@@ -262,7 +262,7 @@ const ContactForm = () => {
           ) : (
             <span />
           )}
-          <span className={`text-xs ${formData.message.length < 20 ? "text-gray-400" : "text-green-600"}`}>
+          <span className={`text-xs ${formData.message.length < 20 ? "text-surface-400" : "text-green-600"}`}>
             {formData.message.length} / 20 min
           </span>
         </div>
@@ -279,7 +279,7 @@ const ContactForm = () => {
         {loading ? "Envoi en cours..." : "Envoyer le message"}
       </Button>
 
-      <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+      <p className="text-xs text-surface-500 dark:text-surface-400 text-center">
         Vos données sont utilisées uniquement pour répondre à votre demande.
       </p>
     </form>
@@ -290,7 +290,7 @@ const ContactForm = () => {
 const Contact = () => {
   return (
     <>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 pt-28 pb-16">
+      <div className="min-h-screen bg-surface-50 dark:bg-surface-900 pt-28 pb-16">
         <div className="container mx-auto px-4">
 
           {/* Breadcrumb */}
@@ -298,10 +298,10 @@ const Contact = () => {
 
           {/* Hero */}
           <div className="text-center mb-12 mt-4">
-            <h1 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+            <h1 className="text-4xl md:text-5xl font-bold text-surface-900 dark:text-white mb-4 font-display">
               Contactez-nous
             </h1>
-            <p className="text-lg text-gray-600 dark:text-gray-400 max-w-xl mx-auto">
+            <p className="text-lg text-surface-600 dark:text-surface-400 max-w-xl mx-auto">
               Une question, un problème, ou envie de discuter d'un projet ?
               Notre équipe vous répond rapidement.
             </p>
@@ -313,8 +313,8 @@ const Contact = () => {
             <div className="lg:col-span-2 space-y-6">
 
               {/* Infos de contact */}
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-5">
+              <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-card p-6">
+                <h2 className="text-xl font-bold text-surface-900 dark:text-white mb-5">
                   Nos coordonnées
                 </h2>
                 <div className="space-y-4">
@@ -324,16 +324,16 @@ const Contact = () => {
                       href={item.href}
                       target={item.external ? "_blank" : undefined}
                       rel={item.external ? "noopener noreferrer" : undefined}
-                      className="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 dark:hover:bg-gray-700 transition group"
+                      className="flex items-center gap-4 p-3 rounded-xl hover:bg-surface-100 dark:hover:bg-surface-700 transition group"
                     >
                       <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 ${item.color}`}>
                         {item.icon}
                       </div>
                       <div>
-                        <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+                        <p className="text-xs font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wide">
                           {item.label}
                         </p>
-                        <p className="text-sm font-semibold text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">
+                        <p className="text-sm font-semibold text-surface-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 transition">
                           {item.value}
                         </p>
                       </div>
@@ -343,12 +343,12 @@ const Contact = () => {
               </div>
 
               {/* Horaires */}
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6">
+              <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-card p-6">
                 <div className="flex items-center gap-3 mb-5">
                   <div className="w-9 h-9 bg-purple-100 rounded-xl flex items-center justify-center">
                     <FaClock className="text-purple-600" />
                   </div>
-                  <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+                  <h2 className="text-xl font-bold text-surface-900 dark:text-white">
                     Horaires d'ouverture
                   </h2>
                 </div>
@@ -356,15 +356,15 @@ const Contact = () => {
                   {HORAIRES.map((h, idx) => (
                     <div
                       key={idx}
-                      className="flex items-center justify-between py-2 border-b border-gray-100 dark:border-gray-700 last:border-0"
+                      className="flex items-center justify-between py-2 border-b border-surface-100 dark:border-surface-700 last:border-0"
                     >
-                      <span className="text-sm text-gray-600 dark:text-gray-400">
+                      <span className="text-sm text-surface-600 dark:text-surface-400">
                         {h.jour}
                       </span>
                       <span className={`text-sm font-semibold ${
                         h.heures === "Fermé"
                           ? "text-red-500"
-                          : "text-gray-900 dark:text-white"
+                          : "text-surface-900 dark:text-white"
                       }`}>
                         {h.heures}
                       </span>
@@ -374,8 +374,8 @@ const Contact = () => {
               </div>
 
               {/* Réseaux sociaux */}
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-6">
-                <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-4">
+              <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-card p-6">
+                <h2 className="text-xl font-bold text-surface-900 dark:text-white mb-4">
                   Réseaux sociaux
                 </h2>
                 <div className="flex gap-3">
@@ -390,7 +390,7 @@ const Contact = () => {
                       href={social.href}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`w-11 h-11 bg-gray-100 dark:bg-gray-700 ${social.color} hover:text-white text-gray-600 dark:text-gray-300 rounded-xl flex items-center justify-center transition`}
+                      className={`w-11 h-11 bg-surface-100 dark:bg-surface-700 ${social.color} hover:text-white text-surface-600 dark:text-surface-300 rounded-xl flex items-center justify-center transition`}
                     >
                       {social.icon}
                     </a>
@@ -401,11 +401,11 @@ const Contact = () => {
 
             {/* ─── Colonne droite : formulaire ─────────────────────────────── */}
             <div className="lg:col-span-3">
-              <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-md p-8">
-                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-card p-8">
+                <h2 className="text-2xl font-bold text-surface-900 dark:text-white mb-2">
                   Envoyer un message
                 </h2>
-                <p className="text-gray-500 dark:text-gray-400 text-sm mb-8">
+                <p className="text-surface-500 dark:text-surface-400 text-sm mb-8">
                   Réponse garantie sous <strong>24h ouvrées</strong>
                 </p>
                 <ContactForm />
@@ -437,4 +437,3 @@ const Contact = () => {
 };
 
 export default Contact;
-

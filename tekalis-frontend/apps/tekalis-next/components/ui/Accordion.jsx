@@ -41,21 +41,21 @@ const Accordion = ({
   const variantClasses = {
     default: {
       container: "space-y-2",
-      item: "bg-white border border-gray-200 rounded-lg overflow-hidden",
-      header: "px-5 py-4 hover:bg-gray-50 transition cursor-pointer",
-      content: "px-5 pb-4 text-gray-700"
+      item: "bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-xl overflow-hidden",
+      header: "px-5 py-4 hover:bg-surface-100 dark:hover:bg-surface-700 transition cursor-pointer",
+      content: "px-5 pb-4 text-surface-700 dark:text-surface-300"
     },
     bordered: {
-      container: "border border-gray-200 rounded-lg divide-y",
+      container: "border border-surface-200 dark:border-surface-700 rounded-xl divide-y",
       item: "",
-      header: "px-5 py-4 hover:bg-gray-50 transition cursor-pointer",
-      content: "px-5 pb-4 bg-gray-50 text-gray-700"
+      header: "px-5 py-4 hover:bg-surface-100 dark:hover:bg-surface-700 transition cursor-pointer",
+      content: "px-5 pb-4 bg-surface-100 dark:bg-surface-800 text-surface-700 dark:text-surface-300"
     },
     filled: {
       container: "space-y-2",
-      item: "bg-gray-50 rounded-lg overflow-hidden",
-      header: "px-5 py-4 hover:bg-gray-100 transition cursor-pointer",
-      content: "px-5 pb-4 bg-white text-gray-700"
+      item: "bg-surface-100 dark:bg-surface-800 rounded-xl overflow-hidden",
+      header: "px-5 py-4 hover:bg-surface-200 dark:hover:bg-surface-700 transition cursor-pointer",
+      content: "px-5 pb-4 bg-white dark:bg-surface-800 text-surface-700 dark:text-surface-300"
     }
   };
 
@@ -75,24 +75,24 @@ const Accordion = ({
             >
               <div className="flex items-center justify-between gap-4">
                 {iconPosition === "left" && (
-                  <span className="text-gray-600 flex-shrink-0">
+                  <span className="text-surface-500 dark:text-surface-400 flex-shrink-0">
                     {getIcon(itemOpen)}
                   </span>
                 )}
 
                 <div className="flex-1">
-                  <h3 className="text-lg font-semibold text-gray-900">
+                  <h3 className="text-lg font-semibold text-surface-900 dark:text-white">
                     {item.title}
                   </h3>
                   {item.subtitle && (
-                    <p className="text-sm text-gray-600 mt-1">
+                    <p className="text-sm text-surface-600 dark:text-surface-400 mt-1">
                       {item.subtitle}
                     </p>
                   )}
                 </div>
 
                 {iconPosition === "right" && (
-                  <span className="text-gray-600 flex-shrink-0">
+                  <span className="text-surface-500 dark:text-surface-400 flex-shrink-0">
                     {getIcon(itemOpen)}
                   </span>
                 )}
@@ -146,27 +146,27 @@ export const AccordionItem = ({
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+    <div className="bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-xl overflow-hidden">
       <div
         onClick={onToggle}
-        className="px-5 py-4 hover:bg-gray-50 transition cursor-pointer"
+        className="px-5 py-4 hover:bg-surface-100 dark:hover:bg-surface-700 transition cursor-pointer"
       >
         <div className="flex items-center justify-between gap-4">
           {iconPosition === "left" && (
-            <span className="text-gray-600 flex-shrink-0">
+            <span className="text-surface-500 dark:text-surface-400 flex-shrink-0">
               {getIcon()}
             </span>
           )}
 
           <div className="flex-1">
-            <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
+            <h3 className="text-lg font-semibold text-surface-900 dark:text-white">{title}</h3>
             {subtitle && (
-              <p className="text-sm text-gray-600 mt-1">{subtitle}</p>
+              <p className="text-sm text-surface-600 dark:text-surface-400 mt-1">{subtitle}</p>
             )}
           </div>
 
           {iconPosition === "right" && (
-            <span className="text-gray-600 flex-shrink-0">
+            <span className="text-surface-500 dark:text-surface-400 flex-shrink-0">
               {getIcon()}
             </span>
           )}
@@ -174,7 +174,7 @@ export const AccordionItem = ({
       </div>
 
       {isOpen && (
-        <div className="px-5 pb-4 text-gray-700 animate-fadeIn">
+        <div className="px-5 pb-4 text-surface-700 dark:text-surface-300 animate-fadeIn">
           {children}
         </div>
       )}

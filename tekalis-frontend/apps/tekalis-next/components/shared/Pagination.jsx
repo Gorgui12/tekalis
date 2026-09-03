@@ -55,19 +55,19 @@ const Pagination = ({
   const sizeClasses = sizes[size];
 
   const buttonBaseClasses = `
-    rounded-lg 
+    rounded-xl 
     border 
-    border-gray-300 
+    border-surface-300 
     font-semibold 
     transition-all 
     duration-200
     disabled:opacity-50 
     disabled:cursor-not-allowed
-    hover:bg-gray-100
-    active:bg-gray-200
+    hover:bg-surface-100
+    active:bg-surface-200
     focus:outline-none 
     focus:ring-2 
-    focus:ring-blue-500
+    focus:ring-brand-500
   `;
 
   return (
@@ -104,17 +104,17 @@ const Pagination = ({
               onClick={() => onPageChange(page)}
               className={`
                 ${sizeClasses.pageButton}
-                rounded-lg 
+                rounded-xl 
                 font-semibold 
                 transition-all 
                 duration-200
                 focus:outline-none 
                 focus:ring-2 
-                focus:ring-blue-500
+                focus:ring-brand-500
                 ${
                   page === currentPage
-                    ? 'bg-blue-600 text-white shadow-md hover:bg-blue-700'
-                    : 'bg-white border border-gray-300 hover:bg-gray-100 active:bg-gray-200'
+                    ? 'bg-brand-500 text-white shadow-md hover:bg-brand-600'
+                    : 'bg-white border border-surface-300 hover:bg-surface-100 active:bg-surface-200'
                 }
               `}
               aria-label={`Page ${page}`}
@@ -128,7 +128,7 @@ const Pagination = ({
 
       {/* Current page indicator (if page numbers hidden) */}
       {!showPageNumbers && (
-        <span className="px-4 py-2 text-sm font-semibold text-gray-700">
+        <span className="px-4 py-2 text-sm font-semibold text-surface-700 dark:text-surface-300">
           Page {currentPage} sur {totalPages}
         </span>
       )}

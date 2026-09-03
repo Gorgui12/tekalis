@@ -13,7 +13,6 @@
   "description": "API Backend Tekalis - E-commerce Tech Sénégal",
   "dependencies": {
     "bcryptjs": "^3.0.3",
-    "body-parser": "^2.2.1",
     "cors": "^2.8.6",
     "dotenv": "^16.6.1",
     "express": "^4.22.1",
@@ -22,11 +21,9 @@
     "express-validator": "^7.2.1",
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.3",
-    "moment-timezone": "^0.6.0",
     "mongoose": "^8.20.2",
     "morgan": "^1.10.1",
     "multer": "^1.4.5-lts.2",
-    "node-cron": "^4.2.1",
     "nodemailer": "^6.10.1",
     "paydunya": "^1.0.12"
   },

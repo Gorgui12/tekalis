@@ -97,22 +97,22 @@ const ProductSpecs = ({ product }) => {
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+    <div className="bg-white dark:bg-surface-800 rounded-xl shadow-card overflow-hidden">
       {/* Tabs */}
-      <div className="flex border-b border-gray-200 dark:border-gray-700 overflow-x-auto">
+      <div className="flex border-b border-surface-200 dark:border-surface-700 overflow-x-auto">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
             className={`flex-1 min-w-fit px-6 py-4 font-semibold transition ${
               activeTab === tab.id
-                ? 'text-blue-600 dark:text-blue-400 border-b-2 border-blue-600 bg-blue-50 dark:bg-blue-900/20'
-                : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700'
+                ? 'text-brand-600 dark:text-brand-400 border-b-2 border-brand-500 bg-brand-50 dark:bg-brand-900/20'
+                : 'text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-surface-200 hover:bg-surface-100 dark:hover:bg-surface-700'
             }`}
           >
             {tab.label}
             {tab.count !== undefined && (
-              <span className="ml-2 text-xs bg-gray-200 dark:bg-gray-700 px-2 py-0.5 rounded-full">
+              <span className="ml-2 text-xs bg-surface-200 dark:bg-surface-700 px-2 py-0.5 rounded-full">
                 {tab.count}
               </span>
             )}
@@ -129,7 +129,7 @@ const ProductSpecs = ({ product }) => {
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={copySpecs}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition text-sm font-medium"
+                className="flex items-center gap-2 px-4 py-2 bg-surface-100 dark:bg-surface-700 hover:bg-surface-200 dark:hover:bg-surface-600 rounded-xl transition text-sm font-medium"
               >
                 {copied ? <FaClipboardCheck className="text-green-500" /> : <FaClipboard />}
                 {copied ? "Copié !" : "Copier"}
@@ -137,7 +137,7 @@ const ProductSpecs = ({ product }) => {
               
               <button
                 onClick={handleShare}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition text-sm font-medium"
+                className="flex items-center gap-2 px-4 py-2 bg-surface-100 dark:bg-surface-700 hover:bg-surface-200 dark:hover:bg-surface-600 rounded-xl transition text-sm font-medium"
               >
                 <FaShare />
                 Partager
@@ -145,7 +145,7 @@ const ProductSpecs = ({ product }) => {
               
               <button
                 onClick={handlePrint}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded-lg transition text-sm font-medium"
+                className="flex items-center gap-2 px-4 py-2 bg-surface-100 dark:bg-surface-700 hover:bg-surface-200 dark:hover:bg-surface-600 rounded-xl transition text-sm font-medium"
               >
                 <FaPrint />
                 Imprimer
@@ -156,16 +156,16 @@ const ProductSpecs = ({ product }) => {
             {product.specs ? (
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                  <tbody className="divide-y divide-surface-200 dark:divide-surface-700">
                     {Object.entries(product.specs).map(([key, value]) => (
-                      <tr key={key} className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition">
-                        <td className="py-4 px-4 text-sm font-semibold text-gray-700 dark:text-gray-300 flex items-center gap-2">
-                          <span className="text-blue-600 dark:text-blue-400">
+                      <tr key={key} className="hover:bg-surface-100 dark:hover:bg-surface-700/50 transition">
+                        <td className="py-4 px-4 text-sm font-semibold text-surface-700 dark:text-surface-300 flex items-center gap-2">
+                          <span className="text-brand-500 dark:text-brand-400">
                             {getSpecIcon(key)}
                           </span>
                           {getSpecLabel(key)}
                         </td>
-                        <td className="py-4 px-4 text-sm text-gray-900 dark:text-white">
+                        <td className="py-4 px-4 text-sm text-surface-900 dark:text-white">
                           {value}
                         </td>
                       </tr>
@@ -174,7 +174,7 @@ const ProductSpecs = ({ product }) => {
                 </table>
               </div>
             ) : (
-              <p className="text-gray-500 dark:text-gray-400 text-center py-8">
+              <p className="text-surface-500 dark:text-surface-400 text-center py-8">
                 Aucune caractéristique disponible
               </p>
             )}
@@ -185,11 +185,11 @@ const ProductSpecs = ({ product }) => {
         {activeTab === "description" && (
           <div className="prose dark:prose-invert max-w-none">
             {product.description ? (
-              <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line">
+              <p className="text-surface-700 dark:text-surface-300 leading-relaxed whitespace-pre-line">
                 {product.description}
               </p>
             ) : (
-              <p className="text-gray-500 dark:text-gray-400 text-center py-8">
+              <p className="text-surface-500 dark:text-surface-400 text-center py-8">
                 Aucune description disponible
               </p>
             )}
@@ -201,22 +201,22 @@ const ProductSpecs = ({ product }) => {
           <div className="space-y-6">
             {product.rating?.count > 0 ? (
               <div className="text-center py-8">
-                <div className="text-5xl font-bold text-blue-600 dark:text-blue-400 mb-2">
+                <div className="text-5xl font-bold text-brand-600 dark:text-brand-400 mb-2">
                   {product.rating.average.toFixed(1)}
                 </div>
                 <div className="flex justify-center mb-2">
                   {[...Array(5)].map((_, i) => (
-                    <span key={i} className={`text-2xl ${i < Math.floor(product.rating.average) ? 'text-yellow-400' : 'text-gray-300 dark:text-gray-600'}`}>
+                    <span key={i} className={`text-2xl ${i < Math.floor(product.rating.average) ? 'text-yellow-400' : 'text-surface-300 dark:text-surface-600'}`}>
                       ★
                     </span>
                   ))}
                 </div>
-                <p className="text-gray-600 dark:text-gray-400">
+                <p className="text-surface-600 dark:text-surface-400">
                   Basé sur {product.rating.count} avis
                 </p>
               </div>
             ) : (
-              <p className="text-gray-500 dark:text-gray-400 text-center py-8">
+              <p className="text-surface-500 dark:text-surface-400 text-center py-8">
                 Aucun avis pour le moment. Soyez le premier à donner votre avis !
               </p>
             )}
@@ -228,5 +228,3 @@ const ProductSpecs = ({ product }) => {
 };
 
 export default ProductSpecs;
-
-

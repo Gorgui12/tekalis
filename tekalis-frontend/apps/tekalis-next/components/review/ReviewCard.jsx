@@ -26,12 +26,12 @@ const ReviewCard = ({ review, onHelpful }) => {
     : "?";
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-5 space-y-3">
+    <div className="bg-white dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700 p-5 space-y-3">
       {/* Header : avatar + nom + date + vérifié */}
       <div className="flex items-start justify-between gap-4">
         <div className="flex items-center gap-3">
           {/* Avatar */}
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-500 to-orange-600 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
             {review.user?.avatar ? (
               <img
                 src={review.user.avatar}
@@ -43,7 +43,7 @@ const ReviewCard = ({ review, onHelpful }) => {
 
           <div>
             <div className="flex items-center gap-2">
-              <p className="font-semibold text-gray-900 dark:text-white text-sm">
+              <p className="font-semibold text-surface-900 dark:text-white text-sm">
                 {review.user?.name || "Utilisateur"}
               </p>
               {review.verifiedPurchase && (
@@ -53,7 +53,7 @@ const ReviewCard = ({ review, onHelpful }) => {
                 </span>
               )}
             </div>
-            <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+            <p className="text-xs text-surface-500 dark:text-surface-400 mt-0.5">
               {review.createdAt
                 ? new Date(review.createdAt || 0).toLocaleDateString("fr-FR", {
                     day: "2-digit", month: "long", year: "numeric"
@@ -69,19 +69,19 @@ const ReviewCard = ({ review, onHelpful }) => {
 
       {/* Titre */}
       {review.title && (
-        <p className="font-bold text-gray-900 dark:text-white text-sm">
+        <p className="font-bold text-surface-900 dark:text-white text-sm">
           {review.title}
         </p>
       )}
 
       {/* Commentaire */}
-      <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+      <p className="text-sm text-surface-700 dark:text-surface-300 leading-relaxed">
         {review.comment}
       </p>
 
       {/* Utilité */}
-      <div className="flex items-center gap-4 pt-2 border-t border-gray-100 dark:border-gray-700">
-        <span className="text-xs text-gray-500 dark:text-gray-400">
+      <div className="flex items-center gap-4 pt-2 border-t border-surface-100 dark:border-surface-700">
+        <span className="text-xs text-surface-500 dark:text-surface-400">
           Cet avis vous a été utile ?
         </span>
         <div className="flex items-center gap-3">
@@ -91,7 +91,7 @@ const ReviewCard = ({ review, onHelpful }) => {
             className={`flex items-center gap-1.5 text-xs font-semibold transition ${
               helpfulVoted === "up"
                 ? "text-green-600 dark:text-green-400"
-                : "text-gray-500 dark:text-gray-400 hover:text-green-600 dark:hover:text-green-400"
+                : "text-surface-500 dark:text-surface-400 hover:text-green-600 dark:hover:text-green-400"
             } disabled:cursor-not-allowed`}
           >
             <FaThumbsUp size={13} />
@@ -103,7 +103,7 @@ const ReviewCard = ({ review, onHelpful }) => {
             className={`flex items-center gap-1.5 text-xs font-semibold transition ${
               helpfulVoted === "down"
                 ? "text-red-500 dark:text-red-400"
-                : "text-gray-500 dark:text-gray-400 hover:text-red-500 dark:hover:text-red-400"
+                : "text-surface-500 dark:text-surface-400 hover:text-red-500 dark:hover:text-red-400"
             } disabled:cursor-not-allowed`}
           >
             <FaThumbsDown size={13} />

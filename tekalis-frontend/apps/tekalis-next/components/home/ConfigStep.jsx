@@ -25,15 +25,15 @@ const ConfigStep = ({
               currentStep > step.number
                 ? "bg-green-500 text-white"
                 : currentStep === step.number
-                ? "bg-blue-600 text-white"
-                : "bg-gray-300 text-gray-600"
+                ? "bg-brand-500 text-white"
+                : "bg-surface-300 text-surface-600"
             }`}>
               {currentStep > step.number ? <FaCheckCircle /> : step.number}
               
               {/* Connector Line */}
               {index < displaySteps.length - 1 && (
                 <div className={`absolute top-full left-1/2 -translate-x-1/2 w-0.5 h-8 ${
-                  currentStep > step.number ? "bg-green-500" : "bg-gray-300"
+                  currentStep > step.number ? "bg-green-500" : "bg-surface-300"
                 }`}></div>
               )}
             </div>
@@ -41,12 +41,12 @@ const ConfigStep = ({
             {/* Label */}
             <div className={`flex-1 ${currentStep >= step.number ? "opacity-100" : "opacity-50"}`}>
               <p className={`font-bold ${
-                currentStep >= step.number ? "text-gray-900" : "text-gray-500"
+                currentStep >= step.number ? "text-surface-900 dark:text-white" : "text-surface-500 dark:text-surface-400"
               }`}>
                 {step.label}
               </p>
               {step.description && (
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-sm text-surface-700 dark:text-surface-300 mt-1">
                   {step.description}
                 </p>
               )}
@@ -69,8 +69,8 @@ const ConfigStep = ({
               currentStep > step.number
                 ? "bg-green-500 text-white"
                 : currentStep === step.number
-                ? "bg-blue-600 text-white animate-pulse"
-                : "bg-gray-300 text-gray-600"
+                ? "bg-brand-500 text-white animate-pulse"
+                : "bg-surface-300 text-surface-600"
             }`}>
               {currentStep > step.number ? <FaCheckCircle /> : step.number}
             </div>
@@ -78,12 +78,12 @@ const ConfigStep = ({
             {/* Label */}
             <div className="mt-2 text-center">
               <p className={`text-sm font-semibold ${
-                currentStep >= step.number ? "text-gray-900" : "text-gray-500"
+                currentStep >= step.number ? "text-surface-900 dark:text-white" : "text-surface-500 dark:text-surface-400"
               }`}>
                 {step.label}
               </p>
               {step.description && (
-                <p className="text-xs text-gray-500 mt-1 hidden sm:block">
+                <p className="text-xs text-surface-500 dark:text-surface-400 mt-1 hidden sm:block">
                   {step.description}
                 </p>
               )}
@@ -93,7 +93,7 @@ const ConfigStep = ({
           {/* Connector Line */}
           {index < displaySteps.length - 1 && (
             <div className={`w-16 sm:w-24 h-1 mx-2 transition ${
-              currentStep > step.number ? "bg-green-500" : "bg-gray-300"
+              currentStep > step.number ? "bg-green-500" : "bg-surface-300"
             }`}></div>
           )}
         </div>

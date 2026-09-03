@@ -97,7 +97,7 @@ console.log('╚═════════════════════�
 
 console.log('1. Si vous voyez des ⚠️  ou ❌, corrigez-les dans .env');
 console.log('2. Obtenez vos vraies clés PayDunya sur https://paydunya.com');
-console.log('3. Installez les dépendances: npm install paydunya body-parser');
+console.log('3. Installez les dépendances: npm install');
 console.log('4. Créez les fichiers controllers/paymentController.js');
 console.log('5. Créez les fichiers routes/paymentRoutes.js');
 console.log('6. Redémarrez le serveur: npm start\n');

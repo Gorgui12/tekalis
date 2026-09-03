@@ -57,14 +57,14 @@ const AddressForm = ({
     onChange({ ...formData, [field]: value });
   };
 
-  const inputBaseClasses = "w-full border rounded-lg px-4 py-3 focus:outline-none focus:ring-2 transition";
+  const inputBaseClasses = "w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 transition";
   const inputClasses = (field) => `
     ${inputBaseClasses}
     ${errors[field] 
       ? 'border-red-500 focus:ring-red-500 bg-red-50' 
-      : 'border-gray-300 focus:ring-blue-500 bg-white'
+      : 'border-surface-300 focus:ring-brand-500 bg-white'
     }
-    ${disabled ? 'opacity-60 cursor-not-allowed bg-gray-100' : ''}
+    ${disabled ? 'opacity-60 cursor-not-allowed bg-surface-100' : ''}
   `;
 
   return (
@@ -72,7 +72,7 @@ const AddressForm = ({
       {/* Libellé de l'adresse */}
       {showLabel && (
         <div>
-          <label className="block text-sm font-semibold text-gray-900 mb-2">
+          <label className="block text-sm font-semibold text-surface-900 dark:text-white mb-2">
             Libellé de l'adresse *
           </label>
           <input
@@ -96,7 +96,7 @@ const AddressForm = ({
 
       {/* Nom complet du destinataire */}
       <div>
-        <label className="block text-sm font-semibold text-gray-900 mb-2">
+          <label className="block text-sm font-semibold text-surface-900 dark:text-white mb-2">
           Nom complet du destinataire *
         </label>
         <input
@@ -119,7 +119,7 @@ const AddressForm = ({
 
       {/* Téléphone */}
       <div>
-        <label className="block text-sm font-semibold text-gray-900 mb-2">
+          <label className="block text-sm font-semibold text-surface-900 dark:text-white mb-2">
           Téléphone *
         </label>
         <input
@@ -139,7 +139,7 @@ const AddressForm = ({
             {errors.phone}
           </p>
         )}
-        <p className="mt-1 text-xs text-gray-500">
+        <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
           Format: XX XXX XX XX (9 chiffres)
         </p>
       </div>
@@ -147,7 +147,7 @@ const AddressForm = ({
       {/* Ville et Région */}
       <div className="grid sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-semibold text-gray-900 mb-2">
+          <label className="block text-sm font-semibold text-surface-900 dark:text-white mb-2">
             Ville *
           </label>
           <select
@@ -170,7 +170,7 @@ const AddressForm = ({
         </div>
 
         <div>
-          <label className="block text-sm font-semibold text-gray-900 mb-2">
+          <label className="block text-sm font-semibold text-surface-900 dark:text-white mb-2">
             Région *
           </label>
           <select
@@ -195,7 +195,7 @@ const AddressForm = ({
 
       {/* Adresse complète */}
       <div>
-        <label className="block text-sm font-semibold text-gray-900 mb-2">
+          <label className="block text-sm font-semibold text-surface-900 dark:text-white mb-2">
           Adresse complète *
         </label>
         <textarea
@@ -214,7 +214,7 @@ const AddressForm = ({
             {errors.address}
           </p>
         )}
-        <p className="mt-1 text-xs text-gray-500">
+        <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
           Soyez précis: nom de quartier, numéro de villa, points de repère
         </p>
       </div>
@@ -227,14 +227,14 @@ const AddressForm = ({
             id="isDefault"
             checked={formData.isDefault || false}
             onChange={(e) => handleChange('isDefault', e.target.checked)}
-            className="mt-1 w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+            className="mt-1 w-5 h-5 text-brand-500 rounded focus:ring-2 focus:ring-brand-500"
             disabled={disabled}
           />
           <label htmlFor="isDefault" className="ml-3 cursor-pointer">
-            <span className="text-sm font-medium text-gray-900">
+            <span className="text-sm font-medium text-surface-900 dark:text-white">
               Définir comme adresse par défaut
             </span>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-surface-500 dark:text-surface-400 mt-0.5">
               Cette adresse sera utilisée automatiquement lors de vos prochaines commandes
             </p>
           </label>

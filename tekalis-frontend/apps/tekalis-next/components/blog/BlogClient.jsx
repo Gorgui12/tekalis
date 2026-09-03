@@ -166,20 +166,20 @@ const Blog = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center mt-20">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-brand-500"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-surface-50">
       {/* Header */}
-      <div className="bg-gradient-to-r from-gray-900 to-gray-800 text-white py-16 mt-20">
+      <div className="bg-gradient-to-r from-surface-900 to-surface-800 text-white py-16 mt-20">
         <div className="container mx-auto px-4">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center font-display">
             📝 Le Labo Tech
           </h1>
-          <p className="text-xl text-gray-300 text-center max-w-2xl mx-auto">
+          <p className="text-xl text-surface-300 text-center max-w-2xl mx-auto">
             Tests, guides d'achat, tutoriels et actualités tech pour vous aider à faire les bons choix
           </p>
         </div>
@@ -187,22 +187,22 @@ const Blog = () => {
 
       <div className="container mx-auto px-4 py-8">
         {/* Barre de recherche et filtres */}
-        <div className="bg-white rounded-lg shadow-md p-4 mb-8">
+        <div className="bg-white dark:bg-surface-800 rounded-xl shadow-card p-4 mb-8">
           <div className="flex flex-col md:flex-row gap-4">
             {/* Recherche */}
             <div className="flex-1 relative">
-              <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-400 dark:text-surface-500" />
               <input
                 type="text"
                 placeholder="Rechercher un article..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full pl-10 pr-10 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500"
               />
               {searchTerm && (
                 <button
                   onClick={() => setSearchTerm("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-surface-400 hover:text-surface-600"
                 >
                   <FaTimes />
                 </button>
@@ -212,7 +212,7 @@ const Blog = () => {
             {/* Bouton filtres mobile */}
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="md:hidden bg-blue-600 text-white px-4 py-3 rounded-lg font-semibold flex items-center justify-center gap-2"
+              className="md:hidden bg-brand-500 text-white px-4 py-3 rounded-xl font-semibold flex items-center justify-center gap-2"
             >
               <FaFilter />
               Catégories
@@ -225,10 +225,10 @@ const Blog = () => {
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
-                className={`px-4 py-2 rounded-lg font-semibold transition flex items-center gap-2 ${
+                className={`px-4 py-2 rounded-xl font-semibold transition flex items-center gap-2 ${
                   selectedCategory === cat.id
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    ? "bg-brand-500 text-white"
+                    : "bg-surface-100 text-surface-700 hover:bg-surface-200"
                 }`}
               >
                 <span>{cat.icon}</span>
@@ -247,10 +247,10 @@ const Blog = () => {
                     setSelectedCategory(cat.id);
                     setShowFilters(false);
                   }}
-                  className={`px-4 py-2 rounded-lg font-semibold transition flex items-center gap-2 ${
+                  className={`px-4 py-2 rounded-xl font-semibold transition flex items-center gap-2 ${
                     selectedCategory === cat.id
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 text-gray-700"
+                      ? "bg-brand-500 text-white"
+                      : "bg-surface-100 text-surface-700"
                   }`}
                 >
                   <span>{cat.icon}</span>
@@ -264,13 +264,13 @@ const Blog = () => {
         {/* Article en vedette */}
         {featuredArticle && (
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">📌 Article mis en avant</h2>
+            <h2 className="text-2xl font-bold text-surface-900 dark:text-white mb-4">📌 Article mis en avant</h2>
             <Link href={`/blog/${featuredArticle.slug}`}
-              className="block bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition group"
+              className="block bg-white dark:bg-surface-800 rounded-2xl shadow-card overflow-hidden hover:shadow-xl transition group"
             >
               <div className="md:flex">
                 <div className="md:w-1/2 relative">
-                  <div className="aspect-video md:aspect-auto md:h-full bg-gray-200">
+                  <div className="aspect-video md:aspect-auto md:h-full bg-surface-200">
                     {/* Image placeholder */}
                   </div>
                   <div className="absolute top-4 left-4">
@@ -278,14 +278,14 @@ const Blog = () => {
                   </div>
                 </div>
                 <div className="md:w-1/2 p-6 md:p-8">
-                  <h3 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition">
+                  <h3 className="text-2xl md:text-3xl font-bold text-surface-900 dark:text-white mb-3 group-hover:text-brand-600 transition">
                     {featuredArticle.title}
                   </h3>
-                  <p className="text-gray-600 mb-4 line-clamp-3">
+                  <p className="text-surface-700 dark:text-surface-300 mb-4 line-clamp-3">
                     {featuredArticle.excerpt}
                   </p>
                   
-                  <div className="flex items-center gap-4 text-sm text-gray-500 mb-4">
+                  <div className="flex items-center gap-4 text-sm text-surface-500 dark:text-surface-400 mb-4">
                     <span className="flex items-center gap-1">
                       <FaClock />
                       {featuredArticle.readTime} min
@@ -297,10 +297,10 @@ const Blog = () => {
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
+                    <div className="w-10 h-10 bg-surface-300 rounded-full"></div>
                     <div>
-                      <p className="font-semibold text-gray-900">{featuredArticle.author.name}</p>
-                      <p className="text-xs text-gray-500">
+                      <p className="font-semibold text-surface-900 dark:text-white">{featuredArticle.author?.name || "Auteur"}</p>
+                      <p className="text-xs text-surface-500 dark:text-surface-400">
                         {new Date(featuredArticle.publishedAt || 0).toLocaleDateString("fr-FR")}
                       </p>
                     </div>
@@ -313,17 +313,17 @@ const Blog = () => {
 
         {/* Liste des articles */}
         <div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">
+          <h2 className="text-2xl font-bold text-surface-900 dark:text-white mb-4">
             {selectedCategory === "all" ? "Tous les articles" : categories.find(c => c.id === selectedCategory)?.label}
           </h2>
 
           {otherArticles.length === 0 ? (
-            <div className="bg-white rounded-lg shadow-md p-12 text-center">
+            <div className="bg-white dark:bg-surface-800 rounded-xl shadow-card p-12 text-center">
               <div className="text-6xl mb-4">🔍</div>
-              <h3 className="text-xl font-bold text-gray-900 mb-2">
+              <h3 className="text-xl font-bold text-surface-900 dark:text-white mb-2">
                 Aucun article trouvé
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className="text-surface-700 dark:text-surface-300 mb-6">
                 Essayez de modifier vos filtres ou votre recherche
               </p>
               <button
@@ -331,7 +331,7 @@ const Blog = () => {
                   setSearchTerm("");
                   setSelectedCategory("all");
                 }}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold"
+                className="bg-brand-500 hover:bg-brand-600 text-white px-6 py-3 rounded-xl font-semibold"
               >
                 Réinitialiser
               </button>
@@ -342,24 +342,24 @@ const Blog = () => {
                 <Link
                   key={article._id}
                   href={`/blog/${article.slug}`}
-                  className="bg-white rounded-lg shadow-md hover:shadow-xl transition overflow-hidden group"
+                  className="bg-white dark:bg-surface-800 rounded-2xl shadow-card hover:shadow-xl transition overflow-hidden group"
                 >
                   <div className="relative">
-                    <div className="aspect-video bg-gray-200"></div>
+                    <div className="aspect-video bg-surface-200"></div>
                     <div className="absolute top-3 left-3">
                       <CategoryBadge category={article.category} />
                     </div>
                   </div>
 
                   <div className="p-5">
-                    <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition">
+                    <h3 className="text-lg font-bold text-surface-900 dark:text-white mb-2 line-clamp-2 group-hover:text-brand-600 transition">
                       {article.title}
                     </h3>
-                    <p className="text-sm text-gray-600 mb-3 line-clamp-2">
+                    <p className="text-sm text-surface-700 dark:text-surface-300 mb-3 line-clamp-2">
                       {article.excerpt}
                     </p>
 
-                    <div className="flex items-center gap-3 text-xs text-gray-500 mb-3">
+                    <div className="flex items-center gap-3 text-xs text-surface-500 dark:text-surface-400 mb-3">
                       <span className="flex items-center gap-1">
                         <FaClock />
                         {article.readTime} min
@@ -371,10 +371,10 @@ const Blog = () => {
                     </div>
 
                     <div className="flex items-center gap-2 pt-3 border-t">
-                      <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
+                      <div className="w-8 h-8 bg-surface-300 rounded-full"></div>
                       <div className="flex-1">
-                        <p className="text-xs font-semibold text-gray-900">{article.author.name}</p>
-                        <p className="text-xs text-gray-500">
+                        <p className="text-xs font-semibold text-surface-900 dark:text-white">{article.author?.name || "Auteur"}</p>
+                        <p className="text-xs text-surface-500 dark:text-surface-400">
                           {new Date(article.publishedAt || 0).toLocaleDateString("fr-FR")}
                         </p>
                       </div>
@@ -398,9 +398,9 @@ const Blog = () => {
             <input
               type="email"
               placeholder="Votre email"
-              className="flex-1 px-4 py-3 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-white"
+              className="flex-1 px-4 py-3 rounded-xl text-surface-900 focus:outline-none focus:ring-2 focus:ring-white"
             />
-            <button className="bg-white text-purple-600 px-6 py-3 rounded-lg font-bold hover:bg-gray-100 transition">
+            <button className="bg-white text-purple-600 px-6 py-3 rounded-xl font-bold hover:bg-surface-100 transition">
               S'abonner
             </button>
           </div>
@@ -411,4 +411,3 @@ const Blog = () => {
 };
 
 export default Blog;
-

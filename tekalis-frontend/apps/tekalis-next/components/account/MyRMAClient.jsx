@@ -61,7 +61,7 @@ const MyRMA = () => {
   const StatusBadge = ({ status }) => {
     const configs = {
       pending: { bg: "bg-yellow-100", text: "text-yellow-700", label: "En attente", icon: "⏳" },
-      approved: { bg: "bg-blue-100", text: "text-blue-700", label: "Approuvée", icon: "✓" },
+      approved: { bg: "bg-brand-100", text: "text-brand-700", label: "Approuvée", icon: "✓" },
       in_progress: { bg: "bg-purple-100", text: "text-purple-700", label: "En cours", icon: "🔧" },
       completed: { bg: "bg-green-100", text: "text-green-700", label: "Terminée", icon: "✓" },
       rejected: { bg: "bg-red-100", text: "text-red-700", label: "Refusée", icon: "✗" }
@@ -91,32 +91,32 @@ const MyRMA = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center mt-20">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-brand-500"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 mt-20">
+    <div className="min-h-screen bg-surface-50 py-8 mt-20">
       <div className="container mx-auto px-4 max-w-7xl">
         {/* En-tête */}
         <div className="mb-8">
           <Link href="/dashboard"
-            className="text-blue-600 hover:text-blue-700 font-semibold mb-4 inline-block"
+            className="text-brand-600 hover:text-brand-700 dark:text-brand-400 font-semibold mb-4 inline-block"
           >
             ← Retour au dashboard
           </Link>
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              <h1 className="text-3xl font-bold text-surface-900 dark:text-white mb-2 font-display">
                 🔧 Mes Demandes SAV
               </h1>
-              <p className="text-gray-600">
+              <p className="text-surface-600 dark:text-surface-400">
                 Suivez vos demandes de service après-vente
               </p>
             </div>
             <Link href="/dashboard/rma/create"
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition"
+              className="bg-brand-500 hover:bg-brand-600 text-white px-6 py-3 rounded-xl font-semibold flex items-center gap-2 transition shadow-md hover:shadow-glow"
             >
               <FaPlus />
               Nouvelle demande
@@ -126,83 +126,83 @@ const MyRMA = () => {
 
         {/* Statistiques */}
         <div className="grid grid-cols-3 sm:grid-cols-6 gap-4 mb-6">
-          <div className="bg-white rounded-lg shadow-md p-4 text-center">
-            <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-            <p className="text-xs text-gray-600">Total</p>
+          <div className="bg-white dark:bg-surface-800 rounded-xl shadow-card p-4 text-center">
+            <p className="text-2xl font-bold text-surface-900 dark:text-white">{stats.total}</p>
+            <p className="text-xs text-surface-600 dark:text-surface-400">Total</p>
           </div>
-          <div className="bg-yellow-50 rounded-lg shadow-md p-4 text-center">
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 rounded-xl shadow-card p-4 text-center">
             <p className="text-2xl font-bold text-yellow-700">{stats.pending}</p>
-            <p className="text-xs text-gray-600">En attente</p>
+            <p className="text-xs text-surface-600 dark:text-surface-400">En attente</p>
           </div>
-          <div className="bg-blue-50 rounded-lg shadow-md p-4 text-center">
-            <p className="text-2xl font-bold text-blue-700">{stats.approved}</p>
-            <p className="text-xs text-gray-600">Approuvées</p>
+          <div className="bg-brand-50 dark:bg-brand-900/20 rounded-xl shadow-card p-4 text-center">
+            <p className="text-2xl font-bold text-brand-700">{stats.approved}</p>
+            <p className="text-xs text-surface-600 dark:text-surface-400">Approuvées</p>
           </div>
-          <div className="bg-purple-50 rounded-lg shadow-md p-4 text-center">
+          <div className="bg-purple-50 dark:bg-purple-900/20 rounded-xl shadow-card p-4 text-center">
             <p className="text-2xl font-bold text-purple-700">{stats.inProgress}</p>
-            <p className="text-xs text-gray-600">En cours</p>
+            <p className="text-xs text-surface-600 dark:text-surface-400">En cours</p>
           </div>
-          <div className="bg-green-50 rounded-lg shadow-md p-4 text-center">
+          <div className="bg-green-50 dark:bg-green-900/20 rounded-xl shadow-card p-4 text-center">
             <p className="text-2xl font-bold text-green-700">{stats.completed}</p>
-            <p className="text-xs text-gray-600">Terminées</p>
+            <p className="text-xs text-surface-600 dark:text-surface-400">Terminées</p>
           </div>
-          <div className="bg-red-50 rounded-lg shadow-md p-4 text-center">
+          <div className="bg-red-50 dark:bg-red-900/20 rounded-xl shadow-card p-4 text-center">
             <p className="text-2xl font-bold text-red-700">{stats.rejected}</p>
-            <p className="text-xs text-gray-600">Refusées</p>
+            <p className="text-xs text-surface-600 dark:text-surface-400">Refusées</p>
           </div>
         </div>
 
         {/* Filtres */}
-        <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+        <div className="bg-white dark:bg-surface-800 rounded-xl shadow-card p-4 mb-6">
           <div className="flex items-center gap-3">
-            <FaFilter className="text-gray-600" />
+            <FaFilter className="text-surface-600 dark:text-surface-400" />
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => setFilter("all")}
-                className={`px-4 py-2 rounded-lg font-semibold text-sm transition ${
+                className={`px-4 py-2 rounded-xl font-semibold text-sm transition ${
                   filter === "all"
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    ? "bg-brand-500 text-white"
+                    : "bg-surface-100 dark:bg-surface-700 text-surface-700 dark:text-surface-300 hover:bg-surface-200 dark:hover:bg-surface-600"
                 }`}
               >
                 Toutes
               </button>
               <button
                 onClick={() => setFilter("pending")}
-                className={`px-4 py-2 rounded-lg font-semibold text-sm transition ${
+                className={`px-4 py-2 rounded-xl font-semibold text-sm transition ${
                   filter === "pending"
                     ? "bg-yellow-600 text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    : "bg-surface-100 dark:bg-surface-700 text-surface-700 dark:text-surface-300 hover:bg-surface-200 dark:hover:bg-surface-600"
                 }`}
               >
                 En attente
               </button>
               <button
                 onClick={() => setFilter("approved")}
-                className={`px-4 py-2 rounded-lg font-semibold text-sm transition ${
+                className={`px-4 py-2 rounded-xl font-semibold text-sm transition ${
                   filter === "approved"
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    ? "bg-brand-500 text-white"
+                    : "bg-surface-100 dark:bg-surface-700 text-surface-700 dark:text-surface-300 hover:bg-surface-200 dark:hover:bg-surface-600"
                 }`}
               >
                 Approuvées
               </button>
               <button
                 onClick={() => setFilter("in_progress")}
-                className={`px-4 py-2 rounded-lg font-semibold text-sm transition ${
+                className={`px-4 py-2 rounded-xl font-semibold text-sm transition ${
                   filter === "in_progress"
                     ? "bg-purple-600 text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    : "bg-surface-100 dark:bg-surface-700 text-surface-700 dark:text-surface-300 hover:bg-surface-200 dark:hover:bg-surface-600"
                 }`}
               >
                 En cours
               </button>
               <button
                 onClick={() => setFilter("completed")}
-                className={`px-4 py-2 rounded-lg font-semibold text-sm transition ${
+                className={`px-4 py-2 rounded-xl font-semibold text-sm transition ${
                   filter === "completed"
                     ? "bg-green-600 text-white"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    : "bg-surface-100 dark:bg-surface-700 text-surface-700 dark:text-surface-300 hover:bg-surface-200 dark:hover:bg-surface-600"
                 }`}
               >
                 Terminées
@@ -213,21 +213,21 @@ const MyRMA = () => {
 
         {/* Liste des RMA */}
         {filteredRMAs.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-md p-12 text-center">
-            <FaTools className="text-6xl text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
+          <div className="bg-white dark:bg-surface-800 rounded-xl shadow-card p-12 text-center">
+            <FaTools className="text-6xl text-surface-400 mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-surface-900 dark:text-white mb-2">
               {filter === "all" 
                 ? "Aucune demande SAV"
                 : "Aucune demande avec ce statut"}
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-surface-600 dark:text-surface-400 mb-6">
               {filter === "all"
                 ? "Vous n'avez pas encore créé de demande de service après-vente"
                 : "Essayez un autre filtre"}
             </p>
             {filter === "all" && (
               <Link href="/dashboard/rma/create"
-                className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold"
+                className="inline-block bg-brand-500 hover:bg-brand-600 text-white px-6 py-3 rounded-xl font-semibold"
               >
                 Créer une demande
               </Link>
@@ -238,22 +238,22 @@ const MyRMA = () => {
             {filteredRMAs.map((rma) => (
               <div
                 key={rma._id}
-                className="bg-white rounded-lg shadow-md hover:shadow-lg transition"
+                className="bg-white dark:bg-surface-800 rounded-xl shadow-card hover:shadow-elevated transition"
               >
                 {/* En-tête */}
-                <div className="bg-gray-50 px-6 py-4 border-b flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+                <div className="bg-surface-50 dark:bg-surface-700 px-6 py-4 border-b border-surface-200 dark:border-surface-600 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-3 mb-2">
-                      <h3 className="font-bold text-gray-900">
+                      <h3 className="font-bold text-surface-900 dark:text-white">
                         RMA #{rma._id.slice(-8).toUpperCase()}
                       </h3>
                       <StatusBadge status={rma.status} />
                     </div>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-surface-600 dark:text-surface-400">
                       Créée le {new Date(rma.createdAt).toLocaleDateString("fr-FR")}
                     </p>
                   </div>
-                  <span className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm font-semibold">
+                  <span className="px-4 py-2 bg-brand-100 dark:bg-brand-900/20 text-brand-700 dark:text-brand-300 rounded-xl text-sm font-semibold">
                     {getRMATypeLabel(rma.type)}
                   </span>
                 </div>
@@ -265,16 +265,16 @@ const MyRMA = () => {
                     <img
                       src={rma.product?.image || "/placeholder.png"}
                       alt={rma.product?.name}
-                      className="w-20 h-20 object-contain rounded border"
+                      className="w-20 h-20 object-contain rounded border border-surface-200 dark:border-surface-700"
                     />
                     <div className="flex-1">
                       <Link href={`/products/${rma.product?._id}`}
-                        className="font-semibold text-gray-900 hover:text-blue-600 block mb-1"
+                        className="font-semibold text-surface-900 dark:text-white hover:text-brand-600 dark:hover:text-brand-400 block mb-1"
                       >
                         {rma.product?.name || "Produit"}
                       </Link>
                       {rma.order && (
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-surface-600 dark:text-surface-400">
                           Commande #{rma.order._id?.slice(-8).toUpperCase()}
                         </p>
                       )}
@@ -282,11 +282,11 @@ const MyRMA = () => {
                   </div>
 
                   {/* Description */}
-                  <div className="bg-gray-50 rounded-lg p-4 mb-4">
-                    <p className="text-sm font-semibold text-gray-900 mb-2">
+                  <div className="bg-surface-50 dark:bg-surface-700/50 rounded-xl p-4 mb-4">
+                    <p className="text-sm font-semibold text-surface-900 dark:text-white mb-2">
                       Motif de la demande :
                     </p>
-                    <p className="text-sm text-gray-700 line-clamp-2">
+                    <p className="text-sm text-surface-700 dark:text-surface-300 line-clamp-2">
                       {rma.reason}
                     </p>
                   </div>
@@ -294,16 +294,16 @@ const MyRMA = () => {
                   {/* Timeline */}
                   {rma.history && rma.history.length > 0 && (
                     <div className="mb-4">
-                      <p className="text-sm font-semibold text-gray-900 mb-2">
+                      <p className="text-sm font-semibold text-surface-900 dark:text-white mb-2">
                         Historique :
                       </p>
                       <div className="space-y-2">
                         {rma.history.slice(0, 2).map((event, idx) => (
                           <div key={idx} className="flex gap-2 text-sm">
-                            <span className="text-gray-500">
+                            <span className="text-surface-500 dark:text-surface-400">
                               {new Date(event.date).toLocaleDateString("fr-FR")}
                             </span>
-                            <span className="text-gray-700">{event.message}</span>
+                            <span className="text-surface-700 dark:text-surface-300">{event.message}</span>
                           </div>
                         ))}
                       </div>
@@ -313,7 +313,7 @@ const MyRMA = () => {
                   {/* Actions */}
                   <div className="flex flex-wrap gap-2">
                     <Link href={`/dashboard/rma/${rma._id}`}
-                      className="flex-1 sm:flex-none bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center justify-center gap-2 transition"
+                      className="flex-1 sm:flex-none bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-xl font-semibold flex items-center justify-center gap-2 transition"
                     >
                       <FaEye />
                       Voir détails
@@ -322,7 +322,7 @@ const MyRMA = () => {
                     {rma.status !== "completed" && rma.status !== "rejected" && (
                       <button
                         onClick={() => navigate(`/dashboard/rma/${rma._id}#comments`)}
-                        className="flex-1 sm:flex-none bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center justify-center gap-2 transition"
+                        className="flex-1 sm:flex-none bg-surface-600 hover:bg-surface-700 text-white px-4 py-2 rounded-xl font-semibold flex items-center justify-center gap-2 transition"
                       >
                         <FaCommentDots />
                         Ajouter un message
@@ -336,7 +336,7 @@ const MyRMA = () => {
         )}
 
         {/* Info SAV */}
-        <div className="mt-8 bg-gradient-to-br from-orange-600 to-red-600 rounded-lg shadow-lg p-6 text-white">
+        <div className="mt-8 bg-gradient-to-br from-orange-600 to-red-600 rounded-xl shadow-lg p-6 text-white">
           <h3 className="text-xl font-bold mb-4">
             ℹ️ Processus SAV
           </h3>
@@ -373,4 +373,3 @@ const MyRMA = () => {
 };
 
 export default MyRMA;
-

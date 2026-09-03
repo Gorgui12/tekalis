@@ -19,8 +19,8 @@ const DashboardStats = ({ stats = {}, loading = false }) => {
       label: "Commandes",
       value: orders,
       icon: <FaShoppingBag />,
-      color: "bg-blue-100 text-blue-600",
-      gradient: "from-blue-500 to-blue-600",
+      color: "bg-brand-100 text-brand-600",
+      gradient: "from-brand-500 to-amber-600",
       description: "Total de vos commandes"
     },
     {
@@ -53,10 +53,10 @@ const DashboardStats = ({ stats = {}, loading = false }) => {
     return (
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 animate-pulse">
-            <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-xl mb-4" />
-            <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-2/3 mb-2" />
-            <div className="h-7 bg-gray-200 dark:bg-gray-700 rounded w-1/2" />
+          <div key={i} className="bg-white dark:bg-surface-800 rounded-2xl shadow-card p-6 animate-pulse">
+            <div className="w-12 h-12 bg-surface-200 dark:bg-surface-700 rounded-2xl mb-4" />
+            <div className="h-3 bg-surface-200 dark:bg-surface-700 rounded w-2/3 mb-2" />
+            <div className="h-7 bg-surface-200 dark:bg-surface-700 rounded w-1/2" />
           </div>
         ))}
       </div>
@@ -68,28 +68,28 @@ const DashboardStats = ({ stats = {}, loading = false }) => {
       {cards.map((card, idx) => (
         <div
           key={idx}
-          className="bg-white dark:bg-gray-800 rounded-xl shadow-md hover:shadow-lg transition-all p-5 group overflow-hidden relative"
+          className="bg-white dark:bg-surface-800 rounded-2xl shadow-card hover:shadow-elevated transition-all p-5 group overflow-hidden relative"
         >
           {/* Fond décoratif */}
           <div className={`absolute -top-4 -right-4 w-20 h-20 rounded-full bg-gradient-to-br ${card.gradient} opacity-10 group-hover:opacity-20 transition-opacity`} />
 
           {/* Icône */}
-          <div className={`w-11 h-11 rounded-xl flex items-center justify-center mb-4 ${card.color} text-lg`}>
+          <div className={`w-11 h-11 rounded-2xl flex items-center justify-center mb-4 ${card.color} text-lg`}>
             {card.icon}
           </div>
 
           {/* Label */}
-          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-1">
+          <p className="text-xs font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wide mb-1">
             {card.label}
           </p>
 
           {/* Valeur */}
-          <p className="text-3xl font-bold text-gray-900 dark:text-white">
+          <p className="text-3xl font-bold text-surface-900 dark:text-white">
             {card.value}
           </p>
 
           {/* Description */}
-          <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
+          <p className="text-xs text-surface-400 dark:text-surface-500 mt-1">
             {card.description}
           </p>
         </div>

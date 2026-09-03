@@ -33,11 +33,11 @@ const ProductGrid = ({
   // Error state
   if (error) {
     return (
-      <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-8 text-center">
-        <p className="text-red-600 dark:text-red-400 font-semibold mb-4">
+      <div className="bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 rounded-2xl p-8 text-center">
+        <p className="text-rose-600 dark:text-rose-400 font-semibold mb-4">
           Erreur lors du chargement des produits
         </p>
-        <p className="text-sm text-red-500 dark:text-red-400">
+        <p className="text-sm text-rose-500 dark:text-rose-400">
           {error}
         </p>
       </div>
@@ -62,17 +62,17 @@ const ProductGrid = ({
       {/* Header avec layout toggle */}
       {onLayoutChange && (
         <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
+          <p className="text-sm text-surface-500 dark:text-surface-400">
             {products.length} produit{products.length > 1 ? 's' : ''}
           </p>
           
-          <div className="flex items-center gap-2 bg-white dark:bg-gray-800 rounded-lg p-1 shadow-sm">
+          <div className="flex items-center gap-2 bg-white dark:bg-surface-800 rounded-xl p-1 shadow-card border border-surface-100 dark:border-surface-700">
             <button
               onClick={() => onLayoutChange('grid')}
-              className={`p-2 rounded transition ${
+              className={`p-2 rounded-lg transition ${
                 layout === 'grid'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  ? 'bg-brand-500 text-white'
+                  : 'text-surface-500 dark:text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-700'
               }`}
               aria-label="Vue grille"
             >
@@ -80,10 +80,10 @@ const ProductGrid = ({
             </button>
             <button
               onClick={() => onLayoutChange('list')}
-              className={`p-2 rounded transition ${
+              className={`p-2 rounded-lg transition ${
                 layout === 'list'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700'
+                  ? 'bg-brand-500 text-white'
+                  : 'text-surface-500 dark:text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-700'
               }`}
               aria-label="Vue liste"
             >

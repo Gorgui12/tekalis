@@ -27,15 +27,15 @@ const WishlistPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 mt-20">
+    <div className="min-h-screen bg-surface-50 py-8 mt-20">
       <div className="container mx-auto px-4 max-w-5xl">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+          <h1 className="text-3xl font-bold text-surface-900 dark:text-white flex items-center gap-3 font-display">
             <FaHeart className="text-red-500" />
             Mes Favoris
           </h1>
-          <p className="text-gray-500 mt-1">
+          <p className="text-surface-500 dark:text-surface-400 mt-1">
             {items.length} produit{items.length !== 1 ? "s" : ""} sauvegardé
             {items.length !== 1 ? "s" : ""}
           </p>
@@ -43,16 +43,16 @@ const WishlistPage = () => {
 
         {/* Empty state */}
         {items.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-md p-16 text-center">
-            <FaHeart className="text-6xl text-gray-200 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
+          <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-card p-16 text-center">
+            <FaHeart className="text-6xl text-surface-200 dark:text-surface-700 mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-surface-900 dark:text-white mb-2">
               Aucun favori pour l'instant
             </h3>
-            <p className="text-gray-500 mb-6">
+            <p className="text-surface-500 dark:text-surface-400 mb-6">
               Cliquez sur le ❤️ sur un produit pour l'ajouter à vos favoris.
             </p>
             <Link href="/products"
-              className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition"
+              className="inline-block bg-brand-500 hover:bg-brand-600 text-white px-8 py-3 rounded-xl font-semibold transition"
             >
               Découvrir les produits
             </Link>
@@ -78,11 +78,11 @@ const WishlistPage = () => {
               return (
                 <div
                   key={product._id}
-                  className="bg-white rounded-xl shadow-md hover:shadow-lg transition overflow-hidden flex flex-col"
+                  className="bg-white dark:bg-surface-800 rounded-2xl shadow-card hover:shadow-elevated transition overflow-hidden flex flex-col"
                 >
                   {/* Image */}
                   <Link href={`/products/${product._id}`}
-                    className="relative block aspect-square bg-gray-50 overflow-hidden"
+                    className="relative block aspect-square bg-surface-50 dark:bg-surface-700 overflow-hidden"
                   >
                     <img
                       src={image}
@@ -100,23 +100,23 @@ const WishlistPage = () => {
                   {/* Infos */}
                   <div className="p-4 flex flex-col flex-grow">
                     {product.brand && (
-                      <span className="text-xs text-gray-400 uppercase font-semibold mb-1">
+                      <span className="text-xs text-surface-400 dark:text-surface-500 uppercase font-semibold mb-1">
                         {product.brand}
                       </span>
                     )}
                     <Link href={`/products/${product._id}`}
-                      className="font-semibold text-gray-900 hover:text-blue-600 line-clamp-2 mb-2 transition"
+                      className="font-semibold text-surface-900 dark:text-white hover:text-brand-600 dark:hover:text-brand-400 line-clamp-2 mb-2 transition"
                     >
                       {product.name}
                     </Link>
 
                     {/* Prix */}
                     <div className="mb-4 mt-auto">
-                      <span className="text-xl font-bold text-blue-600">
+                      <span className="text-xl font-bold text-brand-600 dark:text-brand-400">
                         {product.price?.toLocaleString()} FCFA
                       </span>
                       {product.comparePrice > product.price && (
-                        <span className="ml-2 text-sm text-gray-400 line-through">
+                        <span className="ml-2 text-sm text-surface-400 dark:text-surface-500 line-through">
                           {product.comparePrice?.toLocaleString()} FCFA
                         </span>
                       )}
@@ -138,14 +138,14 @@ const WishlistPage = () => {
                       <button
                         onClick={() => handleAddToCart(product)}
                         disabled={product.stock === 0}
-                        className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white py-2 rounded-lg font-semibold text-sm transition flex items-center justify-center gap-2"
+                        className="flex-1 bg-brand-500 hover:bg-brand-600 disabled:bg-surface-300 dark:disabled:bg-surface-600 text-white py-2 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2"
                       >
                         <FaShoppingCart size={14} />
                         {product.stock > 0 ? "Ajouter" : "Indisponible"}
                       </button>
                       <button
                         onClick={() => handleRemove(product._id)}
-                        className="w-10 h-10 bg-red-50 hover:bg-red-100 text-red-500 rounded-lg transition flex items-center justify-center flex-shrink-0"
+                        className="w-10 h-10 bg-red-50 hover:bg-red-100 text-red-500 rounded-xl transition flex items-center justify-center flex-shrink-0"
                         aria-label="Retirer des favoris"
                       >
                         <FaTrash size={14} />
@@ -161,7 +161,7 @@ const WishlistPage = () => {
         {items.length > 0 && (
           <div className="mt-8 text-center">
             <Link href="/products"
-              className="text-blue-600 hover:underline font-semibold"
+              className="text-brand-600 dark:text-brand-400 hover:underline font-semibold"
             >
               ← Continuer mes achats
             </Link>
@@ -173,6 +173,3 @@ const WishlistPage = () => {
 };
 
 export default WishlistPage;
-
-
-

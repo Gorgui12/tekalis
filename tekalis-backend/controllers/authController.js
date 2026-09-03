@@ -16,6 +16,32 @@ const generateToken = (userId, isAdmin) => {
 };
 
 // ===============================================
+// Cookie httpOnly — ajouté le 2026-09-03
+// En plus du token renvoyé dans le corps JSON (pour compatibilité avec
+// le code client existant qui le stocke en localStorage), on dépose le
+// même JWT dans un cookie httpOnly. C'est ce cookie que le middleware
+// Next.js (tekalis-next/middleware.js) lit pour protéger réellement les
+// routes /dashboard, /checkout, /wishlist côté serveur — un token en
+// localStorage seul n'est pas lisible par un middleware Next.js.
+// ===============================================
+const COOKIE_NAME = "tekalis_token";
+const COOKIE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000; // 7 jours, aligné sur JWT_EXPIRE par défaut
+
+const setAuthCookie = (res, token) => {
+  res.cookie(COOKIE_NAME, token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV !== "development",
+    sameSite: "lax",
+    maxAge: COOKIE_MAX_AGE_MS,
+    path: "/"
+  });
+};
+
+const clearAuthCookie = (res) => {
+  res.clearCookie(COOKIE_NAME, { path: "/" });
+};
+
+// ===============================================
 // POST /api/v1/auth/register
 // CRITIQUE 3 : Ajout de validations anti-abus
 // - Vérification du domaine email (optionnelle via env BLOCKED_EMAIL_DOMAINS)
@@ -60,6 +86,8 @@ exports.register = async (req, res) => {
 
     user.lastLogin = new Date();
     await user.save({ validateBeforeSave: false });
+
+    setAuthCookie(res, token);
 
     res.status(201).json({
       success: true,
@@ -143,6 +171,8 @@ exports.login = async (req, res) => {
 
     user.lastLogin = new Date();
     await user.save({ validateBeforeSave: false });
+
+    setAuthCookie(res, token);
 
     res.status(200).json({
       success: true,
@@ -245,6 +275,7 @@ exports.resetPassword = async (req, res) => {
     await user.save();
 
     const newToken = generateToken(user._id, user.isAdmin);
+    setAuthCookie(res, newToken);
 
     res.status(200).json({
       success: true,
@@ -255,6 +286,18 @@ exports.resetPassword = async (req, res) => {
     console.error("❌ Erreur resetPassword:", error);
     res.status(500).json({ message: error.message });
   }
+};
+
+// ===============================================
+// POST /api/v1/auth/logout
+// Ajouté le 2026-09-03 avec le cookie httpOnly ci-dessus : le logout
+// côté client (suppression du localStorage) ne suffit plus à lui seul
+// à effacer la session, puisqu'un cookie httpOnly n'est pas accessible
+// en JS. Cette route l'efface côté serveur.
+// ===============================================
+exports.logout = (req, res) => {
+  clearAuthCookie(res);
+  res.status(200).json({ success: true, message: "Déconnexion réussie" });
 };
 
 module.exports = exports;

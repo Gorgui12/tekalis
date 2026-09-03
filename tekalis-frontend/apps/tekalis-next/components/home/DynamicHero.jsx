@@ -56,7 +56,7 @@ const SlideContent = ({ slide, isActive, index, isHomePage }) => {
   /* CTA style mapping */
   const ctaStyle = {
     white: 'bg-white text-gray-900 hover:bg-gray-100 shadow-xl',
-    primary: 'bg-blue-600 hover:bg-blue-700 text-white shadow-xl',
+    primary: 'bg-brand-500 hover:bg-brand-600 text-white shadow-xl',
     outline: 'bg-white/10 backdrop-blur-sm border-2 border-white/60 text-white hover:bg-white/20',
   };
 

@@ -71,20 +71,20 @@ const Modal = ({
       {/* Modal Container */}
       <div className="flex min-h-screen items-center justify-center p-4">
         <div 
-          className={`relative bg-white rounded-lg shadow-xl ${sizeClasses[size]} w-full transform transition-all`}
+          className={`relative bg-white dark:bg-surface-800 rounded-2xl shadow-xl ${sizeClasses[size]} w-full transform transition-all`}
         >
           {/* Header */}
           {(title || showCloseButton) && (
             <div className="flex items-center justify-between px-6 py-4 border-b">
               {title && (
-                <h3 className="text-xl font-bold text-gray-900" id="modal-title">
+                <h3 className="text-xl font-bold text-surface-900 dark:text-white" id="modal-title">
                   {title}
                 </h3>
               )}
               {showCloseButton && !preventClose && (
                 <button
                   onClick={onClose}
-                  className="text-gray-400 hover:text-gray-600 transition p-2 rounded-full hover:bg-gray-100"
+                  className="text-surface-400 dark:text-surface-500 hover:text-surface-600 dark:hover:text-surface-300 transition p-2 rounded-full hover:bg-surface-100 dark:hover:bg-surface-700"
                   aria-label="Fermer"
                 >
                   <FaTimes size={20} />
@@ -100,7 +100,7 @@ const Modal = ({
 
           {/* Footer */}
           {footer && (
-            <div className="px-6 py-4 border-t bg-gray-50">
+            <div className="px-6 py-4 border-t bg-surface-50 dark:bg-surface-700/50">
               {footer}
             </div>
           )}
@@ -122,7 +122,7 @@ export const ConfirmModal = ({
   confirmColor = "blue"
 }) => {
   const colorClasses = {
-    blue: "bg-blue-600 hover:bg-blue-700",
+    blue: "bg-brand-500 hover:bg-brand-600",
     red: "bg-red-600 hover:bg-red-700",
     green: "bg-green-600 hover:bg-green-700"
   };
@@ -137,7 +137,7 @@ export const ConfirmModal = ({
         <div className="flex gap-3 justify-end">
           <button
             onClick={onClose}
-            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-lg font-semibold transition"
+            className="px-4 py-2 bg-surface-200 hover:bg-surface-300 text-surface-700 dark:text-surface-300 rounded-xl font-semibold transition"
           >
             {cancelText}
           </button>
@@ -146,14 +146,14 @@ export const ConfirmModal = ({
               onConfirm();
               onClose();
             }}
-            className={`px-4 py-2 ${colorClasses[confirmColor]} text-white rounded-lg font-semibold transition`}
+            className={`px-4 py-2 ${colorClasses[confirmColor]} text-white rounded-xl font-semibold transition`}
           >
             {confirmText}
           </button>
         </div>
       }
     >
-      <p className="text-gray-700">{message}</p>
+      <p className="text-surface-700 dark:text-surface-300">{message}</p>
     </Modal>
   );
 };

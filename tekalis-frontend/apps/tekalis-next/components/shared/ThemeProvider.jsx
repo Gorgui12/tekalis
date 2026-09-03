@@ -39,12 +39,12 @@ export function ThemeToggle({ className = '' }) {
   return (
     <button
       onClick={toggleTheme}
-      className={`p-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition ${className}`}
+      className={`p-2.5 rounded-lg hover:bg-surface-100 dark:hover:bg-surface-800 transition ${className}`}
       aria-label={isDark ? 'Mode clair' : 'Mode sombre'}
     >
       {isDark
-        ? <FaSun className="text-yellow-400 text-xl" />
-        : <FaMoon className="text-gray-600 text-xl" />
+        ? <FaSun className="text-amber-400 text-xl" />
+        : <FaMoon className="text-surface-500 dark:text-surface-400 text-xl" />
       }
     </button>
   );

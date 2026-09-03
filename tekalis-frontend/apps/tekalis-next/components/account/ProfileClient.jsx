@@ -207,20 +207,20 @@ const Profile = () => {
     ${formErrors[field] 
       ? 'border-red-500 bg-red-50 focus:border-red-500' 
       : editMode 
-        ? 'border-gray-200 focus:border-blue-500' 
-        : 'border-gray-100 bg-gray-50'
+        ? 'border-surface-300 dark:border-surface-600 focus:border-brand-500 dark:bg-surface-700 dark:text-white' 
+        : 'border-surface-100 dark:border-surface-700 bg-surface-50 dark:bg-surface-800'
     }
     ${!editMode && 'cursor-not-allowed'}
     focus:outline-none
   `;
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-surface-50 py-8">
       <div className="container mx-auto px-4 max-w-4xl">
-        <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-xl p-8 mb-8 text-white">
+        <div className="bg-gradient-to-r from-brand-500 to-orange-700 rounded-2xl shadow-xl p-8 mb-8 text-white">
           <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-6">
-              <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center text-4xl font-bold text-blue-600">
+              <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center text-4xl font-bold text-brand-600">
                 {userData.name?.charAt(0).toUpperCase()}
               </div>
               <div>
@@ -244,16 +244,16 @@ const Profile = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-md mb-6">
-          <div className="flex border-b">
+        <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-md mb-6">
+          <div className="flex border-b border-surface-200 dark:border-surface-700">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex-1 flex items-center justify-center gap-2 py-4 font-semibold transition ${
                   activeTab === tab.id
-                    ? "text-blue-600 border-b-2 border-blue-600"
-                    : "text-gray-600 hover:text-gray-900"
+                    ? "text-brand-600 dark:text-brand-400 border-b-2 border-brand-600 dark:border-brand-400"
+                    : "text-surface-600 dark:text-surface-400 hover:text-surface-900 dark:hover:text-white"
                 }`}
                 aria-current={activeTab === tab.id ? 'page' : undefined}
               >
@@ -263,11 +263,11 @@ const Profile = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-2xl shadow-md p-8">
+        <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-md p-8">
           {activeTab === "info" && (
             <div>
               <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
-                <h2 className="text-2xl font-bold text-gray-900">
+                <h2 className="text-2xl font-bold text-surface-900 dark:text-white">
                   Informations personnelles
                 </h2>
                 {!editMode ? (
@@ -300,8 +300,8 @@ const Profile = () => {
 
               <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    <FaUser className="inline mr-2 text-gray-400" />
+                  <label className="block text-sm font-semibold text-surface-700 dark:text-surface-300 mb-2">
+                    <FaUser className="inline mr-2 text-surface-400" />
                     Nom complet *
                   </label>
                   <input
@@ -321,8 +321,8 @@ const Profile = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    <FaEnvelope className="inline mr-2 text-gray-400" />
+                  <label className="block text-sm font-semibold text-surface-700 dark:text-surface-300 mb-2">
+                    <FaEnvelope className="inline mr-2 text-surface-400" />
                     Email *
                   </label>
                   <input
@@ -342,8 +342,8 @@ const Profile = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    <FaPhone className="inline mr-2 text-gray-400" />
+                  <label className="block text-sm font-semibold text-surface-700 dark:text-surface-300 mb-2">
+                    <FaPhone className="inline mr-2 text-surface-400" />
                     Téléphone
                   </label>
                   <input
@@ -362,15 +362,15 @@ const Profile = () => {
                     </p>
                   )}
                   {!formErrors.phone && (
-                    <p className="mt-1 text-xs text-gray-500">
+                    <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
                       Format: XX XXX XX XX (9 chiffres)
                     </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
-                    <FaMapMarkerAlt className="inline mr-2 text-gray-400" />
+                  <label className="block text-sm font-semibold text-surface-700 dark:text-surface-300 mb-2">
+                    <FaMapMarkerAlt className="inline mr-2 text-surface-400" />
                     Adresse
                   </label>
                   <textarea
@@ -395,13 +395,13 @@ const Profile = () => {
 
           {activeTab === "security" && (
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              <h2 className="text-2xl font-bold text-surface-900 dark:text-white mb-6">
                 Sécurité du compte
               </h2>
               
               <form onSubmit={handlePasswordChange} className="space-y-6">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-surface-700 dark:text-surface-300 mb-2">
                     Mot de passe actuel *
                   </label>
                   <input
@@ -411,7 +411,7 @@ const Profile = () => {
                     className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none transition ${
                       passwordErrors.currentPassword 
                         ? 'border-red-500 bg-red-50' 
-                        : 'border-gray-200 focus:border-blue-500'
+                        : 'border-surface-300 dark:border-surface-600 focus:border-brand-500 dark:bg-surface-700 dark:text-white'
                     }`}
                   />
                   {/* ✅ AJOUTÉ */}
@@ -423,7 +423,7 @@ const Profile = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-surface-700 dark:text-surface-300 mb-2">
                     Nouveau mot de passe *
                   </label>
                   <input
@@ -433,7 +433,7 @@ const Profile = () => {
                     className={`w-full px-4 py-3 border-2 rounded-xl focus:outline-none transition ${
                       passwordErrors.newPassword 
                         ? 'border-red-500 bg-red-50' 
-                        : 'border-gray-200 focus:border-blue-500'
+                        : 'border-surface-300 dark:border-surface-600 focus:border-brand-500 dark:bg-surface-700 dark:text-white'
                     }`}
                   />
                   {/* ✅ AJOUTÉ */}
@@ -442,20 +442,20 @@ const Profile = () => {
                       {passwordErrors.newPassword}
                     </p>
                   )}
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
                     Minimum 8 caractères, avec majuscule, minuscule et chiffre
                   </p>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-surface-700 dark:text-surface-300 mb-2">
                     Confirmer le nouveau mot de passe *
                   </label>
                   <input
                     type="password"
                     value={passwordData.confirmPassword}
                     onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition"
+                    className="w-full px-4 py-3 border-2 border-surface-300 dark:border-surface-600 rounded-xl focus:outline-none focus:border-brand-500 transition dark:bg-surface-700 dark:text-white"
                   />
                 </div>
 
@@ -473,43 +473,43 @@ const Profile = () => {
 
           {activeTab === "notifications" && (
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              <h2 className="text-2xl font-bold text-surface-900 dark:text-white mb-6">
                 Préférences de notifications
               </h2>
               
               <div className="space-y-4">
-                <label className="flex items-center justify-between p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition">
+                <label className="flex items-center justify-between p-4 border-2 border-surface-200 dark:border-surface-700 rounded-xl cursor-pointer hover:bg-surface-50 dark:hover:bg-surface-700/50 transition">
                   <div>
-                    <p className="font-semibold text-gray-900">Notifications par email</p>
-                    <p className="text-sm text-gray-600">Recevoir les mises à jour par email</p>
+                    <p className="font-semibold text-surface-900 dark:text-white">Notifications par email</p>
+                    <p className="text-sm text-surface-600 dark:text-surface-400">Recevoir les mises à jour par email</p>
                   </div>
                   <input 
                     type="checkbox" 
                     defaultChecked 
-                    className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500" 
+                    className="w-5 h-5 text-brand-500 rounded focus:ring-2 focus:ring-brand-500" 
                   />
                 </label>
 
-                <label className="flex items-center justify-between p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition">
+                <label className="flex items-center justify-between p-4 border-2 border-surface-200 dark:border-surface-700 rounded-xl cursor-pointer hover:bg-surface-50 dark:hover:bg-surface-700/50 transition">
                   <div>
-                    <p className="font-semibold text-gray-900">Offres promotionnelles</p>
-                    <p className="text-sm text-gray-600">Recevoir les offres spéciales</p>
+                    <p className="font-semibold text-surface-900 dark:text-white">Offres promotionnelles</p>
+                    <p className="text-sm text-surface-600 dark:text-surface-400">Recevoir les offres spéciales</p>
                   </div>
                   <input 
                     type="checkbox" 
                     defaultChecked 
-                    className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500" 
+                    className="w-5 h-5 text-brand-500 rounded focus:ring-2 focus:ring-brand-500" 
                   />
                 </label>
 
-                <label className="flex items-center justify-between p-4 border-2 border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition">
+                <label className="flex items-center justify-between p-4 border-2 border-surface-200 dark:border-surface-700 rounded-xl cursor-pointer hover:bg-surface-50 dark:hover:bg-surface-700/50 transition">
                   <div>
-                    <p className="font-semibold text-gray-900">Nouveaux produits</p>
-                    <p className="text-sm text-gray-600">Être informé des nouveautés</p>
+                    <p className="font-semibold text-surface-900 dark:text-white">Nouveaux produits</p>
+                    <p className="text-sm text-surface-600 dark:text-surface-400">Être informé des nouveautés</p>
                   </div>
                   <input 
                     type="checkbox" 
-                    className="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500" 
+                    className="w-5 h-5 text-brand-500 rounded focus:ring-2 focus:ring-brand-500" 
                   />
                 </label>
               </div>
@@ -522,4 +522,3 @@ const Profile = () => {
 };
 
 export default Profile;
-

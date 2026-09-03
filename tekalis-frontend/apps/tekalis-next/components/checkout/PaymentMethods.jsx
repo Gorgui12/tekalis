@@ -39,11 +39,11 @@ const PaymentMethods = ({ onPay, totalAmount = 0, loading = false }) => {
 
       {/* ── Titre ─────────────────────────────────────────────────────── */}
       <div>
-        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1 flex items-center gap-2">
+        <h3 className="text-lg font-bold text-surface-900 dark:text-white mb-1 flex items-center gap-2">
           <FaMoneyBillWave className="text-green-600" />
           Mode de paiement
         </h3>
-        <p className="text-sm text-gray-500 dark:text-gray-400">
+        <p className="text-sm text-surface-500 dark:text-surface-400">
           Paiement à la livraison disponible à Dakar et banlieue
         </p>
       </div>
@@ -59,14 +59,14 @@ const PaymentMethods = ({ onPay, totalAmount = 0, loading = false }) => {
           {/* Texte */}
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-1">
-              <p className="font-bold text-gray-900 dark:text-white">
+              <p className="font-bold text-surface-900 dark:text-white">
                 Paiement à la livraison
               </p>
               <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-400">
                 Disponible
               </span>
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-surface-600 dark:text-surface-400">
               Payez en espèces directement au livreur lors de la réception de votre commande.
             </p>
           </div>
@@ -102,9 +102,9 @@ const PaymentMethods = ({ onPay, totalAmount = 0, loading = false }) => {
       </div>
 
       {/* ── Montant total ─────────────────────────────────────────────── */}
-      <div className="bg-gray-50 dark:bg-gray-800/60 rounded-xl p-4 flex items-center justify-between border border-gray-200 dark:border-gray-700">
+      <div className="bg-surface-50 dark:bg-surface-800/60 rounded-xl p-4 flex items-center justify-between border border-surface-200 dark:border-surface-700">
         <div>
-          <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">
+          <p className="text-xs font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wide mb-0.5">
             Montant à préparer
           </p>
           <p className="text-2xl font-bold text-green-600 dark:text-green-400">
@@ -132,13 +132,13 @@ const PaymentMethods = ({ onPay, totalAmount = 0, loading = false }) => {
             className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
               confirmed
                 ? "border-green-500 bg-green-500"
-                : "border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 group-hover:border-green-400"
+                : "border-surface-300 dark:border-surface-600 bg-white dark:bg-surface-800 group-hover:border-green-400"
             }`}
           >
             {confirmed && <FaCheckCircle className="text-white text-xs" />}
           </div>
         </div>
-        <span className="text-sm text-gray-700 dark:text-gray-300 leading-snug">
+        <span className="text-sm text-surface-700 dark:text-surface-300 leading-snug">
           Je confirme que je serai disponible à l'adresse indiquée pour réceptionner ma commande et effectuer le paiement en espèces.
         </span>
       </label>
@@ -166,7 +166,7 @@ const PaymentMethods = ({ onPay, totalAmount = 0, loading = false }) => {
       </Button>
 
       {/* Sécurité */}
-      <p className="text-center text-xs text-gray-500 dark:text-gray-400 flex items-center justify-center gap-1.5">
+      <p className="text-center text-xs text-surface-500 dark:text-surface-400 flex items-center justify-center gap-1.5">
         <FaLock size={11} />
         Commande sécurisée — Vous ne payez qu'à la réception
       </p>

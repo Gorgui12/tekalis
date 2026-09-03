@@ -79,11 +79,11 @@ const ReviewList = ({ productId, rating = {}, showForm = true }) => {
 
       {/* ─── Résumé des notes ────────────────────────────────────────────── */}
       {rating.count > 0 && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-white dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700 p-6">
           <div className="grid sm:grid-cols-2 gap-6 items-center">
             {/* Moyenne */}
             <div className="text-center">
-              <div className="text-6xl font-bold text-gray-900 dark:text-white mb-2">
+              <div className="text-6xl font-bold text-surface-900 dark:text-white mb-2">
                 {(rating.average || 0).toFixed(1)}
               </div>
               <StarRatingDisplay
@@ -107,17 +107,17 @@ const ReviewList = ({ productId, rating = {}, showForm = true }) => {
                     }`}
                   >
                     <span className={`w-6 text-right font-semibold flex-shrink-0 ${
-                      filterRating === star ? "text-blue-600 dark:text-blue-400" : "text-gray-600 dark:text-gray-400"
+                      filterRating === star ? "text-brand-600 dark:text-brand-400" : "text-surface-600 dark:text-surface-400"
                     }`}>{star}★</span>
-                    <div className="flex-1 bg-gray-200 dark:bg-gray-700 rounded-full h-2 overflow-hidden">
+                    <div className="flex-1 bg-surface-200 dark:bg-surface-700 rounded-full h-2 overflow-hidden">
                       <div
                         className={`h-full rounded-full transition-all duration-500 ${
-                          filterRating === star ? "bg-blue-500" : "bg-yellow-400"
+                          filterRating === star ? "bg-brand-500" : "bg-yellow-400"
                         }`}
                         style={{ width: `${percent}%` }}
                       />
                     </div>
-                    <span className="w-6 text-xs text-gray-500 dark:text-gray-400 flex-shrink-0">
+                    <span className="w-6 text-xs text-surface-500 dark:text-surface-400 flex-shrink-0">
                       {count}
                     </span>
                   </button>
@@ -126,7 +126,7 @@ const ReviewList = ({ productId, rating = {}, showForm = true }) => {
               {filterRating > 0 && (
                 <button
                   onClick={() => setFilterRating(0)}
-                  className="text-xs text-blue-600 dark:text-blue-400 hover:underline mt-1"
+                  className="text-xs text-brand-600 dark:text-brand-400 hover:underline mt-1"
                 >
                   Afficher tous les avis
                 </button>
@@ -138,7 +138,7 @@ const ReviewList = ({ productId, rating = {}, showForm = true }) => {
 
       {/* ─── Formulaire d'avis ───────────────────────────────────────────── */}
       {showForm && (
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
+        <div className="bg-white dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700 p-6">
           <ReviewForm productId={productId} onSuccess={handleNewReview} />
         </div>
       )}
@@ -146,18 +146,18 @@ const ReviewList = ({ productId, rating = {}, showForm = true }) => {
       {/* ─── Tri ─────────────────────────────────────────────────────────── */}
       {reviews.length > 0 || !loading ? (
         <div className="flex items-center justify-between">
-          <h3 className="font-bold text-gray-900 dark:text-white flex items-center gap-2">
-            <FaFilter className="text-blue-600" size={14} />
+          <h3 className="font-bold text-surface-900 dark:text-white flex items-center gap-2">
+            <FaFilter className="text-brand-500" size={14} />
             {rating.count || 0} avis
-            {filterRating > 0 && <span className="text-sm text-blue-600 dark:text-blue-400">({filterRating} étoiles)</span>}
+            {filterRating > 0 && <span className="text-sm text-brand-600 dark:text-brand-400">({filterRating} étoiles)</span>}
           </h3>
 
           <div className="flex items-center gap-2">
-            <FaSortAmountDown className="text-gray-400" size={14} />
+            <FaSortAmountDown className="text-surface-400" size={14} />
             <select
               value={sortBy}
               onChange={e => { setSortBy(e.target.value); setCurrentPage(1); }}
-              className="text-sm border border-gray-300 dark:border-gray-600 rounded-lg px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="text-sm border border-surface-300 dark:border-surface-600 rounded-xl px-3 py-2 bg-white dark:bg-surface-800 text-surface-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-brand-500"
             >
               {SORT_OPTIONS.map(o => (
                 <option key={o.value} value={o.value}>{o.label}</option>

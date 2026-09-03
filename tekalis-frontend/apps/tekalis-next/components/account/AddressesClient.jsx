@@ -144,35 +144,35 @@ const Addresses = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center mt-20">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-brand-500"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8 mt-20">
+    <div className="min-h-screen bg-surface-50 py-8 mt-20">
       <div className="container mx-auto px-4 max-w-6xl">
         {/* En-tête */}
         <div className="mb-8">
           <Link href="/dashboard"
-            className="text-blue-600 hover:text-blue-700 font-semibold mb-4 inline-block"
+            className="text-brand-600 hover:text-brand-700 dark:text-brand-400 font-semibold mb-4 inline-block"
           >
             ← Retour au dashboard
           </Link>
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-3">
-                <FaMapMarkerAlt className="text-blue-600" />
+              <h1 className="text-3xl font-bold text-surface-900 dark:text-white mb-2 flex items-center gap-3 font-display">
+                <FaMapMarkerAlt className="text-brand-500" />
                 Mes Adresses
               </h1>
-              <p className="text-gray-600">
+              <p className="text-surface-600 dark:text-surface-400">
                 Gérez vos adresses de livraison
               </p>
             </div>
             
             <button
               onClick={openAddModal}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition"
+              className="bg-brand-500 hover:bg-brand-600 text-white px-6 py-3 rounded-xl font-semibold flex items-center gap-2 transition shadow-md hover:shadow-glow"
             >
               <FaPlus />
               Ajouter une adresse
@@ -182,17 +182,17 @@ const Addresses = () => {
 
         {/* Liste des adresses */}
         {addresses.length === 0 ? (
-          <div className="bg-white rounded-lg shadow-md p-12 text-center">
-            <FaMapMarkerAlt className="text-6xl text-gray-400 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-gray-900 mb-2">
+          <div className="bg-white dark:bg-surface-800 rounded-xl shadow-card p-12 text-center">
+            <FaMapMarkerAlt className="text-6xl text-surface-400 mx-auto mb-4" />
+            <h3 className="text-xl font-bold text-surface-900 dark:text-white mb-2">
               Aucune adresse enregistrée
             </h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-surface-600 dark:text-surface-400 mb-6">
               Ajoutez une adresse pour faciliter vos commandes futures
             </p>
             <button
               onClick={openAddModal}
-              className="inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold"
+              className="inline-block bg-brand-500 hover:bg-brand-600 text-white px-6 py-3 rounded-xl font-semibold"
             >
               Ajouter ma première adresse
             </button>
@@ -202,13 +202,13 @@ const Addresses = () => {
             {addresses.map((address) => (
               <div
                 key={address._id}
-                className={`bg-white rounded-lg shadow-md hover:shadow-lg transition p-6 ${
-                  address.isDefault ? "border-2 border-blue-600" : ""
+                className={`bg-white dark:bg-surface-800 rounded-xl shadow-card hover:shadow-elevated transition p-6 ${
+                  address.isDefault ? "border-2 border-brand-500" : ""
                 }`}
               >
                 {/* Badge par défaut */}
                 {address.isDefault && (
-                  <div className="flex items-center gap-2 text-blue-600 font-semibold mb-3">
+                  <div className="flex items-center gap-2 text-brand-600 dark:text-brand-400 font-semibold mb-3">
                     <FaStar />
                     <span className="text-sm">Adresse par défaut</span>
                   </div>
@@ -216,8 +216,8 @@ const Addresses = () => {
 
                 {/* Label */}
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
-                    <FaMapMarkerAlt className="text-blue-600" />
+                  <h3 className="text-lg font-bold text-surface-900 dark:text-white flex items-center gap-2">
+                    <FaMapMarkerAlt className="text-brand-500" />
                     {address.label || "Sans titre"}
                   </h3>
                 </div>
@@ -225,26 +225,26 @@ const Addresses = () => {
                 {/* Informations */}
                 <div className="space-y-2 mb-4 text-sm">
                   <div>
-                    <p className="text-gray-600">Destinataire</p>
-                    <p className="font-semibold text-gray-900">{address.fullName}</p>
+                    <p className="text-surface-600 dark:text-surface-400">Destinataire</p>
+                    <p className="font-semibold text-surface-900 dark:text-white">{address.fullName}</p>
                   </div>
                   <div>
-                    <p className="text-gray-600">Téléphone</p>
-                    <p className="font-semibold text-gray-900">{address.phone}</p>
+                    <p className="text-surface-600 dark:text-surface-400">Téléphone</p>
+                    <p className="font-semibold text-surface-900 dark:text-white">{address.phone}</p>
                   </div>
                   <div>
-                    <p className="text-gray-600">Adresse</p>
-                    <p className="font-semibold text-gray-900">{address.address}</p>
-                    <p className="text-gray-700">{address.city}, {address.region}</p>
+                    <p className="text-surface-600 dark:text-surface-400">Adresse</p>
+                    <p className="font-semibold text-surface-900 dark:text-white">{address.address}</p>
+                    <p className="text-surface-700 dark:text-surface-300">{address.city}, {address.region}</p>
                   </div>
                 </div>
 
                 {/* Actions */}
-                <div className="flex flex-wrap gap-2 pt-4 border-t">
+                <div className="flex flex-wrap gap-2 pt-4 border-t border-surface-200 dark:border-surface-700">
                   {!address.isDefault && (
                     <button
                       onClick={() => setDefaultAddress(address._id)}
-                      className="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-600 px-4 py-2 rounded-lg font-semibold text-sm transition flex items-center justify-center gap-2"
+                      className="flex-1 bg-brand-50 hover:bg-brand-100 text-brand-600 dark:text-brand-400 px-4 py-2 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2"
                     >
                       <FaStar />
                       Définir par défaut
@@ -253,7 +253,7 @@ const Addresses = () => {
                   
                   <button
                     onClick={() => openEditModal(address)}
-                    className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 px-4 py-2 rounded-lg font-semibold text-sm transition flex items-center justify-center gap-2"
+                    className="flex-1 bg-surface-100 hover:bg-surface-200 dark:bg-surface-700 dark:hover:bg-surface-600 text-surface-700 dark:text-surface-300 px-4 py-2 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2"
                   >
                     <FaEdit />
                     Modifier
@@ -261,7 +261,7 @@ const Addresses = () => {
                   
                   <button
                     onClick={() => deleteAddress(address._id)}
-                    className="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-lg font-semibold text-sm transition flex items-center justify-center gap-2"
+                    className="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-xl font-semibold text-sm transition flex items-center justify-center gap-2"
                   >
                     <FaTrash />
                   </button>
@@ -274,14 +274,14 @@ const Addresses = () => {
         {/* Modal formulaire */}
         {showModal && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-              <div className="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
-                <h2 className="text-2xl font-bold text-gray-900">
+            <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+              <div className="sticky top-0 bg-white dark:bg-surface-800 border-b border-surface-200 dark:border-surface-700 px-6 py-4 flex items-center justify-between">
+                <h2 className="text-2xl font-bold text-surface-900 dark:text-white">
                   {editingAddress ? "Modifier l'adresse" : "Nouvelle adresse"}
                 </h2>
                 <button
                   onClick={closeModal}
-                  className="text-gray-500 hover:text-gray-700"
+                  className="text-surface-500 hover:text-surface-700 dark:hover:text-surface-300"
                 >
                   <FaTimes size={24} />
                 </button>
@@ -291,7 +291,7 @@ const Addresses = () => {
                 <div className="space-y-4">
                   {/* Label */}
                   <div>
-                    <label className="block text-sm font-semibold text-gray-900 mb-2">
+                    <label className="block text-sm font-semibold text-surface-900 dark:text-white mb-2">
                       Libellé de l'adresse *
                     </label>
                     <input
@@ -299,14 +299,14 @@ const Addresses = () => {
                       value={formData.label}
                       onChange={(e) => setFormData({ ...formData, label: e.target.value })}
                       placeholder="Ex: Maison, Bureau, Chez mes parents..."
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-surface-300 dark:border-surface-600 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:bg-surface-700 dark:text-white"
                       required
                     />
                   </div>
 
                   {/* Nom complet */}
                   <div>
-                    <label className="block text-sm font-semibold text-gray-900 mb-2">
+                    <label className="block text-sm font-semibold text-surface-900 dark:text-white mb-2">
                       Nom complet du destinataire *
                     </label>
                     <input
@@ -314,14 +314,14 @@ const Addresses = () => {
                       value={formData.fullName}
                       onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                       placeholder="Ex: Ousmane Diallo"
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-surface-300 dark:border-surface-600 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:bg-surface-700 dark:text-white"
                       required
                     />
                   </div>
 
                   {/* Téléphone */}
                   <div>
-                    <label className="block text-sm font-semibold text-gray-900 mb-2">
+                    <label className="block text-sm font-semibold text-surface-900 dark:text-white mb-2">
                       Téléphone *
                     </label>
                     <input
@@ -329,7 +329,7 @@ const Addresses = () => {
                       value={formData.phone}
                       onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                       placeholder="Ex: 77 123 45 67"
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-surface-300 dark:border-surface-600 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:bg-surface-700 dark:text-white"
                       required
                     />
                   </div>
@@ -337,13 +337,13 @@ const Addresses = () => {
                   {/* Ville et région */}
                   <div className="grid sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-semibold text-gray-900 mb-2">
+                      <label className="block text-sm font-semibold text-surface-900 dark:text-white mb-2">
                         Ville *
                       </label>
                       <select
                         value={formData.city}
                         onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full border border-surface-300 dark:border-surface-600 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:bg-surface-700 dark:text-white"
                       >
                         <option value="Dakar">Dakar</option>
                         <option value="Pikine">Pikine</option>
@@ -355,13 +355,13 @@ const Addresses = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-semibold text-gray-900 mb-2">
+                      <label className="block text-sm font-semibold text-surface-900 dark:text-white mb-2">
                         Région *
                       </label>
                       <select
                         value={formData.region}
                         onChange={(e) => setFormData({ ...formData, region: e.target.value })}
-                        className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full border border-surface-300 dark:border-surface-600 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:bg-surface-700 dark:text-white"
                       >
                         <option value="Dakar">Dakar</option>
                         <option value="Thiès">Thiès</option>
@@ -374,7 +374,7 @@ const Addresses = () => {
 
                   {/* Adresse complète */}
                   <div>
-                    <label className="block text-sm font-semibold text-gray-900 mb-2">
+                    <label className="block text-sm font-semibold text-surface-900 dark:text-white mb-2">
                       Adresse complète *
                     </label>
                     <textarea
@@ -382,7 +382,7 @@ const Addresses = () => {
                       onChange={(e) => setFormData({ ...formData, address: e.target.value })}
                       placeholder="Ex: Cité Keur Gorgui, Villa n°123, près de la pharmacie Plateau"
                       rows={3}
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full border border-surface-300 dark:border-surface-600 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-brand-500 dark:bg-surface-700 dark:text-white"
                       required
                     />
                   </div>
@@ -394,9 +394,9 @@ const Addresses = () => {
                         type="checkbox"
                         checked={formData.isDefault}
                         onChange={(e) => setFormData({ ...formData, isDefault: e.target.checked })}
-                        className="w-5 h-5 text-blue-600 rounded"
+                        className="w-5 h-5 text-brand-500 rounded"
                       />
-                      <span className="text-sm text-gray-700">
+                      <span className="text-sm text-surface-700 dark:text-surface-300">
                         Définir comme adresse par défaut
                       </span>
                     </label>
@@ -407,14 +407,14 @@ const Addresses = () => {
                 <div className="flex gap-3 mt-6">
                   <button
                     type="submit"
-                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-lg font-semibold transition"
+                    className="flex-1 bg-brand-500 hover:bg-brand-600 text-white py-3 px-6 rounded-xl font-semibold transition"
                   >
                     {editingAddress ? "Enregistrer les modifications" : "Ajouter l'adresse"}
                   </button>
                   <button
                     type="button"
                     onClick={closeModal}
-                    className="bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 px-6 rounded-lg font-semibold transition"
+                    className="bg-surface-200 hover:bg-surface-300 dark:bg-surface-700 dark:hover:bg-surface-600 text-surface-700 dark:text-surface-300 py-3 px-6 rounded-xl font-semibold transition"
                   >
                     Annuler
                   </button>
@@ -425,32 +425,32 @@ const Addresses = () => {
         )}
 
         {/* Info */}
-        <div className="mt-8 bg-gradient-to-br from-purple-600 to-indigo-600 rounded-lg shadow-lg p-6 text-white">
+        <div className="mt-8 bg-gradient-to-br from-amber-500 to-brand-600 rounded-xl shadow-lg p-6 text-white">
           <h3 className="text-xl font-bold mb-4">
             💡 Pourquoi enregistrer plusieurs adresses ?
           </h3>
           <div className="grid sm:grid-cols-2 gap-4 text-sm">
             <div>
               <p className="font-semibold mb-2">Gain de temps</p>
-              <p className="text-purple-100">
+              <p className="text-amber-100">
                 Pas besoin de ressaisir vos informations à chaque commande.
               </p>
             </div>
             <div>
               <p className="font-semibold mb-2">Livraison flexible</p>
-              <p className="text-purple-100">
+              <p className="text-amber-100">
                 Livrez à votre bureau, chez vous ou chez un proche.
               </p>
             </div>
             <div>
               <p className="font-semibold mb-2">Adresses multiples</p>
-              <p className="text-purple-100">
+              <p className="text-amber-100">
                 Enregistrez autant d'adresses que nécessaire.
               </p>
             </div>
             <div>
               <p className="font-semibold mb-2">Sécurisé</p>
-              <p className="text-purple-100">
+              <p className="text-amber-100">
                 Vos informations sont protégées et confidentielles.
               </p>
             </div>
@@ -462,5 +462,3 @@ const Addresses = () => {
 };
 
 export default Addresses;
-
-

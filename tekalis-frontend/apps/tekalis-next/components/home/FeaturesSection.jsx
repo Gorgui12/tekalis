@@ -43,9 +43,9 @@ const FeaturesSection = ({ features, layout = "grid", theme = "light" }) => {
   // Couleurs par thème
   const colorVariants = {
     blue: {
-      bg: "bg-blue-100",
-      text: "text-blue-600",
-      hover: "group-hover:bg-blue-200"
+      bg: "bg-brand-50",
+      text: "text-brand-500",
+      hover: "group-hover:bg-brand-100"
     },
     green: {
       bg: "bg-green-100",
@@ -77,7 +77,7 @@ const FeaturesSection = ({ features, layout = "grid", theme = "light" }) => {
   // Layout grid (défaut)
   if (layout === "grid") {
     return (
-      <section className={`py-12 ${theme === "dark" ? "bg-gray-900" : "bg-white"}`}>
+      <section className={`py-12 ${theme === "dark" ? "bg-surface-900" : "bg-white"}`}>
         <div className="container mx-auto px-4">
           <div className={`grid sm:grid-cols-2 lg:grid-cols-${Math.min(displayFeatures.length, 4)} gap-6 md:gap-8`}>
             {displayFeatures.map((feature, index) => {
@@ -90,10 +90,10 @@ const FeaturesSection = ({ features, layout = "grid", theme = "light" }) => {
                       {feature.icon}
                     </div>
                   </div>
-                  <h3 className={`font-bold mb-2 text-base md:text-lg ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                  <h3 className={`font-bold mb-2 text-base md:text-lg ${theme === "dark" ? "text-white" : "text-surface-900"}`}>
                     {feature.title}
                   </h3>
-                  <p className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+                  <p className={`text-sm ${theme === "dark" ? "text-surface-400" : "text-surface-600 dark:text-surface-400"}`}>
                     {feature.description}
                   </p>
                 </div>
@@ -108,7 +108,7 @@ const FeaturesSection = ({ features, layout = "grid", theme = "light" }) => {
   // Layout horizontal
   if (layout === "horizontal") {
     return (
-      <section className={`py-8 ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}>
+      <section className={`py-8 ${theme === "dark" ? "bg-surface-900" : "bg-surface-50"}`}>
         <div className="container mx-auto px-4">
           <div className="flex flex-wrap justify-center gap-8 md:gap-12">
             {displayFeatures.map((feature, index) => {
@@ -122,10 +122,10 @@ const FeaturesSection = ({ features, layout = "grid", theme = "light" }) => {
                     </div>
                   </div>
                   <div>
-                    <h3 className={`font-bold text-sm ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                    <h3 className={`font-bold text-sm ${theme === "dark" ? "text-white" : "text-surface-900"}`}>
                       {feature.title}
                     </h3>
-                    <p className={`text-xs ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+                    <p className={`text-xs ${theme === "dark" ? "text-surface-400" : "text-surface-600 dark:text-surface-400"}`}>
                       {feature.description}
                     </p>
                   </div>
@@ -141,7 +141,7 @@ const FeaturesSection = ({ features, layout = "grid", theme = "light" }) => {
   // Layout cards
   if (layout === "cards") {
     return (
-      <section className={`py-12 ${theme === "dark" ? "bg-gray-900" : "bg-gray-50"}`}>
+      <section className={`py-12 ${theme === "dark" ? "bg-surface-900" : "bg-surface-50"}`}>
         <div className="container mx-auto px-4">
           <div className={`grid sm:grid-cols-2 lg:grid-cols-${Math.min(displayFeatures.length, 4)} gap-6`}>
             {displayFeatures.map((feature, index) => {
@@ -150,17 +150,17 @@ const FeaturesSection = ({ features, layout = "grid", theme = "light" }) => {
               return (
                 <div 
                   key={index} 
-                  className={`${theme === "dark" ? "bg-gray-800" : "bg-white"} rounded-lg shadow-md hover:shadow-xl transition-all p-6 group`}
+                  className={`${theme === "dark" ? "bg-surface-800" : "bg-white"} rounded-2xl shadow-card hover:shadow-xl transition-all p-6 group`}
                 >
                   <div className={`${colors.bg} ${colors.hover} rounded-full w-14 h-14 flex items-center justify-center mb-4 transition-all transform group-hover:scale-110`}>
                     <div className={`${colors.text} text-2xl`}>
                       {feature.icon}
                     </div>
                   </div>
-                  <h3 className={`font-bold mb-2 text-lg ${theme === "dark" ? "text-white" : "text-gray-900"}`}>
+                  <h3 className={`font-bold mb-2 text-lg ${theme === "dark" ? "text-white" : "text-surface-900"}`}>
                     {feature.title}
                   </h3>
-                  <p className={`text-sm ${theme === "dark" ? "text-gray-400" : "text-gray-600"}`}>
+                  <p className={`text-sm ${theme === "dark" ? "text-surface-400" : "text-surface-600 dark:text-surface-400"}`}>
                     {feature.description}
                   </p>
                 </div>

@@ -48,7 +48,7 @@ const ProductGallery = ({ images = [], productName = "" }) => {
   return (
     <div className="space-y-4">
       {/* Image principale */}
-      <div className="relative bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden aspect-square group">
+      <div className="relative bg-surface-100 dark:bg-surface-800 rounded-xl overflow-hidden aspect-square group">
         <img
           src={currentImage.url}
           alt={productName}
@@ -59,7 +59,7 @@ const ProductGallery = ({ images = [], productName = "" }) => {
         {/* Bouton zoom */}
         <button
           onClick={() => openLightbox(selectedIndex)}
-          className="absolute top-4 right-4 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-blue-600 hover:text-white"
+          className="absolute top-4 right-4 bg-white dark:bg-surface-800 text-surface-700 dark:text-surface-300 p-3 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity hover:bg-brand-500 hover:text-white"
           aria-label="Zoom"
         >
           <FaSearchPlus size={20} />
@@ -70,14 +70,14 @@ const ProductGallery = ({ images = [], productName = "" }) => {
           <>
             <button
               onClick={() => setSelectedIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length)}
-              className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-gray-800/90 p-2 rounded-full shadow-lg hover:bg-blue-600 hover:text-white transition opacity-0 group-hover:opacity-100"
+              className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-surface-800/90 p-2 rounded-full shadow-lg hover:bg-brand-500 hover:text-white transition opacity-0 group-hover:opacity-100"
               aria-label="Image précédente"
             >
               <FaChevronLeft />
             </button>
             <button
               onClick={() => setSelectedIndex((prev) => (prev + 1) % galleryImages.length)}
-              className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-gray-800/90 p-2 rounded-full shadow-lg hover:bg-blue-600 hover:text-white transition opacity-0 group-hover:opacity-100"
+              className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/90 dark:bg-surface-800/90 p-2 rounded-full shadow-lg hover:bg-brand-500 hover:text-white transition opacity-0 group-hover:opacity-100"
               aria-label="Image suivante"
             >
               <FaChevronRight />
@@ -100,10 +100,10 @@ const ProductGallery = ({ images = [], productName = "" }) => {
             <button
               key={index}
               onClick={() => setSelectedIndex(index)}
-              className={`relative aspect-square bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden border-2 transition ${
+              className={`relative aspect-square bg-surface-100 dark:bg-surface-800 rounded-xl overflow-hidden border-2 transition ${
                 index === selectedIndex
-                  ? 'border-blue-600 dark:border-blue-400'
-                  : 'border-transparent hover:border-gray-300 dark:hover:border-gray-600'
+                  ? 'border-brand-500'
+                  : 'border-transparent hover:border-surface-300 dark:hover:border-surface-600'
               }`}
             >
               <img

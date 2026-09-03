@@ -90,16 +90,16 @@ const BudgetSlider = ({
     <div className="w-full">
       {/* Display Selected Budget */}
       <div className="text-center mb-8">
-        <p className="text-sm text-gray-600 mb-2">Budget sélectionné</p>
+        <p className="text-sm text-surface-600 dark:text-surface-400 mb-2">Budget sélectionné</p>
         <div className="flex items-center justify-center gap-3">
-          <span className="text-3xl font-bold text-blue-600">
+          <span className="text-3xl font-bold text-brand-500">
             {minValue.toLocaleString()}
           </span>
-          <span className="text-2xl text-gray-400">-</span>
-          <span className="text-3xl font-bold text-blue-600">
+          <span className="text-2xl text-surface-400">-</span>
+          <span className="text-3xl font-bold text-brand-500">
             {maxValue.toLocaleString()}
           </span>
-          <span className="text-xl text-gray-600">{currency}</span>
+          <span className="text-xl text-surface-600 dark:text-surface-400">{currency}</span>
         </div>
         
         {/* Current Tier Badge */}
@@ -107,15 +107,15 @@ const BudgetSlider = ({
           <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-white font-semibold ${currentTier.color}`}>
             <span>{currentTier.label}</span>
           </span>
-          <p className="text-sm text-gray-600 mt-2">{currentTier.description}</p>
+          <p className="text-sm text-surface-600 dark:text-surface-400 mt-2">{currentTier.description}</p>
         </div>
       </div>
 
       {/* Dual Range Slider */}
-      <div className="relative h-2 bg-gray-200 rounded-full mb-12">
+      <div className="relative h-2 bg-surface-200 rounded-full mb-12">
         {/* Active Range */}
         <div 
-          className="absolute h-full bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"
+          className="absolute h-full bg-gradient-to-r from-brand-500 to-purple-500 rounded-full"
           style={{
             left: `${getMinPercent()}%`,
             width: `${getMaxPercent() - getMinPercent()}%`
@@ -130,7 +130,7 @@ const BudgetSlider = ({
           step={step}
           value={minValue}
           onChange={handleMinChange}
-          className="absolute w-full h-2 appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-blue-600 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-lg [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-blue-600 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:shadow-lg"
+          className="absolute w-full h-2 appearance-none bg-transparent pointer-events-none [&::-webkit-slider-thumb]:pointer-events-auto [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-5 [&::-webkit-slider-thumb]:h-5 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-brand-500 [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:shadow-lg [&::-moz-range-thumb]:w-5 [&::-moz-range-thumb]:h-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-brand-500 [&::-moz-range-thumb]:cursor-pointer [&::-moz-range-thumb]:border-0 [&::-moz-range-thumb]:shadow-lg"
         />
 
         {/* Max Slider */}
@@ -145,10 +145,10 @@ const BudgetSlider = ({
         />
 
         {/* Min/Max Labels */}
-        <div className="absolute -bottom-8 left-0 text-xs text-gray-500">
+        <div className="absolute -bottom-8 left-0 text-xs text-surface-500 dark:text-surface-400">
           {min.toLocaleString()} {currency}
         </div>
-        <div className="absolute -bottom-8 right-0 text-xs text-gray-500">
+        <div className="absolute -bottom-8 right-0 text-xs text-surface-500 dark:text-surface-400">
           {max.toLocaleString()} {currency}
         </div>
       </div>
@@ -156,8 +156,8 @@ const BudgetSlider = ({
       {/* Budget Tiers (Visual) */}
       {showTiers && (
         <div className="mt-8">
-          <p className="text-sm font-semibold text-gray-700 mb-3">Gammes de prix</p>
-          <div className="flex gap-1 h-8 rounded-lg overflow-hidden mb-4">
+          <p className="text-sm font-semibold text-surface-700 dark:text-surface-300 mb-3">Gammes de prix</p>
+          <div className="flex gap-1 h-8 rounded-xl overflow-hidden mb-4">
             {tiers.map((tier, index) => {
               const tierWidth = ((tier.range[1] - tier.range[0]) / max) * 100;
               const isActive = 
@@ -182,17 +182,17 @@ const BudgetSlider = ({
 
       {/* Recommendations */}
       {showRecommendations && (
-        <div className="mt-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
+        <div className="mt-6 bg-brand-50 border border-brand-200 rounded-xl p-4">
           <div className="flex items-start gap-3">
-            <FaInfoCircle className="text-blue-600 text-xl flex-shrink-0 mt-0.5" />
+            <FaInfoCircle className="text-brand-500 text-xl flex-shrink-0 mt-0.5" />
             <div>
-              <p className="font-semibold text-gray-900 mb-2">
+              <p className="font-semibold text-surface-900 dark:text-white mb-2">
                 {currentTier.label} - Ce que vous pouvez attendre
               </p>
-              <ul className="text-sm text-gray-700 space-y-1">
+              <ul className="text-sm text-surface-700 dark:text-surface-300 space-y-1">
                 {currentTier.examples.map((example, idx) => (
                   <li key={idx} className="flex items-center gap-2">
-                    <span className="text-blue-600">✓</span>
+                    <span className="text-brand-500">✓</span>
                     {example}
                   </li>
                 ))}
@@ -204,7 +204,7 @@ const BudgetSlider = ({
 
       {/* Quick Preset Buttons */}
       <div className="mt-6">
-        <p className="text-sm font-semibold text-gray-700 mb-3">Sélections rapides</p>
+        <p className="text-sm font-semibold text-surface-700 dark:text-surface-300 mb-3">Sélections rapides</p>
         <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
           {[
             { min: 300000, max: 500000, label: "Étudiant" },
@@ -220,10 +220,10 @@ const BudgetSlider = ({
                 setMinValue(preset.min);
                 setMaxValue(preset.max);
               }}
-              className={`px-3 py-2 rounded-lg text-sm font-semibold transition ${
+              className={`px-3 py-2 rounded-xl text-sm font-semibold transition ${
                 minValue === preset.min && maxValue === preset.max
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                  ? "bg-brand-500 text-white"
+                  : "bg-surface-100 text-surface-700 hover:bg-surface-200"
               }`}
             >
               {preset.label}

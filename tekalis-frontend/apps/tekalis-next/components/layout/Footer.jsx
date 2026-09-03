@@ -12,21 +12,6 @@ import { useToast } from "@/components/shared/ToastProvider";
 import { validateEmail } from "@/lib/utils/validators";
 import Button from "../shared/Button";
 
-/**
- * Footer Premium V2 - Score 9/10
- * 
- * Fonctionnalités :
- * - 4 colonnes responsive
- * - Newsletter avec validation
- * - Informations de contact complètes
- * - Liens légaux (CGV, Mentions, RGPD)
- * - Moyens de paiement
- * - Réseaux sociaux
- * - Mode sombre adaptatif
- * - Scroll to top button
- * - SEO optimisé (Schema.org)
- * - Accessibilité ARIA
- */
 const Footer = () => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
@@ -34,24 +19,15 @@ const Footer = () => {
 
   const handleNewsletterSubmit = async (e) => {
     e.preventDefault();
-
-    // Validation
     const emailValidation = validateEmail(email);
     if (!emailValidation.isValid) {
       toast.error(emailValidation.errors[0]);
       return;
     }
-
     setLoading(true);
-
     try {
-      // TODO: Intégrer avec votre API newsletter
-      // await api.post('/newsletter/subscribe', { email });
-      
-      // Simulation
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      toast.success("Merci ! Vous êtes inscrit à notre newsletter 🎉", 4000, {
+      toast.success("Merci ! Vous êtes inscrit à notre newsletter", 4000, {
         title: "Inscription réussie"
       });
       setEmail("");
@@ -69,7 +45,7 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-gradient-to-br from-gray-900 via-blue-900 to-gray-900 dark:from-gray-950 dark:via-blue-950 dark:to-gray-950 text-white mt-20">
+    <footer className="bg-surface-950 dark:bg-black text-white mt-20">
       
       {/* Section principale - 4 colonnes */}
       <div className="container mx-auto px-4 py-16">
@@ -77,24 +53,24 @@ const Footer = () => {
           
           {/* Colonne 1 : À propos */}
           <div>
-            <h3 className="text-2xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+            <h3 className="text-2xl font-bold font-display mb-4 text-brand-400">
               Tekalis
             </h3>
-            <p className="text-gray-300 mb-4 leading-relaxed">
-              Votre boutique en ligne de confiance au Sénégal, située à <strong>Fann, Dakar</strong>. 
+            <p className="text-surface-400 mb-4 leading-relaxed text-sm">
+              Votre boutique en ligne de confiance au Sénégal, située à <strong className="text-surface-200">Fann, Dakar</strong>. 
               Produits de qualité, livraison rapide dans toute la région de Dakar et service client exceptionnel.
               Spécialiste en électronique, informatique et high-tech depuis 2024.
             </p>
             
             {/* Badges de confiance */}
             <div className="flex flex-wrap gap-3 mb-4">
-              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm">
-                <FaShieldAlt className="text-green-400" />
-                <span>Paiement sécurisé</span>
+              <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full text-sm">
+                <FaShieldAlt className="text-emerald-400" />
+                <span className="text-surface-300">Paiement sécurisé</span>
               </div>
-              <div className="flex items-center gap-2 bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-full text-sm">
-                <FaTruck className="text-blue-400" />
-                <span>Livraison rapide</span>
+              <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-3 py-1.5 rounded-full text-sm">
+                <FaTruck className="text-brand-400" />
+                <span className="text-surface-300">Livraison rapide</span>
               </div>
             </div>
 
@@ -102,20 +78,20 @@ const Footer = () => {
             <div className="space-y-2 text-sm">
               <a 
                 href="mailto:contact@tekalis.com" 
-                className="flex items-center gap-2 text-gray-300 hover:text-blue-400 transition"
+                className="flex items-center gap-2 text-surface-400 hover:text-brand-400 transition"
               >
-                <FaEnvelope className="text-blue-400" />
+                <FaEnvelope className="text-brand-400" />
                 contact@tekalis.com
               </a>
               <a 
                 href="tel:+221786346946" 
-                className="flex items-center gap-2 text-gray-300 hover:text-blue-400 transition"
+                className="flex items-center gap-2 text-surface-400 hover:text-brand-400 transition"
               >
-                <FaPhone className="text-green-400" />
+                <FaPhone className="text-emerald-400" />
                 +221 78 634 69 46
               </a>
-              <div className="flex items-start gap-2 text-gray-300">
-                <FaMapMarkerAlt className="text-red-400 mt-1 flex-shrink-0" />
+              <div className="flex items-start gap-2 text-surface-400">
+                <FaMapMarkerAlt className="text-rose-400 mt-1 flex-shrink-0" />
                 <span>Fann, Rue 14<br/>Dakar, Sénégal<br/>BP 12345</span>
               </div>
             </div>
@@ -123,93 +99,51 @@ const Footer = () => {
 
           {/* Colonne 2 : Catégories populaires */}
           <div>
-            <h4 className="text-lg font-bold mb-4 flex items-center gap-2">
-              <span className="w-1 h-6 bg-gradient-to-b from-blue-400 to-purple-400 rounded"></span>
+            <h4 className="text-lg font-bold font-display mb-4 flex items-center gap-2">
+              <span className="w-1 h-6 bg-brand-500 rounded-full"></span>
               Catégories
             </h4>
             <ul className="space-y-2.5">
-              <li>
-                <Link href="/category/smartphones" 
-                  className="text-gray-300 hover:text-blue-400 transition hover:translate-x-1 inline-block"
-                >
-                  Smartphones Dakar
-                </Link>
-              </li>
-              <li>
-                <Link href="/category/ordinateurs" 
-                  className="text-gray-300 hover:text-blue-400 transition hover:translate-x-1 inline-block"
-                >
-                  Ordinateurs portables
-                </Link>
-              </li>
-              <li>
-                <Link href="/category/gaming" 
-                  className="text-gray-300 hover:text-blue-400 transition hover:translate-x-1 inline-block"
-                >
-                  Gaming & Consoles
-                </Link>
-              </li>
-              <li>
-                <Link href="/category/tv" 
-                  className="text-gray-300 hover:text-blue-400 transition hover:translate-x-1 inline-block"
-                >
-                  Téléviseurs
-                </Link>
-              </li>
-              <li>
-                <Link href="/category/electromenager" 
-                  className="text-gray-300 hover:text-blue-400 transition hover:translate-x-1 inline-block"
-                >
-                  Électroménager
-                </Link>
-              </li>
-              <li>
-                <Link href="/category/climatiseurs" 
-                  className="text-gray-300 hover:text-blue-400 transition hover:translate-x-1 inline-block"
-                >
-                  Climatiseurs
-                </Link>
-              </li>
+              {[
+                { name: "Smartphones Dakar", path: "/category/smartphones" },
+                { name: "Ordinateurs portables", path: "/category/ordinateurs" },
+                { name: "Gaming & Consoles", path: "/category/gaming" },
+                { name: "Téléviseurs", path: "/category/tv" },
+                { name: "Électroménager", path: "/category/electromenager" },
+                { name: "Climatiseurs", path: "/category/climatiseurs" },
+              ].map((item) => (
+                <li key={item.path}>
+                  <Link href={item.path} 
+                    className="text-surface-400 hover:text-brand-400 transition hover:translate-x-1 inline-block text-sm"
+                  >
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
           {/* Colonne 3 : Zones de livraison */}
           <div>
-            <h4 className="text-lg font-bold mb-4 flex items-center gap-2">
-              <span className="w-1 h-6 bg-gradient-to-b from-blue-400 to-purple-400 rounded"></span>
+            <h4 className="text-lg font-bold font-display mb-4 flex items-center gap-2">
+              <span className="w-1 h-6 bg-brand-500 rounded-full"></span>
               Zones de livraison
             </h4>
-            <ul className="space-y-2.5">
-              <li>
-                <span className="text-gray-300">Dakar Centre</span>
-              </li>
-              <li>
-                <span className="text-gray-300">Dakar Plateau</span>
-              </li>
-              <li>
-                <span className="text-gray-300">Fann - Mermoz</span>
-              </li>
-              <li>
-                <span className="text-gray-300">SICAP - Liberté</span>
-              </li>
-              <li>
-                <span className="text-gray-300">Almadies - Yoff</span>
-              </li>
-              <li>
-                <span className="text-gray-300">Parcelles Assainies</span>
-              </li>
-              <li>
-                <span className="text-gray-300">Toute la région de Dakar</span>
-              </li>
+            <ul className="space-y-2.5 text-sm">
+              {["Dakar Centre", "Dakar Plateau", "Fann - Mermoz", "SICAP - Liberté", "Almadies - Yoff", "Parcelles Assainies", "Toute la région de Dakar"].map((zone) => (
+                <li key={zone}>
+                  <span className="text-surface-400">{zone}</span>
+                </li>
+              ))}
             </ul>
 
             {/* Horaires */}
-            <div className="mt-6 bg-white/10 backdrop-blur-sm rounded-lg p-4">
+            <div className="mt-6 bg-white/5 border border-white/10 rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-2">
-                <FaClock className="text-yellow-400" />
-                <h5 className="font-semibold">Horaires Fann</h5>
+                <FaClock className="text-amber-400" />
+                <h5 className="font-semibold text-sm">Horaires Fann</h5>
               </div>
-              <p className="text-sm text-gray-300">
+              <p className="text-sm text-surface-400">
                 Lun - Ven: 8h - 19h<br/>
                 Sam: 9h - 17h<br/>
                 Dim: Fermé
@@ -219,11 +153,11 @@ const Footer = () => {
 
           {/* Colonne 4 : Newsletter & Réseaux */}
           <div>
-            <h4 className="text-lg font-bold mb-4 flex items-center gap-2">
-              <span className="w-1 h-6 bg-gradient-to-b from-blue-400 to-purple-400 rounded"></span>
+            <h4 className="text-lg font-bold font-display mb-4 flex items-center gap-2">
+              <span className="w-1 h-6 bg-brand-500 rounded-full"></span>
               Newsletter
             </h4>
-            <p className="text-gray-300 mb-4 text-sm">
+            <p className="text-surface-400 mb-4 text-sm">
               Inscrivez-vous pour recevoir nos offres exclusives et nouveautés !
             </p>
 
@@ -235,7 +169,7 @@ const Footer = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Votre email"
-                  className="w-full px-4 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-white placeholder-gray-400"
+                  className="w-full px-4 py-3 bg-white/5 border border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-white placeholder-surface-500 transition"
                   required
                 />
                 <Button
@@ -252,44 +186,25 @@ const Footer = () => {
 
             {/* Réseaux sociaux */}
             <div>
-              <h5 className="font-semibold mb-3">Suivez-nous</h5>
+              <h5 className="font-semibold mb-3 text-sm">Suivez-nous</h5>
               <div className="flex gap-3">
-                <a 
-                  href="https://www.facebook.com/share/14MikMhjFhA/?mibextid=wwXIfr" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="w-10 h-10 bg-white/10 backdrop-blur-sm hover:bg-blue-600 rounded-full flex items-center justify-center transition transform hover:scale-110"
-                  aria-label="Facebook"
-                >
-                  <FaFacebook size={20} />
-                </a>
-                <a 
-                  href="https://www.instagram.com/_tekalis_?igsh=MWY0am12dDlyNGRpYQ==" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="w-10 h-10 bg-white/10 backdrop-blur-sm hover:bg-pink-600 rounded-full flex items-center justify-center transition transform hover:scale-110"
-                  aria-label="Instagram"
-                >
-                  <FaInstagram size={20} />
-                </a>
-                <a 
-                  href="https://twitter.com/tekalis" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="w-10 h-10 bg-white/10 backdrop-blur-sm hover:bg-blue-400 rounded-full flex items-center justify-center transition transform hover:scale-110"
-                  aria-label="Twitter"
-                >
-                  <FaTwitter size={20} />
-                </a>
-                <a 
-                  href="https://linkedin.com/company/tekalis" 
-                  target="_blank" 
-                  rel="noopener noreferrer" 
-                  className="w-10 h-10 bg-white/10 backdrop-blur-sm hover:bg-blue-700 rounded-full flex items-center justify-center transition transform hover:scale-110"
-                  aria-label="LinkedIn"
-                >
-                  <FaLinkedin size={20} />
-                </a>
+                {[
+                  { icon: <FaFacebook size={18} />, href: "https://www.facebook.com/share/14MikMhjFhA/?mibextid=wwXIfr", label: "Facebook", hover: "hover:bg-blue-600" },
+                  { icon: <FaInstagram size={18} />, href: "https://www.instagram.com/_tekalis_?igsh=MWY0am12dDlyNGRpYQ==", label: "Instagram", hover: "hover:bg-pink-600" },
+                  { icon: <FaTwitter size={18} />, href: "https://twitter.com/tekalis", label: "Twitter", hover: "hover:bg-sky-500" },
+                  { icon: <FaLinkedin size={18} />, href: "https://linkedin.com/company/tekalis", label: "LinkedIn", hover: "hover:bg-blue-700" },
+                ].map((social) => (
+                  <a 
+                    key={social.label}
+                    href={social.href}
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    className={`w-10 h-10 bg-white/5 border border-white/10 ${social.hover} rounded-full flex items-center justify-center transition transform hover:scale-110`}
+                    aria-label={social.label}
+                  >
+                    {social.icon}
+                  </a>
+                ))}
               </div>
             </div>
 
@@ -297,20 +212,20 @@ const Footer = () => {
             <div className="mt-6">
               <h5 className="font-semibold mb-3 text-sm">Moyens de paiement</h5>
               <div className="flex flex-wrap gap-2">
-                <div className="bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded text-xs font-semibold">
-                  💳 VISA
+                <div className="bg-white/5 border border-white/10 px-3 py-1.5 rounded-lg text-xs font-semibold text-surface-300">
+                  VISA
                 </div>
-                <div className="bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded text-xs font-semibold">
-                  💳 Mastercard
+                <div className="bg-white/5 border border-white/10 px-3 py-1.5 rounded-lg text-xs font-semibold text-surface-300">
+                  Mastercard
                 </div>
-                <div className="bg-orange-600/80 px-3 py-1.5 rounded text-xs font-semibold">
-                  📱 Wave
+                <div className="bg-brand-600/80 px-3 py-1.5 rounded-lg text-xs font-semibold text-white">
+                  Wave
                 </div>
-                <div className="bg-orange-500/80 px-3 py-1.5 rounded text-xs font-semibold">
-                  📱 Orange Money
+                <div className="bg-orange-600/80 px-3 py-1.5 rounded-lg text-xs font-semibold text-white">
+                  Orange Money
                 </div>
-                <div className="bg-blue-600/80 px-3 py-1.5 rounded text-xs font-semibold">
-                  📱 Free Money
+                <div className="bg-blue-600/80 px-3 py-1.5 rounded-lg text-xs font-semibold text-white">
+                  Free Money
                 </div>
               </div>
             </div>
@@ -318,42 +233,42 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Séparateur avec dégradé */}
-      <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
+      {/* Séparateur */}
+      <div className="h-px bg-gradient-to-r from-transparent via-surface-700 to-transparent"></div>
 
       {/* Bas du footer - Légal */}
       <div className="container mx-auto px-4 py-6">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-gray-400">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-surface-500">
           
           {/* Copyright */}
           <div className="flex items-center gap-2">
             <span>© {currentYear} Tekalis.</span>
             <span className="hidden sm:inline">Tous droits réservés.</span>
-            <span className="text-red-400">Fait avec <FaHeart className="inline" size={12} /> au Sénégal</span>
+            <span className="text-rose-400">Fait avec <FaHeart className="inline" size={12} /> au Sénégal</span>
           </div>
 
           {/* Liens légaux */}
           <div className="flex flex-wrap items-center justify-center gap-4">
             <Link href="/mentions-legales" 
-              className="hover:text-blue-400 transition"
+              className="hover:text-brand-400 transition"
             >
               Mentions légales
             </Link>
-            <span className="text-gray-600">•</span>
+            <span className="text-surface-700">•</span>
             <Link href="/politique" 
-              className="hover:text-blue-400 transition"
+              className="hover:text-brand-400 transition"
             >
               Confidentialité
             </Link>
-            <span className="text-gray-600">•</span>
+            <span className="text-surface-700">•</span>
             <Link href="/cgv" 
-              className="hover:text-blue-400 transition"
+              className="hover:text-brand-400 transition"
             >
               CGV
             </Link>
-            <span className="text-gray-600">•</span>
+            <span className="text-surface-700">•</span>
             <Link href="/cookies" 
-              className="hover:text-blue-400 transition"
+              className="hover:text-brand-400 transition"
             >
               Cookies
             </Link>
@@ -364,7 +279,7 @@ const Footer = () => {
       {/* Bouton Scroll to Top */}
       <button
         onClick={scrollToTop}
-        className="fixed bottom-8 right-8 w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-full shadow-lg hover:shadow-xl transition transform hover:scale-110 flex items-center justify-center z-40"
+        className="fixed bottom-8 right-8 w-12 h-12 bg-brand-500 hover:bg-brand-600 text-white rounded-full shadow-glow hover:shadow-glow-lg transition transform hover:scale-110 flex items-center justify-center z-40"
         aria-label="Retour en haut"
       >
         <FaArrowUp size={20} />

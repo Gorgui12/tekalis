@@ -17,14 +17,14 @@ const ArticleCard = ({ article, variant = "default", featured = false }) => {
   if (variant === "compact") {
     return (
       <Link href={`/blog/${article.slug}`}
-        className="flex gap-3 p-3 hover:bg-gray-50 rounded-lg transition group"
+        className="flex gap-3 p-3 hover:bg-surface-100 dark:hover:bg-surface-800 rounded-xl transition group"
       >
-        <div className="w-20 h-20 bg-gray-200 rounded flex-shrink-0"></div>
+        <div className="w-20 h-20 bg-surface-200 dark:bg-surface-700 skeleton rounded-lg flex-shrink-0"></div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-semibold text-sm text-gray-900 line-clamp-2 group-hover:text-blue-600 transition mb-1">
+          <h3 className="font-semibold text-sm text-surface-900 dark:text-white line-clamp-2 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition mb-1">
             {article.title}
           </h3>
-          <div className="flex items-center gap-2 text-xs text-gray-500">
+          <div className="flex items-center gap-2 text-xs text-surface-500 dark:text-surface-400">
             <FaClock size={10} />
             <span>{article.readTime} min</span>
             <span>•</span>
@@ -38,10 +38,10 @@ const ArticleCard = ({ article, variant = "default", featured = false }) => {
   if (variant === "horizontal") {
     return (
       <Link href={`/blog/${article.slug}`}
-        className="flex flex-col md:flex-row gap-4 bg-white rounded-lg shadow-md hover:shadow-lg transition overflow-hidden group"
+        className="flex flex-col md:flex-row gap-4 bg-white dark:bg-surface-800 rounded-2xl shadow-card hover:shadow-elevated transition overflow-hidden group"
       >
         <div className="md:w-1/3 relative">
-          <div className="aspect-video md:aspect-auto md:h-full bg-gray-200"></div>
+          <div className="aspect-video md:aspect-auto md:h-full bg-surface-200 dark:bg-surface-700 skeleton"></div>
           <div className="absolute top-3 left-3">
             <span className={`${cat.color} px-2 py-1 rounded-full text-xs font-bold uppercase inline-flex items-center gap-1`}>
               <span>{cat.icon}</span>
@@ -50,13 +50,13 @@ const ArticleCard = ({ article, variant = "default", featured = false }) => {
           </div>
         </div>
         <div className="md:w-2/3 p-4">
-          <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-blue-600 transition">
+          <h3 className="text-xl font-bold text-surface-900 dark:text-white mb-2 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition">
             {article.title}
           </h3>
-          <p className="text-gray-600 mb-3 line-clamp-2">
+          <p className="text-surface-600 dark:text-surface-400 mb-3 line-clamp-2">
             {article.excerpt}
           </p>
-          <div className="flex items-center gap-4 text-sm text-gray-500">
+          <div className="flex items-center gap-4 text-sm text-surface-500 dark:text-surface-400">
             <span className="flex items-center gap-1">
               <FaClock />
               {article.readTime} min
@@ -78,12 +78,12 @@ const ArticleCard = ({ article, variant = "default", featured = false }) => {
   // Default variant (card)
   return (
     <Link href={`/blog/${article.slug}`}
-      className={`block bg-white rounded-lg shadow-md hover:shadow-xl transition overflow-hidden group ${
+      className={`block bg-white dark:bg-surface-800 rounded-2xl shadow-card hover:shadow-elevated transition overflow-hidden group ${
         featured ? "md:col-span-2 md:row-span-2" : ""
       }`}
     >
       <div className="relative">
-        <div className={`${featured ? "aspect-video md:aspect-[21/9]" : "aspect-video"} bg-gray-200`}>
+        <div className={`${featured ? "aspect-video md:aspect-[21/9]" : "aspect-video"} bg-surface-200 dark:bg-surface-700 skeleton`}>
           {/* Image placeholder */}
         </div>
         
@@ -97,7 +97,7 @@ const ArticleCard = ({ article, variant = "default", featured = false }) => {
 
         {/* Featured Badge */}
         {featured && (
-          <div className="absolute top-3 right-3 bg-yellow-400 text-gray-900 px-3 py-1 rounded-full text-xs font-bold animate-pulse">
+          <div className="absolute top-3 right-3 bg-amber-400 text-surface-900 px-3 py-1 rounded-full text-xs font-bold animate-pulse">
             ⭐ En vedette
           </div>
         )}
@@ -109,11 +109,11 @@ const ArticleCard = ({ article, variant = "default", featured = false }) => {
       <div className={`p-5 ${featured ? "md:p-6" : ""}`}>
         <h3 className={`${
           featured ? "text-xl md:text-2xl" : "text-lg"
-        } font-bold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition`}>
+        } font-bold text-surface-900 dark:text-white mb-2 line-clamp-2 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition`}>
           {article.title}
         </h3>
 
-        <p className={`text-sm text-gray-600 mb-3 ${
+        <p className={`text-sm text-surface-600 dark:text-surface-400 mb-3 ${
           featured ? "line-clamp-3" : "line-clamp-2"
         }`}>
           {article.excerpt}
@@ -125,7 +125,7 @@ const ArticleCard = ({ article, variant = "default", featured = false }) => {
             {article.tags.slice(0, 3).map((tag, index) => (
               <span
                 key={index}
-                className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs"
+                className="bg-surface-100 dark:bg-surface-700 text-surface-700 dark:text-surface-300 px-2 py-1 rounded text-xs"
               >
                 {tag}
               </span>
@@ -134,7 +134,7 @@ const ArticleCard = ({ article, variant = "default", featured = false }) => {
         )}
 
         {/* Meta Info */}
-        <div className="flex items-center gap-3 text-xs text-gray-500 mb-3">
+        <div className="flex items-center gap-3 text-xs text-surface-500 dark:text-surface-400 mb-3">
           <span className="flex items-center gap-1">
             <FaClock />
             {article.readTime} min
@@ -146,13 +146,13 @@ const ArticleCard = ({ article, variant = "default", featured = false }) => {
         </div>
 
         {/* Author */}
-        <div className="flex items-center gap-2 pt-3 border-t">
-          <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
+        <div className="flex items-center gap-2 pt-3 border-t dark:border-surface-700">
+          <div className="w-8 h-8 bg-surface-300 dark:bg-surface-600 rounded-full"></div>
           <div className="flex-1">
-            <p className="text-xs font-semibold text-gray-900">
+            <p className="text-xs font-semibold text-surface-900 dark:text-white">
               {article.author?.name || "Auteur"}
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-surface-500 dark:text-surface-400">
               {new Date(article.publishedAt || 0).toLocaleDateString("fr-FR")}
             </p>
           </div>

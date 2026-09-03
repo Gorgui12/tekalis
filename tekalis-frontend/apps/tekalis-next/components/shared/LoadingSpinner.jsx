@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
  */
 const LoadingSpinner = ({ 
   size = 'md', 
-  color = 'blue',
+  color = 'primary',
   text = null,
   fullScreen = false,
   className = ''
@@ -20,12 +20,12 @@ const LoadingSpinner = ({
   };
 
   const colors = {
-    blue: 'border-blue-600',
-    gray: 'border-gray-600',
+    primary: 'border-brand-500',
+    surface: 'border-surface-600',
     white: 'border-white',
-    red: 'border-red-600',
-    green: 'border-green-600',
-    yellow: 'border-yellow-600'
+    red: 'border-rose-600',
+    green: 'border-emerald-600',
+    yellow: 'border-amber-500'
   };
 
   const spinner = (
@@ -43,16 +43,16 @@ const LoadingSpinner = ({
         aria-label="Chargement en cours"
       />
       {text && (
-        <p className="text-sm font-medium text-gray-600 animate-pulse">
-          {text}
-        </p>
+      <p className="text-sm font-medium text-surface-600 dark:text-surface-400 animate-pulse">
+        {text}
+      </p>
       )}
     </div>
   );
 
   if (fullScreen) {
     return (
-      <div className="fixed inset-0 bg-white bg-opacity-90 flex items-center justify-center z-50">
+      <div className="fixed inset-0 bg-white bg-opacity-90 dark:bg-surface-950 dark:bg-opacity-90 flex items-center justify-center z-50">
         {spinner}
       </div>
     );
@@ -63,7 +63,7 @@ const LoadingSpinner = ({
 
 LoadingSpinner.propTypes = {
   size: PropTypes.oneOf(['xs', 'sm', 'md', 'lg', 'xl']),
-  color: PropTypes.oneOf(['blue', 'gray', 'white', 'red', 'green', 'yellow']),
+  color: PropTypes.oneOf(['primary', 'surface', 'white', 'red', 'green', 'yellow']),
   text: PropTypes.string,
   fullScreen: PropTypes.bool,
   className: PropTypes.string

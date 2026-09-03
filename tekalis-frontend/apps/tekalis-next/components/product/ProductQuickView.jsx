@@ -65,13 +65,13 @@ const ProductQuickView = ({ product, isOpen, onClose }) => {
       tabIndex={0}
     >
       <div
-        className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto"
+        className="bg-white dark:bg-surface-900 rounded-2xl shadow-2xl max-w-5xl w-full max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Close button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 p-2 z-10"
+          className="absolute top-4 right-4 text-surface-500 hover:text-surface-700 dark:text-surface-400 dark:hover:text-surface-200 p-2 z-10"
           aria-label="Fermer"
         >
           <FaTimes size={24} />
@@ -80,7 +80,7 @@ const ProductQuickView = ({ product, isOpen, onClose }) => {
         <div className="grid md:grid-cols-2 gap-8 p-8">
           {/* Gallery */}
           <div className="space-y-4">
-            <div className="bg-gray-100 dark:bg-gray-800 rounded-lg aspect-square overflow-hidden">
+            <div className="bg-surface-100 dark:bg-surface-800 rounded-xl aspect-square overflow-hidden">
               <img
                 src={images[selectedImage].url}
                 alt={product.name}
@@ -94,10 +94,10 @@ const ProductQuickView = ({ product, isOpen, onClose }) => {
                   <button
                     key={idx}
                     onClick={() => setSelectedImage(idx)}
-                    className={`aspect-square bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden border-2 ${
+                    className={`aspect-square bg-surface-100 dark:bg-surface-800 rounded-xl overflow-hidden border-2 ${
                       idx === selectedImage
-                        ? 'border-blue-600'
-                        : 'border-transparent hover:border-gray-300'
+                        ? 'border-brand-500'
+                        : 'border-transparent hover:border-surface-300'
                     }`}
                   >
                     <img src={img.url} alt="" className="w-full h-full object-contain p-2" />
@@ -111,13 +111,13 @@ const ProductQuickView = ({ product, isOpen, onClose }) => {
           <div className="space-y-6">
             {/* Brand */}
             {product.brand && (
-              <span className="text-sm text-gray-500 dark:text-gray-400 uppercase font-semibold">
+              <span className="text-sm text-surface-500 dark:text-surface-400 uppercase font-semibold">
                 {product.brand}
               </span>
             )}
 
             {/* Title */}
-            <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white">
+            <h2 className="text-2xl md:text-3xl font-bold text-surface-900 dark:text-white">
               {product.name}
             </h2>
 
@@ -128,11 +128,11 @@ const ProductQuickView = ({ product, isOpen, onClose }) => {
                   {[...Array(5)].map((_, i) => (
                     <FaStar
                       key={i}
-                      className={i < Math.floor(product.rating.average) ? 'text-yellow-400' : 'text-gray-300'}
+                      className={i < Math.floor(product.rating.average) ? 'text-yellow-400' : 'text-surface-300'}
                     />
                   ))}
                 </div>
-                <span className="text-sm text-gray-600 dark:text-gray-400">
+                <span className="text-sm text-surface-600 dark:text-surface-400">
                   {product.rating.average.toFixed(1)} ({product.rating.count} avis)
                 </span>
               </div>
@@ -141,11 +141,11 @@ const ProductQuickView = ({ product, isOpen, onClose }) => {
             {/* Price */}
             <div>
               <div className="flex items-baseline gap-3 mb-2">
-                <span className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+                <span className="text-3xl font-bold text-brand-600 dark:text-brand-400">
                   {(product.price || 0).toLocaleString()} FCFA
                 </span>
                 {product.comparePrice && (
-                  <span className="text-lg text-gray-400 line-through">
+                  <span className="text-lg text-surface-400 line-through">
                     {product.comparePrice.toLocaleString()} FCFA
                   </span>
                 )}
@@ -179,14 +179,14 @@ const ProductQuickView = ({ product, isOpen, onClose }) => {
 
             {/* Description courte */}
             {product.description && (
-              <p className="text-gray-600 dark:text-gray-400 line-clamp-3">
+              <p className="text-surface-600 dark:text-surface-400 line-clamp-3">
                 {product.description}
               </p>
             )}
 
             {/* Specs highlight */}
             {product.specs && (
-              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 space-y-2">
+              <div className="bg-surface-50 dark:bg-surface-800 rounded-xl p-4 space-y-2">
                 {product.specs.processor && (
                   <p className="text-sm flex items-center gap-2">
                     <FaCheckCircle className="text-green-500" />
@@ -205,20 +205,20 @@ const ProductQuickView = ({ product, isOpen, onClose }) => {
             {/* Quantity */}
             {!isOutOfStock && (
               <div className="flex items-center gap-4">
-                <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                <span className="text-sm font-semibold text-surface-700 dark:text-surface-300">
                   Quantité:
                 </span>
-                <div className="flex items-center border border-gray-300 dark:border-gray-600 rounded-lg">
+                <div className="flex items-center border border-surface-300 dark:border-surface-600 rounded-xl">
                   <button
                     onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                    className="p-3 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+                    className="p-3 hover:bg-surface-100 dark:hover:bg-surface-800 transition"
                   >
                     <FaMinus size={12} />
                   </button>
                   <span className="px-6 py-2 font-semibold">{quantity}</span>
                   <button
                     onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
-                    className="p-3 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+                    className="p-3 hover:bg-surface-100 dark:hover:bg-surface-800 transition"
                   >
                     <FaPlus size={12} />
                   </button>
@@ -248,7 +248,7 @@ const ProductQuickView = ({ product, isOpen, onClose }) => {
 
             {/* View full details */}
             <Link href={`/products/${product._id}`}
-              className="flex items-center justify-center gap-2 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 font-semibold transition"
+              className="flex items-center justify-center gap-2 text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-semibold transition"
               onClick={onClose}
             >
               <FaExternalLinkAlt />
@@ -262,7 +262,3 @@ const ProductQuickView = ({ product, isOpen, onClose }) => {
 };
 
 export default ProductQuickView;
-
-
-
-

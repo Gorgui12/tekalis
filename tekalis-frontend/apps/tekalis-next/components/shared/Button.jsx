@@ -21,18 +21,18 @@ const Button = ({
   className = '',
   ...props
 }) => {
-  const baseClasses = 'font-semibold rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2';
+  const baseClasses = 'font-semibold rounded-xl transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2';
   
   const variants = {
-    primary: 'bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white focus:ring-blue-500 shadow-sm hover:shadow-md',
-    secondary: 'bg-gray-200 hover:bg-gray-300 active:bg-gray-400 text-gray-700 focus:ring-gray-400',
-    danger: 'bg-red-600 hover:bg-red-700 active:bg-red-800 text-white focus:ring-red-500 shadow-sm hover:shadow-md',
-    success: 'bg-green-600 hover:bg-green-700 active:bg-green-800 text-white focus:ring-green-500 shadow-sm hover:shadow-md',
-    warning: 'bg-yellow-500 hover:bg-yellow-600 active:bg-yellow-700 text-white focus:ring-yellow-500 shadow-sm',
-    outline: 'border-2 border-blue-600 text-blue-600 hover:bg-blue-50 active:bg-blue-100 focus:ring-blue-500',
-    outlineDanger: 'border-2 border-red-600 text-red-600 hover:bg-red-50 active:bg-red-100 focus:ring-red-500',
-    ghost: 'text-gray-700 hover:bg-gray-100 active:bg-gray-200 focus:ring-gray-400',
-    link: 'text-blue-600 hover:text-blue-700 hover:underline focus:ring-blue-500'
+    primary: 'bg-brand-500 hover:bg-brand-600 active:bg-brand-700 text-white focus:ring-brand-500 shadow-sm hover:shadow-md',
+    secondary: 'bg-surface-200 hover:bg-surface-300 active:bg-surface-400 text-surface-700 focus:ring-surface-400 dark:bg-surface-700 dark:hover:bg-surface-600 dark:text-surface-100',
+    danger: 'bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white focus:ring-rose-500 shadow-sm hover:shadow-md',
+    success: 'bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white focus:ring-emerald-500 shadow-sm hover:shadow-md',
+    warning: 'bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-white focus:ring-amber-500 shadow-sm',
+    outline: 'border-2 border-brand-500 text-brand-600 hover:bg-brand-50 active:bg-brand-100 focus:ring-brand-500 dark:text-brand-400 dark:hover:bg-brand-900/20',
+    outlineDanger: 'border-2 border-rose-600 text-rose-600 hover:bg-rose-50 active:bg-rose-100 focus:ring-rose-500',
+    ghost: 'text-surface-700 hover:bg-surface-100 active:bg-surface-200 focus:ring-surface-400 dark:text-surface-300 dark:hover:bg-surface-800',
+    link: 'text-brand-600 hover:text-brand-700 hover:underline focus:ring-brand-500 dark:text-brand-400'
   };
   
   const sizes = {

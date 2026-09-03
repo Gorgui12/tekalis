@@ -25,11 +25,11 @@ function ForgotPassword() {
   const [error, setError] = useState("");
 
   const fieldClass =
-    `w-full pl-11 pr-4 py-3 rounded-xl border-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white
-     placeholder:text-gray-400 focus:outline-none transition-all duration-200
+    `w-full pl-11 pr-4 py-3 rounded-xl border-2 bg-white dark:bg-surface-800 text-surface-900 dark:text-white
+     placeholder:text-surface-400 focus:outline-none transition-all duration-200
      ${error
        ? "border-red-400 focus:border-red-500 bg-red-50 dark:bg-red-900/20"
-       : "border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400"}`;
+       : "border-surface-200 dark:border-surface-700 focus:border-brand-500 dark:focus:border-brand-400"}`;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -56,10 +56,10 @@ function ForgotPassword() {
   ];
 
   return (
-    <div className="min-h-screen flex bg-gray-50 dark:bg-gray-950">
+    <div className="min-h-screen flex bg-surface-50 dark:bg-surface-950">
 
       {/* ── Panneau gauche — branding ──────────────────────────────────── */}
-      <div className="hidden lg:flex lg:w-5/12 relative overflow-hidden bg-gradient-to-br from-blue-700 via-indigo-700 to-purple-800 flex-col items-center justify-center p-12 text-white">
+      <div className="hidden lg:flex lg:w-5/12 relative overflow-hidden bg-gradient-to-br from-brand-500 via-orange-600 to-amber-700 flex-col items-center justify-center p-12 text-white">
         <div className="absolute -top-24 -left-24 w-96 h-96 bg-white/5 rounded-full" />
         <div className="absolute -bottom-32 -right-16 w-80 h-80 bg-white/5 rounded-full" />
         <div className="absolute top-1/3 right-8 w-40 h-40 bg-white/5 rounded-full" />
@@ -68,12 +68,12 @@ function ForgotPassword() {
           <Link href="/" className="text-4xl font-extrabold tracking-tight mb-2 block">
             Tekalis
           </Link>
-          <p className="text-blue-200 text-sm mb-10">Boutique High-Tech · Dakar, Sénégal</p>
+          <p className="text-brand-200 text-sm mb-10">Boutique High-Tech · Dakar, Sénégal</p>
 
           <h2 className="text-3xl font-bold leading-snug mb-4">
             Pas de panique, on s'en occupe !
           </h2>
-          <p className="text-blue-100 leading-relaxed mb-10">
+          <p className="text-brand-100 leading-relaxed mb-10">
             Récupérez l'accès à votre compte en quelques secondes et retrouvez vos
             commandes, garanties et wishlist.
           </p>
@@ -86,7 +86,7 @@ function ForgotPassword() {
                 </div>
                 <div>
                   <p className="font-semibold text-sm">{f.text}</p>
-                  <p className="text-blue-200 text-xs">{f.sub}</p>
+                  <p className="text-brand-200 text-xs">{f.sub}</p>
                 </div>
               </div>
             ))}
@@ -100,30 +100,30 @@ function ForgotPassword() {
 
           {/* Logo mobile */}
           <Link href="/" className="lg:hidden block text-center mb-8">
-            <span className="text-3xl font-extrabold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="text-3xl font-extrabold bg-gradient-to-r from-brand-500 to-orange-600 bg-clip-text text-transparent">
               Tekalis
             </span>
           </Link>
 
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-8">
+          <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-card border border-surface-100 dark:border-surface-700 p-8">
 
             {sent ? (
               /* ── État succès ── */
               <div className="text-center py-6">
                 <FaCheckCircle className="text-6xl text-green-500 mx-auto mb-5" />
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                <h1 className="text-2xl font-bold text-surface-900 dark:text-white mb-3">
                   Email envoyé
                 </h1>
-                <p className="text-gray-600 dark:text-gray-300 leading-relaxed mb-8">
+                <p className="text-surface-600 dark:text-surface-300 leading-relaxed mb-8">
                   Si un compte existe avec l'adresse{" "}
-                  <strong className="text-gray-900 dark:text-white">{email}</strong>,
+                  <strong className="text-surface-900 dark:text-white">{email}</strong>,
                   vous recevrez un lien de réinitialisation dans quelques instants.
                   Pensez à vérifier vos spams.
                 </p>
                 <button
                   type="button"
                   onClick={() => router.push("/login")}
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3.5 rounded-xl hover:opacity-90 transition"
+                  className="w-full bg-gradient-to-r from-brand-500 to-orange-600 text-white font-semibold py-3.5 rounded-xl hover:opacity-90 transition"
                 >
                   Retour à la connexion
                 </button>
@@ -134,16 +134,16 @@ function ForgotPassword() {
                 <button
                   type="button"
                   onClick={() => router.back()}
-                  className="inline-flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 transition mb-6"
+                  className="inline-flex items-center gap-2 text-sm text-surface-500 dark:text-surface-400 hover:text-brand-600 dark:hover:text-brand-400 transition mb-6"
                 >
                   <FaArrowLeft size={12} /> Retour
                 </button>
 
                 <div className="mb-7">
-                  <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+                  <h1 className="text-2xl font-bold text-surface-900 dark:text-white mb-1 font-display">
                     Mot de passe oublié
                   </h1>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                  <p className="text-sm text-surface-500 dark:text-surface-400">
                     Saisissez votre adresse email : nous vous enverrons un lien pour
                     réinitialiser votre mot de passe.
                   </p>
@@ -152,11 +152,11 @@ function ForgotPassword() {
                 <form onSubmit={handleSubmit} noValidate className="space-y-4">
                   {/* Email */}
                   <div>
-                    <label htmlFor="forgot-email" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                    <label htmlFor="forgot-email" className="block text-sm font-semibold text-surface-700 dark:text-surface-300 mb-1.5">
                       Adresse email
                     </label>
                     <div className="relative">
-                      <FaEnvelope className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm pointer-events-none" />
+                      <FaEnvelope className="absolute left-3.5 top-1/2 -translate-y-1/2 text-surface-400 text-sm pointer-events-none" />
                       <input
                         id="forgot-email"
                         type="email"
@@ -178,7 +178,7 @@ function ForgotPassword() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold py-3.5 rounded-xl hover:opacity-90 transition disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="w-full bg-gradient-to-r from-brand-500 to-orange-600 text-white font-semibold py-3.5 rounded-xl hover:opacity-90 transition disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     {loading ? (
                       <>
@@ -190,9 +190,9 @@ function ForgotPassword() {
                   </button>
                 </form>
 
-                <p className="mt-6 text-center text-sm text-gray-500 dark:text-gray-400">
+                <p className="mt-6 text-center text-sm text-surface-500 dark:text-surface-400">
                   Mot de passe retrouvé ?{" "}
-                  <Link href="/login" className="text-blue-600 dark:text-blue-400 hover:underline font-semibold">
+                  <Link href="/login" className="text-brand-600 dark:text-brand-400 hover:underline font-semibold">
                     Se connecter
                   </Link>
                 </p>

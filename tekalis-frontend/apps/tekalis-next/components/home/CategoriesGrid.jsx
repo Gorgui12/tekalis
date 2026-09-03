@@ -124,7 +124,7 @@ const CategoriesGrid = ({ categories, columns = 6, showAll = false }) => {
             className="group relative"
           >
             {/* Card avec gradient */}
-            <div className={`bg-gradient-to-br ${category.color} rounded-lg shadow-md hover:shadow-xl transition-all duration-300 p-6 md:p-8 text-center text-white aspect-square flex flex-col items-center justify-center transform hover:scale-105`}>
+            <div className={`bg-gradient-to-br ${category.color} rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-300 p-6 md:p-8 text-center text-white aspect-square flex flex-col items-center justify-center transform hover:scale-105`}>
               {/* Icône */}
               <div className="text-4xl md:text-5xl mb-3 group-hover:scale-110 transition-transform duration-300">
                 {category.icon}
@@ -158,7 +158,7 @@ const CategoriesGrid = ({ categories, columns = 6, showAll = false }) => {
             </div>
 
             {/* Effet hover overlay */}
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 rounded-lg transition-all duration-300 pointer-events-none"></div>
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 rounded-2xl transition-all duration-300 pointer-events-none"></div>
           </Link>
         ))}
       </div>
@@ -167,7 +167,7 @@ const CategoriesGrid = ({ categories, columns = 6, showAll = false }) => {
       {!showAll && displayCategories.length > columns && (
         <div className="text-center mt-8">
           <Link href="/categories"
-            className="inline-block bg-gray-900 hover:bg-gray-800 text-white px-8 py-3 rounded-lg font-bold transition"
+            className="inline-block bg-surface-950 hover:bg-surface-800 text-white px-8 py-3 rounded-xl font-bold transition"
           >
             Voir toutes les catégories →
           </Link>

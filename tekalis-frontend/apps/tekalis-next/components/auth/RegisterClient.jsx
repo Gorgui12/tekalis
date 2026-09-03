@@ -77,32 +77,32 @@ function Register() {
 
   /* ── Field helpers ───────────────────────────────────────────────────── */
   const fieldClass = (field) =>
-    `w-full pl-11 pr-11 py-3 rounded-xl border-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white
-     placeholder:text-gray-400 focus:outline-none transition-all duration-200
+    `w-full pl-11 pr-11 py-3 rounded-xl border-2 bg-white dark:bg-surface-800 text-surface-900 dark:text-white
+     placeholder:text-surface-400 focus:outline-none transition-all duration-200
      ${errors[field]
-       ? "border-red-400 focus:border-red-500 bg-red-50 dark:bg-red-900/20"
-       : "border-gray-200 dark:border-gray-700 focus:border-blue-500 dark:focus:border-blue-400"}`;
+       ? "border-rose-400 focus:border-rose-500 bg-rose-50 dark:bg-rose-900/20"
+       : "border-surface-200 dark:border-surface-700 focus:border-brand-500 dark:focus:border-brand-400"}`;
 
   return (
-    <div className="min-h-screen flex bg-gray-50 dark:bg-gray-950">
+    <div className="min-h-screen flex bg-surface-50 dark:bg-surface-950">
 
       {/* ── Panneau gauche — illustration ──────────────────────────────── */}
-      <div className="hidden lg:flex lg:w-5/12 relative overflow-hidden bg-gradient-to-br from-blue-700 via-indigo-700 to-purple-800 flex-col items-center justify-center p-12 text-white">
+      <div className="hidden lg:flex lg:w-5/12 relative overflow-hidden bg-gradient-to-br from-brand-500 via-amber-600 to-orange-800 flex-col items-center justify-center p-12 text-white">
         {/* cercles décoratifs */}
         <div className="absolute -top-24 -left-24 w-96 h-96 bg-white/5 rounded-full" />
         <div className="absolute -bottom-32 -right-16 w-80 h-80 bg-white/5 rounded-full" />
         <div className="absolute top-1/3 right-8 w-40 h-40 bg-white/5 rounded-full" />
 
         <div className="relative z-10 max-w-sm">
-          <Link href="/" className="text-4xl font-extrabold tracking-tight mb-2 block">
+          <Link href="/" className="text-4xl font-extrabold font-display tracking-tight mb-2 block">
             Tekalis
           </Link>
-          <p className="text-blue-200 text-sm mb-10">Boutique High-Tech · Dakar, Sénégal</p>
+          <p className="text-amber-100 text-sm mb-10">Boutique High-Tech · Dakar, Sénégal</p>
 
-          <h2 className="text-3xl font-bold leading-snug mb-4">
+          <h2 className="text-3xl font-bold font-display leading-snug mb-4">
             Rejoignez la communauté Tekalis
           </h2>
-          <p className="text-blue-100 leading-relaxed mb-10">
+          <p className="text-amber-50 leading-relaxed mb-10">
             Créez votre compte et accédez à des milliers de produits tech, suivez vos commandes et bénéficiez d'offres exclusives.
           </p>
 
@@ -115,7 +115,7 @@ function Register() {
           ].map((item) => (
             <div key={item} className="flex items-start gap-3 mb-3">
               <FaCheckCircle className="text-emerald-400 flex-shrink-0 mt-0.5" />
-              <span className="text-blue-100 text-sm">{item}</span>
+              <span className="text-amber-50 text-sm">{item}</span>
             </div>
           ))}
         </div>
@@ -127,20 +127,20 @@ function Register() {
 
           {/* Logo mobile */}
           <Link href="/" className="lg:hidden block text-center mb-8">
-            <span className="text-3xl font-extrabold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <span className="text-3xl font-extrabold font-display text-brand-600 dark:text-brand-400">
               Tekalis
             </span>
           </Link>
 
-          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 p-8">
+          <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-card border border-surface-100 dark:border-surface-700 p-8">
 
             <div className="mb-7">
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-1">
+              <h1 className="text-2xl font-bold font-display text-surface-900 dark:text-white mb-1">
                 Créer un compte
               </h1>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-surface-500 dark:text-surface-400">
                 Déjà inscrit ?{" "}
-                <Link href="/login" className="text-blue-600 dark:text-blue-400 hover:underline font-semibold">
+                <Link href="/login" className="text-brand-600 dark:text-brand-400 hover:underline font-semibold">
                   Se connecter
                 </Link>
               </p>
@@ -150,11 +150,11 @@ function Register() {
 
               {/* Nom */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                <label className="block text-sm font-semibold text-surface-700 dark:text-surface-300 mb-1.5">
                   Nom complet
                 </label>
                 <div className="relative">
-                  <FaUser className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
+                  <FaUser className="absolute left-3.5 top-1/2 -translate-y-1/2 text-surface-400 text-sm" />
                   <input
                     type="text"
                     value={formData.name}
@@ -165,16 +165,16 @@ function Register() {
                     aria-invalid={!!errors.name}
                   />
                 </div>
-                {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name}</p>}
+                {errors.name && <p className="mt-1 text-xs text-rose-500">{errors.name}</p>}
               </div>
 
               {/* Email */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                <label className="block text-sm font-semibold text-surface-700 dark:text-surface-300 mb-1.5">
                   Adresse email
                 </label>
                 <div className="relative">
-                  <FaEnvelope className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
+                  <FaEnvelope className="absolute left-3.5 top-1/2 -translate-y-1/2 text-surface-400 text-sm" />
                   <input
                     type="email"
                     value={formData.email}
@@ -185,16 +185,16 @@ function Register() {
                     aria-invalid={!!errors.email}
                   />
                 </div>
-                {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email}</p>}
+                {errors.email && <p className="mt-1 text-xs text-rose-500">{errors.email}</p>}
               </div>
 
               {/* Mot de passe */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                <label className="block text-sm font-semibold text-surface-700 dark:text-surface-300 mb-1.5">
                   Mot de passe
                 </label>
                 <div className="relative">
-                  <FaLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
+                  <FaLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-surface-400 text-sm" />
                   <input
                     type={showPw ? "text" : "password"}
                     value={formData.password}
@@ -207,7 +207,7 @@ function Register() {
                   <button
                     type="button"
                     onClick={() => setShowPw((v) => !v)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-surface-400 hover:text-surface-600 dark:hover:text-surface-200 transition"
                     tabIndex={-1}
                     aria-label={showPw ? "Masquer" : "Afficher"}
                   >
@@ -223,7 +223,7 @@ function Register() {
                         <div
                           key={i}
                           className={`h-1 flex-1 rounded-full transition-all duration-300 ${
-                            i <= pwStrength ? strengthColors[pwStrength] : "bg-gray-200 dark:bg-gray-700"
+                            i <= pwStrength ? strengthColors[pwStrength] : "bg-surface-200 dark:bg-surface-700"
                           }`}
                         />
                       ))}
@@ -242,23 +242,23 @@ function Register() {
                 {formData.password && (
                   <ul className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1">
                     {pwRules.map((r) => (
-                      <li key={r.id} className={`flex items-center gap-1.5 text-xs transition-colors ${r.ok ? "text-emerald-600" : "text-gray-400 dark:text-gray-500"}`}>
-                        <FaCheckCircle size={10} className={r.ok ? "text-emerald-500" : "text-gray-300"} />
+                      <li key={r.id} className={`flex items-center gap-1.5 text-xs transition-colors ${r.ok ? "text-emerald-600" : "text-surface-400 dark:text-surface-500"}`}>
+                        <FaCheckCircle size={10} className={r.ok ? "text-emerald-500" : "text-surface-300 dark:text-surface-600"} />
                         {r.label}
                       </li>
                     ))}
                   </ul>
                 )}
-                {errors.password && <p className="mt-1 text-xs text-red-500">{errors.password}</p>}
+                {errors.password && <p className="mt-1 text-xs text-rose-500">{errors.password}</p>}
               </div>
 
               {/* Confirmation */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5">
+                <label className="block text-sm font-semibold text-surface-700 dark:text-surface-300 mb-1.5">
                   Confirmer le mot de passe
                 </label>
                 <div className="relative">
-                  <FaLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm" />
+                  <FaLock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-surface-400 text-sm" />
                   <input
                     type={showCpw ? "text" : "password"}
                     value={formData.confirm}
@@ -271,20 +271,20 @@ function Register() {
                   <button
                     type="button"
                     onClick={() => setShowCpw((v) => !v)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-surface-400 hover:text-surface-600 dark:hover:text-surface-200 transition"
                     tabIndex={-1}
                     aria-label={showCpw ? "Masquer" : "Afficher"}
                   >
                     {showCpw ? <FaEyeSlash size={14} /> : <FaEye size={14} />}
                   </button>
                 </div>
-                {errors.confirm && <p className="mt-1 text-xs text-red-500">{errors.confirm}</p>}
+                {errors.confirm && <p className="mt-1 text-xs text-rose-500">{errors.confirm}</p>}
               </div>
 
               {/* CGU */}
-              <p className="text-xs text-gray-500 dark:text-gray-400">
+              <p className="text-xs text-surface-500 dark:text-surface-400">
                 En créant un compte, vous acceptez nos{" "}
-                <Link href="/politique" className="text-blue-600 dark:text-blue-400 hover:underline">
+                <Link href="/politique" className="text-brand-600 dark:text-brand-400 hover:underline">
                   conditions d'utilisation
                 </Link>.
               </p>
@@ -293,7 +293,7 @@ function Register() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed shadow-md hover:shadow-lg transition-all duration-200 active:scale-[0.98]"
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-white bg-brand-500 hover:bg-brand-600 disabled:opacity-60 disabled:cursor-not-allowed shadow-md hover:shadow-glow transition-all duration-200 active:scale-[0.98]"
               >
                 {loading ? (
                   <><FaSpinner className="animate-spin" /> Création en cours...</>

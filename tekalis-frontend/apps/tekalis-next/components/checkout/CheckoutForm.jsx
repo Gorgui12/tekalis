@@ -128,7 +128,7 @@ const CheckoutForm = () => {
       <div className="grid lg:grid-cols-3 gap-8 items-start">
 
         {/* Formulaire principal */}
-        <div className="lg:col-span-2 bg-white dark:bg-gray-800 rounded-xl shadow-md p-6">
+        <div className="lg:col-span-2 bg-white dark:bg-surface-800 rounded-2xl shadow-card p-6">
 
           {/* ── Étape 2 : Livraison ── */}
           {step === 2 && (
@@ -143,28 +143,28 @@ const CheckoutForm = () => {
             <div className="space-y-5">
               <button
                 onClick={() => setStep(2)}
-                className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
+                className="text-sm text-brand-600 dark:text-brand-400 hover:underline flex items-center gap-1"
               >
                 ← Modifier la livraison
               </button>
 
               {/* Récap adresse */}
               {deliveryData?.address && (
-                <div className="bg-gray-50 dark:bg-gray-700/50 rounded-xl p-4 border border-gray-200 dark:border-gray-700">
-                  <p className="text-xs font-bold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
+                <div className="bg-surface-50 dark:bg-surface-700/50 rounded-xl p-4 border border-surface-200 dark:border-surface-700">
+                  <p className="text-xs font-bold text-surface-500 dark:text-surface-400 uppercase tracking-wide mb-2">
                     Livraison à
                   </p>
-                  <p className="font-semibold text-gray-900 dark:text-white text-sm">
+                  <p className="font-semibold text-surface-900 dark:text-white text-sm">
                     {deliveryData.address.fullName}
                   </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-surface-600 dark:text-surface-400">
                     {deliveryData.address.phone}
                   </p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-surface-600 dark:text-surface-400">
                     {deliveryData.address.address}, {deliveryData.address.city}
                   </p>
                   {deliveryData.deliveryMode && (
-                    <p className="text-xs text-blue-600 dark:text-blue-400 mt-1 font-semibold">
+                    <p className="text-xs text-brand-600 dark:text-brand-400 mt-1 font-semibold">
                       {deliveryData.deliveryMode.label}
                       {deliveryData.deliveryMode.price > 0
                         ? ` — ${deliveryData.deliveryMode.price.toLocaleString()} FCFA`
@@ -193,4 +193,3 @@ const CheckoutForm = () => {
 };
 
 export default CheckoutForm;
-

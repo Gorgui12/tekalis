@@ -70,13 +70,13 @@ const WarrantyCard = ({ warranty, compact = false }) => {
           <FaShieldAlt />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-semibold text-gray-900 dark:text-white text-sm truncate">
+          <p className="font-semibold text-surface-900 dark:text-white text-sm truncate">
             {warranty.productName || "Produit"}
           </p>
           <p className={`text-xs font-medium ${config.color}`}>
             {label}
             {daysLeft !== null && status !== "expired" && (
-              <span className="text-gray-500 dark:text-gray-400 font-normal ml-1">
+              <span className="text-surface-500 dark:text-surface-400 font-normal ml-1">
                 — {daysLeft}j restants
               </span>
             )}
@@ -89,7 +89,7 @@ const WarrantyCard = ({ warranty, compact = false }) => {
 
   // ─── Version complète ─────────────────────────────────────────────────────
   return (
-    <div className={`bg-white dark:bg-gray-800 rounded-xl border-2 ${config.border} shadow-sm hover:shadow-md transition-all`}>
+    <div className={`bg-white dark:bg-surface-800 rounded-xl border-2 ${config.border} shadow-sm hover:shadow-md transition-all`}>
       {/* Header */}
       <div className={`${config.bg} px-6 py-4 rounded-t-xl border-b ${config.border}`}>
         <div className="flex items-start justify-between gap-4">
@@ -98,11 +98,11 @@ const WarrantyCard = ({ warranty, compact = false }) => {
               <FaShieldAlt />
             </div>
             <div>
-              <h3 className="font-bold text-gray-900 dark:text-white">
+              <h3 className="font-bold text-surface-900 dark:text-white">
                 {warranty.productName || "Produit garanti"}
               </h3>
               {warranty.orderNumber && (
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <p className="text-xs text-surface-500 dark:text-surface-400">
                   Commande #{warranty.orderNumber}
                 </p>
               )}
@@ -117,12 +117,12 @@ const WarrantyCard = ({ warranty, compact = false }) => {
         {/* Dates */}
         <div className="grid grid-cols-2 gap-4">
           <div className="flex items-start gap-3">
-            <FaCalendarAlt className="text-gray-400 mt-0.5 flex-shrink-0" size={14} />
+            <FaCalendarAlt className="text-surface-400 mt-0.5 flex-shrink-0" size={14} />
             <div>
-              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">
+              <p className="text-xs font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wide mb-0.5">
                 Début
               </p>
-              <p className="text-sm font-semibold text-gray-900 dark:text-white">
+              <p className="text-sm font-semibold text-surface-900 dark:text-white">
                 {warranty.startDate
                   ? new Date(warranty.startDate).toLocaleDateString("fr-FR")
                   : "—"}
@@ -130,9 +130,9 @@ const WarrantyCard = ({ warranty, compact = false }) => {
             </div>
           </div>
           <div className="flex items-start gap-3">
-            <FaCalendarAlt className="text-gray-400 mt-0.5 flex-shrink-0" size={14} />
+            <FaCalendarAlt className="text-surface-400 mt-0.5 flex-shrink-0" size={14} />
             <div>
-              <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-0.5">
+              <p className="text-xs font-semibold text-surface-500 dark:text-surface-400 uppercase tracking-wide mb-0.5">
                 Expiration
               </p>
               <p className={`text-sm font-semibold ${config.color}`}>
@@ -147,7 +147,7 @@ const WarrantyCard = ({ warranty, compact = false }) => {
         {/* Barre de progression */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">
+            <span className="text-xs font-semibold text-surface-600 dark:text-surface-400">
               Durée consommée
             </span>
             <span className={`text-xs font-bold ${config.color}`}>
@@ -158,7 +158,7 @@ const WarrantyCard = ({ warranty, compact = false }) => {
                 : "Active"}
             </span>
           </div>
-          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5 overflow-hidden">
+          <div className="w-full bg-surface-200 dark:bg-surface-700 rounded-full h-2.5 overflow-hidden">
             <div
               className={`h-full rounded-full transition-all duration-500 ${
                 status === "expired"
@@ -174,16 +174,16 @@ const WarrantyCard = ({ warranty, compact = false }) => {
 
         {/* Durée totale */}
         {warranty.durationMonths && (
-          <p className="text-xs text-gray-500 dark:text-gray-400">
+          <p className="text-xs text-surface-500 dark:text-surface-400">
             Garantie {warranty.durationMonths} mois{warranty.type ? ` — ${warranty.type}` : ""}
           </p>
         )}
       </div>
 
       {/* Footer actions */}
-      <div className="px-6 py-4 border-t border-gray-100 dark:border-gray-700 flex items-center gap-3">
+      <div className="px-6 py-4 border-t border-surface-100 dark:border-surface-700 flex items-center gap-3">
         <Link href={`/dashboard/warranties/${warranty._id}`}
-          className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400 hover:underline font-semibold"
+          className="flex items-center gap-2 text-sm text-brand-600 dark:text-brand-400 hover:underline font-semibold"
         >
           <FaShieldAlt size={12} />
           Voir les détails

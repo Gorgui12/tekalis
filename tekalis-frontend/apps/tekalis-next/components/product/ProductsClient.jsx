@@ -141,33 +141,33 @@ const Products = ({ initialProducts = [] }) => {
   if (loading && products.length === 0) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-600 text-lg">Chargement des produits...</p>
+        <p className="text-surface-600 text-lg">Chargement des produits...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-surface-50 py-8">
       <div className="container mx-auto px-4 max-w-7xl">
         {/* Header */}
-        <h1 className="text-4xl font-bold text-gray-900 mb-6">
+        <h1 className="text-4xl font-bold text-surface-900 dark:text-white mb-6 font-display">
           Tous les Produits
         </h1>
 
         {/* Search */}
         <div className="relative mb-6">
-          <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+          <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-surface-400" />
           <input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Rechercher un produit..."
-            className="w-full pl-12 pr-12 py-4 border-2 rounded-xl"
+            className="w-full pl-12 pr-12 py-4 border-2 border-surface-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
           />
           {searchTerm && (
             <button
               onClick={() => setSearchTerm("")}
-              className="absolute right-4 top-1/2 -translate-y-1/2"
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-surface-400 hover:text-surface-600"
             >
               <FaTimes />
             </button>
@@ -179,7 +179,7 @@ const Products = ({ initialProducts = [] }) => {
           <select
             value={selectedCategory}
             onChange={(e) => setSelectedCategory(e.target.value)}
-            className="border-2 rounded-lg px-4 py-2"
+            className="border-2 border-surface-200 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
           >
             {allCategories.map((cat) => (
               <option key={cat} value={cat}>
@@ -205,7 +205,7 @@ const Products = ({ initialProducts = [] }) => {
         {/* Display */}
         {filteredProducts.length === 0 ? (
           <div className="text-center py-12">
-            <p className="text-gray-600 dark:text-gray-400">
+            <p className="text-surface-600 dark:text-surface-400">
               Aucun produit trouve.
             </p>
           </div>

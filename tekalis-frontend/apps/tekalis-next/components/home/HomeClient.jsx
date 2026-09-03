@@ -193,7 +193,7 @@ const Home = ({ initialProducts = [], initialArticles = [] }) => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-surface-50 dark:bg-surface-950">
 
       {/* ── SEO HEAD ────────────────────────────────────────────────────────── */}
       <PageMeta
@@ -211,26 +211,26 @@ const Home = ({ initialProducts = [], initialArticles = [] }) => {
       {/* Quick Actions */}
       <section className="container mx-auto px-4 -mt-16 relative z-10 mb-16">
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <Link href="/products" className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition group">
+          <Link href="/products" className="bg-white dark:bg-surface-800 rounded-2xl shadow-card hover:shadow-card-hover p-6 transition group border border-surface-100 dark:border-surface-700">
             <div className="flex items-center gap-4">
-              <div className="bg-blue-100 rounded-full p-4 group-hover:bg-blue-200 transition">
-                <FaLaptop className="text-blue-600 text-2xl" />
+              <div className="bg-brand-100 dark:bg-brand-900/30 rounded-2xl p-4 group-hover:bg-brand-200 dark:group-hover:bg-brand-900/50 transition">
+                <FaLaptop className="text-brand-600 dark:text-brand-400 text-2xl" />
               </div>
               <div>
-                <h3 className="font-bold text-gray-900 text-lg">Tous les produits</h3>
-                <p className="text-sm text-gray-600">Explorez notre catalogue</p>
+                <h3 className="font-bold font-display text-surface-900 dark:text-white text-lg">Tous les produits</h3>
+                <p className="text-sm text-surface-500">Explorez notre catalogue</p>
               </div>
             </div>
           </Link>
 
-          <Link href="/blog" className="bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition group">
+          <Link href="/blog" className="bg-white dark:bg-surface-800 rounded-2xl shadow-card hover:shadow-card-hover p-6 transition group border border-surface-100 dark:border-surface-700">
             <div className="flex items-center gap-4">
-              <div className="bg-orange-100 rounded-full p-4 group-hover:bg-orange-200 transition">
-                <FaStar className="text-orange-600 text-2xl" />
+              <div className="bg-amber-100 dark:bg-amber-900/30 rounded-2xl p-4 group-hover:bg-amber-200 dark:group-hover:bg-amber-900/50 transition">
+                <FaStar className="text-amber-600 dark:text-amber-400 text-2xl" />
               </div>
               <div>
-                <h3 className="font-bold text-gray-900 text-lg">Labo Tech</h3>
-                <p className="text-sm text-gray-600">Tests & guides d'achat</p>
+                <h3 className="font-bold font-display text-surface-900 dark:text-white text-lg">Labo Tech</h3>
+                <p className="text-sm text-surface-500">Tests & guides d'achat</p>
               </div>
             </div>
           </Link>
@@ -239,13 +239,13 @@ const Home = ({ initialProducts = [], initialArticles = [] }) => {
 
       {/* Catégories */}
       <section className="container mx-auto px-4 mb-16">
-        <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+        <h2 className="text-3xl font-bold font-display text-surface-900 dark:text-white mb-8 text-center">
           Parcourir par catégorie
         </h2>
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 lg:gap-6">
           {categories.map((category) => (
             <Link key={category.slug} href={`/category/${category.slug}`} className="group">
-              <div className="relative bg-white rounded-xl shadow-md hover:shadow-xl transition-all overflow-hidden aspect-square sm:aspect-auto sm:h-48">
+              <div className="relative bg-white dark:bg-surface-800 rounded-2xl shadow-card hover:shadow-card-hover transition-all overflow-hidden border border-surface-100 dark:border-surface-700 aspect-square sm:aspect-auto sm:h-48">
                 <img
                   src={category.image}
                   alt={category.name}
@@ -256,7 +256,7 @@ const Home = ({ initialProducts = [], initialArticles = [] }) => {
                   <div className="text-3xl sm:text-4xl mb-2 group-hover:scale-110 transition-transform">
                     {category.icon}
                   </div>
-                  <h3 className="font-bold text-sm sm:text-base text-center">{category.name}</h3>
+                  <h3 className="font-bold font-display text-sm sm:text-base text-center">{category.name}</h3>
                 </div>
               </div>
             </Link>
@@ -267,8 +267,8 @@ const Home = ({ initialProducts = [], initialArticles = [] }) => {
       {/* Nouveautés */}
       <section className="container mx-auto px-4 mb-16">
         <div className="flex items-center justify-between mb-8">
-          <h2 className="text-3xl font-bold text-gray-900">⚡ Nouveautés</h2>
-          <Link href="/products?sort=newest" className="text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-2">
+          <h2 className="text-3xl font-bold font-display text-surface-900 dark:text-white">Nouveautés</h2>
+          <Link href="/products?sort=newest" className="text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-semibold flex items-center gap-2 transition">
             Voir tout <FaArrowRight />
           </Link>
         </div>
@@ -276,10 +276,10 @@ const Home = ({ initialProducts = [], initialArticles = [] }) => {
         {isLoading ? (
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {[...Array(8)].map((_, i) => (
-              <div key={i} className="bg-white rounded-lg shadow-md p-4 animate-pulse">
-                <div className="bg-gray-200 aspect-square rounded mb-4"></div>
-                <div className="bg-gray-200 h-4 rounded mb-2"></div>
-                <div className="bg-gray-200 h-4 rounded w-2/3"></div>
+              <div key={i} className="bg-white dark:bg-surface-800 rounded-2xl shadow-card p-4 animate-pulse border border-surface-100 dark:border-surface-700">
+                <div className="bg-surface-200 dark:bg-surface-700 aspect-square rounded-xl mb-4"></div>
+                <div className="bg-surface-200 dark:bg-surface-700 h-4 rounded-lg mb-2"></div>
+                <div className="bg-surface-200 dark:bg-surface-700 h-4 rounded-lg w-2/3"></div>
               </div>
             ))}
           </div>
@@ -293,11 +293,11 @@ const Home = ({ initialProducts = [], initialArticles = [] }) => {
       </section>
 
       {/* Best-sellers */}
-      <section className="bg-gradient-to-br from-blue-50 to-indigo-50 py-16">
+      <section className="bg-gradient-to-br from-brand-50 to-amber-50 dark:from-surface-900 dark:to-surface-950 py-16">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-3xl font-bold text-gray-900">🔥 Meilleures ventes</h2>
-            <Link href="/products?sort=popular" className="text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-2">
+            <h2 className="text-3xl font-bold font-display text-surface-900 dark:text-white">Meilleures ventes</h2>
+            <Link href="/products?sort=popular" className="text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-semibold flex items-center gap-2 transition">
               Voir tout <FaArrowRight />
             </Link>
           </div>
@@ -312,62 +312,62 @@ const Home = ({ initialProducts = [], initialArticles = [] }) => {
       {/* Features */}
       <section className="container mx-auto px-4 py-16">
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8">
-          <div className="text-center">
-            <div className="bg-blue-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
-              <FaTruck className="text-blue-600 text-3xl" />
+          <div className="text-center group">
+            <div className="bg-brand-100 dark:bg-brand-900/30 rounded-2xl w-20 h-20 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+              <FaTruck className="text-brand-600 dark:text-brand-400 text-3xl" />
             </div>
-            <h3 className="font-bold text-gray-900 mb-2">Livraison rapide</h3>
-            <p className="text-sm text-gray-600">Livraison gratuite à Dakar sous 2-3 jours</p>
+            <h3 className="font-bold font-display text-surface-900 dark:text-white mb-2">Livraison rapide</h3>
+            <p className="text-sm text-surface-500">Livraison gratuite à Dakar sous 2-3 jours</p>
           </div>
-          <div className="text-center">
-            <div className="bg-green-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
-              <FaShieldAlt className="text-green-600 text-3xl" />
+          <div className="text-center group">
+            <div className="bg-emerald-100 dark:bg-emerald-900/30 rounded-2xl w-20 h-20 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+              <FaShieldAlt className="text-emerald-600 dark:text-emerald-400 text-3xl" />
             </div>
-            <h3 className="font-bold text-gray-900 mb-2">Garantie constructeur</h3>
-            <p className="text-sm text-gray-600">Tous nos produits sont garantis 12 mois minimum</p>
+            <h3 className="font-bold font-display text-surface-900 dark:text-white mb-2">Garantie constructeur</h3>
+            <p className="text-sm text-surface-500">Tous nos produits sont garantis 12 mois minimum</p>
           </div>
-          <div className="text-center">
-            <div className="bg-purple-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
-              <FaHeadset className="text-purple-600 text-3xl" />
+          <div className="text-center group">
+            <div className="bg-amber-100 dark:bg-amber-900/30 rounded-2xl w-20 h-20 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+              <FaHeadset className="text-amber-600 dark:text-amber-400 text-3xl" />
             </div>
-            <h3 className="font-bold text-gray-900 mb-2">Support 24/7</h3>
-            <p className="text-sm text-gray-600">Notre équipe est disponible pour vous aider</p>
+            <h3 className="font-bold font-display text-surface-900 dark:text-white mb-2">Support 24/7</h3>
+            <p className="text-sm text-surface-500">Notre équipe est disponible pour vous aider</p>
           </div>
-          <div className="text-center">
-            <div className="bg-orange-100 rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-4">
-              <FaCreditCard className="text-orange-600 text-3xl" />
+          <div className="text-center group">
+            <div className="bg-orange-100 dark:bg-orange-900/30 rounded-2xl w-20 h-20 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
+              <FaCreditCard className="text-orange-600 dark:text-orange-400 text-3xl" />
             </div>
-            <h3 className="font-bold text-gray-900 mb-2">Paiement sécurisé</h3>
-            <p className="text-sm text-gray-600">Wave, OM, Free Money ou paiement à la livraison</p>
+            <h3 className="font-bold font-display text-surface-900 dark:text-white mb-2">Paiement sécurisé</h3>
+            <p className="text-sm text-surface-500">Wave, OM, Free Money ou paiement à la livraison</p>
           </div>
         </div>
       </section>
 
       {/* Blog Preview */}
-      <section className="bg-gray-900 text-white py-16">
+      <section className="bg-surface-950 dark:bg-black text-white py-16">
         <div className="container mx-auto px-4">
           <div className="flex items-center justify-between mb-8">
             <div>
-              <h2 className="text-3xl font-bold mb-2">📝 Le Labo Tech</h2>
-              <p className="text-gray-400">Tests, guides d'achat et actualités tech</p>
+              <h2 className="text-3xl font-bold font-display mb-2">Le Labo Tech</h2>
+              <p className="text-surface-500">Tests, guides d'achat et actualités tech</p>
             </div>
-            <Link href="/blog" className="bg-white text-gray-900 px-6 py-3 rounded-lg font-semibold hover:bg-gray-100 transition flex items-center gap-2">
+            <Link href="/blog" className="bg-brand-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-brand-600 transition flex items-center gap-2 shadow-sm">
               Voir le blog <FaArrowRight />
             </Link>
           </div>
 
           {loading ? (
-            <div className="text-center py-12 text-gray-400">Chargement des articles...</div>
+            <div className="text-center py-12 text-surface-500">Chargement des articles...</div>
           ) : (
             <div className="grid md:grid-cols-3 gap-6">
               {articles.slice(0, 3).map(article => (
-                <Link key={article._id} href={`/blog/${article.slug}`} className="bg-gray-800 rounded-lg overflow-hidden hover:bg-gray-750 transition group">
-                  <div className="bg-gray-700 aspect-video"></div>
+                <Link key={article._id} href={`/blog/${article.slug}`} className="bg-surface-900 dark:bg-surface-900 rounded-2xl overflow-hidden hover:bg-surface-800 transition group border border-surface-800">
+                  <div className="bg-surface-800 aspect-video"></div>
                   <div className="p-6">
-                    <span className="text-xs text-blue-400 font-semibold uppercase">{article.category}</span>
-                    <h3 className="font-bold text-lg mt-2 mb-2 group-hover:text-blue-400 transition">{article.title}</h3>
-                    <p className="text-sm text-gray-400 mb-3">{article.excerpt}</p>
-                    <p className="text-xs text-gray-500">
+                    <span className="text-xs text-brand-400 font-semibold uppercase tracking-wide">{article.category}</span>
+                    <h3 className="font-bold font-display text-lg mt-2 mb-2 group-hover:text-brand-400 transition">{article.title}</h3>
+                    <p className="text-sm text-surface-500 mb-3 line-clamp-2">{article.excerpt}</p>
+                    <p className="text-xs text-surface-600">
                       {new Date(article.publishedAt || 0).toLocaleDateString("fr-FR")} • {article.readTime} min de lecture
                     </p>
                   </div>
@@ -380,17 +380,17 @@ const Home = ({ initialProducts = [], initialArticles = [] }) => {
 
       {/* CTA Final */}
       <section className="container mx-auto px-4 py-16">
-        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl shadow-2xl p-12 text-center text-white">
-          <h2 className="text-4xl font-bold mb-4">Besoin d'aide pour choisir ?</h2>
-          <p className="text-xl mb-8 text-blue-100">Notre équipe d'experts est là pour vous conseiller</p>
+        <div className="bg-gradient-to-r from-brand-500 via-amber-500 to-brand-600 rounded-3xl shadow-glow p-12 text-center text-white">
+          <h2 className="text-4xl font-bold font-display mb-4">Besoin d'aide pour choisir ?</h2>
+          <p className="text-xl mb-8 text-white/90">Notre équipe d'experts est là pour vous conseiller</p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="https://wa.me/221786346946"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-green-500 hover:bg-green-600 text-white px-8 py-4 rounded-lg font-bold text-lg transition"
+              className="bg-emerald-500 hover:bg-emerald-600 text-white px-8 py-4 rounded-2xl font-bold text-lg transition shadow-lg hover:scale-105"
             >
-              💬 Contacter sur WhatsApp
+              Contacter sur WhatsApp
             </a>
           </div>
         </div>

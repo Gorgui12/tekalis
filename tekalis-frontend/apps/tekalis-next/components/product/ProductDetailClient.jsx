@@ -49,11 +49,11 @@ const ProductDetails = ({ product: initialProduct }) => {
 
   if (!product) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center px-4">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Produit introuvable</h1>
-          <p className="text-gray-600 mb-6">Ce produit n'existe pas ou a été supprimé.</p>
-          <a href="/products" className="text-blue-600 hover:underline">Voir tous les produits</a>
+          <h1 className="text-2xl font-bold font-display text-surface-900 dark:text-white mb-4">Produit introuvable</h1>
+          <p className="text-surface-500 dark:text-surface-400 mb-6">Ce produit n'existe pas ou a été supprimé.</p>
+          <a href="/products" className="text-brand-600 dark:text-brand-400 hover:underline font-semibold">Voir tous les produits</a>
         </div>
       </div>
     );
@@ -183,13 +183,13 @@ const ProductDetails = ({ product: initialProduct }) => {
         <div>
           {/* Marque */}
           {product.brand && (
-            <p className="text-sm text-gray-500 uppercase font-semibold mb-2">
+            <p className="text-sm text-surface-500 dark:text-surface-400 uppercase font-semibold mb-2 tracking-wide">
               {product.brand}
             </p>
           )}
 
           {/* H1 produit */}
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-4">
+          <h1 className="text-3xl font-bold font-display text-surface-900 dark:text-white mb-4">
             {product.name}
           </h1>
 
@@ -200,13 +200,13 @@ const ProductDetails = ({ product: initialProduct }) => {
                 {[...Array(5)].map((_, i) => (
                   <span
                     key={i}
-                    className={i < Math.floor(product.rating.average) ? "text-yellow-400" : "text-gray-300"}
+                    className={i < Math.floor(product.rating.average) ? "text-amber-400" : "text-surface-200 dark:text-surface-600"}
                   >
                     ★
                   </span>
                 ))}
               </div>
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-surface-600 dark:text-surface-400">
                 {product.rating.average.toFixed(1)} ({product.rating.count} avis)
               </span>
             </div>
@@ -215,17 +215,17 @@ const ProductDetails = ({ product: initialProduct }) => {
           {/* Prix */}
           <div className="mb-6">
             <div className="flex items-baseline gap-3">
-              <span className="text-4xl font-bold text-blue-600">
+              <span className="text-4xl font-bold font-display text-brand-600 dark:text-brand-400">
                 {(product.price || 0).toLocaleString()} FCFA
               </span>
               {product.comparePrice && discount > 0 && (
-                <span className="text-xl text-gray-400 line-through">
+                <span className="text-xl text-surface-400 dark:text-surface-500 line-through">
                   {(product.comparePrice || 0).toLocaleString()} FCFA
                 </span>
               )}
             </div>
             {discount > 0 && (
-              <p className="text-sm text-red-500 font-semibold mt-1">
+              <p className="text-sm text-rose-500 font-semibold mt-1">
                 Economisez {((product.comparePrice || 0) - (product.price || 0)).toLocaleString()} FCFA (-{discount}%)
               </p>
             )}
@@ -233,12 +233,12 @@ const ProductDetails = ({ product: initialProduct }) => {
 
           {/* Stock */}
           <div className="flex flex-wrap gap-3 mb-6">
-            <div className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium ${
+            <div className={`flex items-center gap-2 px-3 py-2 rounded-xl text-sm font-medium ${
               isOutOfStock
-                ? "bg-red-50 text-red-700"
+                ? "bg-rose-50 dark:bg-rose-900/20 text-rose-700 dark:text-rose-300"
                 : product.stock < 5
-                ? "bg-orange-50 text-orange-700"
-                : "bg-green-50 text-green-700"
+                ? "bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300"
+                : "bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300"
             }`}>
               <FaCheckCircle />
               {isOutOfStock
@@ -247,7 +247,7 @@ const ProductDetails = ({ product: initialProduct }) => {
                 ? `Stock limité (${product.stock} restants)`
                 : `En stock (${product.stock} unités)`}
             </div>
-            <div className="flex items-center gap-2 bg-blue-50 text-blue-700 px-3 py-2 rounded-lg text-sm font-medium">
+            <div className="flex items-center gap-2 bg-brand-50 dark:bg-brand-900/20 text-brand-700 dark:text-brand-300 px-3 py-2 rounded-xl text-sm font-medium">
               <FaShieldAlt />
               Garantie 12 mois
             </div>
@@ -255,7 +255,7 @@ const ProductDetails = ({ product: initialProduct }) => {
 
           {/* Description courte */}
           {product.description && (
-            <p className="text-gray-700 dark:text-gray-300 mb-6 leading-relaxed">
+            <p className="text-surface-700 dark:text-surface-300 mb-6 leading-relaxed">
               {product.description}
             </p>
           )}
@@ -263,21 +263,21 @@ const ProductDetails = ({ product: initialProduct }) => {
           {/* Quantité */}
           {!isOutOfStock && (
             <div className="flex items-center gap-4 mb-6">
-              <span className="text-sm font-semibold text-gray-700">Quantité :</span>
-              <div className="flex items-center border border-gray-300 rounded-lg overflow-hidden">
+              <span className="text-sm font-semibold text-surface-700 dark:text-surface-300">Quantité :</span>
+              <div className="flex items-center border border-surface-300 dark:border-surface-600 rounded-xl overflow-hidden bg-white dark:bg-surface-800">
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="px-3 py-2 hover:bg-gray-100 transition"
+                  className="px-3 py-2 hover:bg-surface-100 dark:hover:bg-surface-700 transition text-surface-600 dark:text-surface-300"
                   aria-label="Diminuer"
                 >
                   <FaMinus size={12} />
                 </button>
-                <span className="px-5 py-2 font-semibold border-x border-gray-300">
+                <span className="px-5 py-2 font-semibold border-x border-surface-300 dark:border-surface-600 text-surface-900 dark:text-white">
                   {quantity}
                 </span>
                 <button
                   onClick={() => setQuantity(Math.min(product.stock, quantity + 1))}
-                  className="px-3 py-2 hover:bg-gray-100 transition"
+                  className="px-3 py-2 hover:bg-surface-100 dark:hover:bg-surface-700 transition text-surface-600 dark:text-surface-300"
                   aria-label="Augmenter"
                 >
                   <FaPlus size={12} />
@@ -291,10 +291,10 @@ const ProductDetails = ({ product: initialProduct }) => {
             <button
               onClick={handleAddToCart}
               disabled={isOutOfStock}
-              className={`flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-lg font-semibold transition ${
+              className={`flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-xl font-semibold transition ${
                 isOutOfStock
-                  ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700 text-white"
+                  ? "bg-surface-200 dark:bg-surface-700 text-surface-500 dark:text-surface-400 cursor-not-allowed"
+                  : "bg-brand-500 hover:bg-brand-600 text-white shadow-sm hover:shadow-md active:scale-[0.98]"
               }`}
             >
               <FaShoppingCart />
@@ -304,10 +304,10 @@ const ProductDetails = ({ product: initialProduct }) => {
             <button
               onClick={handleToggleWishlist}
               aria-label={isInWishlist ? "Retirer des favoris" : "Ajouter aux favoris"}
-              className={`px-4 py-3 rounded-lg border-2 transition ${
+              className={`px-4 py-3 rounded-xl border-2 transition ${
                 isInWishlist
-                  ? "bg-red-500 border-red-500 text-white"
-                  : "border-gray-300 text-gray-600 hover:border-red-400 hover:text-red-500"
+                  ? "bg-rose-500 border-rose-500 text-white"
+                  : "border-surface-300 dark:border-surface-600 text-surface-600 dark:text-surface-300 hover:border-rose-400 hover:text-rose-500"
               }`}
             >
               {isInWishlist ? <FaHeart /> : <FaRegHeart />}
@@ -315,12 +315,12 @@ const ProductDetails = ({ product: initialProduct }) => {
           </div>
 
           {/* Livraison */}
-          <div className="border-t pt-4">
-            <div className="flex items-start gap-3 text-sm text-gray-700">
-              <FaTruck className="text-blue-600 text-lg mt-0.5" />
+          <div className="border-t border-surface-200 dark:border-surface-700 pt-4">
+            <div className="flex items-start gap-3 text-sm text-surface-700 dark:text-surface-300">
+              <FaTruck className="text-brand-600 dark:text-brand-400 text-lg mt-0.5" />
               <div>
                 <p className="font-semibold">Livraison gratuite à Dakar</p>
-                <p className="text-gray-500">Estimée sous 2-3 jours ouvrés</p>
+                <p className="text-surface-500 dark:text-surface-400">Estimée sous 2-3 jours ouvrés</p>
               </div>
             </div>
           </div>

@@ -50,22 +50,22 @@ const ArticleFilters = ({
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+    <div className="bg-white dark:bg-surface-800 rounded-xl shadow-card p-4 mb-6">
       {/* Search Bar */}
       <div className="mb-4">
         <div className="relative">
-          <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+          <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-surface-400 dark:text-surface-500" />
           <input
             type="text"
             placeholder="Rechercher un article..."
             value={searchTerm}
             onChange={(e) => handleSearch(e.target.value)}
-            className="w-full pl-10 pr-10 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full pl-10 pr-10 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500"
           />
           {searchTerm && (
             <button
               onClick={clearSearch}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-surface-400 hover:text-surface-600 transition"
             >
               <FaTimes />
             </button>
@@ -76,7 +76,7 @@ const ArticleFilters = ({
       {/* Mobile Filter Toggle */}
       <button
         onClick={onToggleMobileFilters}
-        className="md:hidden w-full bg-blue-600 text-white px-4 py-3 rounded-lg font-semibold flex items-center justify-center gap-2 mb-4"
+        className="md:hidden w-full bg-brand-500 text-white px-4 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 mb-4"
       >
         <FaFilter />
         Filtres
@@ -86,7 +86,7 @@ const ArticleFilters = ({
       <div className="hidden md:flex flex-col lg:flex-row gap-4">
         {/* Categories */}
         <div className="flex-1">
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className="block text-sm font-semibold text-surface-700 dark:text-surface-300 mb-2">
             Catégorie
           </label>
           <div className="flex flex-wrap gap-2">
@@ -94,10 +94,10 @@ const ArticleFilters = ({
               <button
                 key={cat.id}
                 onClick={() => onCategoryChange && onCategoryChange(cat.id)}
-                className={`px-4 py-2 rounded-lg font-semibold text-sm transition flex items-center gap-2 ${
+                className={`px-4 py-2 rounded-xl font-semibold text-sm transition flex items-center gap-2 ${
                   selectedCategory === cat.id
-                    ? "bg-blue-600 text-white shadow-md"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    ? "bg-brand-500 text-white shadow-md"
+                    : "bg-surface-100 text-surface-700 hover:bg-surface-200"
                 }`}
               >
                 <span>{cat.icon}</span>
@@ -109,13 +109,13 @@ const ArticleFilters = ({
 
         {/* Sort */}
         <div className="lg:w-64">
-          <label className="block text-sm font-semibold text-gray-700 mb-2">
+          <label className="block text-sm font-semibold text-surface-700 dark:text-surface-300 mb-2">
             Trier par
           </label>
           <select
             value={sortBy}
             onChange={(e) => onSortChange && onSortChange(e.target.value)}
-            className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
           >
             {sortOptions.map(option => (
               <option key={option.value} value={option.value}>
@@ -131,7 +131,7 @@ const ArticleFilters = ({
         <div className="md:hidden space-y-4 mt-4 pt-4 border-t">
           {/* Categories Mobile */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-surface-700 dark:text-surface-300 mb-2">
               Catégorie
             </label>
             <div className="flex flex-wrap gap-2">
@@ -142,10 +142,10 @@ const ArticleFilters = ({
                     onCategoryChange && onCategoryChange(cat.id);
                     onToggleMobileFilters && onToggleMobileFilters();
                   }}
-                  className={`px-3 py-2 rounded-lg font-semibold text-sm transition flex items-center gap-2 ${
+                  className={`px-3 py-2 rounded-xl font-semibold text-sm transition flex items-center gap-2 ${
                     selectedCategory === cat.id
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-100 text-gray-700"
+                      ? "bg-brand-500 text-white"
+                      : "bg-surface-100 text-surface-700"
                   }`}
                 >
                   <span>{cat.icon}</span>
@@ -157,13 +157,13 @@ const ArticleFilters = ({
 
           {/* Sort Mobile */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-surface-700 dark:text-surface-300 mb-2">
               Trier par
             </label>
             <select
               value={sortBy}
               onChange={(e) => onSortChange && onSortChange(e.target.value)}
-              className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full border rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-brand-500"
             >
               {sortOptions.map(option => (
                 <option key={option.value} value={option.value}>
@@ -179,7 +179,7 @@ const ArticleFilters = ({
       {(selectedCategory !== "all" || searchTerm) && (
         <div className="mt-4 pt-4 border-t">
           <div className="flex items-center justify-between">
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-surface-700 dark:text-surface-300">
               Filtres actifs : 
               {searchTerm && <span className="ml-2 font-semibold">"{searchTerm}"</span>}
               {selectedCategory !== "all" && (

@@ -100,8 +100,8 @@ const ProductsSection = ({
             <Link href={viewAllLink}
               className={`mt-4 sm:mt-0 font-semibold flex items-center gap-2 hover:gap-3 transition-all ${
                 theme === "dark" 
-                  ? "text-blue-400 hover:text-blue-300" 
-                  : "text-blue-600 hover:text-blue-700"
+                  ? "text-brand-400 hover:text-brand-300" 
+                  : "text-brand-600 hover:text-brand-700"
               }`}
             >
               {viewAllText}

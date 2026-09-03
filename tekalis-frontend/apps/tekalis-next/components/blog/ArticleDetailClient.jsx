@@ -16,6 +16,7 @@ import {
 } from "react-icons/fa";
 import api from "@/lib/api";
 import PageMeta from "@/components/seo/PageMeta";
+import { sanitizeArticleHtml } from "@/lib/sanitizeHtml";
 
 const ArticleDetails = ({ article: initialArticle, related: initialRelated }) => {
   const { slug } = useParams();
@@ -182,7 +183,7 @@ const ArticleDetails = ({ article: initialArticle, related: initialRelated }) =>
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center mt-20">
-        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-600"></div>
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-brand-500"></div>
       </div>
     );
   }
@@ -191,8 +192,8 @@ const ArticleDetails = ({ article: initialArticle, related: initialRelated }) =>
     return (
       <div className="min-h-screen flex items-center justify-center mt-20">
         <div className="text-center">
-          <p className="text-xl text-gray-600 mb-4">Article introuvable</p>
-          <Link href="/blog" className="text-blue-600 hover:text-blue-700 font-semibold">
+          <p className="text-xl text-surface-700 dark:text-surface-300 mb-4">Article introuvable</p>
+          <Link href="/blog" className="text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-500 font-semibold">
             ← Retour au blog
           </Link>
         </div>
@@ -206,7 +207,7 @@ const ArticleDetails = ({ article: initialArticle, related: initialRelated }) =>
   const authorAvatar = article.author?.avatar;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-surface-50">
       <PageMeta
         title={`${article.title} | Blog Tekalis`}
         description={article.excerpt || article.title}
@@ -231,7 +232,7 @@ const ArticleDetails = ({ article: initialArticle, related: initialRelated }) =>
       />
 
       {/* Hero Image */}
-      <div className="relative h-[32rem] bg-gray-900 mt-20">
+      <div className="relative h-[32rem] bg-surface-900 mt-20">
         {article.image && (
           <img
             src={article.image}
@@ -239,7 +240,7 @@ const ArticleDetails = ({ article: initialArticle, related: initialRelated }) =>
             className="w-full h-full object-cover opacity-80"
           />
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-gray-900/40 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-surface-900 via-surface-900/40 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 p-8 md:p-12">
           <div className="container mx-auto max-w-4xl">
             <Link
@@ -253,7 +254,7 @@ const ArticleDetails = ({ article: initialArticle, related: initialRelated }) =>
               <span>{cat.icon}</span>
               {cat.label}
             </span>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mt-4 leading-tight max-w-3xl">
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mt-4 leading-tight max-w-3xl font-display">
               {article.title}
             </h1>
             {article.excerpt && (
@@ -268,21 +269,21 @@ const ArticleDetails = ({ article: initialArticle, related: initialRelated }) =>
       {/* Content */}
       <div className="container mx-auto px-4 -mt-16 relative z-10 pb-16">
         <div className="max-w-3xl mx-auto">
-          <article className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          <article className="bg-white dark:bg-surface-800 rounded-2xl shadow-xl overflow-hidden">
             <div className="p-8 md:p-12">
               {/* Meta bar */}
-              <div className="flex flex-wrap items-center justify-between gap-4 mb-8 pb-6 border-b border-gray-100">
+              <div className="flex flex-wrap items-center justify-between gap-4 mb-8 pb-6 border-b border-surface-100">
                 <div className="flex items-center gap-3">
                   {authorAvatar ? (
                     <img src={authorAvatar} alt={authorName} className="w-11 h-11 rounded-full object-cover ring-2 ring-white shadow" />
                   ) : (
-                    <div className="w-11 h-11 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-sm shadow">
+                    <div className="w-11 h-11 bg-gradient-to-br from-brand-500 to-orange-700 rounded-full flex items-center justify-center text-white font-bold text-sm shadow">
                       {authorName.charAt(0)}
                     </div>
                   )}
                   <div>
-                    <p className="font-semibold text-gray-900 text-sm">{authorName}</p>
-                    <p className="text-xs text-gray-500">
+                    <p className="font-semibold text-surface-900 dark:text-white text-sm">{authorName}</p>
+                    <p className="text-xs text-surface-500 dark:text-surface-400">
                       {new Date(article.publishedAt || 0).toLocaleDateString("fr-FR", {
                         day: "numeric",
                         month: "long",
@@ -292,7 +293,7 @@ const ArticleDetails = ({ article: initialArticle, related: initialRelated }) =>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4 text-sm text-gray-500">
+                <div className="flex items-center gap-4 text-sm text-surface-500 dark:text-surface-400">
                   <span className="flex items-center gap-1.5">
                     <FaClock size={13} />
                     {article.readTime} min
@@ -307,26 +308,26 @@ const ArticleDetails = ({ article: initialArticle, related: initialRelated }) =>
               {/* Prose content */}
               <div
                 className="prose max-w-none
-                  prose-headings:font-bold prose-headings:text-gray-900
-                  prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-h2:border-b prose-h2:border-gray-100 prose-h2:pb-3
+                  prose-headings:font-bold prose-headings:text-surface-900 dark:prose-headings:text-white
+                  prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-h2:border-b prose-h2:border-surface-100 prose-h2:pb-3
                   prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
-                  prose-p:text-gray-600 prose-p:leading-relaxed prose-p:text-base
-                  prose-ul:my-5 prose-li:text-gray-600 prose-li:leading-relaxed
-                  prose-strong:text-gray-900 prose-strong:font-semibold
-                  prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline"
-                dangerouslySetInnerHTML={{ __html: article.content }}
+                  prose-p:text-surface-700 dark:prose-p:text-surface-300 prose-p:leading-relaxed prose-p:text-base
+                  prose-ul:my-5 prose-li:text-surface-700 dark:prose-li:text-surface-300 prose-li:leading-relaxed
+                  prose-strong:text-surface-900 dark:prose-strong:text-white prose-strong:font-semibold
+                  prose-a:text-brand-600 dark:prose-a:text-brand-400 prose-a:no-underline hover:prose-a:underline"
+                dangerouslySetInnerHTML={{ __html: sanitizeArticleHtml(article.content) }}
               />
 
               {/* Tags */}
               {article.tags?.length > 0 && (
-                <div className="mt-10 pt-6 border-t border-gray-100">
+                <div className="mt-10 pt-6 border-t border-surface-100">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <FaTag className="text-gray-400" size={13} />
+                    <FaTag className="text-surface-400 dark:text-surface-500" size={13} />
                     {article.tags.map((tag, index) => (
                       <Link
                         key={index}
                         href={`/blog?tag=${tag}`}
-                        className="bg-gray-100 hover:bg-blue-50 hover:text-blue-600 text-gray-600 px-3 py-1 rounded-full text-xs font-medium transition"
+                        className="bg-surface-100 hover:bg-brand-50 hover:text-brand-600 text-surface-700 dark:text-surface-300 px-3 py-1 rounded-full text-xs font-medium transition"
                       >
                         {tag}
                       </Link>
@@ -336,9 +337,9 @@ const ArticleDetails = ({ article: initialArticle, related: initialRelated }) =>
               )}
 
               {/* Share */}
-              <div className="mt-8 pt-6 border-t border-gray-100">
+              <div className="mt-8 pt-6 border-t border-surface-100">
                 <div className="flex items-center gap-3">
-                  <span className="text-sm text-gray-500 flex items-center gap-2">
+                  <span className="text-sm text-surface-500 dark:text-surface-400 flex items-center gap-2">
                     <FaShare size={13} />
                     Partager
                   </span>
@@ -360,18 +361,18 @@ const ArticleDetails = ({ article: initialArticle, related: initialRelated }) =>
               </div>
 
               {/* Author Bio */}
-              <div className="mt-8 p-5 bg-gray-50 rounded-xl">
+              <div className="mt-8 p-5 bg-surface-50 dark:bg-surface-700/50 rounded-xl">
                 <div className="flex gap-4">
                   {authorAvatar ? (
                     <img src={authorAvatar} alt={authorName} className="w-14 h-14 rounded-full object-cover flex-shrink-0" />
                   ) : (
-                    <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
+                    <div className="w-14 h-14 bg-gradient-to-br from-brand-500 to-orange-700 rounded-full flex items-center justify-center text-white font-bold text-lg flex-shrink-0">
                       {authorName.charAt(0)}
                     </div>
                   )}
                   <div>
-                    <h3 className="font-bold text-gray-900 text-sm mb-1">À propos de {authorName}</h3>
-                    <p className="text-sm text-gray-500 leading-relaxed">{authorBio}</p>
+                    <h3 className="font-bold text-surface-900 dark:text-white text-sm mb-1">À propos de {authorName}</h3>
+                    <p className="text-sm text-surface-500 dark:text-surface-400 leading-relaxed">{authorBio}</p>
                   </div>
                 </div>
               </div>
@@ -380,10 +381,10 @@ const ArticleDetails = ({ article: initialArticle, related: initialRelated }) =>
 
           {/* Related Products */}
           {relatedProducts.length > 0 && (
-            <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 mt-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-6">Produits mentionnés</h2>
+            <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-lg p-6 md:p-8 mt-8">
+              <h2 className="text-xl font-bold text-surface-900 dark:text-white mb-6">Produits mentionnés</h2>
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-                <div className="text-center text-gray-400 col-span-full text-sm py-6">
+                <div className="text-center text-surface-400 dark:text-surface-500 col-span-full text-sm py-6">
                   Les produits mentionnés dans l&apos;article apparaîtront ici
                 </div>
               </div>
@@ -392,20 +393,20 @@ const ArticleDetails = ({ article: initialArticle, related: initialRelated }) =>
 
           {/* Related Articles */}
           {relatedArticles.length > 0 && (
-            <div className="bg-white rounded-2xl shadow-lg p-6 md:p-8 mt-8">
-              <h2 className="text-xl font-bold text-gray-900 mb-6">Articles similaires</h2>
+            <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-lg p-6 md:p-8 mt-8">
+              <h2 className="text-xl font-bold text-surface-900 dark:text-white mb-6">Articles similaires</h2>
               <div className="grid md:grid-cols-3 gap-6">
                 {relatedArticles.map(related => (
                   <Link key={related._id} href={`/blog/${related.slug}`} className="group">
-                    <div className="aspect-video bg-gray-200 rounded-xl mb-3 overflow-hidden">
+                    <div className="aspect-video bg-surface-200 rounded-xl mb-3 overflow-hidden">
                       {related.image && (
                         <img src={related.image} alt={related.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
                       )}
                     </div>
-                    <h3 className="font-bold text-gray-900 group-hover:text-blue-600 transition line-clamp-2 mb-2 text-sm">
+                    <h3 className="font-bold text-surface-900 dark:text-white group-hover:text-brand-600 transition line-clamp-2 mb-2 text-sm">
                       {related.title}
                     </h3>
-                    <p className="text-xs text-gray-500 flex items-center gap-1.5">
+                    <p className="text-xs text-surface-500 dark:text-surface-400 flex items-center gap-1.5">
                       <FaClock size={11} />
                       {related.readTime} min de lecture
                     </p>

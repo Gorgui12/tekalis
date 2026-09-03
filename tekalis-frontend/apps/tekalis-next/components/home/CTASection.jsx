@@ -7,7 +7,7 @@ const CTASection = ({
   description,
   primaryButton,
   secondaryButton,
-  gradient = "from-blue-600 to-indigo-600",
+  gradient = "from-brand-500 to-orange-700",
   icon,
   size = "large",
   layout = "center"
@@ -78,7 +78,7 @@ const CTASection = ({
                       href={primaryButton.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`inline-flex items-center justify-center gap-2 bg-white text-gray-900 px-6 md:px-8 py-3 md:py-4 rounded-lg font-bold text-base md:text-lg hover:bg-gray-100 transition shadow-xl transform hover:scale-105 ${primaryButton.className || ""}`}
+                      className={`inline-flex items-center justify-center gap-2 bg-white text-surface-900 px-6 md:px-8 py-3 md:py-4 rounded-xl font-bold text-base md:text-lg hover:bg-surface-100 transition shadow-xl transform hover:scale-105 ${primaryButton.className || ""}`}
                     >
                       {primaryButton.icon}
                       {primaryButton.text}
@@ -86,7 +86,7 @@ const CTASection = ({
                     </a>
                   ) : (
                     <Link href={primaryButton.link}
-                      className={`inline-flex items-center justify-center gap-2 bg-white text-gray-900 px-6 md:px-8 py-3 md:py-4 rounded-lg font-bold text-base md:text-lg hover:bg-gray-100 transition shadow-xl transform hover:scale-105 ${primaryButton.className || ""}`}
+                      className={`inline-flex items-center justify-center gap-2 bg-white text-surface-900 px-6 md:px-8 py-3 md:py-4 rounded-xl font-bold text-base md:text-lg hover:bg-surface-100 transition shadow-xl transform hover:scale-105 ${primaryButton.className || ""}`}
                     >
                       {primaryButton.icon}
                       {primaryButton.text}
@@ -102,14 +102,14 @@ const CTASection = ({
                       href={secondaryButton.link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className={`inline-flex items-center justify-center gap-2 bg-white/20 backdrop-blur-sm text-white px-6 md:px-8 py-3 md:py-4 rounded-lg font-bold text-base md:text-lg hover:bg-white/30 transition border-2 border-white/50 ${secondaryButton.className || ""}`}
+                      className={`inline-flex items-center justify-center gap-2 bg-white/20 backdrop-blur-sm text-white px-6 md:px-8 py-3 md:py-4 rounded-xl font-bold text-base md:text-lg hover:bg-white/30 transition border-2 border-white/50 ${secondaryButton.className || ""}`}
                     >
                       {secondaryButton.icon}
                       {secondaryButton.text}
                     </a>
                   ) : (
                     <Link href={secondaryButton.link}
-                      className={`inline-flex items-center justify-center gap-2 bg-white/20 backdrop-blur-sm text-white px-6 md:px-8 py-3 md:py-4 rounded-lg font-bold text-base md:text-lg hover:bg-white/30 transition border-2 border-white/50 ${secondaryButton.className || ""}`}
+                      className={`inline-flex items-center justify-center gap-2 bg-white/20 backdrop-blur-sm text-white px-6 md:px-8 py-3 md:py-4 rounded-xl font-bold text-base md:text-lg hover:bg-white/30 transition border-2 border-white/50 ${secondaryButton.className || ""}`}
                     >
                       {secondaryButton.icon}
                       {secondaryButton.text}

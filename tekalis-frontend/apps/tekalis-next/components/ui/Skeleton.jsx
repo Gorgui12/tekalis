@@ -8,8 +8,8 @@ const Skeleton = ({
 }) => {
   return (
     <div 
-      className={`bg-gray-200 ${width} ${height} ${rounded} ${className} ${
-        animated ? "animate-pulse" : ""
+      className={`skeleton ${width} ${height} ${rounded} ${className} ${
+        animated ? "" : ""
       }`}
     ></div>
   );
@@ -32,9 +32,9 @@ export const SkeletonText = ({ lines = 3, spacing = "space-y-2" }) => {
 // Skeleton pour carte produit
 export const SkeletonProductCard = () => {
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 animate-pulse">
+    <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-card p-4 animate-pulse">
       {/* Image */}
-      <Skeleton height="aspect-square" rounded="rounded-lg" className="mb-4" />
+      <Skeleton height="aspect-square" rounded="rounded-xl" className="mb-4" />
       
       {/* Brand */}
       <Skeleton width="w-1/3" height="h-3" className="mb-2" />
@@ -58,7 +58,7 @@ export const SkeletonProductCard = () => {
 // Skeleton pour carte article de blog
 export const SkeletonArticleCard = () => {
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden animate-pulse">
+    <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-card overflow-hidden animate-pulse">
       {/* Image */}
       <Skeleton height="h-48" rounded="rounded-none" />
       
@@ -89,9 +89,9 @@ export const SkeletonArticleCard = () => {
 // Skeleton pour tableau
 export const SkeletonTable = ({ rows = 5, columns = 5 }) => {
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden">
+    <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-card overflow-hidden">
       <table className="w-full">
-        <thead className="bg-gray-50 border-b">
+        <thead className="bg-surface-50 dark:bg-surface-900 border-b dark:border-surface-700">
           <tr>
             {Array.from({ length: columns }).map((_, index) => (
               <th key={index} className="py-3 px-4">
@@ -129,7 +129,7 @@ export const SkeletonPage = () => {
       {/* Stats Grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         {Array.from({ length: 4 }).map((_, index) => (
-          <div key={index} className="bg-white rounded-lg shadow-md p-6 animate-pulse">
+          <div key={index} className="bg-white dark:bg-surface-800 rounded-2xl shadow-card p-6 animate-pulse">
             <Skeleton width="w-12" height="h-12" rounded="rounded-full" className="mb-4" />
             <Skeleton width="w-24" height="h-4" className="mb-2" />
             <Skeleton width="w-16" height="h-8" />
@@ -144,7 +144,7 @@ export const SkeletonPage = () => {
         </div>
         <div className="space-y-4">
           {Array.from({ length: 5 }).map((_, index) => (
-            <div key={index} className="bg-white rounded-lg shadow-md p-4 animate-pulse">
+            <div key={index} className="bg-white dark:bg-surface-800 rounded-2xl shadow-card p-4 animate-pulse">
               <div className="flex gap-3">
                 <Skeleton width="w-10" height="h-10" rounded="rounded-full" />
                 <div className="flex-1">

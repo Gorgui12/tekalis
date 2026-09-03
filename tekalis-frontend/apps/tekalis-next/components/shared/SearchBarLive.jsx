@@ -43,10 +43,10 @@ const ResultItem = ({ product, onSelect }) => {
   return (
     <Link href={`/products/${product._id}`}
       onClick={onSelect}
-      className="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 dark:hover:bg-gray-800 transition group"
+        className="flex items-center gap-3 px-4 py-3 hover:bg-surface-50 dark:hover:bg-surface-800 transition group"
     >
       {/* Image */}
-      <div className="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-700 overflow-hidden flex-shrink-0">
+      <div className="w-12 h-12 rounded-xl bg-surface-100 dark:bg-surface-700 overflow-hidden flex-shrink-0">
         <img
           src={image}
           alt={product.name}
@@ -57,11 +57,11 @@ const ResultItem = ({ product, onSelect }) => {
 
       {/* Infos */}
       <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium text-gray-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition">
+        <p className="text-sm font-medium text-surface-900 dark:text-white truncate group-hover:text-brand-600 dark:group-hover:text-brand-400 transition">
           {product.name}
         </p>
         <div className="flex items-center gap-2 mt-0.5">
-          <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
+          <span className="text-sm font-bold text-brand-500 dark:text-brand-400">
             {product.price?.toLocaleString()} FCFA
           </span>
           {discount > 0 && (
@@ -74,7 +74,7 @@ const ResultItem = ({ product, onSelect }) => {
       </div>
 
       {/* Flèche */}
-      <FaArrowRight size={11} className="text-gray-300 dark:text-gray-600 group-hover:text-blue-500 transition flex-shrink-0" />
+      <FaArrowRight size={11} className="text-surface-300 dark:text-surface-600 group-hover:text-brand-500 transition flex-shrink-0" />
     </Link>
   );
 };
@@ -209,9 +209,9 @@ const SearchBarLive = ({
     <div className={`relative ${className}`}>
       {/* Input */}
       <div className="relative flex items-center">
-        <FaSearch
+          <FaSearch
           size={14}
-          className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+          className="absolute left-4 top-1/2 -translate-y-1/2 text-surface-400 dark:text-surface-500 pointer-events-none"
         />
         <input
           ref={inputRef}
@@ -227,23 +227,23 @@ const SearchBarLive = ({
           aria-autocomplete="list"
           aria-expanded={showDropdown}
           aria-controls="search-results-dropdown"
-          className={`w-full h-11 pl-10 pr-20 rounded-xl border bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:ring-2 transition ${
+          className={`w-full h-11 pl-10 pr-20 rounded-xl border bg-white dark:bg-surface-800 text-sm text-surface-900 dark:text-white placeholder:text-surface-400 focus:outline-none focus:ring-2 transition ${
             showDropdown
-              ? 'border-blue-500 dark:border-blue-500 ring-2 ring-blue-500/20 rounded-b-none'
-              : 'border-gray-300 dark:border-gray-600 focus:border-blue-500'
+              ? 'border-brand-500 dark:border-brand-500 ring-2 ring-brand-500/20 rounded-b-none'
+              : 'border-surface-300 dark:border-surface-600 focus:border-brand-500'
           } ${inputClassName}`}
         />
 
         {/* Loading indicator */}
         {loading && (
-          <FaSpinner size={13} className="absolute right-14 top-1/2 -translate-y-1/2 text-gray-400 animate-spin" />
+          <FaSpinner size={13} className="absolute right-14 top-1/2 -translate-y-1/2 text-surface-400 animate-spin" />
         )}
 
         {/* Bouton effacer */}
         {query && (
           <button
             onClick={clearQuery}
-            className="absolute right-14 top-1/2 -translate-y-1/2 p-1 text-gray-400 hover:text-gray-600 transition"
+            className="absolute right-14 top-1/2 -translate-y-1/2 p-1 text-surface-400 hover:text-surface-600 dark:hover:text-surface-300 transition"
             aria-label="Effacer"
           >
             <FaTimes size={12} />
@@ -254,7 +254,7 @@ const SearchBarLive = ({
         <button
           onClick={handleFullSearch}
           disabled={!query.trim()}
-          className="absolute right-2 top-1/2 -translate-y-1/2 h-7 px-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-200 dark:disabled:bg-gray-700 text-white disabled:text-gray-400 rounded-lg text-xs font-semibold transition"
+          className="absolute right-2 top-1/2 -translate-y-1/2 h-7 px-3 bg-brand-500 hover:bg-brand-600 disabled:bg-surface-200 dark:disabled:bg-surface-700 text-white disabled:text-surface-400 rounded-xl text-xs font-semibold transition"
           aria-label="Lancer la recherche"
         >
           Chercher
@@ -267,7 +267,7 @@ const SearchBarLive = ({
           id="search-results-dropdown"
           ref={dropdownRef}
           role="listbox"
-          className="absolute top-full left-0 right-0 bg-white dark:bg-gray-900 border border-blue-500 border-t-0 rounded-b-xl shadow-2xl z-50 overflow-hidden max-h-[70vh] overflow-y-auto"
+          className="absolute top-full left-0 right-0 bg-white dark:bg-surface-900 border border-brand-500 border-t-0 rounded-b-xl shadow-2xl z-50 overflow-hidden max-h-[70vh] overflow-y-auto"
         >
           {/* Résultats */}
           {query.length >= 2 && (
@@ -275,13 +275,13 @@ const SearchBarLive = ({
               {results.length > 0 ? (
                 <>
                   <div className="px-4 pt-3 pb-1 flex items-center justify-between">
-                    <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide">
+                    <span className="text-[11px] font-semibold text-surface-400 dark:text-surface-500 uppercase tracking-wide">
                       {results.length} résultat{results.length > 1 ? 's' : ''}
                     </span>
                     {results.length >= maxResults && (
                       <button
                         onClick={handleFullSearch}
-                        className="text-[11px] text-blue-600 dark:text-blue-400 hover:underline font-semibold"
+                        className="text-[11px] text-brand-600 dark:text-brand-400 hover:underline font-semibold"
                       >
                         Voir tous les résultats →
                       </button>
@@ -293,17 +293,17 @@ const SearchBarLive = ({
                         key={product._id}
                         role="option"
                         aria-selected={idx === activeIdx}
-                        className={idx === activeIdx ? 'bg-blue-50 dark:bg-blue-900/20' : ''}
+                        className={idx === activeIdx ? 'bg-brand-50 dark:bg-brand-900/20' : ''}
                       >
                         <ResultItem product={product} onSelect={handleSelect} />
                       </div>
                     ))}
                   </div>
                   {/* CTA voir tous */}
-                  <div className="border-t border-gray-100 dark:border-gray-800">
+                  <div className="border-t border-surface-100 dark:border-surface-800">
                     <button
                       onClick={handleFullSearch}
-                      className="w-full flex items-center justify-center gap-2 py-3 text-sm font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition"
+                      className="w-full flex items-center justify-center gap-2 py-3 text-sm font-semibold text-brand-600 dark:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-900/20 transition"
                     >
                       <FaSearch size={12} />
                       Voir tous les résultats pour « {query} »
@@ -312,12 +312,12 @@ const SearchBarLive = ({
                 </>
               ) : !loading ? (
                 <div className="px-4 py-8 text-center">
-                  <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+                  <p className="text-sm text-surface-500 dark:text-surface-400 mb-3">
                     Aucun résultat pour « <strong>{query}</strong> »
                   </p>
                   <Link href="/products"
                     onClick={handleSelect}
-                    className="text-sm text-blue-600 dark:text-blue-400 hover:underline"
+                    className="text-sm text-brand-600 dark:text-brand-400 hover:underline"
                   >
                     Parcourir tous les produits
                   </Link>
@@ -327,10 +327,10 @@ const SearchBarLive = ({
                 <div className="p-4 space-y-3">
                   {[...Array(3)].map((_, i) => (
                     <div key={i} className="flex items-center gap-3 animate-pulse">
-                      <div className="w-12 h-12 bg-gray-200 dark:bg-gray-700 rounded-lg flex-shrink-0" />
+                      <div className="w-12 h-12 bg-surface-200 dark:bg-surface-700 rounded-xl flex-shrink-0" />
                       <div className="flex-1 space-y-1.5">
-                        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-3/4" />
-                        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/3" />
+                        <div className="h-3 bg-surface-200 dark:bg-surface-700 rounded w-3/4" />
+                        <div className="h-3 bg-surface-200 dark:bg-surface-700 rounded w-1/3" />
                       </div>
                     </div>
                   ))}
@@ -343,7 +343,7 @@ const SearchBarLive = ({
           {query.length < 2 && recentSearches.length > 0 && (
             <div className="py-2">
               <div className="px-4 py-1.5 flex items-center justify-between">
-                <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide">
+                <span className="text-[11px] font-semibold text-surface-400 dark:text-surface-500 uppercase tracking-wide">
                   Recherches récentes
                 </span>
                 <button
@@ -354,7 +354,7 @@ const SearchBarLive = ({
                     setRecentSearches([]);
                     setOpen(false);
                   }}
-                  className="text-[11px] text-gray-400 hover:text-red-500 transition"
+                  className="text-[11px] text-surface-400 hover:text-red-500 transition"
                 >
                   Effacer
                 </button>
@@ -366,10 +366,10 @@ const SearchBarLive = ({
                     setQuery(term);
                     inputRef.current?.focus();
                   }}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 dark:hover:bg-gray-800 transition text-left"
+                  className="w-full flex items-center gap-3 px-4 py-2.5 hover:bg-surface-50 dark:hover:bg-surface-800 transition text-left"
                 >
-                  <FaSearch size={11} className="text-gray-400" />
-                  <span className="text-sm text-gray-700 dark:text-gray-300">{term}</span>
+                  <FaSearch size={11} className="text-surface-400" />
+                  <span className="text-sm text-surface-700 dark:text-surface-300">{term}</span>
                 </button>
               ))}
             </div>

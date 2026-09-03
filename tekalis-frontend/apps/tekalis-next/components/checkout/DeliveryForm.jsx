@@ -23,7 +23,7 @@ const DELIVERY_MODES = [
     price: 0,
     priceLabel: "Gratuit",
     icon: <FaTruck />,
-    color: "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+    color: "border-brand-500 bg-brand-50 dark:bg-brand-900/20"
   },
   {
     id: "express",
@@ -97,8 +97,8 @@ const DeliveryForm = ({ onNext, savedAddresses = [], loading = false }) => {
 
       {/* ─── Adresse de livraison ────────────────────────────────────────── */}
       <div>
-        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-          <FaMapMarkerAlt className="text-blue-600" />
+        <h3 className="text-lg font-bold text-surface-900 dark:text-white mb-4 flex items-center gap-2">
+          <FaMapMarkerAlt className="text-brand-500" />
           Adresse de livraison
         </h3>
 
@@ -126,14 +126,14 @@ const DeliveryForm = ({ onNext, savedAddresses = [], loading = false }) => {
               onClick={() => setMode("new")}
               className={`w-full flex items-center gap-3 p-4 rounded-xl border-2 border-dashed transition ${
                 mode === "new"
-                  ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
-                  : "border-gray-300 dark:border-gray-600 hover:border-blue-400"
+                  ? "border-brand-500 bg-brand-50 dark:bg-brand-900/20"
+                  : "border-surface-300 dark:border-surface-600 hover:border-brand-400"
               }`}
             >
-              <div className="w-9 h-9 bg-blue-100 dark:bg-blue-900/40 rounded-lg flex items-center justify-center">
-                <FaPlus className="text-blue-600" />
+              <div className="w-9 h-9 bg-brand-100 dark:bg-brand-900/40 rounded-lg flex items-center justify-center">
+                <FaPlus className="text-brand-500" />
               </div>
-              <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+              <span className="text-sm font-semibold text-surface-700 dark:text-surface-300">
                 Utiliser une nouvelle adresse
               </span>
             </button>
@@ -142,7 +142,7 @@ const DeliveryForm = ({ onNext, savedAddresses = [], loading = false }) => {
 
         {/* Formulaire nouvelle adresse */}
         {mode === "new" && (
-          <div className="mt-5 bg-gray-50 dark:bg-gray-800/50 rounded-xl p-5 border border-gray-200 dark:border-gray-700">
+          <div className="mt-5 bg-surface-50 dark:bg-surface-800/50 rounded-xl p-5 border border-surface-200 dark:border-surface-700">
             <AddressForm
               formData={newAddress}
               onChange={setNewAddress}
@@ -156,8 +156,8 @@ const DeliveryForm = ({ onNext, savedAddresses = [], loading = false }) => {
 
       {/* ─── Mode de livraison ───────────────────────────────────────────── */}
       <div>
-        <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-2">
-          <FaTruck className="text-blue-600" />
+        <h3 className="text-lg font-bold text-surface-900 dark:text-white mb-4 flex items-center gap-2">
+          <FaTruck className="text-brand-500" />
           Mode de livraison
         </h3>
         <div className="space-y-3">
@@ -168,26 +168,26 @@ const DeliveryForm = ({ onNext, savedAddresses = [], loading = false }) => {
               className={`w-full flex items-center gap-4 p-4 rounded-xl border-2 text-left transition-all ${
                 deliveryMode === dm.id
                   ? dm.color + " border-opacity-100 shadow-sm"
-                  : "border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-300"
+                  : "border-surface-200 dark:border-surface-700 bg-white dark:bg-surface-800 hover:border-surface-300"
               }`}
             >
               <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 text-xl ${
-                deliveryMode === dm.id ? "bg-white dark:bg-gray-800 shadow" : "bg-gray-100 dark:bg-gray-700 text-gray-500"
+                deliveryMode === dm.id ? "bg-white dark:bg-surface-800 shadow" : "bg-surface-100 dark:bg-surface-700 text-surface-500"
               } ${deliveryMode === dm.id && dm.id === "express" ? "text-orange-600" : ""}
-                ${deliveryMode === dm.id && dm.id === "standard" ? "text-blue-600" : ""}
+                ${deliveryMode === dm.id && dm.id === "standard" ? "text-brand-500" : ""}
               `}>
                 {dm.icon}
               </div>
               <div className="flex-1">
-                <p className="font-semibold text-gray-900 dark:text-white text-sm">
+                <p className="font-semibold text-surface-900 dark:text-white text-sm">
                   {dm.label}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                <p className="text-xs text-surface-500 dark:text-surface-400 mt-0.5">
                   {dm.description}
                 </p>
               </div>
               <p className={`font-bold text-sm flex-shrink-0 ${
-                dm.price === 0 ? "text-green-600" : "text-gray-900 dark:text-white"
+                dm.price === 0 ? "text-green-600" : "text-surface-900 dark:text-white"
               }`}>
                 {dm.priceLabel}
               </p>
