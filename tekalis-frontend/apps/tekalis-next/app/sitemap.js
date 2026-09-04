@@ -22,10 +22,11 @@ const CATEGORY_SLUGS = [
 
 export const revalidate = 3600;
 
-// L'API est servie sous https://tekalis.onrender.com/api/v1.
-// NE PAS ajouter "/api/v1" une seconde fois ici (bug historique : le sitemap
-// interrogeait /api/v1/api/v1/products → 404 → aucun produit dans le sitemap).
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://tekalis.onrender.com/api/v1';
+// NEXT_PUBLIC_API_BASE peut contenir "/api/v1" (env local) ou pas (Vercel).
+// Normalisation : l'API est servie sous https://tekalis.onrender.com/api/v1 et
+// ne doit JAMAIS doubler le préfixe (bug historique /api/v1/api/v1 → 404).
+const rawBase = process.env.NEXT_PUBLIC_API_BASE || 'https://tekalis.onrender.com/api/v1';
+const API_BASE = rawBase.replace(/\/+$/, '').replace(/\/api\/v1$/, '') + '/api/v1';
 
 const BLOCKED_STATUSES = new Set(['discontinued']);
 

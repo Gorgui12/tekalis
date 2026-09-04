@@ -3,7 +3,10 @@
  * Pas de directive "use client".
  */
 
-const BASE = process.env.NEXT_PUBLIC_API_BASE || "https://tekalis.onrender.com/api/v1";
+// NEXT_PUBLIC_API_BASE peut contenir "/api/v1" (env local) ou pas (Vercel).
+// Normalisation : la base d'API termine TOUJOURS par "/api/v1".
+const rawBase = process.env.NEXT_PUBLIC_API_BASE || "https://tekalis.onrender.com/api/v1";
+const BASE = rawBase.replace(/\/+$/, "").replace(/\/api\/v1$/, "") + "/api/v1";
 
 /**
  * Fetch côté serveur avec timeout + 1 nouvelle tentative.

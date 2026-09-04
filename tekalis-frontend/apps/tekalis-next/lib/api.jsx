@@ -5,10 +5,16 @@
  */
 import axios from "axios";
 
-const API_BASE =
+const rawBase =
   typeof window === "undefined"
     ? process.env.NEXT_PUBLIC_API_BASE || "https://tekalis.onrender.com/api/v1"
     : "/api/v1";
+// Normalisation : la base d'API termine toujours par "/api/v1", que
+// NEXT_PUBLIC_API_BASE contienne le préfixe ou non (env local vs Vercel).
+const API_BASE =
+  typeof window === "undefined"
+    ? rawBase.replace(/\/+$/, "").replace(/\/api\/v1$/, "") + "/api/v1"
+    : rawBase;
 
 const api = axios.create({
   baseURL: API_BASE,
