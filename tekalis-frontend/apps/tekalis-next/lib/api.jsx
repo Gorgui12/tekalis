@@ -7,7 +7,7 @@ import axios from "axios";
 
 const API_BASE =
   typeof window === "undefined"
-    ? (process.env.NEXT_PUBLIC_API_BASE || "https://tekalis.onrender.com") + "/api/v1"
+    ? process.env.NEXT_PUBLIC_API_BASE || "https://tekalis.onrender.com/api/v1"
     : "/api/v1";
 
 const api = axios.create({

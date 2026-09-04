@@ -21,11 +21,15 @@ const nextConfig = {
   // ── Proxy API → évite CORS en dev ────────────────────────────────────────
   async rewrites() {
     const isDev = process.env.NODE_ENV === 'development';
-    const apiBase = isDev ? 'http://localhost:5000' : (process.env.NEXT_PUBLIC_API_BASE || 'https://tekalis.onrender.com');
+    // NEXT_PUBLIC_API_BASE contient déjà "/api/v1" (ex. https://tekalis.onrender.com/api/v1).
+    // Ne PAS ajouter "/api/v1" une seconde fois ici.
+    const apiBase = isDev
+      ? 'http://localhost:5000/api/v1'
+      : (process.env.NEXT_PUBLIC_API_BASE || 'https://tekalis.onrender.com/api/v1');
     return [
       {
         source: '/api/v1/:path*',
-        destination: `${apiBase}/api/v1/:path*`,
+        destination: `${apiBase}/:path*`,
       },
     ];
   },
@@ -56,7 +60,25 @@ const nextConfig = {
 
   // ── Redirections ancienne URLs ─────────────────────────────────────────────
   async redirects() {
-    return [];
+    return [
+      // Ancien schéma /produit/:slug (sitemap backend) → /products/:slug
+      {
+        source: '/produit/:slug',
+        destination: '/products/:slug',
+        permanent: true,
+      },
+      {
+        source: '/produit/:slug/',
+        destination: '/products/:slug',
+        permanent: true,
+      },
+      // Anciennes URLs produits avec query params → version canonique
+      {
+        source: '/products/:id/slug',
+        destination: '/products/:id',
+        permanent: true,
+      },
+    ];
   },
 
   // ── Perf ─────────────────────────────────────────────────────────────────

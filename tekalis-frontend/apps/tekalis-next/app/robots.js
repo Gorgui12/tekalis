@@ -1,22 +1,34 @@
 export default function robots() {
-return {
-rules: [
-{
-userAgent: '*',
-allow: ['/', '/products', '/products/*', '/blog', '/blog/*', '/category/*', '/category/*/*'],
-disallow: ['/admin', '/api/', '/cart', '/checkout', '/dashboard', '/login', '/register', '/wishlist'],
-},
-{
-userAgent: ['AhrefsBot', 'SemrushBot', 'MJ12bot', 'AhrefsSiteAudit'],
-disallow: '/',
-},
-{
-userAgent: 'Googlebot',
-allow: '/',
-crawlDelay: 1,
-},
-],
-sitemap: 'https://tekalis.com/sitemap.xml',
-host: 'https://tekalis.com',
-};
+  return {
+    rules: [
+      {
+        userAgent: '*',
+        allow: '/',
+        disallow: [
+          '/admin',
+          '/api/',
+          '/cart',
+          '/checkout',
+          '/dashboard',
+          '/login',
+          '/register',
+          '/profile',
+          '/forgot-password',
+          '/reset-password',
+          '/wishlist',
+        ],
+      },
+      {
+        userAgent: ['AhrefsBot', 'SemrushBot', 'MJ12bot', 'AhrefsSiteAudit'],
+        disallow: '/',
+      },
+      {
+        userAgent: 'Googlebot',
+        allow: '/',
+        crawlDelay: 1,
+      },
+    ],
+    sitemap: 'https://tekalis.com/sitemap.xml',
+    host: 'https://tekalis.com',
+  };
 }

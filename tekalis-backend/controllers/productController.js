@@ -42,7 +42,8 @@ exports.getProducts = async (req, res) => {
       status,
       minPrice,
       maxPrice,
-      featured
+      featured,
+      fields
     } = req.query;
 
     const filter = {};
@@ -76,12 +77,21 @@ exports.getProducts = async (req, res) => {
     };
     const sortQuery = sortMap[sort] || sortMap.newest;
 
+    // Projection optionnelle : "fields=a,b,c" réduit la taille des réponses
+    // (utilisé par le sitemap qui n'a besoin que de _id, slug, status, updatedAt).
+    const projection = String(fields || "")
+      .split(",")
+      .map(f => f.trim())
+      .filter(Boolean)
+      .reduce((acc, f) => { acc[f] = 1; return acc; }, {});
+
     const pageNum = Math.max(1, Number(page));
     const limitNum = Math.min(100, Math.max(1, Number(limit)));
     const skip = (pageNum - 1) * limitNum;
 
     const [products, total] = await Promise.all([
       Product.find(filter)
+        .select(projection)
         .sort(sortQuery)
         .skip(skip)
         .limit(limitNum)

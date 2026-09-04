@@ -22,9 +22,51 @@ const CATEGORY_SLUGS = [
 
 export const revalidate = 3600;
 
-export default async function sitemap() {
-  const BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://tekalis.onrender.com';
+// L'API est servie sous https://tekalis.onrender.com/api/v1.
+// NE PAS ajouter "/api/v1" une seconde fois ici (bug historique : le sitemap
+// interrogeait /api/v1/api/v1/products → 404 → aucun produit dans le sitemap).
+const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://tekalis.onrender.com/api/v1';
 
+const BLOCKED_STATUSES = new Set(['discontinued']);
+
+/**
+ * Récupère TOUS les produits en paginant (le backend plafonne limit à 100).
+ * Ne garde que les produits indexables (statut publiable).
+ */
+async function fetchAllProducts() {
+  const products = [];
+  const { revalidate: rev } = { revalidate: 3600 };
+
+  for (let page = 1; page <= 25; page += 1) {
+    const url = `${API_BASE}/products?page=${page}&limit=100&fields=_id,slug,status,updatedAt`;
+    const res = await fetch(url, { next: { revalidate: rev } });
+    if (!res.ok) break;
+    const data = await res.json();
+    const items = data?.products || data?.data || (Array.isArray(data) ? data : []);
+    if (!Array.isArray(items) || items.length === 0) break;
+    products.push(...items);
+
+    const totalPages = data?.pagination?.totalPages;
+    if (typeof totalPages === 'number' && page >= totalPages) break;
+  }
+
+  return products.filter((p) => p && !BLOCKED_STATUSES.has(p.status));
+}
+
+async function fetchAllArticles() {
+  try {
+    const res = await fetch(`${API_BASE}/articles?limit=200&fields=slug,updatedAt`, {
+      next: { revalidate: 3600 },
+    });
+    const data = await res.json();
+    return (data?.articles || data?.data || [])
+      .filter((a) => a.slug);
+  } catch {
+    return [];
+  }
+}
+
+export default async function sitemap() {
   // Pages statiques
   const staticEntries = STATIC_PAGES.map(({ url, ...rest }) => ({
     url: `${SITE_URL}${url}`,
@@ -40,17 +82,12 @@ export default async function sitemap() {
     priority: 0.9,
   }));
 
-  // Produits dynamiques
+  // Produits dynamiques (URLs SEO par slug, sinon _id)
   let productEntries = [];
   try {
-    const res = await fetch(
-      `${BASE}/api/v1/products?limit=9999&fields=_id,slug,updatedAt`,
-      { next: { revalidate: 3600 } }
-    );
-    const data = await res.json();
-    const products = data?.products || data?.data || (Array.isArray(data) ? data : []);
+    const products = await fetchAllProducts();
     productEntries = products.map((p) => ({
-      url: `${SITE_URL}/products/${p._id}`,
+      url: `${SITE_URL}/products/${p.slug || p._id}`,
       lastModified: new Date(p.updatedAt || Date.now()),
       changeFrequency: 'weekly',
       priority: 0.8,
@@ -62,20 +99,13 @@ export default async function sitemap() {
   // Articles dynamiques
   let articleEntries = [];
   try {
-    const res = await fetch(
-      `${BASE}/api/v1/articles?limit=9999&fields=slug,updatedAt`,
-      { next: { revalidate: 3600 } }
-    );
-    const data = await res.json();
-    const articles = data?.articles || data?.data || [];
-    articleEntries = articles
-      .filter((a) => a.slug)
-      .map((a) => ({
-        url: `${SITE_URL}/blog/${a.slug}`,
-        lastModified: new Date(a.updatedAt || Date.now()),
-        changeFrequency: 'monthly',
-        priority: 0.6,
-      }));
+    const articles = await fetchAllArticles();
+    articleEntries = articles.map((a) => ({
+      url: `${SITE_URL}/blog/${a.slug}`,
+      lastModified: new Date(a.updatedAt || Date.now()),
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    }));
   } catch {
     // silencieux
   }

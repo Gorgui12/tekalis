@@ -78,7 +78,7 @@ const ProductCard = ({ product, showSpecs = false }) => {
   };
 
   return (
-    <Link href={`/products/${product._id}`}
+    <Link href={`/products/${product.slug || product._id}`}
       className="group bg-white dark:bg-surface-800 rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-300 overflow-hidden flex flex-col h-full border border-surface-100 dark:border-surface-700 hover:-translate-y-1"
     >
       {/* ─── Image ─────────────────────────────────────────────────────────── */}

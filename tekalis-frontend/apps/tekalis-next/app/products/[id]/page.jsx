@@ -1,30 +1,30 @@
-import { notFound } from "next/navigation";
+import { permanentRedirect } from "next/navigation";
 import { serverFetch } from "@/lib/serverFetch";
 import ProductDetailClient from '@/components/product/ProductDetailClient';
+
+const SITE_URL = 'https://tekalis.com';
+
+const BLOCKED_STATUSES = new Set(['discontinued']);
 
 export async function generateMetadata({ params }) {
   try {
     const { id } = await params;
-    const res = await serverFetch(`/products/${id}`);
-    const product = res?.data || res;
+    const product = await fetchProduct(id);
 
-    if (!product) {
-      return {
-        title: 'Produit introuvable | Tekalis',
-        robots: { index: false },
-      };
-    }
+    // Produit absent → la page fera un redirect() vers /products :
+    // inutile de renvoyer des métadonnées (aucune page n'est rendue).
+    if (!product || product === "not-found") return {};
 
+    const path = product.slug || id;
     return {
       title: `${product.name || 'Produit'} | Tekalis Sénégal`,
-      description: product.description?.substring(0, 160) || 'Achetez au meilleur prix au Sénégal. Livraison rapide à Dakar.',
-      alternates: { canonical: `https://tekalis.com/products/${id}` },
+      description: product.metaDescription || product.description?.substring(0, 160) || 'Achetez au meilleur prix au Sénégal. Livraison rapide à Dakar.',
+      alternates: { canonical: `${SITE_URL}/products/${path}` },
     };
   } catch {
-    return {
-      title: 'Produit introuvable | Tekalis',
-      robots: { index: false },
-    };
+    // Erreur transitoire (cold start Render, timeout) : on affiche un état
+    // d'erreur, PAS une page noindex. On laisse les métadonnées par défaut.
+    return {};
   }
 }
 
@@ -35,8 +35,13 @@ export default async function ProductPage({ params }) {
 
   const product = await fetchProduct(id);
 
-  // Un produit absent de la base → vraie page 404 (pour le SEO)
-  if (product === "not-found") notFound();
+  // Produit réellement absent (vraie 404 API) :
+  // c'est un vieux produit supprimé → on redirige vers le catalogue parent
+  // plutôt que de servir une 404 (nettoie les erreurs "Introuvable (404)"
+  // de Google Search Console).
+  if (product === "not-found") {
+    permanentRedirect('/products');
+  }
 
   // Erreur transitoire (cold start Render, timeout, panne réseau)
   // → N'affiche PAS un 404 : on montre un état d'erreur élégant à la place.
@@ -56,14 +61,24 @@ export default async function ProductPage({ params }) {
     );
   }
 
+  // Produit discontinué → page "morte" pour le SEO, on redirige vers le catalogue.
+  if (BLOCKED_STATUSES.has(product.status)) {
+    permanentRedirect('/products');
+  }
+
+  // Une URL _id redirige vers l'URL canonique slug (respecte aussi le canonical).
+  if (product.slug && product.slug !== id) {
+    permanentRedirect(`/products/${product.slug}`);
+  }
+
   return <ProductDetailClient product={product} />;
 }
 
 /**
  * Récupère un produit en distinguant :
  *  - un produit réel (objet)
- *  - une vraie absence (renvoie "not-found", → 404)
- *  - une erreur transitoire (renvoie null, → pas de 404)
+ *  - une vraie absence (renvoie "not-found", → on redirige vers /products)
+ *  - une erreur transitoire (renvoie null, → pas de 404, pas de redirect)
  * Le backend Render en free tier fait souvent du cold start : un simple
  * timeout ne doit pas transformer la page en 404.
  */

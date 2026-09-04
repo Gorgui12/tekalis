@@ -125,6 +125,8 @@ const ProductDetails = ({ product: initialProduct }) => {
     })
     .slice(0, 4);
 
+  const productPath = product.slug || product._id;
+
   const isOutOfStock = product.stock === 0;
   const discount = product.comparePrice
     ? Math.round(((product.comparePrice - product.price) / product.comparePrice) * 100)
@@ -150,7 +152,7 @@ const ProductDetails = ({ product: initialProduct }) => {
         type="product"
         price={product.price}
         availability={product.stock > 0 ? "InStock" : "OutOfStock"}
-        canonical={`https://tekalis.com/products/${product._id}`}
+        canonical={`https://tekalis.com/products/${productPath}`}
         // ── productData complet pour schema Product + AggregateRating ──
         productData={{
           name: product.name,
@@ -161,7 +163,7 @@ const ProductDetails = ({ product: initialProduct }) => {
         }}
         breadcrumbs={[
           { name: "Produits", url: "/products" },
-          { name: product.name, url: `/products/${product._id}` },
+          { name: product.name, url: `/products/${productPath}` },
         ]}
       />
 
@@ -169,7 +171,7 @@ const ProductDetails = ({ product: initialProduct }) => {
       <Breadcrumb
         items={[
           { name: "Produits", path: "/products" },
-          { name: product.name, path: `/products/${product._id}` },
+          { name: product.name, path: `/products/${productPath}` },
         ]}
       />
 

@@ -63,15 +63,17 @@ const urlBlock = ({ loc, lastmod, changefreq, priority }) => `
 // ── GET /api/v1/sitemap.xml ───────────────────────────────────────────────────
 router.get("/sitemap.xml", async (req, res) => {
   try {
-    // 1. Produits publiés
+    // 1. Produits publiés (status disponible) — on exclut les produits
+    //    discontinués ("discontinued") qui sur un site marchand sont des
+    //    pages mortes (supprimées en front → 404 ou redirect).
     const products = await Product.find(
-      { stock: { $gt: 0 } },
+      { status: { $ne: "discontinued" } },
       { _id: 1, slug: 1, updatedAt: 1, createdAt: 1 }
     ).lean();
 
-    // 2. Articles publiés
+    // 2. Articles publiés (les articles n'ont PAS de champ stock !)
     const articles = await Article.find(
-      { stock: { $gt: 0 } },
+      { status: "published" },
       { slug: 1, updatedAt: 1, createdAt: 1 }
     ).lean();
 
@@ -89,10 +91,11 @@ router.get("/sitemap.xml", async (req, res) => {
         })
       ),
 
-      // Produits individuels
+      // Produits individuels — chemin identique aux URLs canoniques du frontend
+      // (/products/:slug, slug sinon _id). Ne PAS générer /produit/...
       ...products.map((p) => {
         // Préférer le slug SEO-friendly si disponible, sinon l'_id
-        const path = p.slug ? `/produit/${p.slug}` : `/products/${p._id}`;
+        const path = `/products/${p.slug || p._id}`;
         return urlBlock({
           loc: path,
           lastmod: toDate(p.updatedAt || p.createdAt),
