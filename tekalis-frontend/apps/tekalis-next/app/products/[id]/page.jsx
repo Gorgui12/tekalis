@@ -11,19 +11,39 @@ export async function generateMetadata({ params }) {
     const { id } = await params;
     const product = await fetchProduct(id);
 
-    // Produit absent → la page fera un redirect() vers /products :
-    // inutile de renvoyer des métadonnées (aucune page n'est rendue).
     if (!product || product === "not-found") return {};
 
     const path = product.slug || id;
+    const productUrl = `${SITE_URL}/products/${path}`;
+    const primaryImage = product.images?.[0]?.url || product.image || '';
+
     return {
-      title: `${product.name || 'Produit'} | Tekalis Sénégal`,
-      description: product.metaDescription || product.description?.substring(0, 160) || 'Achetez au meilleur prix au Sénégal. Livraison rapide à Dakar.',
-      alternates: { canonical: `${SITE_URL}/products/${path}` },
+      title: `${product.name} — Prix ${product.price?.toLocaleString('fr-FR')} FCFA | Tekalis Sénégal`,
+      description:
+        product.metaDescription ||
+        `Achetez ${product.name} à Dakar au prix de ${product.price?.toLocaleString('fr-FR')} FCFA. ` +
+        `${product.description?.substring(0, 120) || ''}... ` +
+        `Livraison rapide au Sénégal. Garantie constructeur 12 mois. Paiement Wave, Orange Money.`,
+      keywords: [
+        `${product.name} Dakar`,
+        `${product.name} Sénégal`,
+        `${product.name} prix`,
+        `acheter ${product.name} Dakar`,
+        product.brand ? `${product.brand} Dakar` : null,
+        product.brand ? `${product.brand} Sénégal` : null,
+      ].filter(Boolean),
+      alternates: { canonical: productUrl },
+      openGraph: {
+        type: 'website',
+        title: `${product.name} — ${product.price?.toLocaleString('fr-FR')} FCFA | Tekalis`,
+        description: product.metaDescription || product.description?.substring(0, 160) || '',
+        url: productUrl,
+        siteName: 'Tekalis Sénégal',
+        locale: 'fr_SN',
+        images: primaryImage ? [{ url: primaryImage, width: 800, height: 800, alt: product.name }] : [],
+      },
     };
   } catch {
-    // Erreur transitoire (cold start Render, timeout) : on affiche un état
-    // d'erreur, PAS une page noindex. On laisse les métadonnées par défaut.
     return {};
   }
 }
@@ -35,16 +55,10 @@ export default async function ProductPage({ params }) {
 
   const product = await fetchProduct(id);
 
-  // Produit réellement absent (vraie 404 API) :
-  // c'est un vieux produit supprimé → on redirige vers le catalogue parent
-  // plutôt que de servir une 404 (nettoie les erreurs "Introuvable (404)"
-  // de Google Search Console).
   if (product === "not-found") {
     permanentRedirect('/products');
   }
 
-  // Erreur transitoire (cold start Render, timeout, panne réseau)
-  // → N'affiche PAS un 404 : on montre un état d'erreur élégant à la place.
   if (!product) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -61,34 +75,90 @@ export default async function ProductPage({ params }) {
     );
   }
 
-  // Produit discontinué → page "morte" pour le SEO, on redirige vers le catalogue.
   if (BLOCKED_STATUSES.has(product.status)) {
     permanentRedirect('/products');
   }
 
-  // Une URL _id redirige vers l'URL canonique slug (respecte aussi le canonical).
   if (product.slug && product.slug !== id) {
     permanentRedirect(`/products/${product.slug}`);
   }
 
-  return <ProductDetailClient product={product} />;
+  const productPath = product.slug || product._id;
+  const productUrl = `${SITE_URL}/products/${productPath}`;
+  const primaryImage = product.images?.[0]?.url || product.image || '';
+  const allImages = (product.images || []).map((img) => img.url || img).filter(Boolean);
+
+  const productSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Product',
+    name: product.name,
+    image: allImages.length > 0 ? allImages : primaryImage ? [primaryImage] : undefined,
+    description: product.description || product.metaDescription || '',
+    sku: product._id,
+    mpn: product._id,
+    brand: { '@type': 'Brand', name: product.brand || 'Tekalis' },
+    offers: {
+      '@type': 'Offer',
+      url: productUrl,
+      priceCurrency: 'XOF',
+      price: product.price,
+      priceValidUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      itemCondition: 'https://schema.org/NewCondition',
+      availability: product.stock > 0
+        ? 'https://schema.org/InStock'
+        : 'https://schema.org/OutOfStock',
+      seller: {
+        '@type': 'Organization',
+        name: 'Tekalis',
+        url: SITE_URL,
+      },
+    },
+    ...(product.rating && product.rating.average > 0 ? {
+      aggregateRating: {
+        '@type': 'AggregateRating',
+        ratingValue: product.rating.average,
+        bestRating: 5,
+        reviewCount: product.rating.count,
+      },
+    } : {}),
+    category: product.category?.[0]?.name || product.category?.[0] || '',
+  };
+
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Accueil', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: 'Produits', item: `${SITE_URL}/products` },
+      ...(product.category?.[0] ? [{
+        '@type': 'ListItem',
+        position: 3,
+        name: product.category[0].name || product.category[0],
+        item: `${SITE_URL}/category/${product.category[0].slug || ''}`,
+      }] : []),
+      {
+        '@type': 'ListItem',
+        position: product.category?.[0] ? 4 : 3,
+        name: product.name,
+        item: productUrl,
+      },
+    ],
+  };
+
+  return (
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      <ProductDetailClient product={product} />
+    </>
+  );
 }
 
-/**
- * Récupère un produit en distinguant :
- *  - un produit réel (objet)
- *  - une vraie absence (renvoie "not-found", → on redirige vers /products)
- *  - une erreur transitoire (renvoie null, → pas de 404, pas de redirect)
- * Le backend Render en free tier fait souvent du cold start : un simple
- * timeout ne doit pas transformer la page en 404.
- */
 async function fetchProduct(id) {
   try {
     const res = await serverFetch(`/products/${id}`);
     return res?.data || res || null;
   } catch (err) {
-    // serverFetch échoue avec `Error("API <status>: <path>")` sur non-OK,
-    // ou avec une erreur réseau/timeout (sans "API ").
     const msg = err?.message || "";
     const m = msg.match(/^API (\d+):/);
     if (m && Number(m[1]) === 404) return "not-found";

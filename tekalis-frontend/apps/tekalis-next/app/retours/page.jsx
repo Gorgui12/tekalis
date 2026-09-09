@@ -37,6 +37,13 @@ export const metadata = {
   description:
     "Politique de retour tekalis.com : retour sous 7 jours, procédure RMA simple depuis votre espace client, remboursement sous 7 jours ouvrables.",
   alternates: { canonical: "https://tekalis.com/retours" },
+  openGraph: {
+    title: "Retours & Remboursements | Tekalis",
+    description: "Retour sous 7 jours, procédure RMA simple, remboursement sous 7 jours ouvrables.",
+    url: "https://tekalis.com/retours",
+    siteName: "Tekalis Sénégal",
+    locale: "fr_SN",
+  },
 };
 
 export default function RetoursPage() {

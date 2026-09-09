@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProducts } from "@/store/slices/productSlice";
-import PageMeta from "@/components/seo/PageMeta";
 import DynamicHero from "@/components/home/DynamicHero";
 import { 
   FaChevronLeft, 
@@ -194,15 +193,6 @@ const Home = ({ initialProducts = [], initialArticles = [] }) => {
 
   return (
     <div className="min-h-screen bg-surface-50 dark:bg-surface-950">
-
-      {/* ── SEO HEAD ────────────────────────────────────────────────────────── */}
-      <PageMeta
-        title="Tekalis — Boutique Électronique Dakar | Livraison Rapide Sénégal"
-        description="Achetez smartphones, laptops, TV et électroménager en ligne au Sénégal. Livraison rapide à Dakar. Garantie constructeur. Paiement Wave, Orange Money."
-        keywords={['boutique électronique Dakar', 'livraison rapide Sénégal', 'smartphone Dakar', 'laptop Sénégal', 'tekalis']}
-        canonical="https://tekalis.com/"
-        schema={HOME_SCHEMA}
-      />
 
       {/* Hero Section - Carousel */}
 

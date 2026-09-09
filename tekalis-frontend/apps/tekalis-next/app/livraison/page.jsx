@@ -32,6 +32,13 @@ export const metadata = {
   description:
     "Livraison rapide à Dakar et au Sénégal : délais 24-48h, paiement à la livraison, livraison offerte dès 50 000 FCFA. Détail des zones et tarifs par quartier.",
   alternates: { canonical: "https://tekalis.com/livraison" },
+  openGraph: {
+    title: "Livraison — Zones, délais et tarifs | Tekalis",
+    description: "Délais 24-48h à Dakar, paiement à la livraison, zones desservies au Sénégal.",
+    url: "https://tekalis.com/livraison",
+    siteName: "Tekalis Sénégal",
+    locale: "fr_SN",
+  },
 };
 
 export default function LivraisonPage() {

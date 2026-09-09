@@ -247,7 +247,7 @@ const ProductQuickView = ({ product, isOpen, onClose }) => {
             </div>
 
             {/* View full details */}
-            <Link href={`/products/${product._id}`}
+            <Link href={`/products/${product.slug || product._id}`}
               className="flex items-center justify-center gap-2 text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-semibold transition"
               onClick={onClose}
             >

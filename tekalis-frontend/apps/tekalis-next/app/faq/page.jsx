@@ -108,6 +108,13 @@ export const metadata = {
   description:
     "Réponses aux questions fréquentes sur tekalis.com : paiement à la livraison, Wave et Orange Money, délais de livraison à Dakar, retours sous 7 jours et garanties.",
   alternates: { canonical: "https://tekalis.com/faq" },
+  openGraph: {
+    title: "FAQ — Questions fréquentes | Tekalis",
+    description: "Paiement à la livraison, Wave, délais de livraison Dakar, retours et garanties.",
+    url: "https://tekalis.com/faq",
+    siteName: "Tekalis Sénégal",
+    locale: "fr_SN",
+  },
 };
 
 const faqSchema = {

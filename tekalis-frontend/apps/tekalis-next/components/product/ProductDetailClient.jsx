@@ -17,7 +17,6 @@ import ProductGallery from "@/components/product/ProductGallery";
 import ProductSpecs from "@/components/product/ProductSpecs";
 import ReviewList from "@/components/review/ReviewList";
 import { Breadcrumb } from "@/components/seo/Breadcrumb";
-import PageMeta from "@/components/seo/PageMeta";
 import {
   FaShieldAlt,
   FaTruck,
@@ -134,38 +133,6 @@ const ProductDetails = ({ product: initialProduct }) => {
 
   return (
     <div className="container mx-auto px-4 py-8 mt-32">
-
-      {/* ── SEO HEAD complet ─────────────────────────────────────────────── */}
-      <PageMeta
-        title={`${product.name} — Prix ${product.price?.toLocaleString()} FCFA Dakar | Tekalis`}
-        description={`Achetez ${product.name} à Dakar au prix de ${product.price?.toLocaleString()} FCFA. ${
-          product.description?.slice(0, 100) || ""
-        }... Livraison rapide au Sénégal. Garantie constructeur 12 mois.`}
-        image={productImageUrls[0]}
-        keywords={[
-          `${product.name} prix Dakar`,
-          `${product.name} Sénégal`,
-          `acheter ${product.name} Dakar`,
-          product.brand ? `${product.brand} Dakar` : null,
-          product.brand ? `${product.brand} Sénégal prix` : null,
-        ].filter(Boolean)}
-        type="product"
-        price={product.price}
-        availability={product.stock > 0 ? "InStock" : "OutOfStock"}
-        canonical={`https://tekalis.com/products/${productPath}`}
-        // ── productData complet pour schema Product + AggregateRating ──
-        productData={{
-          name: product.name,
-          brand: product.brand || "Tekalis",
-          sku: product._id,
-          images: productImageUrls,
-          rating: product.rating,
-        }}
-        breadcrumbs={[
-          { name: "Produits", url: "/products" },
-          { name: product.name, url: `/products/${productPath}` },
-        ]}
-      />
 
       {/* ── Fil d'Ariane SEO ─────────────────────────────────────────────── */}
       <Breadcrumb

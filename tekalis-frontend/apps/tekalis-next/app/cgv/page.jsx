@@ -139,6 +139,13 @@ export const metadata = {
   description:
     "CGV de tekalis.com : prix en FCFA, paiement Wave / Orange Money / à la livraison, livraison Dakar 24-48h, retours sous 7 jours et garanties.",
   alternates: { canonical: "https://tekalis.com/cgv" },
+  openGraph: {
+    title: "Conditions Générales de Vente | Tekalis",
+    description: "Prix en FCFA, paiement Wave / Orange Money, livraison Dakar 24-48h, retours sous 7 jours.",
+    url: "https://tekalis.com/cgv",
+    siteName: "Tekalis Sénégal",
+    locale: "fr_SN",
+  },
 };
 
 export default function CgvPage() {

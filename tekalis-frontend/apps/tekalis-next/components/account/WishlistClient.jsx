@@ -81,7 +81,7 @@ const WishlistPage = () => {
                   className="bg-white dark:bg-surface-800 rounded-2xl shadow-card hover:shadow-elevated transition overflow-hidden flex flex-col"
                 >
                   {/* Image */}
-                  <Link href={`/products/${product._id}`}
+                  <Link href={`/products/${product.slug || product._id}`}
                     className="relative block aspect-square bg-surface-50 dark:bg-surface-700 overflow-hidden"
                   >
                     <img
@@ -104,7 +104,7 @@ const WishlistPage = () => {
                         {product.brand}
                       </span>
                     )}
-                    <Link href={`/products/${product._id}`}
+                    <Link href={`/products/${product.slug || product._id}`}
                       className="font-semibold text-surface-900 dark:text-white hover:text-brand-600 dark:hover:text-brand-400 line-clamp-2 mb-2 transition"
                     >
                       {product.name}

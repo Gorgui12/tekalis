@@ -268,7 +268,7 @@ const MyRMA = () => {
                       className="w-20 h-20 object-contain rounded border border-surface-200 dark:border-surface-700"
                     />
                     <div className="flex-1">
-                      <Link href={`/products/${rma.product?._id}`}
+                      <Link href={`/products/${rma.product?.slug || rma.product?._id}`}
                         className="font-semibold text-surface-900 dark:text-white hover:text-brand-600 dark:hover:text-brand-400 block mb-1"
                       >
                         {rma.product?.name || "Produit"}

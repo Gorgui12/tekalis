@@ -15,35 +15,22 @@ const STATIC_PAGES = [
   { url: '/cookies', priority: 0.3, changeFrequency: 'yearly' },
 ];
 
-const CATEGORY_SLUGS = [
-  'smartphones', 'ordinateurs', 'gaming', 'tv',
-  'electromenager', 'climatiseurs', 'energie-solaire', 'accessoires', 'audio',
-];
-
 export const revalidate = 3600;
 
-// NEXT_PUBLIC_API_BASE peut contenir "/api/v1" (env local) ou pas (Vercel).
-// Normalisation : l'API est servie sous https://tekalis.onrender.com/api/v1 et
-// ne doit JAMAIS doubler le préfixe (bug historique /api/v1/api/v1 → 404).
 const rawBase = process.env.NEXT_PUBLIC_API_BASE || 'https://tekalis.onrender.com/api/v1';
 const API_BASE = rawBase.replace(/\/+$/, '').replace(/\/api\/v1$/, '') + '/api/v1';
 
 const BLOCKED_STATUSES = new Set(['discontinued']);
 
-/**
- * Récupère TOUS les produits en paginant (le backend plafonne limit à 100).
- * Ne garde que les produits indexables (statut publiable).
- */
 async function fetchAllProducts() {
   const products = [];
-  const { revalidate: rev } = { revalidate: 3600 };
 
-  for (let page = 1; page <= 25; page += 1) {
-    const url = `${API_BASE}/products?page=${page}&limit=100&fields=_id,slug,status,updatedAt`;
-    const res = await fetch(url, { next: { revalidate: rev } });
-    if (!res.ok) break;
+  for (let page = 1; page <= 10; page += 1) {
+    const url = `${API_BASE}/products?page=${page}&limit=200&fields=_id,slug,status,updatedAt`;
+    const res = await fetch(url, { next: { revalidate: 3600 } });
+    if (!res.ok) throw new Error(`Products fetch failed: ${res.status}`);
     const data = await res.json();
-    const items = data?.products || data?.data || (Array.isArray(data) ? data : []);
+    const items = data?.data || data?.products || (Array.isArray(data) ? data : []);
     if (!Array.isArray(items) || items.length === 0) break;
     products.push(...items);
 
@@ -54,36 +41,59 @@ async function fetchAllProducts() {
   return products.filter((p) => p && !BLOCKED_STATUSES.has(p.status));
 }
 
+async function fetchAllCategories() {
+  const res = await fetch(`${API_BASE}/categories`, { next: { revalidate: 3600 } });
+  if (!res.ok) throw new Error(`Categories fetch failed: ${res.status}`);
+  const data = await res.json();
+  const categories = data?.categories || [];
+  return categories.reduce((acc, cat) => {
+    acc.push(cat);
+    if (cat.children) acc.push(...cat.children);
+    return acc;
+  }, []);
+}
+
 async function fetchAllArticles() {
-  try {
-    const res = await fetch(`${API_BASE}/articles?limit=200&fields=slug,updatedAt`, {
-      next: { revalidate: 3600 },
-    });
-    const data = await res.json();
-    return (data?.articles || data?.data || [])
-      .filter((a) => a.slug);
-  } catch {
-    return [];
-  }
+  const res = await fetch(`${API_BASE}/articles?limit=200&fields=slug,updatedAt`, {
+    next: { revalidate: 3600 },
+  });
+  if (!res.ok) throw new Error(`Articles fetch failed: ${res.status}`);
+  const data = await res.json();
+  return (data?.articles || data?.data || []).filter((a) => a.slug);
 }
 
 export default async function sitemap() {
-  // Pages statiques
   const staticEntries = STATIC_PAGES.map(({ url, ...rest }) => ({
     url: `${SITE_URL}${url}`,
     lastModified: new Date(),
     ...rest,
   }));
 
-  // Catégories
-  const categoryEntries = CATEGORY_SLUGS.map((slug) => ({
-    url: `${SITE_URL}/category/${slug}`,
-    lastModified: new Date(),
-    changeFrequency: 'daily',
-    priority: 0.9,
-  }));
+  let categoryEntries = [];
+  try {
+    const categories = await fetchAllCategories();
+    categoryEntries = categories
+      .filter((c) => c.isActive !== false)
+      .map((c) => ({
+        url: `${SITE_URL}/category/${c.slug}`,
+        lastModified: new Date(c.updatedAt || c.createdAt || Date.now()),
+        changeFrequency: 'daily',
+        priority: 0.9,
+      }));
+  } catch (err) {
+    console.error('[sitemap] Categories fetch failed, using fallback:', err.message);
+    const FALLBACK_SLUGS = [
+      'smartphones', 'ordinateurs', 'gaming', 'tv',
+      'electromenager', 'climatiseurs', 'energie-solaire', 'accessoires', 'audio',
+    ];
+    categoryEntries = FALLBACK_SLUGS.map((slug) => ({
+      url: `${SITE_URL}/category/${slug}`,
+      lastModified: new Date(),
+      changeFrequency: 'daily',
+      priority: 0.9,
+    }));
+  }
 
-  // Produits dynamiques (URLs SEO par slug, sinon _id)
   let productEntries = [];
   try {
     const products = await fetchAllProducts();
@@ -93,11 +103,10 @@ export default async function sitemap() {
       changeFrequency: 'weekly',
       priority: 0.8,
     }));
-  } catch {
-    // silencieux si API indisponible au build
+  } catch (err) {
+    console.error('[sitemap] Products fetch failed:', err.message);
   }
 
-  // Articles dynamiques
   let articleEntries = [];
   try {
     const articles = await fetchAllArticles();
@@ -107,8 +116,8 @@ export default async function sitemap() {
       changeFrequency: 'monthly',
       priority: 0.6,
     }));
-  } catch {
-    // silencieux
+  } catch (err) {
+    console.error('[sitemap] Articles fetch failed:', err.message);
   }
 
   return [...staticEntries, ...categoryEntries, ...productEntries, ...articleEntries];

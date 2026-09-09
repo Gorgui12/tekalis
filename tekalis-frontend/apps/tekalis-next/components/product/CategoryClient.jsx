@@ -21,7 +21,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchProducts } from "@/store/slices/productSlice";
 import ProductCard from "@/components/product/ProductCard";
 import { Breadcrumb } from "@/components/seo/Breadcrumb";
-import PageMeta from "@/components/seo/PageMeta";
 import { FaFilter, FaThLarge, FaList, FaTruck, FaShieldAlt } from "react-icons/fa";
 
 // ── Metadata SEO par catégorie ────────────────────────────────────────────────
@@ -154,8 +153,10 @@ const CategoryPage = ({ products: initialProducts = [], seo: initialSeo, slug: i
 
   const seo = initialSeo ?? CATEGORY_SEO[slug] ?? DEFAULT_SEO(slug);
   
-  // Utiliser les produits SSR initiaux, puis Redux si disponible
-  const items = initialProducts.length > 0 ? initialProducts : reduxItems;
+  // Utiliser les produits SSR initiaux (déjà filtrés par le backend),
+  // puis Redux si aucune donnée SSR n'est disponible.
+  const usingServerData = initialProducts.length > 0;
+  const items = usingServerData ? initialProducts : reduxItems;
 
   useEffect(() => {
     // Charger les produits via Redux pour les interactions client
@@ -167,7 +168,13 @@ const CategoryPage = ({ products: initialProducts = [], seo: initialSeo, slug: i
     if (!items || !Array.isArray(items)) return [];
     let result = [...items];
 
-    if (slug) {
+    // Le filtre par slug n'est appliqué QUE si les produits viennent de
+    // Redux (liste complète non filtrée). Les produits SSR sont déjà
+    // filtrés côté serveur via GET /products?category=<id> : réappliquer
+    // un filtre textuel (name.includes(slug)) casserait les catégories
+    // dont le nom accentué ne contient pas le slug normalisé
+    // (ex: "Électroménager" ne contient pas "electromenager").
+    if (slug && !usingServerData) {
       result = result.filter((p) => {
         const categories = Array.isArray(p.category) ? p.category : p.category ? [p.category] : [];
         return categories.some((cat) => {
@@ -188,7 +195,7 @@ const CategoryPage = ({ products: initialProducts = [], seo: initialSeo, slug: i
       case "rating": return sorted.sort((a, b) => (b.rating?.average || 0) - (a.rating?.average || 0));
       default: return sorted.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
     }
-  }, [items, slug, filters]);
+  }, [items, slug, filters, usingServerData]);
 
   // Marques disponibles
   const availableBrands = useMemo(() => {
@@ -204,34 +211,6 @@ const CategoryPage = ({ products: initialProducts = [], seo: initialSeo, slug: i
     }));
   };
 
-  // Schema.org pour la catégorie
-  const categorySchema = {
-    '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
-    name: seo.h1,
-    description: seo.description,
-    url: `https://tekalis.com/category/${slug}`,
-    breadcrumb: {
-      '@type': 'BreadcrumbList',
-      itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Accueil', item: 'https://tekalis.com' },
-        { '@type': 'ListItem', position: 2, name: 'Produits', item: 'https://tekalis.com/products' },
-        { '@type': 'ListItem', position: 3, name: seo.h1, item: `https://tekalis.com/category/${slug}` },
-      ],
-    },
-  };
-
-  // Schema FAQ si disponible
-  const faqSchema = seo.faqs && seo.faqs.length > 0 ? {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: seo.faqs.map((faq) => ({
-      '@type': 'Question',
-      name: faq.q,
-      acceptedAnswer: { '@type': 'Answer', text: faq.a },
-    })),
-  } : null;
-
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center mt-20">
@@ -245,18 +224,6 @@ const CategoryPage = ({ products: initialProducts = [], seo: initialSeo, slug: i
 
   return (
     <div className="min-h-screen bg-surface-50 py-8 mt-20">
-
-      {/* ── SEO HEAD ──────────────────────────────────────────────────────── */}
-      <PageMeta
-        title={seo.title}
-        description={seo.description}
-        keywords={seo.keywords}
-        canonical={`https://tekalis.com/category/${slug}`}
-        schema={categorySchema}
-      />
-      {faqSchema && (
-        <script type="application/ld+json">{JSON.stringify(faqSchema)}</script>
-      )}
 
       <div className="container mx-auto px-4">
 

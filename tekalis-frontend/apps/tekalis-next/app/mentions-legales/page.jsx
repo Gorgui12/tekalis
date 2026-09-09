@@ -79,6 +79,13 @@ export const metadata = {
   description:
     "Mentions légales du site tekalis.com — éditeur, hébergement, propriété intellectuelle et responsabilité. Tekalis, boutique high-tech à Fann, Dakar.",
   alternates: { canonical: "https://tekalis.com/mentions-legales" },
+  openGraph: {
+    title: "Mentions légales | Tekalis",
+    description: "Éditeur, hébergement et responsabilité — Tekalis, boutique high-tech à Fann, Dakar.",
+    url: "https://tekalis.com/mentions-legales",
+    siteName: "Tekalis Sénégal",
+    locale: "fr_SN",
+  },
 };
 
 export default function MentionsLegalesPage() {

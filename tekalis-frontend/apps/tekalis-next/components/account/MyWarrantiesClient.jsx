@@ -94,7 +94,7 @@ const MyWarranties = () => {
                 className="w-20 h-20 object-contain rounded border border-surface-200 dark:border-surface-700"
               />
               <div>
-                <Link href={`/products/${warranty.product?._id}`}
+                <Link href={`/products/${warranty.product?.slug || warranty.product?._id}`}
                   className="font-bold text-surface-900 dark:text-white hover:text-brand-600 dark:hover:text-brand-400 block mb-1"
                 >
                   {warranty.product?.name || "Produit"}

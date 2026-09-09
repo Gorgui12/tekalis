@@ -15,7 +15,6 @@ import {
   FaTag
 } from "react-icons/fa";
 import api from "@/lib/api";
-import PageMeta from "@/components/seo/PageMeta";
 import { sanitizeArticleHtml } from "@/lib/sanitizeHtml";
 
 const ArticleDetails = ({ article: initialArticle, related: initialRelated }) => {
@@ -208,28 +207,6 @@ const ArticleDetails = ({ article: initialArticle, related: initialRelated }) =>
 
   return (
     <div className="min-h-screen bg-surface-50">
-      <PageMeta
-        title={`${article.title} | Blog Tekalis`}
-        description={article.excerpt || article.title}
-        image={article.image ? `https://tekalis.com${article.image}` : undefined}
-        keywords={[
-          ...(article.tags || []),
-          'blog tech Sénégal',
-          'guide achat Dakar',
-          'tekalis blog',
-        ]}
-        type="article"
-        canonical={`https://tekalis.com/blog/${article.slug}`}
-        breadcrumbs={[
-          { name: 'Blog', url: '/blog' },
-          { name: article.title, url: `/blog/${article.slug}` },
-        ]}
-        articleData={{
-          publishedAt: article.publishedAt,
-          modifiedAt: article.updatedAt,
-          author: authorName,
-        }}
-      />
 
       {/* Hero Image */}
       <div className="relative h-[32rem] bg-surface-900 mt-20">

@@ -193,7 +193,7 @@ const OrderDetails = () => {
                       className="w-24 h-24 object-contain rounded border border-surface-200 dark:border-surface-700"
                     />
                     <div className="flex-1">
-                      <Link href={`/products/${item.product?._id}`}
+                      <Link href={`/products/${item.product?.slug || item.product?._id}`}
                         className="font-semibold text-surface-900 dark:text-white hover:text-brand-600 dark:hover:text-brand-400 block mb-1"
                       >
                         {item.product?.name || "Produit"}

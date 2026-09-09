@@ -41,7 +41,7 @@ const ResultItem = ({ product, onSelect }) => {
     : 0;
 
   return (
-    <Link href={`/products/${product._id}`}
+    <Link href={`/products/${product.slug || product._id}`}
       onClick={onSelect}
         className="flex items-center gap-3 px-4 py-3 hover:bg-surface-50 dark:hover:bg-surface-800 transition group"
     >

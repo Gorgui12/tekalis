@@ -86,7 +86,7 @@ exports.getProducts = async (req, res) => {
       .reduce((acc, f) => { acc[f] = 1; return acc; }, {});
 
     const pageNum = Math.max(1, Number(page));
-    const limitNum = Math.min(100, Math.max(1, Number(limit)));
+    const limitNum = Math.min(200, Math.max(1, Number(limit)));
     const skip = (pageNum - 1) * limitNum;
 
     const [products, total] = await Promise.all([

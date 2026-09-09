@@ -2,9 +2,9 @@
 import HomeClient from '@/components/home/HomeClient';
 
 export const metadata = {
-  title: 'Tekalis — Boutique Électronique Dakar Fann | Smartphones, Laptops, TV | Livraison Sénégal',
+  title: 'Tekalis — Boutique Électronique Dakar Fann | Livraison Sénégal',
   description:
-    'Tekalis, votre boutique électronique à Dakar Fann. Smartphones iPhone Samsung, ordinateurs portables HP Dell Lenovo, TV 4K, électroménager. Livraison rapide dans toute la région de Dakar. Paiement Wave, Orange Money, Free Money. Garantie constructeur incluse.',
+    'Smartphones, laptops, TV et électroménager à Dakar Fann. iPhone, Samsung, HP, Dell. Livraison rapide au Sénégal. Paiement Wave, Orange Money. Garantie incluse.',
   keywords: [
     'électronique Dakar Fann', 'smartphone Dakar', 'ordinateur portable Sénégal', 'TV Dakar',
     'électroménager Dakar', 'boutique tech Dakar', 'Tekalis', 'livraison Dakar',
@@ -12,8 +12,8 @@ export const metadata = {
   ],
   alternates: { canonical: 'https://tekalis.com/' },
   openGraph: {
-    title: 'Tekalis — Boutique Électronique Dakar Fann | Smartphones, Laptops, TV',
-    description: 'Smartphones, ordinateurs, TV et électroménager à Dakar Fann. Livraison rapide dans toute la région de Dakar. Garantie incluse.',
+    title: 'Tekalis — Boutique Électronique Dakar Fann',
+    description: 'Smartphones, laptops, TV et électroménager à Dakar Fann. Livraison rapide, garantie incluse.',
     url: 'https://tekalis.com',
     siteName: 'Tekalis Sénégal',
     locale: 'fr_SN',
@@ -24,26 +24,22 @@ export const metadata = {
 export const revalidate = 3600;
 
 async function getHomeData() {
-  try {
-    const [productsData, articlesData] = await Promise.allSettled([
-      serverFetch('/products'),
-      serverFetch('/articles?limit=3'),
-    ]);
+  const [productsData, articlesData] = await Promise.allSettled([
+    serverFetch('/products'),
+    serverFetch('/articles?limit=3'),
+  ]);
 
-    const products =
-      productsData.status === 'fulfilled'
-        ? productsData.value?.products || productsData.value?.data || productsData.value || []
-        : [];
+  const products =
+    productsData.status === 'fulfilled'
+      ? productsData.value?.data || productsData.value?.products || productsData.value || []
+      : [];
 
-    const articles =
-      articlesData.status === 'fulfilled'
-        ? articlesData.value?.articles || articlesData.value?.data || []
-        : [];
+  const articles =
+    articlesData.status === 'fulfilled'
+      ? articlesData.value?.articles || articlesData.value?.data || []
+      : [];
 
-    return { products, articles };
-  } catch {
-    return { products: [], articles: [] };
-  }
+  return { products, articles };
 }
 
 // Schema.org WebSite (boîte de recherche Google)

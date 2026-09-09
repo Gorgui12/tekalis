@@ -33,6 +33,13 @@ export const metadata = {
   description:
     "Garantie constructeur sur tous les produits tekalis.com : durée, couverture, procédure SAV simple depuis votre espace client. Réparation, échange ou remboursement.",
   alternates: { canonical: "https://tekalis.com/garanties" },
+  openGraph: {
+    title: "Garanties & SAV | Tekalis",
+    description: "Garantie constructeur sur tous les produits, SAV simple depuis ton espace client.",
+    url: "https://tekalis.com/garanties",
+    siteName: "Tekalis Sénégal",
+    locale: "fr_SN",
+  },
 };
 
 export default function GarantiesPage() {
