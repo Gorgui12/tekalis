@@ -101,6 +101,9 @@ router.post("/articles", (req, res) => {
   articleController.createArticle(req, res);
 });
 
+// GET /admin/articles/:id — détail article (édition)
+router.get("/articles/:id", articleController.getArticleById);
+
 router.put("/articles/:id/publish", articleController.togglePublish);
 router.put("/articles/:id", articleController.updateArticle);
 router.delete("/articles/:id", articleController.deleteArticle);

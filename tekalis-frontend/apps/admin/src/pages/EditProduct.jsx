@@ -70,53 +70,54 @@ const EditProduct = () => {
   const fetchProduct = async () => {
     try {
       const { data } = await api.get(`/products/${id}`);
+      const product = data.data;
       
       // Formatter les données pour le formulaire
       setFormData({
-        name: data.name || "",
-        slug: data.slug || "",
-        description: data.description || "",
-        price: data.price || "",
-        comparePrice: data.comparePrice || "",
-        stock: data.stock || "",
-        images: data.images?.length > 0 ? data.images : [{ url: "", alt: "", isPrimary: true }],
-        category: data.category?.map(cat => typeof cat === 'object' ? cat._id : cat) || [],
-        brand: data.brand || "",
+        name: product.name || "",
+        slug: product.slug || "",
+        description: product.description || "",
+        price: product.price || "",
+        comparePrice: product.comparePrice || "",
+        stock: product.stock || "",
+        images: product.images?.length > 0 ? product.images : [{ url: "", alt: "", isPrimary: true }],
+        category: product.category?.map(cat => typeof cat === 'object' ? cat._id : cat) || [],
+        brand: product.brand || "",
         specs: {
-          processor: data.specs?.processor || "",
-          processorBrand: data.specs?.processorBrand || "",
-          processorGeneration: data.specs?.processorGeneration || "",
-          ram: data.specs?.ram || "",
-          ramType: data.specs?.ramType || "",
-          storage: data.specs?.storage || "",
-          storageType: data.specs?.storageType || "",
-          screen: data.specs?.screen || "",
-          screenTech: data.specs?.screenTech || "",
-          refreshRate: data.specs?.refreshRate || "",
-          graphics: data.specs?.graphics || "",
-          graphicsMemory: data.specs?.graphicsMemory || "",
-          connectivity: data.specs?.connectivity || [],
-          ports: data.specs?.ports || [],
-          os: data.specs?.os || "",
-          battery: data.specs?.battery || "",
-          weight: data.specs?.weight || "",
-          dimensions: data.specs?.dimensions || "",
-          color: data.specs?.color || [],
-          camera: data.specs?.camera || "",
-          frontCamera: data.specs?.frontCamera || "",
-          batteryCapacity: data.specs?.batteryCapacity || "",
-          rgb: data.specs?.rgb || false,
-          coolingSystem: data.specs?.coolingSystem || ""
+          processor: product.specs?.processor || "",
+          processorBrand: product.specs?.processorBrand || "",
+          processorGeneration: product.specs?.processorGeneration || "",
+          ram: product.specs?.ram || "",
+          ramType: product.specs?.ramType || "",
+          storage: product.specs?.storage || "",
+          storageType: product.specs?.storageType || "",
+          screen: product.specs?.screen || "",
+          screenTech: product.specs?.screenTech || "",
+          refreshRate: product.specs?.refreshRate || "",
+          graphics: product.specs?.graphics || "",
+          graphicsMemory: product.specs?.graphicsMemory || "",
+          connectivity: product.specs?.connectivity || [],
+          ports: product.specs?.ports || [],
+          os: product.specs?.os || "",
+          battery: product.specs?.battery || "",
+          weight: product.specs?.weight || "",
+          dimensions: product.specs?.dimensions || "",
+          color: product.specs?.color || [],
+          camera: product.specs?.camera || "",
+          frontCamera: product.specs?.frontCamera || "",
+          batteryCapacity: product.specs?.batteryCapacity || "",
+          rgb: product.specs?.rgb || false,
+          coolingSystem: product.specs?.coolingSystem || ""
         },
         warranty: {
-          duration: data.warranty?.duration || 12,
-          type: data.warranty?.type || "constructeur"
+          duration: product.warranty?.duration || 12,
+          type: product.warranty?.type || "constructeur"
         },
-        tags: data.tags || [],
-        status: data.status || "available",
-        isFeatured: data.isFeatured || false,
-        metaTitle: data.metaTitle || "",
-        metaDescription: data.metaDescription || ""
+        tags: product.tags || [],
+        status: product.status || "available",
+        isFeatured: product.isFeatured || false,
+        metaTitle: product.metaTitle || "",
+        metaDescription: product.metaDescription || ""
       });
     } catch (error) {
       console.error("Erreur chargement produit:", error);

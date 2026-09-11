@@ -96,6 +96,23 @@ exports.getArticleBySlug = async (req, res) => {
   }
 };
 
+// Récupérer un article par ID (Admin — édition)
+exports.getArticleById = async (req, res) => {
+  try {
+    const article = await Article.findById(req.params.id)
+      .populate("author", "name avatar")
+      .populate("relatedProducts", "name images price rating");
+
+    if (!article) {
+      return res.status(404).json({ success: false, message: "Article introuvable" });
+    }
+
+    res.status(200).json({ success: true, article });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // Créer un article (Admin)
 exports.createArticle = async (req, res) => {
   try {

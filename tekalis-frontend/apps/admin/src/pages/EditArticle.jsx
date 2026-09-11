@@ -32,7 +32,18 @@ const EditArticle = () => {
   const fetchArticle = async () => {
     try {
       const { data } = await api.get(`/admin/articles/${id}`);
-      setFormData(data.article || EMPTY_ARTICLE);
+      const article = data.article || {};
+      setFormData({
+        title: article.title || "",
+        slug: article.slug || "",
+        excerpt: article.excerpt || "",
+        content: article.content || "",
+        category: article.category || "test",
+        tags: article.tags || [],
+        featuredImage: article.coverImage || "",
+        status: article.status || "draft",
+        featured: article.isFeatured || false
+      });
     } catch (error) {
       console.error("Erreur chargement article:", error);
       setFormData(EMPTY_ARTICLE);
@@ -46,7 +57,15 @@ const EditArticle = () => {
     setSaving(true);
 
     try {
-      await api.put(`/admin/articles/${id}`, formData);
+      const payload = {
+        ...formData,
+        coverImage: formData.featuredImage,
+        isFeatured: formData.featured
+      };
+      delete payload.featuredImage;
+      delete payload.featured;
+
+      await api.put(`/admin/articles/${id}`, payload);
       toast.success("Article mis à jour avec succès !");
       navigate("/articles");
     } catch (error) {
