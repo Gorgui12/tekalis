@@ -9,7 +9,7 @@ import {
   FaClock,
   FaExclamationTriangle
 } from "react-icons/fa";
-import api from "../../../../packages/shared/api/api";
+import api from "@shared/api/api";
 
 const AdminWarranties = () => {
   const [warranties, setWarranties] = useState([]);
@@ -25,50 +25,25 @@ const AdminWarranties = () => {
     try {
       const params = statusFilter !== "all" ? `?status=${statusFilter}` : "";
       const { data } = await api.get(`/admin/warranties${params}`);
-      setWarranties(data.warranties || getDemoWarranties());
+      setWarranties(data.warranties || []);
     } catch (error) {
       console.error("Erreur chargement garanties:", error);
-      setWarranties(getDemoWarranties());
+      setWarranties([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const getDemoWarranties = () => [
-    {
-      _id: "1",
-      orderNumber: "CMD-2025-001",
-      customer: { name: "Mamadou Diop", email: "mamadou@email.com" },
-      product: { name: "HP Pavilion Gaming 15", model: "15-DK2045NF" },
-      warrantyType: "manufacturer",
-      startDate: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000),
-      endDate: new Date(Date.now() + 275 * 24 * 60 * 60 * 1000),
-      status: "active",
-      serialNumber: "5CD123ABCD"
-    },
-    {
-      _id: "2",
-      orderNumber: "CMD-2024-156",
-      customer: { name: "Fatou Sall", email: "fatou@email.com" },
-      product: { name: "Dell XPS 13", model: "XPS13-9310" },
-      warrantyType: "extended",
-      startDate: new Date(Date.now() - 300 * 24 * 60 * 60 * 1000),
-      endDate: new Date(Date.now() + 65 * 24 * 60 * 60 * 1000),
-      status: "expiring_soon",
-      serialNumber: "DXPS987654"
-    },
-    {
-      _id: "3",
-      orderNumber: "CMD-2023-089",
-      customer: { name: "Ousmane Dia", email: "ousmane@email.com" },
-      product: { name: "MacBook Pro 14", model: "M1 Pro 2021" },
-      warrantyType: "manufacturer",
-      startDate: new Date(Date.now() - 400 * 24 * 60 * 60 * 1000),
-      endDate: new Date(Date.now() - 35 * 24 * 60 * 60 * 1000),
-      status: "expired",
-      serialNumber: "MBP202145678"
+  // Mettre à jour le statut (active ↔ suspended / claimed)
+  const updateStatus = async (id, status) => {
+    try {
+      await api.put(`/admin/warranties/${id}/status`, { status });
+      fetchWarranties();
+    } catch (error) {
+      console.error("Erreur maj statut garantie:", error);
+      alert("Erreur lors de la mise à jour du statut");
     }
-  ];
+  };
 
   // Calculer les jours restants
   const getDaysRemaining = (endDate) => {
@@ -81,8 +56,8 @@ const AdminWarranties = () => {
   // Filtrer les garanties
   const filteredWarranties = warranties.filter(warranty => {
     const matchesSearch = 
-      warranty.orderNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      warranty.customer?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      warranty.order?.orderNumber?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (warranty.user?.name || warranty.customer?.name || "")?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       warranty.product?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       warranty.serialNumber?.toLowerCase().includes(searchTerm.toLowerCase());
     
@@ -112,6 +87,18 @@ const AdminWarranties = () => {
         icon: <FaClock />,
         label: "Expire bientôt" 
       },
+      suspended: { 
+        bg: "bg-gray-100", 
+        text: "text-gray-700", 
+        icon: <FaShieldAlt />,
+        label: "Suspendue" 
+      },
+      claimed: { 
+        bg: "bg-purple-100", 
+        text: "text-purple-700", 
+        icon: <FaTimes />,
+        label: "Réclamée" 
+      },
       expired: { 
         bg: "bg-red-100", 
         text: "text-red-700", 
@@ -132,7 +119,8 @@ const AdminWarranties = () => {
   const WarrantyTypeBadge = ({ type }) => {
     const types = {
       manufacturer: { label: "Constructeur", color: "blue" },
-      extended: { label: "Extension", color: "purple" }
+      extended: { label: "Extension", color: "purple" },
+      commercial: { label: "Commerciale", color: "teal" }
     };
     const config = types[type] || types.manufacturer;
 
@@ -157,7 +145,7 @@ const AdminWarranties = () => {
         {/* Header */}
         <div className="mb-8">
           <Link
-            to="/admin"
+            to="/dashboard"
             className="text-blue-600 hover:text-blue-700 font-semibold mb-4 inline-block"
           >
             ← Retour au dashboard
@@ -214,6 +202,7 @@ const AdminWarranties = () => {
               <option value="all">Tous les statuts</option>
               <option value="active">Actives</option>
               <option value="expiring_soon">Expirent bientôt</option>
+              <option value="suspended">Suspendues</option>
               <option value="expired">Expirées</option>
             </select>
           </div>
@@ -251,23 +240,23 @@ const AdminWarranties = () => {
                       <tr key={warranty._id} className="border-b hover:bg-gray-50">
                         <td className="py-3 px-4">
                           <p className="font-semibold text-sm text-gray-900">
-                            {warranty.orderNumber}
+                            {warranty.order?.orderNumber}
                           </p>
                         </td>
                         <td className="py-3 px-4">
                           <p className="text-sm font-medium text-gray-900">
-                            {warranty.customer.name}
+                            {warranty.user?.name || warranty.customer?.name}
                           </p>
                           <p className="text-xs text-gray-500">
-                            {warranty.customer.email}
+                            {warranty.user?.email || warranty.customer?.email}
                           </p>
                         </td>
                         <td className="py-3 px-4">
                           <p className="text-sm font-medium text-gray-900">
-                            {warranty.product.name}
+                            {warranty.product?.name}
                           </p>
                           <p className="text-xs text-gray-500">
-                            {warranty.product.model}
+                            {warranty.product?.brand}
                           </p>
                         </td>
                         <td className="py-3 px-4">
@@ -276,7 +265,7 @@ const AdminWarranties = () => {
                           </p>
                         </td>
                         <td className="py-3 px-4">
-                          <WarrantyTypeBadge type={warranty.warrantyType} />
+                          <WarrantyTypeBadge type={warranty.warrantyTypeLabel || warranty.warrantyType} />
                         </td>
                         <td className="py-3 px-4">
                           <p className="text-sm text-gray-900">
@@ -300,6 +289,22 @@ const AdminWarranties = () => {
                         </td>
                         <td className="py-3 px-4">
                           <div className="flex items-center justify-center gap-2">
+                            {warranty.status === "active" && (
+                              <button
+                                onClick={() => updateStatus(warranty._id, "suspended")}
+                                className="text-red-600 hover:text-red-700 py-1 text-sm font-semibold"
+                              >
+                                Suspendre
+                              </button>
+                            )}
+                            {warranty.status === "suspended" && (
+                              <button
+                                onClick={() => updateStatus(warranty._id, "active")}
+                                className="text-green-600 hover:text-green-700 py-1 text-sm font-semibold"
+                              >
+                                Réactiver
+                              </button>
+                            )}
                             <button
                               onClick={() => alert("Voir détails - À implémenter")}
                               className="text-blue-600 hover:text-blue-700 px-3 py-1 rounded-lg text-sm font-semibold"

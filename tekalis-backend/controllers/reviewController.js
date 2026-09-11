@@ -210,8 +210,43 @@ exports.getAllReviews = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      reviews,
+      reviews: reviews.map(r => {
+        const obj = r.toObject();
+        obj.status = r.status && r.status !== "pending"
+          ? r.status
+          : (r.isApproved ? "approved" : "rejected");
+        return obj;
+      }),
       pagination: { page: Number(page), total, pages: Math.ceil(total / Number(limit)) }
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// ===============================================
+// PUT /api/v1/reviews/:id/approve|reject — Admin (statut explicite)
+// ===============================================
+exports.setApproval = async (req, res) => {
+  try {
+    const review = await Review.findById(req.params.id);
+    if (!review) {
+      return res.status(404).json({ message: "Avis introuvable" });
+    }
+
+    const approved = req.body.isApproved === true;
+    review.isApproved = approved;
+    review.status = approved ? "approved" : "rejected";
+    await review.save();
+    await updateProductRating(review.product);
+
+    res.status(200).json({
+      success: true,
+      message: `Avis ${approved ? "approuvé" : "rejeté"}`,
+      review: {
+        ...review.toObject(),
+        status: review.status
+      }
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -229,6 +264,7 @@ exports.toggleApprove = async (req, res) => {
     }
 
     review.isApproved = !review.isApproved;
+    review.status = review.isApproved ? "approved" : "rejected";
     await review.save();
     await updateProductRating(review.product);
 

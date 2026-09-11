@@ -4,7 +4,7 @@ import {
   ORDER_STATUS_COLORS,
   RMA_STATUS_LABELS,
   WARRANTY_STATUS,
-} from '../../../../../packages/shared/outils/constants';
+} from '@shared/outils/constants';
 
 /**
  * StatusBadge — Badge de statut universel

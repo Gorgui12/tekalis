@@ -8,14 +8,11 @@ import {
   FaEnvelope,
   FaCreditCard,
   FaBox,
-  FaTruck,
-  FaCheckCircle,
   FaPrint,
-  FaEdit,
   FaTrash
 } from "react-icons/fa";
-import api from "../../../../packages/shared/api/api";
-import { useToast } from '../../../../packages/shared/context/ToastContext';
+import api from "@shared/api/api";
+import { useToast } from '@shared/context/ToastContext';
 
 const AdminOrderDetails = () => {
   const toast = useToast();
@@ -32,57 +29,14 @@ const AdminOrderDetails = () => {
   const fetchOrderDetails = async () => {
     try {
       const { data } = await api.get(`/admin/orders/${id}`);
-      setOrder(data.order || getDemoOrder());
+      setOrder(data.order || null);
     } catch (error) {
       console.error("Erreur chargement commande:", error);
-      setOrder(getDemoOrder());
+      setOrder(null);
     } finally {
       setLoading(false);
     }
   };
-
-  const getDemoOrder = () => ({
-    _id: id,
-    orderNumber: "CMD-2025-001",
-    customer: {
-      name: "Mamadou Diop",
-      email: "mamadou@email.com",
-      phone: "+221 77 123 45 67"
-    },
-    deliveryAddress: {
-      street: "Rue 10, Quartier Plateau",
-      city: "Dakar",
-      postalCode: "12000",
-      country: "Sénégal"
-    },
-    products: [
-      {
-        _id: "1",
-        name: "HP Pavilion Gaming 15",
-        image: "https://via.placeholder.com/100",
-        price: 850000,
-        quantity: 1,
-        total: 850000
-      }
-    ],
-    subtotal: 850000,
-    shipping: 5000,
-    tax: 0,
-    totalPrice: 855000,
-    status: "pending",
-    paymentMethod: "cash",
-    paymentStatus: "pending",
-    tracking: {
-      number: "TRK123456789",
-      carrier: "DHL Express",
-      url: "https://dhl.com/track/TRK123456789"
-    },
-    timeline: [
-      { status: "pending", date: new Date(), message: "Commande reçue" }
-    ],
-    createdAt: new Date(),
-    notes: ""
-  });
 
   const updateStatus = async (newStatus) => {
     if (!window.confirm(`Changer le statut en "${newStatus}" ?`)) return;
@@ -105,7 +59,7 @@ const AdminOrderDetails = () => {
     try {
       await api.delete(`/admin/orders/${id}`);
       toast.success("Commande supprimée avec succès");
-      navigate("/admin/orders");
+      navigate("/orders");
     } catch (error) {
       toast.error("Erreur lors de la suppression de la commande");
     }
@@ -129,6 +83,16 @@ const AdminOrderDetails = () => {
     );
   };
 
+  const items = order?.products || [];
+  const customerName = order?.customerInfo?.name || order?.user?.name || order?.deliveryName || "Client";
+  const customerEmail = order?.customerInfo?.email || order?.user?.email || "";
+  const customerPhone = order?.customerInfo?.phone || order?.deliveryPhone || "";
+  const subtotal = items.reduce(
+    (sum, p) => sum + (p.price || p.product?.price || 0) * (p.quantity || 1),
+    0
+  );
+  const shipping = order?.shippingCost || 0;
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -142,7 +106,7 @@ const AdminOrderDetails = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <p className="text-gray-600 mb-4">Commande non trouvée</p>
-          <Link to="/admin/orders" className="text-blue-600 hover:text-blue-700 font-semibold">
+          <Link to="/orders" className="text-blue-600 hover:text-blue-700 font-semibold">
             Retour aux commandes
           </Link>
         </div>
@@ -156,7 +120,7 @@ const AdminOrderDetails = () => {
         {/* Header */}
         <div className="mb-8">
           <Link
-            to="/admin/orders"
+            to="/orders"
             className="text-blue-600 hover:text-blue-700 font-semibold mb-4 inline-flex items-center gap-2"
           >
             <FaArrowLeft /> Retour aux commandes
@@ -234,86 +198,59 @@ const AdminOrderDetails = () => {
               </h2>
 
               <div className="space-y-4">
-                {order.products.map((product) => (
-                  <div key={product._id} className="flex gap-4 pb-4 border-b last:border-b-0">
-                    <img
-                      src={product.image}
-                      alt={product.name}
-                      className="w-20 h-20 object-cover rounded-lg"
-                    />
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900 mb-1">
-                        {product.name}
-                      </h3>
-                      <p className="text-sm text-gray-600">
-                        Quantité: {product.quantity}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        Prix unitaire: {product.price.toLocaleString()} FCFA
-                      </p>
+                {items.map((item) => {
+                  const product = item.product || {};
+                  const unitPrice = item.price || product.price || 0;
+                  const image = Array.isArray(product.images)
+                    ? (product.images[0]?.url || product.images[0])
+                    : product.images;
+                  const lineTotal = unitPrice * (item.quantity || 1);
+                  return (
+                    <div key={item._id || product._id} className="flex gap-4 pb-4 border-b last:border-b-0">
+                      {image && (
+                        <img
+                          src={image}
+                          alt={product.name}
+                          className="w-20 h-20 object-cover rounded-lg"
+                        />
+                      )}
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-900 mb-1">
+                          {product.name}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          Quantité: {item.quantity}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Prix unitaire: {unitPrice.toLocaleString()} FCFA
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-gray-900">
+                          {lineTotal.toLocaleString()} FCFA
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-bold text-gray-900">
-                        {product.total.toLocaleString()} FCFA
-                      </p>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
 
               {/* Total */}
               <div className="mt-6 pt-6 border-t space-y-2">
                 <div className="flex justify-between text-gray-700">
                   <span>Sous-total</span>
-                  <span>{order.subtotal.toLocaleString()} FCFA</span>
+                  <span>{subtotal.toLocaleString()} FCFA</span>
                 </div>
                 <div className="flex justify-between text-gray-700">
                   <span>Livraison</span>
-                  <span>{order.shipping.toLocaleString()} FCFA</span>
+                  <span>{shipping.toLocaleString()} FCFA</span>
                 </div>
-                {order.tax > 0 && (
-                  <div className="flex justify-between text-gray-700">
-                    <span>Taxes</span>
-                    <span>{order.tax.toLocaleString()} FCFA</span>
-                  </div>
-                )}
                 <div className="flex justify-between text-xl font-bold text-gray-900 pt-2 border-t">
                   <span>Total</span>
                   <span>{order.totalPrice.toLocaleString()} FCFA</span>
                 </div>
               </div>
             </div>
-
-            {/* Tracking */}
-            {order.tracking && (
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <FaTruck /> Suivi de livraison
-                </h2>
-                
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <div className="grid sm:grid-cols-2 gap-4 mb-4">
-                    <div>
-                      <p className="text-sm text-gray-600 mb-1">Numéro de suivi</p>
-                      <p className="font-semibold text-gray-900">{order.tracking.number}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-600 mb-1">Transporteur</p>
-                      <p className="font-semibold text-gray-900">{order.tracking.carrier}</p>
-                    </div>
-                  </div>
-                  
-                  <a
-                    href={order.tracking.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold inline-block"
-                  >
-                    Suivre le colis →
-                  </a>
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Sidebar */}
@@ -327,22 +264,26 @@ const AdminOrderDetails = () => {
               <div className="space-y-3">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Nom</p>
-                  <p className="font-semibold text-gray-900">{order.customer.name}</p>
+                  <p className="font-semibold text-gray-900">{customerName}</p>
                 </div>
                 
-                <div className="flex items-center gap-2 text-gray-700">
-                  <FaEnvelope className="text-gray-400" />
-                  <a href={`mailto:${order.customer.email}`} className="hover:text-blue-600">
-                    {order.customer.email}
-                  </a>
-                </div>
+                {customerEmail && (
+                  <div className="flex items-center gap-2 text-gray-700">
+                    <FaEnvelope className="text-gray-400" />
+                    <a href={`mailto:${customerEmail}`} className="hover:text-blue-600">
+                      {customerEmail}
+                    </a>
+                  </div>
+                )}
                 
-                <div className="flex items-center gap-2 text-gray-700">
-                  <FaPhone className="text-gray-400" />
-                  <a href={`tel:${order.customer.phone}`} className="hover:text-blue-600">
-                    {order.customer.phone}
-                  </a>
-                </div>
+                {customerPhone && (
+                  <div className="flex items-center gap-2 text-gray-700">
+                    <FaPhone className="text-gray-400" />
+                    <a href={`tel:${customerPhone}`} className="hover:text-blue-600">
+                      {customerPhone}
+                    </a>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -353,10 +294,13 @@ const AdminOrderDetails = () => {
               </h2>
               
               <div className="text-gray-700 space-y-1">
-                <p>{order.deliveryAddress.street}</p>
-                <p>{order.deliveryAddress.city}</p>
-                <p>{order.deliveryAddress.postalCode}</p>
-                <p className="font-semibold">{order.deliveryAddress.country}</p>
+                <p>{order.deliveryAddress}</p>
+                <p>{order.deliveryName}</p>
+                <p>{order.deliveryPhone}</p>
+                <p>{order.deliveryCity}</p>
+                {order.deliveryRegion && order.deliveryRegion !== order.deliveryCity && (
+                  <p>{order.deliveryRegion}</p>
+                )}
               </div>
             </div>
 
@@ -374,6 +318,7 @@ const AdminOrderDetails = () => {
                     {order.paymentMethod === "wave" && "Wave"}
                     {order.paymentMethod === "om" && "Orange Money"}
                     {order.paymentMethod === "card" && "Carte bancaire"}
+                    {["online", "free"].includes(order.paymentMethod) && order.paymentMethod}
                   </p>
                 </div>
                 
@@ -384,24 +329,14 @@ const AdminOrderDetails = () => {
                       ? "bg-green-100 text-green-700" 
                       : "bg-yellow-100 text-yellow-700"
                   }`}>
-                    {order.paymentStatus === "paid" ? "Payé" : "En attente"}
+                    {order.paymentStatus === "paid"
+                      ? "Payé"
+                      : order.paymentStatus === "failed"
+                        ? "Échoué"
+                        : "En attente"}
                   </span>
                 </div>
               </div>
-            </div>
-
-            {/* Notes */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Notes internes</h2>
-              <textarea
-                placeholder="Ajouter des notes..."
-                rows={4}
-                className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                defaultValue={order.notes}
-              ></textarea>
-              <button className="mt-3 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold w-full">
-                Enregistrer
-              </button>
             </div>
           </div>
         </div>

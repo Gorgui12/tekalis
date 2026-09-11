@@ -88,6 +88,29 @@ export default async function ProductPage({ params }) {
   const primaryImage = product.images?.[0]?.url || product.image || '';
   const allImages = (product.images || []).map((img) => img.url || img).filter(Boolean);
 
+  // Avis approuvés (utilisés pour les champs review + aggregateRating requis par Google)
+  const reviewsData = await fetchReviews(product._id);
+  const reviewItems = (reviewsData?.reviews || [])
+    .slice(0, 5)
+    .map((rev) => ({
+      '@type': 'Review',
+      ...(rev.title ? { name: rev.title } : {}),
+      reviewRating: {
+        '@type': 'Rating',
+        ratingValue: rev.rating,
+        bestRating: 5,
+        worstRating: 1,
+      },
+      author: {
+        '@type': 'Person',
+        name: rev.user?.name || (rev.isVerified ? 'Acheteur vérifié' : 'Client Tekalis'),
+      },
+      ...(rev.createdAt
+        ? { datePublished: new Date(rev.createdAt).toISOString().split('T')[0] }
+        : {}),
+      ...(rev.comment ? { reviewBody: rev.comment } : {}),
+    }));
+
   const productSchema = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -103,6 +126,9 @@ export default async function ProductPage({ params }) {
       priceCurrency: 'XOF',
       price: product.price,
       priceValidUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      validFrom: product.createdAt
+        ? new Date(product.createdAt).toISOString()
+        : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
       itemCondition: 'https://schema.org/NewCondition',
       availability: product.stock > 0
         ? 'https://schema.org/InStock'
@@ -112,15 +138,42 @@ export default async function ProductPage({ params }) {
         name: 'Tekalis',
         url: SITE_URL,
       },
+      hasMerchantReturnPolicy: {
+        '@type': 'MerchantReturnPolicy',
+        applicableCountry: 'SN',
+        returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+        merchantReturnDays: 14,
+        returnMethod: 'https://schema.org/ReturnByMail',
+        returnFees: 'https://schema.org/FreeReturn',
+      },
+      shippingDetails: {
+        '@type': 'OfferShippingDetails',
+        shippingRate: {
+          '@type': 'MonetaryAmount',
+          value: product.price >= 50000 ? 0 : 2500,
+          currency: 'XOF',
+        },
+        shippingDestination: {
+          '@type': 'DefinedRegion',
+          addressCountry: 'SN',
+        },
+        deliveryTime: {
+          '@type': 'ShippingDeliveryTime',
+          handlingTime: { '@type': 'QuantitativeValue', minValue: 0, maxValue: 1, unitCode: 'DAY' },
+          transitTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 2, unitCode: 'DAY' },
+        },
+      },
     },
-    ...(product.rating && product.rating.average > 0 ? {
+    ...(product.rating && product.rating.count > 0 ? {
       aggregateRating: {
         '@type': 'AggregateRating',
         ratingValue: product.rating.average,
         bestRating: 5,
+        worstRating: 1,
         reviewCount: product.rating.count,
       },
     } : {}),
+    ...(reviewItems.length > 0 ? { review: reviewItems } : {}),
     category: product.category?.[0]?.name || product.category?.[0] || '',
   };
 
@@ -162,6 +215,15 @@ async function fetchProduct(id) {
     const msg = err?.message || "";
     const m = msg.match(/^API (\d+):/);
     if (m && Number(m[1]) === 404) return "not-found";
+    return null;
+  }
+}
+
+async function fetchReviews(productId) {
+  try {
+    const res = await serverFetch(`/reviews/${productId}?limit=5`);
+    return res || null;
+  } catch {
     return null;
   }
 }

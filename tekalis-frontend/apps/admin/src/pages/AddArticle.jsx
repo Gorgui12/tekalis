@@ -8,8 +8,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Save, Eye } from "lucide-react";
-import api from "../../../../packages/shared/api/api";
-import { useToast } from "../../../../packages/shared/context/ToastContext";
+import api from "@shared/api/api";
+import { useToast } from "@shared/context/ToastContext";
 
 // Enum du modèle Article
 const CATEGORIES = [

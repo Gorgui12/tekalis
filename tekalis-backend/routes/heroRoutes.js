@@ -8,6 +8,21 @@ const router = express.Router();
 const HeroSlide = require("../models/HeroSlide");
 const { verifyToken, isAdmin } = require("../middlewares/authMiddleware");
 
+// Liste blanche de champs — empêche l'assignation de masse via req.body
+const HERO_FIELDS = [
+  "title", "subtitle", "description", "badge", "image", "mobileImage",
+  "overlay", "gradient", "primaryCta", "secondaryCta", "order",
+  "isActive", "textPosition", "textColor", "stats", "tags"
+];
+
+const pickFields = (source, allowedKeys) => {
+  const result = {};
+  for (const key of allowedKeys) {
+    if (source[key] !== undefined) result[key] = source[key];
+  }
+  return result;
+};
+
 // ── GET /api/v1/hero — Public : slides actifs ordonnés ──────────────────────
 router.get("/", async (req, res) => {
   try {
@@ -34,7 +49,7 @@ router.get("/all", verifyToken, isAdmin, async (req, res) => {
 // ── POST /api/v1/hero — Admin : créer un slide ───────────────────────────────
 router.post("/", verifyToken, isAdmin, async (req, res) => {
   try {
-    const slide = new HeroSlide(req.body);
+    const slide = new HeroSlide(pickFields(req.body, HERO_FIELDS));
     await slide.save();
     res.status(201).json({ success: true, slide, message: "Slide créé avec succès" });
   } catch (err) {
@@ -63,7 +78,7 @@ router.put("/:id", verifyToken, isAdmin, async (req, res) => {
   try {
     const slide = await HeroSlide.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      pickFields(req.body, HERO_FIELDS),
       { new: true, runValidators: true }
     );
     if (!slide) return res.status(404).json({ message: "Slide introuvable" });

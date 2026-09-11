@@ -9,8 +9,10 @@ import {
   FaEye,
   FaTrash
 } from "react-icons/fa";
-import api from "../../../../packages/shared/api/api";
-import { useToast } from '../../../../packages/shared/context/ToastContext';
+import api from "@shared/api/api";
+import { useToast } from '@shared/context/ToastContext';
+
+const CLIENT_URL = import.meta.env.VITE_CLIENT_URL || "https://tekalis.com";
 
 const AdminReviews = () => {
   const toast = useToast();
@@ -27,61 +29,14 @@ const AdminReviews = () => {
   const fetchReviews = async () => {
     try {
       const { data } = await api.get("/admin/reviews");
-      setReviews(data.reviews || getDemoReviews());
+      setReviews(data.reviews || []);
     } catch (error) {
       console.error("Erreur chargement avis:", error);
-      setReviews(getDemoReviews());
+      setReviews([]);
     } finally {
       setLoading(false);
     }
   };
-
-  const getDemoReviews = () => [
-    {
-      _id: "REV001",
-      user: { name: "Mamadou Diop", email: "mamadou@email.com" },
-      product: { _id: "PROD1", name: "HP Pavilion Gaming 15" },
-      rating: 5,
-      title: "Excellent produit !",
-      comment: "Très satisfait de mon achat. Le PC est rapide et le rapport qualité-prix est imbattable. Je recommande vivement !",
-      isVerified: true,
-      status: "pending",
-      createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000)
-    },
-    {
-      _id: "REV002",
-      user: { name: "Fatou Sall", email: "fatou@email.com" },
-      product: { _id: "PROD2", name: "Dell XPS 13" },
-      rating: 4,
-      title: "Très bon ultrabook",
-      comment: "Design magnifique et performances au rendez-vous. Juste un peu cher mais ça vaut le coup.",
-      isVerified: true,
-      status: "approved",
-      createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
-    },
-    {
-      _id: "REV003",
-      user: { name: "Ousmane Dia", email: "ousmane@email.com" },
-      product: { _id: "PROD3", name: "MacBook Air M2" },
-      rating: 3,
-      title: "Correct mais pas exceptionnel",
-      comment: "Le produit est bien mais j'attendais mieux pour le prix. La batterie tient moins longtemps que prévu.",
-      isVerified: false,
-      status: "approved",
-      createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
-    },
-    {
-      _id: "REV004",
-      user: { name: "Cheikh Fall", email: "cheikh@email.com" },
-      product: { _id: "PROD1", name: "HP Pavilion Gaming 15" },
-      rating: 2,
-      title: "Déçu de la qualité",
-      comment: "Le produit ne correspond pas à la description. Problème de chauffe et bruit excessif des ventilateurs.",
-      isVerified: true,
-      status: "pending",
-      createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000)
-    }
-  ];
 
   // Filtrer les avis
   const filteredReviews = reviews.filter(review => {
@@ -172,7 +127,7 @@ const AdminReviews = () => {
         {/* Header */}
         <div className="mb-8">
           <Link
-            to="/admin"
+            to="/dashboard"
             className="text-blue-600 hover:text-blue-700 font-semibold mb-4 inline-block"
           >
             ← Retour au dashboard
@@ -290,12 +245,14 @@ const AdminReviews = () => {
                       </div>
                     </div>
 
-                    <Link
-                      to={`/product/${review.product?._id}`}
+                    <a
+                      href={`${CLIENT_URL}/products/${review.product?._id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="text-sm text-blue-600 hover:text-blue-700 font-medium block mb-2"
                     >
                       {review.product?.name}
-                    </Link>
+                    </a>
 
                     <div className="flex items-center gap-2 text-xs text-gray-500">
                       {review.isVerified && (
@@ -328,25 +285,25 @@ const AdminReviews = () => {
 
                   {/* Right: Actions */}
                   <div className="md:w-32 flex md:flex-col gap-2">
-                    {review.status === "pending" && (
-                      <>
-                        <button
-                          onClick={() => moderateReview(review._id, "approve")}
-                          className="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center justify-center gap-2 transition"
-                          title="Approuver"
-                        >
-                          <FaCheck />
-                          <span className="hidden md:inline">Approuver</span>
-                        </button>
-                        <button
-                          onClick={() => moderateReview(review._id, "reject")}
-                          className="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center justify-center gap-2 transition"
-                          title="Rejeter"
-                        >
-                          <FaTimes />
-                          <span className="hidden md:inline">Rejeter</span>
-                        </button>
-                      </>
+                    {review.status !== "approved" && (
+                      <button
+                        onClick={() => moderateReview(review._id, "approve")}
+                        className="flex-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center justify-center gap-2 transition"
+                        title="Approuver"
+                      >
+                        <FaCheck />
+                        <span className="hidden md:inline">Approuver</span>
+                      </button>
+                    )}
+                    {review.status !== "rejected" && (
+                      <button
+                        onClick={() => moderateReview(review._id, "reject")}
+                        className="flex-1 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center justify-center gap-2 transition"
+                        title="Rejeter"
+                      >
+                        <FaTimes />
+                        <span className="hidden md:inline">Rejeter</span>
+                      </button>
                     )}
 
                     <button

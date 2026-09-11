@@ -10,8 +10,10 @@ import {
   FaFolder,
   FaLayerGroup
 } from "react-icons/fa";
-import api from "../../../../packages/shared/api/api";
-import { useToast } from '../../../../packages/shared/context/ToastContext';
+import api from "@shared/api/api";
+import { useToast } from '@shared/context/ToastContext';
+
+const CLIENT_URL = import.meta.env.VITE_CLIENT_URL || "https://tekalis.com";
 
 const AdminCategories = () => {
   const toast = useToast();
@@ -37,74 +39,17 @@ const AdminCategories = () => {
   const fetchCategories = async () => {
     try {
       const { data } = await api.get("/admin/categories");
-      setCategories(data.categories || getDemoCategories());
+      setCategories(data.categories || []);
     } catch (error) {
       console.error("Erreur chargement catégories:", error);
       toast.error("Erreur lors du chargement des catégories");
-      setCategories(getDemoCategories());
+      setCategories([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const getDemoCategories = () => [
-    {
-      _id: "1",
-      name: "Ordinateurs Portables",
-      slug: "ordinateurs-portables",
-      description: "Laptops gaming, bureautique et ultrabooks",
-      icon: "💻",
-      productsCount: 145,
-      parentCategory: null,
-      isActive: true,
-      order: 1
-    },
-    {
-      _id: "2",
-      name: "PC de Bureau",
-      slug: "pc-bureau",
-      description: "PC fixe gaming, bureautique et workstation",
-      icon: "🖥️",
-      productsCount: 78,
-      parentCategory: null,
-      isActive: true,
-      order: 2
-    },
-    {
-      _id: "3",
-      name: "Composants PC",
-      slug: "composants-pc",
-      description: "Processeurs, cartes graphiques, RAM, etc.",
-      icon: "⚙️",
-      productsCount: 234,
-      parentCategory: null,
-      isActive: true,
-      order: 3
-    },
-    {
-      _id: "4",
-      name: "Périphériques",
-      slug: "peripheriques",
-      description: "Claviers, souris, écrans, casques",
-      icon: "🎮",
-      productsCount: 189,
-      parentCategory: null,
-      isActive: true,
-      order: 4
-    },
-    {
-      _id: "5",
-      name: "Accessoires",
-      slug: "accessoires",
-      description: "Sacs, housses, supports, câbles",
-      icon: "🎒",
-      productsCount: 92,
-      parentCategory: null,
-      isActive: true,
-      order: 5
-    }
-  ];
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -175,7 +120,7 @@ const AdminCategories = () => {
         {/* Header */}
         <div className="mb-8">
           <Link
-            to="/admin"
+            to="/dashboard"
             className="text-blue-600 hover:text-blue-700 font-semibold mb-4 inline-block"
           >
             ← Retour au dashboard
@@ -267,12 +212,14 @@ const AdminCategories = () => {
 
               {/* Card Actions */}
               <div className="p-3 flex gap-2">
-                <Link
-                  to={`/category/${category.slug}`}
+                <a
+                  href={`${CLIENT_URL}/category/${category.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg font-semibold text-sm text-center flex items-center justify-center gap-2"
                 >
                   <FaEye /> Voir
-                </Link>
+                </a>
                 <button
                   onClick={() => handleEdit(category)}
                   className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold text-sm flex items-center justify-center gap-2"

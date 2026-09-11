@@ -12,8 +12,8 @@ import {
   Settings,
   ChevronRight,
 } from 'lucide-react';
-import { logout } from '../../../../../packages/shared/redux/slices/authSlice';
-import { getInitials, stringToColor } from '../../../../../packages/shared/outils/helpers';
+import { logout } from '@shared/redux/slices/authSlice';
+import { getInitials, stringToColor } from '@shared/outils/helpers';
 
 /* ── Breadcrumb ─────────────────────────────────────────────────────────── */
 const ROUTE_LABELS = {

@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Eye, EyeOff, Zap, AlertCircle } from 'lucide-react';
-import { loginUser } from '../../../../packages/shared/redux/slices/authSlice';
-import { useToast } from '../../../../packages/shared/context/ToastContext';
+import { loginUser } from '@shared/redux/slices/authSlice';
+import { useToast } from '@shared/context/ToastContext';
 
 const Login = () => {
   const navigate  = useNavigate();
@@ -17,13 +17,9 @@ const Login = () => {
   const [formError, setFormError] = useState('');
 
   useEffect(() => {
-    if (user) {
-      const isAdmin = user.role === 'admin' || user.isAdmin === true;
-      console.log('🔄 useEffect user détecté:', user, '| isAdmin:', isAdmin);
-      if (isAdmin) {
-        const from = location.state?.from?.pathname || '/admin/dashboard';
-        navigate(from, { replace: true });
-      }
+    if (user && (user.role === 'admin' || user.isAdmin === true)) {
+      const from = location.state?.from?.pathname || '/dashboard';
+      navigate(from, { replace: true });
     }
   }, [user, navigate, location]);
 
@@ -41,38 +37,22 @@ const Login = () => {
     }
 
     try {
-      console.log('📤 Envoi login avec:', form.email);
-
       const result = await dispatch(loginUser(form)).unwrap();
 
-      // 🔍 LOG 1 — structure complète retournée
-      console.log('🟢 LOGIN RESULT complet:', JSON.stringify(result, null, 2));
-
       const user = result.user;
-
-      // 🔍 LOG 2 — objet user isolé
-      console.log('👤 user object:', JSON.stringify(user, null, 2));
-      console.log('👤 user.role:', user?.role);
-      console.log('👤 user.isAdmin:', user?.isAdmin);
-
       const isAdmin = user?.role === 'admin' || user?.isAdmin === true;
 
-      // 🔍 LOG 3 — résultat du check
-      console.log('🔐 isAdmin result:', isAdmin);
-
       if (!isAdmin) {
-        console.warn('⛔ Accès refusé — pas admin. role =', user?.role, '/ isAdmin =', user?.isAdmin);
         toast.error('Accès réservé aux administrateurs');
         return;
       }
 
       toast.success('Connexion réussie !');
-      navigate('/admin/dashboard', { replace: true });
+      const from = location.state?.from?.pathname || '/dashboard';
+      navigate(from, { replace: true });
 
     } catch (err) {
-      // 🔍 LOG 4 — erreur
-      console.error('🔴 LOGIN ERROR:', JSON.stringify(err, null, 2));
-      setFormError(typeof err === 'string' ? err : 'Email ou mot de passe incorrect');
+      setFormError('Email ou mot de passe incorrect');
     }
   };
 

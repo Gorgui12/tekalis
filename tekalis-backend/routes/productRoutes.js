@@ -7,6 +7,7 @@ const express = require("express");
 const router = express.Router();
 const productController = require("../controllers/productController");
 const { verifyToken, isAdmin } = require("../middlewares/authMiddleware");
+const { productValidation } = require("../middlewares/validation");
 
 // ── Routes Admin (nommées — AVANT les routes dynamiques) ─────────────────────
 
@@ -24,10 +25,10 @@ router.get("/:id", productController.getProductById);
 // ── Routes protégées (Admin) ──────────────────────────────────────────────────
 
 // POST /api/v1/products
-router.post("/", verifyToken, isAdmin, productController.createProduct);
+router.post("/", verifyToken, isAdmin, productValidation.create, productController.createProduct);
 
 // PUT /api/v1/products/:id
-router.put("/:id", verifyToken, isAdmin, productController.updateProduct);
+router.put("/:id", verifyToken, isAdmin, productValidation.update, productController.updateProduct);
 
 // DELETE /api/v1/products/:id
 router.delete("/:id", verifyToken, isAdmin, productController.deleteProduct);

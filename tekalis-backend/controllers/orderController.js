@@ -11,6 +11,7 @@ const PromoCode = require("../models/PromoCode");
 const { escapeRegex } = require("../utils/regexEscape");
 const EmailService = require("../services/emailService");
 const warrantyController = require("./warrantyController");
+const PricingService = require("../services/pricingService");
 
 // ===============================================
 // POST /api/v1/orders — Créer une commande
@@ -19,8 +20,6 @@ exports.createOrder = async (req, res) => {
   try {
     const {
       products,
-      totalPrice,
-      shippingCost,
       paymentMethod,
       deliveryName,
       deliveryPhone,
@@ -57,12 +56,31 @@ exports.createOrder = async (req, res) => {
       return res.status(400).json({ message: "Problème de stock", errors: stockErrors });
     }
 
+    // ─── Recalcul du prix côté serveur (jamais de confiance au client) ────────
+    // Les prix unitaires et le total sont recalculés depuis les données
+    // produits en base : le totalPrice/shippingCost envoyés par le client
+    // sont ignorés (mass assignment / falsification de prix).
+    const validProducts = products.map(item => ({
+      product: item.product,
+      quantity: item.quantity,
+      price: productMap[item.product].price
+    }));
+
+    const pricing = await PricingService.calculateOrderTotal(
+      validProducts,
+      promoCode,
+      req.user._id
+    );
+    if (pricing.promoError) {
+      return res.status(400).json({ message: pricing.promoError });
+    }
+
     // ─── Créer la commande ────────────────────────────────────────────────────
     const newOrder = new Order({
       user: req.user._id,
-      products,
-      totalPrice,
-      shippingCost: shippingCost || 0,
+      products: validProducts,
+      totalPrice: pricing.total,
+      shippingCost: pricing.shippingCost,
       paymentMethod,
       deliveryName,
       deliveryPhone,
@@ -95,7 +113,7 @@ exports.createOrder = async (req, res) => {
               usedBy: {
                 user: req.user._id,
                 usedAt: new Date(),
-                orderAmount: totalPrice
+                orderAmount: pricing.total
               }
             }
           }

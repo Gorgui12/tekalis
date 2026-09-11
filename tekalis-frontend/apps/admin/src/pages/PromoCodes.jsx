@@ -11,8 +11,8 @@ import {
   FaPlus, FaEdit, FaTrash, FaCopy,
   FaSearch, FaTimes, FaTag
 } from "react-icons/fa";
-import api from "../../../../packages/shared/api/api";
-import { useToast } from "../../../../packages/shared/context/ToastContext";
+import api from "@shared/api/api";
+import { useToast } from "@shared/context/ToastContext";
 
 const EMPTY_FORM = {
   code: "",

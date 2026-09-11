@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { FaSave, FaTimes, FaPlus, FaTrash } from "react-icons/fa";
-import api from "../../../../packages/shared/api/api";
-import { useToast } from '../../../../packages/shared/context/ToastContext';
+import api from "@shared/api/api";
+import { useToast } from '@shared/context/ToastContext';
 
 const EditProduct = () => {
   const toast = useToast();
@@ -144,7 +144,7 @@ const EditProduct = () => {
 
       await api.put(`/products/${id}`, payload);
       toast.success("Produit mis à jour avec succès !");
-      navigate("/admin/produits");
+      navigate("/products");
     } catch (error) {
       console.error("Erreur modification:", error);
       toast.error("Erreur lors de la modification du produit");
@@ -242,7 +242,7 @@ const EditProduct = () => {
         {/* Header */}
         <div className="mb-8">
           <Link
-            to="/admin/produits"
+            to="/products"
             className="text-blue-600 hover:text-blue-700 font-semibold mb-4 inline-block"
           >
             ← Retour aux produits
@@ -530,7 +530,7 @@ const EditProduct = () => {
           {/* Actions */}
           <div className="flex gap-3 justify-end bg-white rounded-lg shadow-md p-6">
             <Link
-              to="/admin/produits"
+              to="/products"
               className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold flex items-center gap-2"
             >
               <FaTimes /> Annuler

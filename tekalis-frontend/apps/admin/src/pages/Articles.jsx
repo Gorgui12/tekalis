@@ -10,8 +10,10 @@ import {
   FaNewspaper,
   FaClock
 } from "react-icons/fa";
-import api from "../../../../packages/shared/api/api";
-import { useToast } from '../../../../packages/shared/context/ToastContext';
+import api from "@shared/api/api";
+import { useToast } from '@shared/context/ToastContext';
+
+const CLIENT_URL = import.meta.env.VITE_CLIENT_URL || "https://tekalis.com";
 
 const AdminArticles = () => {
   const toast = useToast();
@@ -33,57 +35,17 @@ const AdminArticles = () => {
       const queryString = params.length > 0 ? `?${params.join("&")}` : "";
       
       const { data } = await api.get(`/articles${queryString}`);
-      setArticles(data.articles || getDemoArticles());
+      setArticles(data.articles || []);
     } catch (error) {
       console.error("Erreur chargement articles:", error);
       toast.error("Erreur lors du chargement des articles");
-      setArticles(getDemoArticles());
+      setArticles([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const getDemoArticles = () => [
-    {
-      _id: "1",
-      title: "Test complet du HP Pavilion Gaming 15",
-      slug: "test-hp-pavilion-gaming-15",
-      excerpt: "Un laptop gaming abordable avec de belles performances",
-      category: "test",
-      author: { name: "Jean Dupont" },
-      status: "published",
-      views: 1245,
-      featured: true,
-      createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-      publishedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
-    },
-    {
-      _id: "2",
-      title: "Comment choisir son PC portable en 2025",
-      slug: "guide-choisir-pc-portable-2025",
-      excerpt: "Guide complet pour faire le bon choix selon vos besoins",
-      category: "guide",
-      author: { name: "Marie Martin" },
-      status: "published",
-      views: 2567,
-      featured: false,
-      createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-      publishedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
-    },
-    {
-      _id: "3",
-      title: "Les nouveautés gaming 2025",
-      slug: "nouveautes-gaming-2025",
-      excerpt: "Découvrez les dernières sorties dans le monde du gaming",
-      category: "news",
-      author: { name: "Jean Dupont" },
-      status: "draft",
-      views: 0,
-      featured: false,
-      createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
-    }
-  ];
-
+  
   // Filtrer les articles
   const filteredArticles = articles.filter(article => {
     const matchesSearch = 
@@ -163,7 +125,7 @@ const AdminArticles = () => {
         {/* Header */}
         <div className="mb-8">
           <Link
-            to="/admin"
+            to="/dashboard"
             className="text-blue-600 hover:text-blue-700 font-semibold mb-4 inline-block"
           >
             ← Retour au dashboard
@@ -179,7 +141,7 @@ const AdminArticles = () => {
             </div>
 
             <Link
-              to="/admin/articles/add"
+              to="/articles/add"
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 shadow-md"
             >
               <FaPlus /> Nouvel article
@@ -280,7 +242,7 @@ const AdminArticles = () => {
                       <FaNewspaper className="text-6xl text-gray-300 mx-auto mb-4" />
                       <p className="text-gray-500 mb-4">Aucun article trouvé</p>
                       <Link
-                        to="/admin/articles/add"
+                        to="/articles/add"
                         className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold inline-block"
                       >
                         Créer le premier article
@@ -334,16 +296,17 @@ const AdminArticles = () => {
                       </td>
                       <td className="py-3 px-4">
                         <div className="flex items-center justify-center gap-2">
-                          <Link
-                            to={`/blog/${article.slug}`}
+                          <a
+                            href={`${CLIENT_URL}/blog/${article.slug}`}
                             target="_blank"
+                            rel="noopener noreferrer"
                             className="text-gray-600 hover:text-gray-800 p-2"
                             title="Voir"
                           >
                             <FaEye />
-                          </Link>
+                          </a>
                           <Link
-                            to={`/admin/articles/edit/${article._id}`}
+                            to={`/articles/edit/${article._id}`}
                             className="text-blue-600 hover:text-blue-700 p-2"
                             title="Modifier"
                           >

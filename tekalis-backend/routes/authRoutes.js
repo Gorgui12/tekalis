@@ -2,12 +2,13 @@ const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/authController");
 const { verifyToken, isAdmin } = require("../middlewares/authMiddleware");
+const { authValidation } = require("../middlewares/validation");
 
 // POST /api/v1/auth/register
-router.post("/register", authController.register);
+router.post("/register", authValidation.register, authController.register);
 
 // POST /api/v1/auth/login
-router.post("/login", authController.login);
+router.post("/login", authValidation.login, authController.login);
 
 // POST /api/v1/auth/admin/register — protégé: admin uniquement
 router.post("/admin/register", verifyToken, isAdmin, authController.registerAdmin);

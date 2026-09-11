@@ -4,8 +4,8 @@ import {
   Image, Link, Type, Save, X, ChevronUp, ChevronDown,
   Zap, ExternalLink, ToggleLeft, ToggleRight, ArrowLeft
 } from 'lucide-react';
-import api from '../../../../packages/shared/api/api';
-import { useToast } from '../../../../packages/shared/context/ToastContext';
+import api from '@shared/api/api';
+import { useToast } from '@shared/context/ToastContext';
 
 /* ── Slide vide (formulaire) ──────────────────────────────────────────────── */
 const EMPTY_SLIDE = {
@@ -309,35 +309,7 @@ const HeroSlides = () => {
       const { data } = await api.get('/hero/all');
       setSlides(data.slides || []);
     } catch {
-      // Données démo si API pas encore branchée
-      setSlides([
-        {
-          _id: 'demo1',
-          title: 'GAMING PC ULTRA — RTX 5090',
-          subtitle: 'Repoussez les limites du possible',
-          badge: '🔥 NOUVEAU',
-          image: 'https://images.unsplash.com/photo-1593640408182-31c228edb56a?w=1920&q=80',
-          overlay: 'rgba(0,0,0,0.55)',
-          gradient: 'from-purple-900/70 to-blue-900/50',
-          primaryCta: { text: 'Voir les offres', link: '/category/gaming', style: 'white' },
-          secondaryCta: { text: '', link: '', style: 'outline' },
-          order: 0, isActive: true, textPosition: 'left',
-          stats: [{ value: '10K+', label: 'Clients' }, { value: '4.9★', label: 'Avis' }],
-        },
-        {
-          _id: 'demo2',
-          title: 'SMARTPHONES DERNIÈRE GÉNÉRATION',
-          subtitle: 'iPhone, Samsung, Xiaomi — Meilleurs prix à Dakar',
-          badge: '📱 EXCLUSIVITÉ',
-          image: 'https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=1920&q=80',
-          overlay: 'rgba(0,0,0,0.4)',
-          gradient: 'from-blue-900/60 to-cyan-900/40',
-          primaryCta: { text: 'Explorer', link: '/category/smartphones', style: 'white' },
-          secondaryCta: { text: '', link: '', style: 'outline' },
-          order: 1, isActive: true, textPosition: 'left',
-          stats: [],
-        },
-      ]);
+      setSlides([]);
     } finally {
       setLoading(false);
     }

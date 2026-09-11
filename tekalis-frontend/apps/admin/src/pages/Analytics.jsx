@@ -22,7 +22,7 @@ import {
   Legend, 
   ResponsiveContainer 
 } from "recharts";
-import api from "../../../../packages/shared/api/api";
+import api from "@shared/api/api";
 
 const AdminAnalytics = () => {
   const [loading, setLoading] = useState(true);
@@ -36,6 +36,14 @@ const AdminAnalytics = () => {
     stats: {}
   });
 
+  const emptyAnalytics = {
+    stats: {},
+    revenue: [],
+    categories: [],
+    topProducts: [],
+    customers: []
+  };
+
   useEffect(() => {
     fetchAnalytics();
   }, [period]);
@@ -43,66 +51,18 @@ const AdminAnalytics = () => {
   const fetchAnalytics = async () => {
     try {
       const { data } = await api.get(`/admin/analytics?period=${period}`);
-      const safeData = {
-  ...getDemoAnalytics(),
-  ...data,
-  stats: {
-    ...getDemoAnalytics().stats,
-    ...(data?.stats || {})
-  }
-};
-
-setAnalyticsData(safeData);
+      setAnalyticsData({
+        ...emptyAnalytics,
+        ...data,
+        stats: { ...(data?.stats || {}) }
+      });
     } catch (error) {
       console.error("Erreur chargement analytics:", error);
-      setAnalyticsData(getDemoAnalytics());
+      setAnalyticsData(emptyAnalytics);
     } finally {
       setLoading(false);
     }
   };
-
-  const getDemoAnalytics = () => ({
-    stats: {
-      totalRevenue: 45678900,
-      revenueChange: 12.5,
-      totalOrders: 1247,
-      ordersChange: 8.3,
-      avgOrderValue: 366400,
-      avgOrderChange: 4.2,
-      newCustomers: 234,
-      customersChange: 15.7,
-      conversionRate: 2.8,
-      conversionChange: 0.5
-    },
-    revenue: [
-      { date: "01 Jan", revenue: 2500000, orders: 85 },
-      { date: "05 Jan", revenue: 3200000, orders: 92 },
-      { date: "10 Jan", revenue: 2800000, orders: 78 },
-      { date: "15 Jan", revenue: 4100000, orders: 105 },
-      { date: "20 Jan", revenue: 3800000, orders: 98 },
-      { date: "25 Jan", revenue: 4500000, orders: 112 },
-      { date: "30 Jan", revenue: 5200000, orders: 128 }
-    ],
-    categories: [
-      { name: "Laptops", value: 45, revenue: 20500000 },
-      { name: "PC Bureau", value: 25, revenue: 11400000 },
-      { name: "Composants", value: 15, revenue: 6800000 },
-      { name: "Périphériques", value: 10, revenue: 4500000 },
-      { name: "Accessoires", value: 5, revenue: 2200000 }
-    ],
-    topProducts: [
-      { name: "HP Pavilion", sales: 45, revenue: 29250000 },
-      { name: "Dell XPS 13", sales: 38, revenue: 55100000 },
-      { name: "MacBook Air", sales: 32, revenue: 52800000 },
-      { name: "Lenovo Legion", sales: 28, revenue: 51800000 }
-    ],
-    customers: [
-      { date: "Semaine 1", new: 45, returning: 120 },
-      { date: "Semaine 2", new: 52, returning: 135 },
-      { date: "Semaine 3", new: 38, returning: 142 },
-      { date: "Semaine 4", new: 61, returning: 158 }
-    ]
-  });
 
   // Colors for charts
   const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"];
@@ -162,7 +122,7 @@ setAnalyticsData(safeData);
         {/* Header */}
         <div className="mb-8">
           <Link
-            to="/admin"
+            to="/dashboard"
             className="text-blue-600 hover:text-blue-700 font-semibold mb-4 inline-block"
           >
             ← Retour au dashboard
@@ -366,24 +326,34 @@ setAnalyticsData(safeData);
           <h2 className="text-xl font-bold text-gray-900 mb-6">
             📌 Métriques clés
           </h2>
-          
+
           <div className="grid md:grid-cols-3 gap-6">
             <div className="border-l-4 border-blue-600 pl-4">
-              <p className="text-sm text-gray-600 mb-1">Taux de rebond</p>
-              <p className="text-2xl font-bold text-gray-900">42.3%</p>
-              <p className="text-xs text-gray-500 mt-1">↓ 5.2% vs mois dernier</p>
+              <p className="text-sm text-gray-600 mb-1">Chiffre d'affaires</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {analyticsData.stats.totalRevenue
+                  ? `${(analyticsData.stats.totalRevenue / 1000000).toFixed(1)}M FCFA`
+                  : "—"}
+              </p>
             </div>
-            
+
             <div className="border-l-4 border-green-600 pl-4">
-              <p className="text-sm text-gray-600 mb-1">Durée session moyenne</p>
-              <p className="text-2xl font-bold text-gray-900">4m 32s</p>
-              <p className="text-xs text-gray-500 mt-1">↑ 0m 18s vs mois dernier</p>
+              <p className="text-sm text-gray-600 mb-1">Panier moyen</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {analyticsData.stats.avgOrderValue
+                  ? `${analyticsData.stats.avgOrderValue.toLocaleString()} FCFA`
+                  : "—"}
+              </p>
             </div>
-            
+
             <div className="border-l-4 border-purple-600 pl-4">
-              <p className="text-sm text-gray-600 mb-1">Pages par session</p>
-              <p className="text-2xl font-bold text-gray-900">5.8</p>
-              <p className="text-xs text-gray-500 mt-1">↑ 0.3 vs mois dernier</p>
+              <p className="text-sm text-gray-600 mb-1">Taux de conversion</p>
+              <p className="text-2xl font-bold text-gray-900">
+                {analyticsData.stats.conversionRate ?? "0"}%
+              </p>
+              <p className="text-xs text-gray-500 mt-1">
+                Non suivi (pas de données de visites)
+              </p>
             </div>
           </div>
         </div>

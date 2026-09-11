@@ -9,7 +9,7 @@ import {
   FaExclamationCircle,
   FaCommentDots
 } from "react-icons/fa";
-import api from "../../../../packages/shared/api/api";
+import api from "@shared/api/api";
 
 const AdminRMA = () => {
   const [rmas, setRmas] = useState([]);
@@ -27,59 +27,16 @@ const AdminRMA = () => {
     try {
       const params = statusFilter !== "all" ? `?status=${statusFilter}` : "";
       const { data } = await api.get(`/admin/rma${params}`);
-      setRmas(data.rmas || getDemoRMAs());
+      setRmas(data.rmas || []);
     } catch (error) {
       console.error("Erreur chargement RMA:", error);
-      setRmas(getDemoRMAs());
+      setRmas([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const getDemoRMAs = () => [
-    {
-      _id: "1",
-      rmaNumber: "RMA-2025-001",
-      orderNumber: "CMD-2025-001",
-      customer: { name: "Mamadou Diop", email: "mamadou@email.com", phone: "+221 77 123 45 67" },
-      product: { name: "HP Pavilion Gaming 15", serialNumber: "5CD123ABCD" },
-      reason: "defect",
-      description: "L'écran affiche des lignes verticales",
-      status: "open",
-      priority: "high",
-      createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
-      images: []
-    },
-    {
-      _id: "2",
-      rmaNumber: "RMA-2025-002",
-      orderNumber: "CMD-2024-156",
-      customer: { name: "Fatou Sall", email: "fatou@email.com", phone: "+221 78 234 56 78" },
-      product: { name: "Dell XPS 13", serialNumber: "DXPS987654" },
-      reason: "malfunction",
-      description: "Le clavier ne répond plus",
-      status: "in_progress",
-      priority: "medium",
-      createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-      images: []
-    },
-    {
-      _id: "3",
-      rmaNumber: "RMA-2024-234",
-      orderNumber: "CMD-2024-089",
-      customer: { name: "Ousmane Dia", email: "ousmane@email.com", phone: "+221 76 345 67 89" },
-      product: { name: "Asus Vivobook", serialNumber: "ASUS456789" },
-      reason: "damage",
-      description: "Boîtier endommagé à la livraison",
-      status: "resolved",
-      priority: "low",
-      resolution: "Remplacement effectué",
-      createdAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-      resolvedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-      images: []
-    }
-  ];
-
+  
   // Filtrer les RMA
   const filteredRMAs = rmas.filter(rma => {
     const matchesSearch = 
@@ -198,7 +155,7 @@ const AdminRMA = () => {
         {/* Header */}
         <div className="mb-8">
           <Link
-            to="/admin"
+            to="/dashboard"
             className="text-blue-600 hover:text-blue-700 font-semibold mb-4 inline-block"
           >
             ← Retour au dashboard

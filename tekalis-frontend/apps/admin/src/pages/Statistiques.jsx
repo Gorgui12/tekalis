@@ -10,16 +10,13 @@ import {
 } from 'lucide-react';
 
 // ✅ Fix : import depuis le bon chemin (shared/api/api au lieu de localhost hardcodé)
-import api from '../../../../packages/shared/api/api';
-
-// ✅ Fix : import de la Navbar depuis le bon chemin
-import AdminHeader from '../components/layout/AdminHeader';
+import api from '@shared/api/api';
 
 import StatCard     from '../components/dashboard/StatCard';
 import RevenueChart from '../components/dashboard/RevenueChart';
 import TopProducts  from '../components/dashboard/TopProducts';
 import RecentActivity from '../components/dashboard/RecentActivity';
-import { formatPrice } from '../../../../packages/shared/outils/formatters';
+import { formatPrice } from '@shared/outils/formatters';
 
 const Statistiques = () => {
   const [stats, setStats] = useState(null);
@@ -72,27 +69,27 @@ const Statistiques = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         <StatCard
           title="Chiffre d'affaires"
-          value={stats ? formatPrice(stats.totalRevenue ?? 0) : '—'}
+          value={stats ? formatPrice(stats.stats?.revenue?.total ?? 0) : '—'}
           icon={DollarSign}
           iconColor="text-emerald-400"
           iconBg="bg-emerald-500/10"
-          trend={stats?.revenueTrend}
+          trend={stats?.stats?.revenue?.change}
           loading={loading}
           className="xl:col-span-2"
         />
         <StatCard
           title="Commandes"
-          value={stats?.totalOrders ?? '—'}
+          value={stats?.stats?.orders?.total ?? '—'}
           icon={ShoppingCart}
           iconColor="text-blue-400"
           iconBg="bg-blue-500/10"
-          trend={stats?.ordersTrend}
+          trend={stats?.stats?.orders?.change}
           loading={loading}
         />
         <StatCard
           title="Produits"
-          value={stats?.totalProducts ?? '—'}
-          subtitle={stats?.lowStockCount ? `${stats.lowStockCount} en stock faible` : undefined}
+          value={stats?.stats?.products?.total ?? '—'}
+          subtitle={stats?.stats?.products?.lowStock ? `${stats.stats.products.lowStock} en stock faible` : undefined}
           icon={Package}
           iconColor="text-purple-400"
           iconBg="bg-purple-500/10"
@@ -100,24 +97,24 @@ const Statistiques = () => {
         />
         <StatCard
           title="Clients"
-          value={stats?.totalCustomers ?? '—'}
+          value={stats?.stats?.users?.total ?? '—'}
           icon={Users}
           iconColor="text-pink-400"
           iconBg="bg-pink-500/10"
-          trend={stats?.customersTrend}
+          trend={stats?.stats?.users?.change}
           loading={loading}
         />
         <StatCard
           title="SAV ouverts"
-          value={stats?.openRMA ?? '—'}
+          value={stats?.stats?.rmas?.pending ?? '—'}
           icon={Wrench}
           iconColor="text-orange-400"
           iconBg="bg-orange-500/10"
           loading={loading}
         />
         <StatCard
-          title="Garanties actives"
-          value={stats?.activeWarranties ?? '—'}
+          title="Avis en attente"
+          value={stats?.stats?.reviews?.pending ?? '—'}
           icon={Shield}
           iconColor="text-cyan-400"
           iconBg="bg-cyan-500/10"

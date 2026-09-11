@@ -54,10 +54,12 @@ function App() {
           ROUTES PROTÉGÉES : admin seulement
           AdminGuard vérifie token + role === 'admin'
       ───────────────────────────────────────── */}
-      <Route path="/hero-slides" element={<HeroSlides />} />
       <Route element={<AdminGuard />}>
         {/* AdminLayout = sidebar + header communs */}
         <Route element={<AdminLayout />}>
+
+          {/* Hero slides */}
+          <Route path="/hero-slides" element={<HeroSlides />} />
 
           {/* Redirect racine → dashboard */}
           <Route path="/" element={<Navigate to="/dashboard" replace />} />

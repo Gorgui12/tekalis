@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const orderController = require("../controllers/orderController");
 const { verifyToken, isAdmin } = require("../middlewares/authMiddleware");
+const { orderValidation } = require("../middlewares/validation");
 
 // Toutes les routes nécessitent une authentification
 router.use(verifyToken);
@@ -23,7 +24,7 @@ router.delete("/:id", isAdmin, orderController.deleteOrder);
 // ── Routes utilisateur ────────────────────────────────────────────────────────
 
 // POST /api/v1/orders
-router.post("/", orderController.createOrder);
+router.post("/", orderValidation.create, orderController.createOrder);
 
 // GET /api/v1/orders/my-orders (AVANT /:id)
 router.get("/my-orders", orderController.getMyOrders);

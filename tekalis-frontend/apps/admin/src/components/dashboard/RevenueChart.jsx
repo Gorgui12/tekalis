@@ -8,7 +8,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { formatCompactPrice } from '../../../../../packages/shared/outils/formatters';
+import { formatCompactPrice } from '@shared/outils/formatters';
 
 /* ── Tooltip personnalisé ───────────────────────────────────────────────── */
 const CustomTooltip = ({ active, payload, label }) => {
@@ -27,8 +27,7 @@ const CustomTooltip = ({ active, payload, label }) => {
 
 /* ── RevenueChart ───────────────────────────────────────────────────────── */
 const RevenueChart = ({ data = [], loading = false }) => {
-  // Données de démo si aucune donnée fournie
-  const chartData = data.length > 0 ? data : DEMO_DATA;
+  const chartData = data;
 
   if (loading) {
     return (
@@ -87,20 +86,5 @@ const RevenueChart = ({ data = [], loading = false }) => {
     </div>
   );
 };
-
-const DEMO_DATA = [
-  { month: 'Jan', revenue: 1200000 },
-  { month: 'Fév', revenue: 1850000 },
-  { month: 'Mar', revenue: 1450000 },
-  { month: 'Avr', revenue: 2100000 },
-  { month: 'Mai', revenue: 1900000 },
-  { month: 'Jun', revenue: 2400000 },
-  { month: 'Jul', revenue: 2200000 },
-  { month: 'Aoû', revenue: 2700000 },
-  { month: 'Sep', revenue: 2500000 },
-  { month: 'Oct', revenue: 3100000 },
-  { month: 'Nov', revenue: 3400000 },
-  { month: 'Déc', revenue: 3800000 },
-];
 
 export default RevenueChart;

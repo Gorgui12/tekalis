@@ -15,6 +15,65 @@ router.use(verifyToken);
 router.use(isAdmin);
 
 // ===============================================
+// 📈 GET /admin/stats/revenue — Série revenu/commandes par jour
+// ===============================================
+router.get("/revenue", async (req, res) => {
+  try {
+    const { period = "30d" } = req.query;
+
+    const start = new Date();
+    if (period === "7d") start.setDate(start.getDate() - 7);
+    else if (period === "90d") start.setDate(start.getDate() - 90);
+    else if (period === "1y") start.setFullYear(start.getFullYear() - 1);
+    else start.setDate(start.getDate() - 30);
+
+    const salesData = await Order.aggregate([
+      {
+        $match: {
+          isPaid: true,
+          createdAt: { $gte: start }
+        }
+      },
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          revenue: { $sum: "$totalPrice" },
+          orders: { $sum: 1 }
+        }
+      },
+      { $sort: { _id: 1 } }
+    ]);
+
+    // Remplir les jours manquants avec 0
+    const filledData = [];
+    const current = new Date(start);
+    current.setHours(0, 0, 0, 0);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    while (current <= today) {
+      const dateStr = current.toISOString().split("T")[0];
+      const day = salesData.find(d => d._id === dateStr);
+      filledData.push({
+        date: dateStr,
+        revenue: day ? Math.round(day.revenue) : 0,
+        orders: day ? day.orders : 0
+      });
+      current.setDate(current.getDate() + 1);
+    }
+
+    res.status(200).json({
+      success: true,
+      period,
+      data: filledData
+    });
+  } catch (error) {
+    console.error("❌ Erreur revenue:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// ===============================================
 // 📊 Statistiques globales du dashboard
 // ===============================================
 router.get("/", async (req, res) => {

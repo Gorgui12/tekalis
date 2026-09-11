@@ -13,7 +13,7 @@ import {
   FaDownload,
   FaExclamationTriangle
 } from "react-icons/fa";
-import api from "../../../../packages/shared/api/api";
+import api from "@shared/api/api";
 
 const AdminPayments = () => {
   const [payments, setPayments] = useState([]);
@@ -36,84 +36,14 @@ const AdminPayments = () => {
       
       const queryString = params.length > 0 ? `?${params.join("&")}` : "";
       const { data } = await api.get(`/admin/payments${queryString}`);
-      setPayments(data.payments || getDemoPayments());
+      setPayments(data.payments || []);
     } catch (error) {
       console.error("Erreur chargement paiements:", error);
-      setPayments(getDemoPayments());
+      setPayments([]);
     } finally {
       setLoading(false);
     }
   };
-
-  const getDemoPayments = () => [
-    {
-      _id: "PAY001",
-      transactionId: "TXN-2025-001",
-      orderId: { 
-        _id: "ORD001", 
-        orderNumber: "CMD-2025-001",
-        totalPrice: 850000
-      },
-      customer: { name: "Mamadou Diop", email: "mamadou@email.com" },
-      amount: 850000,
-      method: "wave",
-      status: "pending",
-      phoneNumber: "+221 77 123 45 67",
-      reference: "WAVE-REF-123456",
-      createdAt: new Date(Date.now() - 30 * 60 * 1000),
-      notes: ""
-    },
-    {
-      _id: "PAY002",
-      transactionId: "TXN-2025-002",
-      orderId: { 
-        _id: "ORD002", 
-        orderNumber: "CMD-2025-002",
-        totalPrice: 1200000
-      },
-      customer: { name: "Fatou Sall", email: "fatou@email.com" },
-      amount: 1200000,
-      method: "om",
-      status: "completed",
-      phoneNumber: "+221 78 234 56 78",
-      reference: "OM-REF-789012",
-      paidAt: new Date(Date.now() - 2 * 60 * 60 * 1000),
-      createdAt: new Date(Date.now() - 3 * 60 * 60 * 1000),
-      notes: "Paiement vérifié manuellement"
-    },
-    {
-      _id: "PAY003",
-      transactionId: "TXN-2025-003",
-      orderId: { 
-        _id: "ORD003", 
-        orderNumber: "CMD-2025-003",
-        totalPrice: 650000
-      },
-      customer: { name: "Ousmane Dia", email: "ousmane@email.com" },
-      amount: 650000,
-      method: "cash",
-      status: "pending",
-      createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
-      notes: "Paiement à la livraison"
-    },
-    {
-      _id: "PAY004",
-      transactionId: "TXN-2025-004",
-      orderId: { 
-        _id: "ORD004", 
-        orderNumber: "CMD-2025-004",
-        totalPrice: 2100000
-      },
-      customer: { name: "Aissatou Ndiaye", email: "aissatou@email.com" },
-      amount: 2100000,
-      method: "card",
-      status: "failed",
-      createdAt: new Date(Date.now() - 6 * 60 * 60 * 1000),
-      failedAt: new Date(Date.now() - 5 * 60 * 60 * 1000),
-      failureReason: "Carte expirée",
-      notes: ""
-    }
-  ];
 
   // Filtrer les paiements
   const filteredPayments = payments.filter(payment => {
@@ -253,7 +183,7 @@ const AdminPayments = () => {
         {/* Header */}
         <div className="mb-8">
           <Link
-            to="/admin"
+            to="/dashboard"
             className="text-blue-600 hover:text-blue-700 font-semibold mb-4 inline-block"
           >
             ← Retour au dashboard
@@ -382,7 +312,7 @@ const AdminPayments = () => {
                       </td>
                       <td className="py-3 px-4">
                         <Link
-                          to={`/admin/orders/${payment.orderId?._id}`}
+                          to={`/orders/${payment.orderId?._id}`}
                           className="text-sm font-medium text-blue-600 hover:text-blue-700"
                         >
                           {payment.orderId?.orderNumber}

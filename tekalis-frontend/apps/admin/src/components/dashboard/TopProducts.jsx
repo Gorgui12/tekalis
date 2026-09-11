@@ -1,10 +1,10 @@
 import React from 'react';
 import { TrendingUp } from 'lucide-react';
-import { formatCompactPrice } from '../../../../../packages/shared/outils/formatters';
-import { IMAGE } from '../../../../../packages/shared/outils/constants';
+import { formatCompactPrice } from '@shared/outils/formatters';
+import { IMAGE } from '@shared/outils/constants';
 
 const TopProducts = ({ products = [], loading = false }) => {
-  const items = products.length > 0 ? products : DEMO_PRODUCTS;
+  const items = products;
 
   return (
     <div className="bg-gray-900 border border-white/5 rounded-2xl p-5">
@@ -70,13 +70,5 @@ const TopProducts = ({ products = [], loading = false }) => {
     </div>
   );
 };
-
-const DEMO_PRODUCTS = [
-  { _id: '1', name: 'MacBook Pro 14"', sold: 24, price: 850000 },
-  { _id: '2', name: 'iPhone 15 Pro',   sold: 41, price: 580000 },
-  { _id: '3', name: 'RTX 4080 Super',  sold: 18, price: 620000 },
-  { _id: '4', name: 'Samsung 4K 27"',  sold: 33, price: 230000 },
-  { _id: '5', name: 'Logitech MX Keys',sold: 67, price: 75000  },
-];
 
 export default TopProducts;

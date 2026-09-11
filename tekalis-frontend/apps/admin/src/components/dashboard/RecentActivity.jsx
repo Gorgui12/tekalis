@@ -1,6 +1,6 @@
 import React from 'react';
 import { ShoppingCart, Package, Wrench, Shield, FileText } from 'lucide-react';
-import { formatRelativeTime } from '../../../../../packages/shared/outils/formatters';
+import { formatRelativeTime } from '@shared/outils/formatters';
 
 const TYPE_CONFIG = {
   order:    { icon: ShoppingCart, color: 'text-blue-400',   bg: 'bg-blue-500/10'   },
@@ -28,7 +28,7 @@ const ActivityItem = ({ item }) => {
 };
 
 const RecentActivity = ({ activities = [], loading = false }) => {
-  const items = activities.length > 0 ? activities : DEMO_ACTIVITIES;
+  const items = activities;
 
   return (
     <div className="bg-gray-900 border border-white/5 rounded-2xl p-5">
@@ -59,16 +59,5 @@ const RecentActivity = ({ activities = [], loading = false }) => {
     </div>
   );
 };
-
-const now = new Date();
-const ago = (min) => new Date(now - min * 60 * 1000);
-
-const DEMO_ACTIVITIES = [
-  { _id: '1', type: 'order',    message: 'Nouvelle commande #A3F91B — 125 000 FCFA',      createdAt: ago(5)  },
-  { _id: '2', type: 'product',  message: 'Stock mis à jour — RTX 4080 Super (3 restants)', createdAt: ago(18) },
-  { _id: '3', type: 'rma',      message: 'Demande SAV #RMA-0042 soumise par Moussa D.',    createdAt: ago(34) },
-  { _id: '4', type: 'warranty', message: 'Garantie expirante dans 7 jours — Commande #B29',createdAt: ago(60) },
-  { _id: '5', type: 'article',  message: 'Article publié — "Guide Ryzen 9 vs Core i9"',   createdAt: ago(90) },
-];
 
 export default RecentActivity;

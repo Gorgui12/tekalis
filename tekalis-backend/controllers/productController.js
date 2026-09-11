@@ -3,6 +3,25 @@ const Category = require("../models/Category");
 const { escapeRegex } = require("../utils/regexEscape");
 
 // ===============================================
+// Liste blanche de champs produit — empêche l'assignation
+// de masse (un client ne peut pas injecter rating,
+// salesCount, viewCount, etc. via le body).
+// ===============================================
+const PRODUCT_FIELDS = [
+  "name", "slug", "description", "price", "comparePrice", "stock",
+  "images", "category", "brand", "specs", "warranty", "tags",
+  "status", "isFeatured", "metaTitle", "metaDescription"
+];
+
+const pickFields = (source, allowedKeys) => {
+  const result = {};
+  for (const key of allowedKeys) {
+    if (source[key] !== undefined) result[key] = source[key];
+  }
+  return result;
+};
+
+// ===============================================
 // Utilitaire : résoudre les catégories
 // ===============================================
 const resolveCategoryIds = async (categoryInput) => {
@@ -149,7 +168,7 @@ exports.getProductById = async (req, res) => {
 // ===============================================
 exports.createProduct = async (req, res) => {
   try {
-    const data = req.body;
+    const data = pickFields(req.body, PRODUCT_FIELDS);
     const categoryIds = await resolveCategoryIds(data.category || []);
     const images = (data.images || []).filter(img => img.url && img.url.trim() !== "");
 
@@ -273,7 +292,7 @@ exports.bulkCreateProducts = async (req, res) => {
 // ===============================================
 exports.updateProduct = async (req, res) => {
   try {
-    const data = req.body;
+    const data = pickFields(req.body, PRODUCT_FIELDS);
     const categoryIds = await resolveCategoryIds(data.category || []);
     const images = (data.images || []).filter(img => img.url?.trim());
 

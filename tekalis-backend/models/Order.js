@@ -135,6 +135,11 @@ const orderSchema = new mongoose.Schema({
     default: false 
   },
   
+  // Raison de rejet d'un paiement (admin)
+  paymentFailedReason: { 
+    type: String 
+  },
+  
 }, { 
   timestamps: true 
 });

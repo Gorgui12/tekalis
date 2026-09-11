@@ -63,6 +63,11 @@ const reviewSchema = new mongoose.Schema({
   
   // Modération
   isApproved: { type: Boolean, default: true },
+  status: {
+    type: String,
+    enum: ["pending", "approved", "rejected"],
+    default: "pending"
+  },
   isReported: { type: Boolean, default: false }
 }, { timestamps: true });
 

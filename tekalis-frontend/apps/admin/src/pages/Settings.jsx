@@ -10,7 +10,7 @@ import {
   FaShieldAlt,
   FaCog
 } from "react-icons/fa";
-import api from "../../../../packages/shared/api/api";
+import api from "@shared/api/api";
 
 const AdminSettings = () => {
   const [loading, setLoading] = useState(true);
@@ -107,7 +107,7 @@ const AdminSettings = () => {
         {/* Header */}
         <div className="mb-8">
           <Link
-            to="/admin"
+            to="/dashboard"
             className="text-blue-600 hover:text-blue-700 font-semibold mb-4 inline-block"
           >
             ← Retour au dashboard

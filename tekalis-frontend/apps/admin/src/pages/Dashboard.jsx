@@ -12,7 +12,7 @@ import {
   FaCheckCircle,
   FaTruck
 } from "react-icons/fa";
-import api from "../../../../packages/shared/api/api";
+import api from "@shared/api/api";
 
 const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
@@ -38,98 +38,48 @@ const AdminDashboard = () => {
       api.get("/admin/stats/top-products"),
     ]);
 
-    const apiStats = statsRes.data;
+    const apiStats = statsRes.data.stats || statsRes.data;
 
     setStats({
       revenue: {
-        total: apiStats.totalRevenue || 0,
-        change: 0, // à calculer plus tard
+        total: apiStats.revenue?.total || 0,
+        change: apiStats.revenue?.change || 0,
       },
       orders: {
-        total: apiStats.totalOrders || 0,
-        change: 0,
-        pending: apiStats.pendingOrders || 0,
+        total: apiStats.orders?.total || 0,
+        change: apiStats.orders?.change || 0,
+        pending: apiStats.orders?.pending || 0,
       },
       products: {
-        total: apiStats.totalProducts || 0,
-        outOfStock: apiStats.outOfStock || 0,
+        total: apiStats.products?.total || 0,
+        outOfStock: apiStats.products?.outOfStock || 0,
       },
       users: {
-        total: apiStats.totalUsers || 0,
-        newThisMonth: 0,
+        total: apiStats.users?.total || 0,
+        newThisMonth: apiStats.users?.new || 0,
+        change: apiStats.users?.change || 0,
       },
     });
 
-    setRecentOrders(ordersRes.data.orders || []);
+    const orders = ordersRes.data.orders || [];
+    setRecentOrders(orders);
     setTopProducts(productsRes.data.products || []);
-    setRecentActivities(getDemoActivities());
-
+    setRecentActivities(
+      orders.map((o) => ({
+        type: "order",
+        message: `Nouvelle commande ${o.orderNumber || "#" + (o._id || "").slice(-6)}`,
+        time: new Date(o.createdAt).toLocaleDateString("fr-FR"),
+      }))
+    );
   } catch (error) {
     console.error("Erreur chargement dashboard:", error);
-    setStats(getDemoStats());
-    setRecentOrders(getDemoOrders());
-    setTopProducts(getDemoProducts());
-    setRecentActivities(getDemoActivities());
+    setRecentOrders([]);
+    setTopProducts([]);
+    setRecentActivities([]);
   } finally {
     setLoading(false);
   }
 };
-
-
-
-  // Données de démo
-  const getDemoStats = () => ({
-    revenue: { total: 45678900, change: 12.5 },
-    orders: { total: 1247, change: 8.3, pending: 23 },
-    products: { total: 342, outOfStock: 8 },
-    users: { total: 5678, newThisMonth: 234 }
-  });
-
-  const getDemoOrders = () => [
-    {
-      _id: "ORD001",
-      customer: "Mamadou Diop",
-      total: 850000,
-      status: "pending",
-      createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000)
-    },
-    {
-      _id: "ORD002",
-      customer: "Fatou Sall",
-      total: 1200000,
-      status: "processing",
-      createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000)
-    },
-    {
-      _id: "ORD003",
-      customer: "Ousmane Dia",
-      total: 650000,
-      status: "shipped",
-      createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
-    },
-    {
-      _id: "ORD004",
-      customer: "Aissatou Ndiaye",
-      total: 2100000,
-      status: "delivered",
-      createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000)
-    }
-  ];
-
-  const getDemoProducts = () => [
-    { name: "HP Pavilion Gaming 15", sales: 45, revenue: 29250000 },
-    { name: "Dell XPS 13", sales: 38, revenue: 55100000 },
-    { name: "MacBook Air M2", sales: 32, revenue: 52800000 },
-    { name: "Lenovo Legion 5", sales: 28, revenue: 51800000 },
-    { name: "Asus Vivobook", sales: 67, revenue: 28475000 }
-  ];
-
-  const getDemoActivities = () => [
-    { type: "order", message: "Nouvelle commande #ORD001", time: "Il y a 2h" },
-    { type: "product", message: "Produit ajouté: Samsung Galaxy S24", time: "Il y a 4h" },
-    { type: "review", message: "Nouvel avis 5★ sur HP Pavilion", time: "Il y a 6h" },
-    { type: "user", message: "Nouvel utilisateur: cheikh@email.com", time: "Il y a 8h" }
-  ];
 
   // StatCard Component
   const StatCard = ({ title, value, change, icon, color, subtitle }) => (
@@ -223,6 +173,7 @@ const AdminDashboard = () => {
           <StatCard
             title="Utilisateurs"
             value={stats.users.total.toLocaleString()}
+            change={stats.users.change}
             icon={<FaUsers className="text-2xl" />}
             color="#8b5cf6"
             subtitle={`+${stats.users.newThisMonth} ce mois`}
@@ -237,7 +188,7 @@ const AdminDashboard = () => {
                 🛒 Commandes récentes
               </h2>
               <Link
-                to="/admin/orders"
+                to="/orders"
                 className="text-blue-600 hover:text-blue-700 font-semibold text-sm"
               >
                 Voir tout →
@@ -260,7 +211,7 @@ const AdminDashboard = () => {
                   {recentOrders.map((order) => (
                     <tr key={order._id} className="border-b hover:bg-gray-50">
                       <td className="py-3 px-2 text-sm font-medium text-gray-900">
-                        #{order._id.slice(-6)}
+                        {order.orderNumber || `#${(order._id || "").slice(-6)}`}
                       </td>
                       <td className="py-3 px-2 text-sm text-gray-700">
                         {order.customer}
@@ -276,7 +227,7 @@ const AdminDashboard = () => {
                       </td>
                       <td className="py-3 px-2 text-center">
                         <Link
-                          to={`/admin/orders/${order._id}`}
+                          to={`/orders/${order._id}`}
                           className="text-blue-600 hover:text-blue-700"
                         >
                           <FaEye className="inline" />
@@ -327,7 +278,7 @@ const AdminDashboard = () => {
               🏆 Top 5 Produits
             </h2>
             <Link
-              to="/admin/products"
+              to="/products"
               className="text-blue-600 hover:text-blue-700 font-semibold text-sm"
             >
               Gérer les produits →
@@ -340,7 +291,7 @@ const AdminDashboard = () => {
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-2xl font-bold text-gray-400">#{index + 1}</span>
                   <span className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded-full font-semibold">
-                    {product.sales} ventes
+                    {product.salesCount ?? product.sales ?? 0} ventes
                   </span>
                 </div>
                 <h3 className="font-semibold text-sm text-gray-900 mb-2 line-clamp-2">
@@ -357,7 +308,7 @@ const AdminDashboard = () => {
         {/* Quick Actions */}
         <div className="mt-6 grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Link
-            to="/admin/add-product"
+            to="/products/add"
             className="bg-gradient-to-br from-blue-600 to-indigo-600 text-white p-6 rounded-lg shadow-md hover:shadow-xl transition text-center"
           >
             <FaBox className="text-4xl mx-auto mb-3" />
@@ -365,7 +316,7 @@ const AdminDashboard = () => {
           </Link>
 
           <Link
-            to="/admin/orders?status=pending"
+            to="/orders?status=pending"
             className="bg-gradient-to-br from-orange-600 to-red-600 text-white p-6 rounded-lg shadow-md hover:shadow-xl transition text-center"
           >
             <FaClock className="text-4xl mx-auto mb-3" />
@@ -374,7 +325,7 @@ const AdminDashboard = () => {
           </Link>
 
           <Link
-            to="/admin/products?stock=low"
+            to="/products?status=outofstock"
             className="bg-gradient-to-br from-yellow-600 to-orange-600 text-white p-6 rounded-lg shadow-md hover:shadow-xl transition text-center"
           >
             <FaTruck className="text-4xl mx-auto mb-3" />
@@ -383,7 +334,7 @@ const AdminDashboard = () => {
           </Link>
 
           <Link
-            to="/admin/users"
+            to="/users"
             className="bg-gradient-to-br from-purple-600 to-pink-600 text-white p-6 rounded-lg shadow-md hover:shadow-xl transition text-center"
           >
             <FaUsers className="text-4xl mx-auto mb-3" />

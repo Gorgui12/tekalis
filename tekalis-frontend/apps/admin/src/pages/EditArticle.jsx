@@ -1,8 +1,20 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams, Link } from "react-router-dom";
 import { FaSave, FaTimes, FaUpload } from "react-icons/fa";
-import api from "../../../../packages/shared/api/api";
-import { useToast } from '../../../../packages/shared/context/ToastContext';
+import api from "@shared/api/api";
+import { useToast } from '@shared/context/ToastContext';
+
+const EMPTY_ARTICLE = {
+  title: "",
+  slug: "",
+  excerpt: "",
+  content: "",
+  category: "test",
+  tags: [],
+  featuredImage: "",
+  status: "draft",
+  featured: false
+};
 
 const EditArticle = () => {
   const toast = useToast();
@@ -10,17 +22,7 @@ const EditArticle = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [formData, setFormData] = useState({
-    title: "",
-    slug: "",
-    excerpt: "",
-    content: "",
-    category: "test",
-    tags: [],
-    featuredImage: "",
-    status: "draft",
-    featured: false
-  });
+  const [formData, setFormData] = useState(EMPTY_ARTICLE);
   const [tagInput, setTagInput] = useState("");
 
   useEffect(() => {
@@ -30,26 +32,14 @@ const EditArticle = () => {
   const fetchArticle = async () => {
     try {
       const { data } = await api.get(`/admin/articles/${id}`);
-      setFormData(data.article || getDemoArticle());
+      setFormData(data.article || EMPTY_ARTICLE);
     } catch (error) {
       console.error("Erreur chargement article:", error);
-      setFormData(getDemoArticle());
+      setFormData(EMPTY_ARTICLE);
     } finally {
       setLoading(false);
     }
   };
-
-  const getDemoArticle = () => ({
-    title: "Test complet du HP Pavilion Gaming 15",
-    slug: "test-hp-pavilion-gaming-15",
-    excerpt: "Un laptop gaming abordable avec de belles performances",
-    content: "<p>Contenu de l'article...</p>",
-    category: "test",
-    tags: ["HP", "Gaming", "Laptop"],
-    featuredImage: "https://via.placeholder.com/800x400",
-    status: "published",
-    featured: true
-  });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -58,7 +48,7 @@ const EditArticle = () => {
     try {
       await api.put(`/admin/articles/${id}`, formData);
       toast.success("Article mis à jour avec succès !");
-      navigate("/admin/articles");
+      navigate("/articles");
     } catch (error) {
       console.error("Erreur mise à jour article:", error);
       toast.error("Erreur lors de la mise à jour de l'article");
@@ -98,7 +88,7 @@ const EditArticle = () => {
         {/* Header */}
         <div className="mb-8">
           <Link
-            to="/admin/articles"
+            to="/articles"
             className="text-blue-600 hover:text-blue-700 font-semibold mb-4 inline-block"
           >
             ← Retour aux articles
@@ -308,7 +298,7 @@ const EditArticle = () => {
           {/* Actions */}
           <div className="flex gap-3 justify-end bg-white rounded-lg shadow-md p-6">
             <Link
-              to="/admin/articles"
+              to="/articles"
               className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold flex items-center gap-2"
             >
               <FaTimes /> Annuler

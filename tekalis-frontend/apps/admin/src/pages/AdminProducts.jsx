@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   FaPlus,
   FaEdit,
@@ -13,16 +13,19 @@ import {
   FaCheckCircle,
   FaClock
 } from "react-icons/fa";
-import api from "../../../../packages/shared/api/api";
-import { useToast } from "../../../../packages/shared/context/ToastContext";
+import api from "@shared/api/api";
+import { useToast } from "@shared/context/ToastContext";
+
+const CLIENT_URL = import.meta.env.VITE_CLIENT_URL || "https://tekalis.com";
 
 const AdminProducts = () => {
   const toast = useToast();
+  const [searchParams] = useSearchParams();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
-  const [stockFilter, setStockFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState(searchParams.get("status") || "all");
+  const [stockFilter, setStockFilter] = useState(searchParams.get("stock") || "all");
   const [sortBy, setSortBy] = useState("newest");
 
   useEffect(() => {
@@ -271,13 +274,14 @@ const AdminProducts = () => {
 
                   {/* Actions */}
                   <div className="flex gap-2 mb-2">
-                    <Link
-                      to={`/product/${product._id}`}
+                    <a
+                      href={`${CLIENT_URL}/products/${product._id}`}
                       target="_blank"
+                      rel="noopener noreferrer"
                       className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg font-semibold text-xs text-center flex items-center justify-center gap-1"
                     >
                       <FaEye /> Voir
-                    </Link>
+                    </a>
                     <Link
                       to={`/products/edit/${product._id}`}
                       className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold text-xs text-center flex items-center justify-center gap-1"

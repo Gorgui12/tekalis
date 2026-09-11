@@ -6,8 +6,8 @@ import {
   FaStar
 } from "react-icons/fa";
 import * as XLSX from 'xlsx';
-import api from "../../../../packages/shared/api/api";
-import { useToast } from '../../../../packages/shared/context/ToastContext';
+import api from "@shared/api/api";
+import { useToast } from '@shared/context/ToastContext';
 
 const AddProduct = () => {
   const toast = useToast();

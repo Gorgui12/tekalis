@@ -9,7 +9,7 @@ import {
   FaTimes,
   FaCheck
 } from "react-icons/fa";
-import api from "../../../../packages/shared/api/api";
+import api from "@shared/api/api";
 
 const AdminOrders = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -28,51 +28,16 @@ const AdminOrders = () => {
     try {
       const params = statusFilter !== "all" ? `?status=${statusFilter}` : "";
       const { data } = await api.get(`/admin/orders${params}`);
-      setOrders(data.orders || getDemoOrders());
+      setOrders(data.orders || []);
     } catch (error) {
       console.error("Erreur chargement commandes:", error);
-      setOrders(getDemoOrders());
+      setOrders([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const getDemoOrders = () => [
-    {
-      _id: "ORD001",
-      orderNumber: "CMD-2025-001",
-      customer: { name: "Mamadou Diop", email: "mamadou@email.com" },
-      products: [{ name: "HP Pavilion", quantity: 1, price: 850000 }],
-      totalPrice: 850000,
-      status: "pending",
-      paymentMethod: "cash",
-      deliveryAddress: "Dakar, Plateau",
-      createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000)
-    },
-    {
-      _id: "ORD002",
-      orderNumber: "CMD-2025-002",
-      customer: { name: "Fatou Sall", email: "fatou@email.com" },
-      products: [{ name: "Dell XPS 13", quantity: 1, price: 1200000 }],
-      totalPrice: 1200000,
-      status: "processing",
-      paymentMethod: "wave",
-      deliveryAddress: "Pikine, Cité",
-      createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000)
-    },
-    {
-      _id: "ORD003",
-      orderNumber: "CMD-2025-003",
-      customer: { name: "Ousmane Dia", email: "ousmane@email.com" },
-      products: [{ name: "Asus Vivobook", quantity: 2, price: 325000 }],
-      totalPrice: 650000,
-      status: "shipped",
-      paymentMethod: "om",
-      deliveryAddress: "Guédiawaye",
-      createdAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
-    }
-  ];
-
+  
   // Filtrer les commandes
   const filteredOrders = orders.filter(order => {
     const matchesSearch = 
@@ -160,7 +125,7 @@ const AdminOrders = () => {
         {/* Header */}
         <div className="mb-8">
           <Link
-            to="/admin"
+            to="/dashboard"
             className="text-blue-600 hover:text-blue-700 font-semibold mb-4 inline-block"
           >
             ← Retour au dashboard
@@ -298,12 +263,12 @@ const AdminOrders = () => {
                         </p>
                       </td>
                       <td className="py-3 px-4">
-                        <p className="text-sm font-medium text-gray-900">
-                          {order.customer?.name}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {order.customer?.email}
-                        </p>
+<p className="text-sm font-medium text-gray-900">
+                    {order.user?.name || order.customerInfo?.name || order.deliveryName || "—"}
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    {order.user?.email || order.customerInfo?.email || order.deliveryPhone}
+                  </p>
                       </td>
                       <td className="py-3 px-4">
                         <p className="text-sm text-gray-700">
@@ -330,7 +295,7 @@ const AdminOrders = () => {
                       <td className="py-3 px-4">
                         <div className="flex items-center justify-center gap-2">
                           <Link
-                            to={`/admin/orders/${order._id}`}
+                            to={`/orders/${order._id}`}
                             className="text-blue-600 hover:text-blue-700 p-2"
                             title="Voir détails"
                           >

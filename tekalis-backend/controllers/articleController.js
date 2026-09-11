@@ -4,6 +4,24 @@
 const Article = require("../models/Article");
 const Product = require("../models/Product");
 
+// ===============================================
+// Liste blanche de champs article — empêche l'assignation
+// de masse (viewCount, auteur, etc. non injectables).
+// ===============================================
+const ARTICLE_FIELDS = [
+  "title", "slug", "content", "excerpt", "coverImage", "category",
+  "tags", "isTest", "relatedProducts", "metaTitle", "metaDescription",
+  "status", "isFeatured"
+];
+
+const pickFields = (source, allowedKeys) => {
+  const result = {};
+  for (const key of allowedKeys) {
+    if (source[key] !== undefined) result[key] = source[key];
+  }
+  return result;
+};
+
 // Récupérer tous les articles
 exports.getAllArticles = async (req, res) => {
   try {
@@ -82,7 +100,7 @@ exports.getArticleBySlug = async (req, res) => {
 exports.createArticle = async (req, res) => {
   try {
     const articleData = {
-      ...req.body,
+      ...pickFields(req.body, ARTICLE_FIELDS),
       author: req.user._id
     };
     
@@ -107,15 +125,17 @@ exports.createArticle = async (req, res) => {
 // Modifier un article (Admin)
 exports.updateArticle = async (req, res) => {
   try {
+    const data = pickFields(req.body, ARTICLE_FIELDS);
+
     // Recalculer le temps de lecture si le contenu change
-    if (req.body.content) {
-      const wordCount = req.body.content.split(/\s+/).length;
-      req.body.readTime = Math.ceil(wordCount / 250);
+    if (data.content) {
+      const wordCount = data.content.split(/\s+/).length;
+      data.readTime = Math.ceil(wordCount / 250);
     }
     
     const article = await Article.findByIdAndUpdate(
       req.params.id,
-      req.body,
+      data,
       { new: true, runValidators: true }
     );
     

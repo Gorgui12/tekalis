@@ -1,12 +1,13 @@
 // src/pages/admin/Register.jsx
 import { useState } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { useToast } from '../../../../packages/shared/context/ToastContext';
+import api from "@shared/api/api";
+import { useToast } from "@shared/context/ToastContext";
+
 const Register = () => {
   const toast = useToast();
   const [form, setForm] = useState({
-    username: "",  // ✅ Changement ici
+    username: "",
     email: "",
     password: "",
   });
@@ -22,9 +23,9 @@ const Register = () => {
     setError("");
 
     try {
-      const res = await axios.post("http://localhost:5000/api/admin/register", form);
+      await api.post("/auth/admin/register", form);
       toast.success("Admin créé avec succès !");
-      navigate("/admin/login");
+      navigate("/login");
     } catch (err) {
       setError(err.response?.data?.error || "Erreur lors de l'inscription");
     }
@@ -38,7 +39,7 @@ const Register = () => {
 
         <input
           type="text"
-          name="username"  // ✅ Changement ici
+          name="username"
           placeholder="Nom d'utilisateur"
           onChange={handleChange}
           required
