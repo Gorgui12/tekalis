@@ -38,8 +38,8 @@ const CONTACT_INFO = [
   {
     icon: <FaMapMarkerAlt />,
     label: "Adresse",
-    value: "Plateau, Dakar, Sénégal",
-    href: "https://maps.google.com/?q=Dakar+Plateau+Senegal",
+    value: "Fann, Rue 14, Dakar, Sénégal",
+    href: "https://maps.google.com/?q=Fann+Rue+14+Dakar+Senegal",
     external: true,
     color: "bg-red-100 text-red-600"
   }
@@ -302,8 +302,9 @@ const Contact = () => {
               Contactez-nous
             </h1>
             <p className="text-lg text-surface-600 dark:text-surface-400 max-w-xl mx-auto">
-              Une question, un problème, ou envie de discuter d'un projet ?
-              Notre équipe vous répond rapidement.
+              Une question sur un produit ou une commande ? Notre équipe vous répond rapidement.
+              Livraison rapide à Dakar, paiement à la livraison ou par Wave — passez aussi nous voir
+              à la boutique high-tech de Fann, Rue 14.
             </p>
           </div>
 

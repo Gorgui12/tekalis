@@ -27,10 +27,9 @@ export const metadata = {
     template: '%s | Tekalis Sénégal',
   },
   description:
-    'Tekalis, votre spécialiste en électronique et high-tech à Dakar. Ordinateurs, smartphones, TV, électroménager. Livraison rapide au Sénégal. Prix compétitifs, garantie incluse.',
+    'Votre boutique électronique et magasin high-tech à Dakar. Ordinateurs, smartphones, TV, électroménager. Livraison rapide au Sénégal, garantie incluse.',
   keywords: [
-    'électronique Sénégal', 'high-tech Dakar', 'ordinateur portable', 'smartphone Dakar',
-    'TV Dakar', 'électroménager Sénégal', 'boutique tech Dakar', 'Tekalis',
+    'boutique électronique Dakar', 'magasin high-tech Dakar', 'acheter électronique en ligne Sénégal', 'site e-commerce électronique Sénégal', 'Tekalis',
   ],
   authors: [{ name: 'Tekalis' }],
   creator: 'Tekalis',

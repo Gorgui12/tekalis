@@ -2,12 +2,12 @@
 
 export const metadata = {
   title: "Contact | Tekalis — Boutique Électronique Dakar Fann",
-  description: "Contactez Tekalis à Dakar Fann : +221 78 634 69 46, contact@tekalis.com. Boutique de smartphones, laptops, TV à Fann, Rue 14. Réponse rapide, conseils d'experts.",
-  keywords: ['contact tekalis', 'boutique électronique Dakar', 'joindre tekalis', 'adresse tekalis Fann'],
+  description: "Contactez Tekalis, boutique high-tech Sénégal, à Dakar Fann (Fann, Rue 14) : +221 78 634 69 46. Livraison rapide à Dakar, paiement Wave ou à la livraison.",
+  keywords: ['contact tekalis', 'boutique high-tech Sénégal', 'électronique Fann Dakar', 'livraison rapide électronique Dakar'],
   alternates: { canonical: 'https://tekalis.com/contact' },
   openGraph: {
     title: 'Contact | Tekalis — Boutique Électronique Dakar Fann',
-    description: 'Contactez Tekalis à Dakar Fann : +221 78 634 69 46. Fann, Rue 14, Dakar.',
+    description: 'Boutique high-tech à Dakar Fann : +221 78 634 69 46. Fann, Rue 14, livraison rapide au Sénégal.',
     url: 'https://tekalis.com/contact',
     siteName: 'Tekalis Sénégal',
     locale: 'fr_SN',
