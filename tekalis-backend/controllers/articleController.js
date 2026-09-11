@@ -73,10 +73,17 @@ exports.getArticleBySlug = async (req, res) => {
     if (!article) {
       return res.status(404).json({ message: "Article introuvable" });
     }
-    
-    article.viewCount += 1;
-    await article.save();
-    
+
+    // Incrémentation atomique du compteur (sûr en cas de requêtes concurrentes).
+    // Le findOne initial ci-dessus sert à vérifier l'existence + peupler la réponse,
+    // on n'y touche pas : on fait juste l'opération $inc ici.
+    await Article.findOneAndUpdate(
+      { slug: req.params.slug, status: "published" },
+      { $inc: { viewCount: 1 } }
+    );
+    // Refléter la vue dans la réponse immédiate (doc mémoire seulement, pas de save)
+    article.viewCount = (article.viewCount || 0) + 1;
+
     // Articles similaires
     const relatedArticles = await Article.find({
       category: article.category,

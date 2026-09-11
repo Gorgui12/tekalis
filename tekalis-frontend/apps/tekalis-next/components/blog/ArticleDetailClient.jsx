@@ -126,7 +126,7 @@ const ArticleDetails = ({ article: initialArticle, related: initialRelated }) =>
     },
     image: "/blog/gaming-pc.jpg",
     readTime: 8,
-    views: 1542,
+    viewCount: 1542,
     publishedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
     tags: ["Gaming", "PC", "Hardware", "Test"],
     relatedProductIds: ["prod1", "prod2", "prod3"]
@@ -277,7 +277,7 @@ const ArticleDetails = ({ article: initialArticle, related: initialRelated }) =>
                   </span>
                   <span className="flex items-center gap-1.5">
                     <FaEye size={13} />
-                    {article.views?.toLocaleString() ?? 0} vues
+                    {article.viewCount?.toLocaleString() ?? 0} vues
                   </span>
                 </div>
               </div>

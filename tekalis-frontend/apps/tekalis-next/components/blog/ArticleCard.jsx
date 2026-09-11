@@ -63,7 +63,7 @@ const ArticleCard = ({ article, variant = "default", featured = false }) => {
             </span>
             <span className="flex items-center gap-1">
               <FaEye />
-              {article.views}
+              {article.viewCount}
             </span>
             <span className="flex items-center gap-1">
               <FaUser />
@@ -141,7 +141,7 @@ const ArticleCard = ({ article, variant = "default", featured = false }) => {
           </span>
           <span className="flex items-center gap-1">
             <FaEye />
-            {article.views}
+            {article.viewCount}
           </span>
         </div>
 

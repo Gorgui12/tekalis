@@ -17,12 +17,24 @@ import DOMPurify from "isomorphic-dompurify";
 
 const ALLOWED_TAGS = [
   "p", "br", "strong", "b", "em", "i", "u", "s",
-  "h2", "h3", "h4", "ul", "ol", "li",
+  "h1", "h2", "h3", "h4", "h5", "h6",
+  "ul", "ol", "li",
   "a", "img", "blockquote", "code", "pre",
-  "table", "thead", "tbody", "tr", "th", "td"
+  "table", "thead", "tbody", "tr", "th", "td",
+  // Structure éditoriale
+  "section", "div", "span", "hr",
+  // Texte enrichi
+  "mark", "small", "sup", "sub", "abbr", "cite", "q",
+  // Média / illustration
+  "figure", "figcaption",
+  // Listes de description
+  "dl", "dt", "dd"
 ];
 
-const ALLOWED_ATTR = ["href", "src", "alt", "title", "target", "rel", "class"];
+const ALLOWED_ATTR = [
+  "href", "src", "alt", "title", "target", "rel", "class",
+  "id", "width", "height", "loading"
+];
 
 export function sanitizeArticleHtml(html) {
   if (!html || typeof html !== "string") return "";

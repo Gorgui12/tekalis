@@ -50,7 +50,7 @@ const Blog = () => {
       author: { name: "Mamadou Diop", avatar: "/avatar1.jpg" },
       image: "/blog/gaming-pc.jpg",
       readTime: 8,
-      views: 1542,
+      viewCount: 1542,
       publishedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
       featured: true,
       tags: ["Gaming", "PC", "Hardware"]
@@ -64,7 +64,7 @@ const Blog = () => {
       author: { name: "Fatou Sall", avatar: "/avatar2.jpg" },
       image: "/blog/laptop-guide.jpg",
       readTime: 12,
-      views: 3241,
+      viewCount: 3241,
       publishedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
       featured: false,
       tags: ["Laptop", "Guide d'achat"]
@@ -78,7 +78,7 @@ const Blog = () => {
       author: { name: "Ousmane Dia", avatar: "/avatar3.jpg" },
       image: "/blog/tech-trends.jpg",
       readTime: 6,
-      views: 892,
+      viewCount: 892,
       publishedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
       featured: false,
       tags: ["Tendances", "Tech", "Sénégal"]
@@ -92,7 +92,7 @@ const Blog = () => {
       author: { name: "Aissatou Ndiaye", avatar: "/avatar4.jpg" },
       image: "/blog/phone-comparison.jpg",
       readTime: 10,
-      views: 2156,
+      viewCount: 2156,
       publishedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
       featured: true,
       tags: ["Smartphones", "Comparatif"]
@@ -106,7 +106,7 @@ const Blog = () => {
       author: { name: "Cheikh Fall", avatar: "/avatar5.jpg" },
       image: "/blog/build-pc.jpg",
       readTime: 15,
-      views: 1876,
+      viewCount: 1876,
       publishedAt: new Date(Date.now() - 12 * 24 * 60 * 60 * 1000),
       featured: false,
       tags: ["PC", "DIY", "Tutoriel"]
@@ -120,7 +120,7 @@ const Blog = () => {
       author: { name: "Mamadou Diop", avatar: "/avatar1.jpg" },
       image: "/blog/gaming-headset.jpg",
       readTime: 9,
-      views: 1234,
+      viewCount: 1234,
       publishedAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000),
       featured: false,
       tags: ["Gaming", "Audio", "Test"]
@@ -292,7 +292,7 @@ const Blog = () => {
                     </span>
                     <span className="flex items-center gap-1">
                       <FaEye />
-                      {featuredArticle.views} vues
+                      {featuredArticle.viewCount} vues
                     </span>
                   </div>
 
@@ -366,7 +366,7 @@ const Blog = () => {
                       </span>
                       <span className="flex items-center gap-1">
                         <FaEye />
-                        {article.views}
+                        {article.viewCount}
                       </span>
                     </div>
 
