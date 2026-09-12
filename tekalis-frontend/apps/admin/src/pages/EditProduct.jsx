@@ -53,6 +53,10 @@ const EditProduct = () => {
     tags: [],
     status: "available",
     isFeatured: false,
+    gtin: "",
+    mpn: "",
+    weight: 1,
+    condition: "new",
     metaTitle: "",
     metaDescription: ""
   });
@@ -116,6 +120,10 @@ const EditProduct = () => {
         tags: product.tags || [],
         status: product.status || "available",
         isFeatured: product.isFeatured || false,
+        gtin: product.gtin || "",
+        mpn: product.mpn || "",
+        weight: product.weight || 1,
+        condition: product.condition || "new",
         metaTitle: product.metaTitle || "",
         metaDescription: product.metaDescription || ""
       });
@@ -481,6 +489,60 @@ const EditProduct = () => {
                     <label htmlFor="isFeatured" className="text-sm font-semibold text-gray-700">
                       Produit en vedette ⭐
                     </label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Catalogue Google Merchant */}
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <h3 className="font-bold text-gray-900 mb-1">Catalogue Google Merchant</h3>
+                <p className="text-xs text-gray-500 mb-4">
+                  Facultatif — GTIN/MPN améliorent la visibilité Google Shopping.
+                </p>
+                <div className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Code GTIN / EAN</label>
+                    <input
+                      type="text"
+                      value={formData.gtin}
+                      onChange={(e) => setFormData({ ...formData, gtin: e.target.value })}
+                      className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Ex : 1234567890123"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Référence fabricant (MPN)</label>
+                    <input
+                      type="text"
+                      value={formData.mpn}
+                      onChange={(e) => setFormData({ ...formData, mpn: e.target.value })}
+                      className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Ex : AB-12345"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">Poids unitaire (kg)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={formData.weight}
+                      onChange={(e) => setFormData({ ...formData, weight: Number(e.target.value) })}
+                      className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Ex : 2.3"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">État</label>
+                    <select
+                      value={formData.condition}
+                      onChange={(e) => setFormData({ ...formData, condition: e.target.value })}
+                      className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="new">Neuf</option>
+                      <option value="refurbished">Reconditionné</option>
+                      <option value="used">Occasion</option>
+                    </select>
                   </div>
                 </div>
               </div>

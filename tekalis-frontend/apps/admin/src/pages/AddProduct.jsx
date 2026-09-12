@@ -58,6 +58,10 @@ const AddProduct = () => {
     tags: [],
     status: "available",
     isFeatured: false,
+    gtin: "",
+    mpn: "",
+    weight: 1,
+    condition: "new",
     metaTitle: "",
     metaDescription: ""
   });
@@ -848,6 +852,60 @@ const AddProduct = () => {
                           {c} <button type="button" onClick={() => removeFromSpecsArray("color", i)} className="text-red-400 hover:text-red-600"><FaTimes size={10} /></button>
                         </span>
                       ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Catalogue Google Merchant */}
+                <div className="bg-white rounded-lg shadow-md p-6">
+                  <h2 className="text-xl font-bold text-gray-900 mb-1">Catalogue Google Merchant</h2>
+                  <p className="text-sm text-gray-500 mb-4">
+                    Facultatif — améliore la visibilité des annonces Google Shopping (GTIN/MPN requis par Google sinon).
+                  </p>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Code GTIN / EAN</label>
+                      <input
+                        type="text"
+                        value={formData.gtin}
+                        onChange={e => setFormData(prev => ({ ...prev, gtin: e.target.value }))}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                        placeholder="Ex : 1234567890123"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Référence fabricant (MPN)</label>
+                      <input
+                        type="text"
+                        value={formData.mpn}
+                        onChange={e => setFormData(prev => ({ ...prev, mpn: e.target.value }))}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                        placeholder="Ex : AB-12345"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Poids unitaire (kg)</label>
+                      <input
+                        type="number"
+                        min="0"
+                        step="0.01"
+                        value={formData.weight}
+                        onChange={e => setFormData(prev => ({ ...prev, weight: Number(e.target.value) }))}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                        placeholder="Ex : 2.3"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">État</label>
+                      <select
+                        value={formData.condition}
+                        onChange={e => setFormData(prev => ({ ...prev, condition: e.target.value }))}
+                        className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="new">Neuf</option>
+                        <option value="refurbished">Reconditionné</option>
+                        <option value="used">Occasion</option>
+                      </select>
                     </div>
                   </div>
                 </div>
