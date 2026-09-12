@@ -10,6 +10,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import Link from "next/link"; import { useRouter } from "next/navigation";
 import { FaSearch, FaTimes, FaSpinner, FaArrowRight } from 'react-icons/fa';
 import api from '@/lib/api';
+import { trackSearch } from '@/lib/analytics';
 
 
 /* ── Debounce hook ─────────────────────────────────────────────────────── */
@@ -185,6 +186,7 @@ const SearchBarLive = ({
   const handleFullSearch = () => {
     if (!query.trim()) return;
     saveRecentSearch(query.trim());
+    trackSearch(query.trim());
     navigate(`/products?search=${encodeURIComponent(query.trim())}`);
     setOpen(false);
   };

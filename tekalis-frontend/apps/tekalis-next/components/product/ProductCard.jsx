@@ -11,6 +11,7 @@ import {
   removeFromWishlistLocal,
 } from "@/store/slices/wishlistSlice";
 import { useToast } from "@/components/shared/ToastProvider";
+import { trackAddToCart, trackEvent } from "@/lib/analytics";
 import {
   FaStar,
   FaShoppingCart,
@@ -60,6 +61,7 @@ const ProductCard = ({ product, showSpecs = false }) => {
       return;
     }
     dispatch(addToCart(product));
+    trackAddToCart(product, 1);
     toast.success(`${product.name} ajouté au panier !`);
   };
 
@@ -73,6 +75,13 @@ const ProductCard = ({ product, showSpecs = false }) => {
     } else {
       dispatch(addToWishlistLocal(product));
       dispatch(addToWishlist(product._id));
+      trackEvent("AddToWishlist", {
+        content_type: "product",
+        content_ids: [product._id],
+        contents: [{ id: product._id, quantity: 1 }],
+        value: product.price || 0,
+        currency: "XOF",
+      }, { eventId: product._id });
       toast.success("Ajouté aux favoris ❤️");
     }
   };

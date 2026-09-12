@@ -10,7 +10,8 @@ const { escapeRegex } = require("../utils/regexEscape");
 const PRODUCT_FIELDS = [
   "name", "slug", "description", "price", "comparePrice", "stock",
   "images", "category", "brand", "specs", "warranty", "tags",
-  "status", "isFeatured", "metaTitle", "metaDescription"
+  "status", "isFeatured", "metaTitle", "metaDescription",
+  "gtin", "mpn", "weight", "condition"
 ];
 
 const pickFields = (source, allowedKeys) => {

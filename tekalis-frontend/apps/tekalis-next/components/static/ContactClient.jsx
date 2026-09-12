@@ -10,6 +10,7 @@ import {
 import { useToast } from "@/components/shared/ToastProvider";
 import Button from "@/components/shared/Button";
 import { Breadcrumb } from "@/components/seo/Breadcrumb";
+import { SOCIAL_LINKS } from "@/lib/utils/constants";
 
 // ─── Données de contact ────────────────────────────────────────────────────────
 const CONTACT_INFO = [
@@ -381,10 +382,10 @@ const Contact = () => {
                 </h2>
                 <div className="flex gap-3">
                   {[
-                    { icon: <FaFacebook size={18} />, href: "https://www.facebook.com/share/14MikMhjFhA/", color: "hover:bg-blue-600" },
-                    { icon: <FaInstagram size={18} />, href: "https://www.instagram.com/_tekalis_", color: "hover:bg-pink-600" },
-                    { icon: <FaWhatsapp size={18} />, href: "https://wa.me/221786346946", color: "hover:bg-green-500" },
-                    { icon: <FaLinkedin size={18} />, href: "https://linkedin.com/company/tekalis", color: "hover:bg-blue-700" }
+                    { icon: <FaFacebook size={18} />, href: SOCIAL_LINKS.facebook, color: "hover:bg-blue-600" },
+                    { icon: <FaInstagram size={18} />, href: SOCIAL_LINKS.instagram, color: "hover:bg-pink-600" },
+                    { icon: <FaWhatsapp size={18} />, href: SOCIAL_LINKS.whatsapp, color: "hover:bg-green-500" },
+                    { icon: <FaLinkedin size={18} />, href: SOCIAL_LINKS.linkedin, color: "hover:bg-blue-700" }
                   ].map((social, idx) => (
                     <a
                       key={idx}

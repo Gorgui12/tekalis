@@ -1,17 +1,19 @@
 "use client";
 
 import { useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { FaTimesCircle } from "react-icons/fa";
+import { trackEvent } from "@/lib/analytics";
 
-const PaymentCancel = () => {
-  const { orderId } = useParams();
+const PaymentCancel = ({ orderId }) => {
   const router = useRouter();
   const navigate = (path) => router.push(path);
 
   useEffect(() => {
-    // Optionnel : log ou analytics
-    console.log("Paiement annulé pour la commande :", orderId);
+    trackEvent("InitiateCheckoutAbandoned", {
+      eventId: orderId,
+      category: "checkout",
+    });
   }, [orderId]);
 
   return (

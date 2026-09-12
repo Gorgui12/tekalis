@@ -36,6 +36,7 @@ const AdminProducts = () => {
     setLoading(true);
     try {
       const params = new URLSearchParams();
+      params.append("limit", "200");
       if (statusFilter !== "all") params.append("status", statusFilter);
       if (sortBy) params.append("sort", sortBy);
 

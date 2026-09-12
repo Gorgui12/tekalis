@@ -2,9 +2,11 @@ import './globals.css';
 import { Space_Grotesk, DM_Sans } from 'next/font/google';
 import Script from 'next/script';
 import Providers from '@/components/shared/Providers';
+import AnalyticsProvider from '@/components/shared/AnalyticsProvider';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import WhatsAppButton from '@/components/layout/WhatsAppButton';
+import { SOCIAL_LINKS } from '@/lib/utils/constants';
 
 const fontDisplay = Space_Grotesk({
   subsets: ['latin'],
@@ -139,10 +141,10 @@ const localBusinessSchema = {
     worstRating: '1',
   },
   sameAs: [
-    'https://www.facebook.com/share/14MikMhjFhA/',
-    'https://www.instagram.com/_tekalis_',
-    'https://twitter.com/tekalis',
-    'https://linkedin.com/company/tekalis',
+    SOCIAL_LINKS.facebook,
+    SOCIAL_LINKS.instagram,
+    SOCIAL_LINKS.twitter,
+    SOCIAL_LINKS.linkedin,
   ],
 };
 
@@ -153,6 +155,28 @@ export default function RootLayout({ children }) {
         <link rel="preconnect" href="https://images.unsplash.com" />
         <link rel="dns-prefetch" href="//tekalis.onrender.com" />
         <meta name="theme-color" content="#f59e0b" />
+
+        {/*
+          ── Google Consent Mode v2 ─────────────────────────────────────
+          Bootstrap de la couche donnée AVANT le moindre script de tracking.
+          Tout est "denied" par défaut : aucun pixel/GA4 n'est chargé
+          tant que l'utilisateur n'a pas accepté (voir lib/analytics.js).
+        */}
+        <script
+          id="consent-mode-bootstrap"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('consent', 'default', {
+                'ad_storage': 'denied',
+                'ad_user_data': 'denied',
+                'ad_personalization': 'denied',
+                'analytics_storage': 'denied'
+              });
+            `,
+          }}
+        />
       </head>
       <Script
         id="local-business-schema"
@@ -162,10 +186,12 @@ export default function RootLayout({ children }) {
       <body className="bg-white dark:bg-surface-950 text-surface-900 dark:text-surface-50 font-body antialiased">
         <Providers>
           <div className="pt-[100px]">
-            <Navbar />
-            <main>{children}</main>
-            <Footer />
-            <WhatsAppButton />
+            <AnalyticsProvider>
+              <Navbar />
+              <main>{children}</main>
+              <Footer />
+              <WhatsAppButton />
+            </AnalyticsProvider>
           </div>
         </Providers>
       </body>

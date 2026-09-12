@@ -28,6 +28,16 @@ const productSchemaEnhanced = new mongoose.Schema({
   }],
   
   brand: { type: String, required: true },
+
+  // 🆕 Champs catalogue / Google Merchant Center
+  gtin: String,        // EAN / UPC / GTIN-13 international
+  mpn: String,         // Référence constructeur
+  weight: { type: Number, default: 0 },  // Poids unitaire en kg
+  condition: {
+    type: String,
+    enum: ["new", "refurbished", "used"],
+    default: "new"
+  },
   
   // 🆕 Spécifications techniques détaillées
   specs: {

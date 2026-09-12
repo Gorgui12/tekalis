@@ -1,58 +1,92 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { 
-  FaSave, 
+import {
+  FaSave,
   FaStore,
   FaTruck,
   FaCreditCard,
-  FaEnvelope,
-  FaBell,
   FaShieldAlt,
-  FaCog
+  FaCog,
+  FaChartLine,
+  FaTag,
+  FaExchangeAlt,
+  FaStar,
 } from "react-icons/fa";
 import api from "@shared/api/api";
+
+// ── Valeurs par défaut = schéma Mongoose du modèle Settings (backend) ──────
+const INITIAL = {
+  siteName: "Tekalis",
+  siteDescription: "",
+  logo: "",
+  favicon: "",
+  contactEmail: "contact@tekalis.com",
+  contactPhone: "",
+  contactAddress: "",
+  socialLinks: {
+    facebook: "",
+    instagram: "",
+    twitter: "",
+    linkedin: "",
+    youtube: "",
+  },
+  shipping: {
+    standardCost: 2500,
+    freeShippingThreshold: 50000,
+    expressAvailable: true,
+    expressCost: 5000,
+    regions: [],
+  },
+  tax: { enabled: false, rate: 0, included: true },
+  loyalty: {
+    enabled: true,
+    pointsPerFCFA: 0.001,
+    redemptionRate: 1,
+    minPointsToRedeem: 100,
+  },
+  warranty: {
+    defaultDuration: 12,
+    extensionAvailable: true,
+    extensionCost: 5000,
+  },
+  returns: { enabled: true, periodDays: 14, conditions: "" },
+  paymentMethods: {
+    cash: true,
+    wave: true,
+    orangeMoney: true,
+    freeMoney: true,
+    stripe: false,
+  },
+  maintenance: { enabled: false, message: "" },
+  seo: {
+    metaTitle: "",
+    metaDescription: "",
+    metaKeywords: [],
+    googleAnalyticsId: "",
+    facebookPixelId: "",
+  },
+};
+
+// Fusion profonde des defaults + valeurs déjà en base
+const mergeSettings = (s = {}) => {
+  const result = {};
+  Object.keys(INITIAL).forEach((k) => {
+    const def = INITIAL[k];
+    if (def && typeof def === "object" && !Array.isArray(def)) {
+      result[k] = { ...def, ...((s && s[k]) || {}) };
+    } else {
+      result[k] = (s && s[k]) ?? def;
+    }
+  });
+  return result;
+};
 
 const AdminSettings = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [accountSaved, setAccountSaved] = useState(false);
   const [activeTab, setActiveTab] = useState("general");
-  const [settings, setSettings] = useState({
-    // General
-    siteName: "Tekalis",
-    siteDescription: "Votre boutique high-tech au Sénégal",
-    contactEmail: "contact@tekalis.com",
-    contactPhone: "+221 33 123 45 67",
-    address: "Dakar, Plateau",
-    
-    // Shipping
-    freeShippingThreshold: 100000,
-    shippingCost: 5000,
-    shippingTime: "2-5 jours ouvrés",
-    
-    // Payment
-    enableCash: true,
-    enableWave: true,
-    enableOrangeMoney: true,
-    enableCard: false,
-    waveNumber: "+221 77 123 45 67",
-    orangeMoneyNumber: "+221 78 123 45 67",
-    
-    // Email
-    emailNotificationsEnabled: true,
-    orderConfirmationEmail: true,
-    shippingConfirmationEmail: true,
-    promotionalEmails: false,
-    
-    // Notifications
-    lowStockAlert: 10,
-    newOrderNotification: true,
-    newReviewNotification: true,
-    
-    // Security
-    requireEmailVerification: false,
-    enableTwoFactor: false,
-    sessionTimeout: 30
-  });
+  const [settings, setSettings] = useState(mergeSettings());
 
   useEffect(() => {
     fetchSettings();
@@ -61,7 +95,7 @@ const AdminSettings = () => {
   const fetchSettings = async () => {
     try {
       const { data } = await api.get("/admin/settings");
-      setSettings(data.settings || settings);
+      setSettings(mergeSettings(data.settings));
     } catch (error) {
       console.error("Erreur chargement paramètres:", error);
     } finally {
@@ -72,10 +106,11 @@ const AdminSettings = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
-
+    setAccountSaved(false);
     try {
       await api.put("/admin/settings", settings);
-      alert("Paramètres enregistrés avec succès !");
+      setAccountSaved(true);
+      setTimeout(() => setAccountSaved(false), 3000);
     } catch (error) {
       console.error("Erreur enregistrement:", error);
       alert("Erreur lors de l'enregistrement des paramètres");
@@ -84,13 +119,74 @@ const AdminSettings = () => {
     }
   };
 
+  // Helpers de mise à jour (imbriqué)
+  const setFlat = (key) => (e) => {
+    const value = e.target.type === "number" ? Number(e.target.value) : e.target.value;
+    setSettings((s) => ({ ...s, [key]: value }));
+  };
+  const setNested = (section, key) => (e) => {
+    const value = e.target.type === "checkbox" ? e.target.checked : e.target.type === "number" ? Number(e.target.value) : e.target.value;
+    setSettings((s) => ({
+      ...s,
+      [section]: { ...(s[section] || {}), [key]: value },
+    }));
+  };
+  const setNestedBool = (section, key) => (e) => {
+    setSettings((s) => ({
+      ...s,
+      [section]: { ...(s[section] || {}), [key]: e.target.checked },
+    }));
+  };
+
+  const Field = ({ label, value, onChange, type = "text", placeholder = "", required = false, hint = "" }) => (
+    <div>
+      <label className="block text-sm font-semibold text-gray-700 mb-2">
+        {label} {required && <span className="text-red-500">*</span>}
+      </label>
+      <input
+        type={type}
+        required={required}
+        value={value ?? ""}
+        onChange={onChange}
+        placeholder={placeholder}
+        className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
+      {hint && <p className="text-xs text-gray-500 mt-1">{hint}</p>}
+    </div>
+  );
+
+  const Toggle = ({ label, checked, onChange, hint = "" }) => (
+    <label className="flex items-center justify-between py-3 border-b border-gray-100 last:border-0 cursor-pointer">
+      <span>
+        <span className="block text-sm font-semibold text-gray-700">{label}</span>
+        {hint && <span className="block text-xs text-gray-500 mt-0.5">{hint}</span>}
+      </span>
+      <input
+        type="checkbox"
+        checked={!!checked}
+        onChange={onChange}
+        className="w-5 h-5 accent-blue-600"
+      />
+    </label>
+  );
+
+  const Card = ({ title, icon, children }) => (
+    <div className="bg-white rounded-lg shadow-md p-6">
+      <h2 className="text-xl font-bold text-gray-900 mb-5 flex items-center gap-2">
+        <span className="text-blue-600">{icon}</span> {title}
+      </h2>
+      <div className="space-y-4">{children}</div>
+    </div>
+  );
+
   const tabs = [
-    { id: "general", label: "Général", icon: <FaStore /> },
+    { id: "general", label: "Général & contact", icon: <FaStore /> },
     { id: "shipping", label: "Livraison", icon: <FaTruck /> },
-    { id: "payment", label: "Paiement", icon: <FaCreditCard /> },
-    { id: "email", label: "Emails", icon: <FaEnvelope /> },
-    { id: "notifications", label: "Notifications", icon: <FaBell /> },
-    { id: "security", label: "Sécurité", icon: <FaShieldAlt /> }
+    { id: "payment", label: "Paiements", icon: <FaCreditCard /> },
+    { id: "warranty", label: "Garanties & retours", icon: <FaShieldAlt /> },
+    { id: "loyalty", label: "Fidélité", icon: <FaStar /> },
+    { id: "seo", label: "SEO & Tracking", icon: <FaChartLine /> },
+    { id: "maintenance", label: "Maintenance", icon: <FaCog /> },
   ];
 
   if (loading) {
@@ -112,12 +208,28 @@ const AdminSettings = () => {
           >
             ← Retour au dashboard
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            ⚙️ Paramètres du site
-          </h1>
-          <p className="text-gray-600">
-            Configurez les paramètres de votre boutique
-          </p>
+          <div className="flex items-center justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                ⚙️ Paramètres du site
+              </h1>
+              <p className="text-gray-600">
+                Informations, livraison, paiements, SEO et tracking
+              </p>
+            </div>
+            <button
+              onClick={handleSubmit}
+              disabled={saving}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 shadow-md disabled:opacity-60"
+            >
+              <FaSave /> {saving ? "Enregistrement..." : "Enregistrer les paramètres"}
+            </button>
+          </div>
+          {accountSaved && (
+            <div className="mt-4 bg-green-50 text-green-700 border border-green-200 px-4 py-3 rounded-lg font-semibold">
+              ✅ Paramètres enregistrés avec succès !
+            </div>
+          )}
         </div>
 
         <div className="grid lg:grid-cols-4 gap-6">
@@ -134,411 +246,136 @@ const AdminSettings = () => {
                       : "text-gray-700 hover:bg-gray-100"
                   }`}
                 >
-                  <span className="text-xl">{tab.icon}</span>
+                  <span>{tab.icon}</span>
                   <span>{tab.label}</span>
                 </button>
               ))}
+              <button
+                onClick={handleSubmit}
+                disabled={saving}
+                className="w-full mt-2 text-center px-4 py-3 rounded-lg font-bold transition bg-blue-600 hover:bg-blue-700 text-white disabled:opacity-60"
+              >
+                <FaSave className="inline mr-2" />
+                {saving ? "..." : "Enregistrer"}
+              </button>
             </div>
           </div>
 
           {/* Content */}
-          <div className="lg:col-span-3">
-            <form onSubmit={handleSubmit} className="space-y-6">
-              {/* General Settings */}
-              {activeTab === "general" && (
-                <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
-                  <h2 className="text-xl font-bold text-gray-900 mb-4">Informations générales</h2>
-                  
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Nom du site *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={settings.siteName}
-                      onChange={(e) => setSettings({ ...settings, siteName: e.target.value })}
-                      className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Description
-                    </label>
-                    <textarea
-                      rows={3}
-                      value={settings.siteDescription}
-                      onChange={(e) => setSettings({ ...settings, siteDescription: e.target.value })}
-                      className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    ></textarea>
-                  </div>
-
+          <div className="lg:col-span-3 space-y-6">
+            {activeTab === "general" && (
+              <>
+                <Card title="Informations générales" icon={<FaStore />}>
                   <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Email de contact *
-                      </label>
-                      <input
-                        type="email"
-                        required
-                        value={settings.contactEmail}
-                        onChange={(e) => setSettings({ ...settings, contactEmail: e.target.value })}
-                        className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Téléphone *
-                      </label>
-                      <input
-                        type="tel"
-                        required
-                        value={settings.contactPhone}
-                        onChange={(e) => setSettings({ ...settings, contactPhone: e.target.value })}
-                        className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                    </div>
+                    <Field label="Nom du site" required value={settings.siteName} onChange={setFlat("siteName")} />
+                    <Field label="Email de contact" type="email" value={settings.contactEmail} onChange={setFlat("contactEmail")} />
                   </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Adresse physique
-                    </label>
-                    <input
-                      type="text"
-                      value={settings.address}
-                      onChange={(e) => setSettings({ ...settings, address: e.target.value })}
-                      className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
+                  <Field label="Description du site" value={settings.siteDescription} onChange={setFlat("siteDescription")} />
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <Field label="Téléphone" type="tel" value={settings.contactPhone} onChange={setFlat("contactPhone")} />
+                    <Field label="Adresse physique" value={settings.contactAddress} onChange={setFlat("contactAddress")} />
                   </div>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <Field label="URL du logo" value={settings.logo} onChange={setFlat("logo")} placeholder="https://..." />
+                    <Field label="URL favicon" value={settings.favicon} onChange={setFlat("favicon")} placeholder="https://..." />
+                  </div>
+                </Card>
+
+                <Card title="Réseaux sociaux" icon={<FaStore />}>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <Field label="Facebook" value={settings.socialLinks?.facebook} onChange={setNested("socialLinks", "facebook")} placeholder="https://facebook.com/..." />
+                    <Field label="Instagram" value={settings.socialLinks?.instagram} onChange={setNested("socialLinks", "instagram")} placeholder="https://instagram.com/..." />
+                    <Field label="Twitter / X" value={settings.socialLinks?.twitter} onChange={setNested("socialLinks", "twitter")} placeholder="https://x.com/..." />
+                    <Field label="LinkedIn" value={settings.socialLinks?.linkedin} onChange={setNested("socialLinks", "linkedin")} placeholder="https://linkedin.com/..." />
+                    <Field label="YouTube" value={settings.socialLinks?.youtube} onChange={setNested("socialLinks", "youtube")} placeholder="https://youtube.com/..." />
+                  </div>
+                </Card>
+              </>
+            )}
+
+            {activeTab === "shipping" && (
+              <Card title="Livraison" icon={<FaTruck />}>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <Field label="Coût standard (FCFA)" type="number" value={settings.shipping?.standardCost} onChange={setNested("shipping", "standardCost")} />
+                  <Field label="Seuil livraison gratuite (FCFA)" type="number" value={settings.shipping?.freeShippingThreshold} onChange={setNested("shipping", "freeShippingThreshold")} />
+                  <Field label="Coût express (FCFA)" type="number" value={settings.shipping?.expressCost} onChange={setNested("shipping", "expressCost")} />
                 </div>
-              )}
+                <Toggle label="Livraison express disponible" checked={settings.shipping?.expressAvailable} onChange={setNestedBool("shipping", "expressAvailable")} />
+              </Card>
+            )}
 
-              {/* Shipping Settings */}
-              {activeTab === "shipping" && (
-                <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
-                  <h2 className="text-xl font-bold text-gray-900 mb-4">Paramètres de livraison</h2>
-                  
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Frais de livraison (FCFA)
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      value={settings.shippingCost}
-                      onChange={(e) => setSettings({ ...settings, shippingCost: parseInt(e.target.value) })}
-                      className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
+            {activeTab === "payment" && (
+              <Card title="Moyens de paiement" icon={<FaCreditCard />}>
+                <Toggle label="Paiement à la livraison (cash)" checked={settings.paymentMethods?.cash} onChange={setNestedBool("paymentMethods", "cash")} />
+                <Toggle label="Wave" checked={settings.paymentMethods?.wave} onChange={setNestedBool("paymentMethods", "wave")} />
+                <Toggle label="Orange Money" checked={settings.paymentMethods?.orangeMoney} onChange={setNestedBool("paymentMethods", "orangeMoney")} />
+                <Toggle label="Free Money" checked={settings.paymentMethods?.freeMoney} onChange={setNestedBool("paymentMethods", "freeMoney")} />
+                <Toggle label="Carte bancaire / Stripe" checked={settings.paymentMethods?.stripe} onChange={setNestedBool("paymentMethods", "stripe")} />
+              </Card>
+            )}
+
+            {activeTab === "warranty" && (
+              <>
+                <Card title="Garantie" icon={<FaShieldAlt />}>
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <Field label="Durée par défaut (mois)" type="number" value={settings.warranty?.defaultDuration} onChange={setNested("warranty", "defaultDuration")} />
+                    <Field label="Coût extension (FCFA)" type="number" value={settings.warranty?.extensionCost} onChange={setNested("warranty", "extensionCost")} />
                   </div>
+                  <Toggle label="Extension de garantie disponible" checked={settings.warranty?.extensionAvailable} onChange={setNestedBool("warranty", "extensionAvailable")} />
+                </Card>
 
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Seuil livraison gratuite (FCFA)
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      value={settings.freeShippingThreshold}
-                      onChange={(e) => setSettings({ ...settings, freeShippingThreshold: parseInt(e.target.value) })}
-                      className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Livraison gratuite à partir de ce montant
-                    </p>
-                  </div>
+                <Card title="Retours / SAV" icon={<FaExchangeAlt />}>
+                  <Field label="Période de retour (jours)" type="number" value={settings.returns?.periodDays} onChange={setNested("returns", "periodDays")} />
+                  <Field label="Conditions de retour" value={settings.returns?.conditions} onChange={setNested("returns", "conditions")} />
+                  <Toggle label="Retours activés" checked={settings.returns?.enabled} onChange={setNestedBool("returns", "enabled")} />
+                </Card>
+              </>
+            )}
 
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Délai de livraison
-                    </label>
-                    <input
-                      type="text"
-                      value={settings.shippingTime}
-                      onChange={(e) => setSettings({ ...settings, shippingTime: e.target.value })}
-                      className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      placeholder="Ex: 2-5 jours ouvrés"
-                    />
-                  </div>
-                </div>
-              )}
+            {activeTab === "loyalty" && (
+              <Card title="Points de fidélité" icon={<FaStar />}>
+                <Field label="Points par FCFA (ex. 0.001 = 1 pt / 1000 FCFA)" type="number" step="0.001" value={settings.loyalty?.pointsPerFCFA} onChange={setNested("loyalty", "pointsPerFCFA")} />
+                <Field label="Valeur de rachat 1 pt = ? FCFA" type="number" value={settings.loyalty?.redemptionRate} onChange={setNested("loyalty", "redemptionRate")} />
+                <Field label="Points minimum pour racheter" type="number" value={settings.loyalty?.minPointsToRedeem} onChange={setNested("loyalty", "minPointsToRedeem")} />
+                <Toggle label="Fidélité activée" checked={settings.loyalty?.enabled} onChange={setNestedBool("loyalty", "enabled")} />
+              </Card>
+            )}
 
-              {/* Payment Settings */}
-              {activeTab === "payment" && (
-                <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
-                  <h2 className="text-xl font-bold text-gray-900 mb-4">Méthodes de paiement</h2>
-                  
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        id="enableCash"
-                        checked={settings.enableCash}
-                        onChange={(e) => setSettings({ ...settings, enableCash: e.target.checked })}
-                        className="w-5 h-5 text-blue-600 rounded"
-                      />
-                      <label htmlFor="enableCash" className="text-sm font-semibold text-gray-700">
-                        💵 Paiement à la livraison (Cash)
-                      </label>
-                    </div>
+            {activeTab === "seo" && (
+              <>
+                <Card title="SEO" icon={<FaTag />}>
+                  <Field label="Meta title par défaut" value={settings.seo?.metaTitle} onChange={setNested("seo", "metaTitle")} />
+                  <Field label="Meta description par défaut" value={settings.seo?.metaDescription} onChange={setNested("seo", "metaDescription")} />
+                </Card>
 
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        id="enableWave"
-                        checked={settings.enableWave}
-                        onChange={(e) => setSettings({ ...settings, enableWave: e.target.checked })}
-                        className="w-5 h-5 text-blue-600 rounded"
-                      />
-                      <label htmlFor="enableWave" className="text-sm font-semibold text-gray-700">
-                        📱 Wave
-                      </label>
-                    </div>
+                <Card title="Tracking — Meta Pixel (Facebook Ads)" icon={<FaChartLine />}>
+                  <Field
+                    label="ID du Pixel Facebook"
+                    value={settings.seo?.facebookPixelId}
+                    onChange={setNested("seo", "facebookPixelId")}
+                    placeholder="Ex : 1234567890123456"
+                    hint="Injecté côté frontend. Laissez vide pour désactiver. (préfixe NEXT_PUBLIC_FACEBOOK_PIXEL_ID écrasé si renseigné)"
+                  />
+                </Card>
 
-                    {settings.enableWave && (
-                      <div className="ml-7">
-                        <input
-                          type="tel"
-                          value={settings.waveNumber}
-                          onChange={(e) => setSettings({ ...settings, waveNumber: e.target.value })}
-                          className="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          placeholder="Numéro Wave"
-                        />
-                      </div>
-                    )}
+                <Card title="Tracking — Google" icon={<FaChartLine />}>
+                  <Field
+                    label="ID Google Analytics 4"
+                    value={settings.seo?.googleAnalyticsId}
+                    onChange={setNested("seo", "googleAnalyticsId")}
+                    placeholder="Ex : G-XXXXXXXXXX"
+                    hint="Injecté côté frontend. Laissez vide pour désactiver."
+                  />
+                </Card>
+              </>
+            )}
 
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        id="enableOrangeMoney"
-                        checked={settings.enableOrangeMoney}
-                        onChange={(e) => setSettings({ ...settings, enableOrangeMoney: e.target.checked })}
-                        className="w-5 h-5 text-blue-600 rounded"
-                      />
-                      <label htmlFor="enableOrangeMoney" className="text-sm font-semibold text-gray-700">
-                        🟠 Orange Money
-                      </label>
-                    </div>
-
-                    {settings.enableOrangeMoney && (
-                      <div className="ml-7">
-                        <input
-                          type="tel"
-                          value={settings.orangeMoneyNumber}
-                          onChange={(e) => setSettings({ ...settings, orangeMoneyNumber: e.target.value })}
-                          className="w-full border rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          placeholder="Numéro Orange Money"
-                        />
-                      </div>
-                    )}
-
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        id="enableCard"
-                        checked={settings.enableCard}
-                        onChange={(e) => setSettings({ ...settings, enableCard: e.target.checked })}
-                        className="w-5 h-5 text-blue-600 rounded"
-                      />
-                      <label htmlFor="enableCard" className="text-sm font-semibold text-gray-700">
-                        💳 Carte bancaire
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Email Settings */}
-              {activeTab === "email" && (
-                <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
-                  <h2 className="text-xl font-bold text-gray-900 mb-4">Paramètres emails</h2>
-                  
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        id="emailNotificationsEnabled"
-                        checked={settings.emailNotificationsEnabled}
-                        onChange={(e) => setSettings({ ...settings, emailNotificationsEnabled: e.target.checked })}
-                        className="w-5 h-5 text-blue-600 rounded"
-                      />
-                      <label htmlFor="emailNotificationsEnabled" className="text-sm font-semibold text-gray-700">
-                        Activer les notifications par email
-                      </label>
-                    </div>
-
-                    {settings.emailNotificationsEnabled && (
-                      <>
-                        <div className="ml-7 space-y-2">
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="checkbox"
-                              id="orderConfirmationEmail"
-                              checked={settings.orderConfirmationEmail}
-                              onChange={(e) => setSettings({ ...settings, orderConfirmationEmail: e.target.checked })}
-                              className="w-4 h-4 text-blue-600 rounded"
-                            />
-                            <label htmlFor="orderConfirmationEmail" className="text-sm text-gray-700">
-                              Confirmation de commande
-                            </label>
-                          </div>
-
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="checkbox"
-                              id="shippingConfirmationEmail"
-                              checked={settings.shippingConfirmationEmail}
-                              onChange={(e) => setSettings({ ...settings, shippingConfirmationEmail: e.target.checked })}
-                              className="w-4 h-4 text-blue-600 rounded"
-                            />
-                            <label htmlFor="shippingConfirmationEmail" className="text-sm text-gray-700">
-                              Confirmation d'expédition
-                            </label>
-                          </div>
-
-                          <div className="flex items-center gap-2">
-                            <input
-                              type="checkbox"
-                              id="promotionalEmails"
-                              checked={settings.promotionalEmails}
-                              onChange={(e) => setSettings({ ...settings, promotionalEmails: e.target.checked })}
-                              className="w-4 h-4 text-blue-600 rounded"
-                            />
-                            <label htmlFor="promotionalEmails" className="text-sm text-gray-700">
-                              Emails promotionnels
-                            </label>
-                          </div>
-                        </div>
-                      </>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Notification Settings */}
-              {activeTab === "notifications" && (
-                <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
-                  <h2 className="text-xl font-bold text-gray-900 mb-4">Notifications admin</h2>
-                  
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Alerte stock faible (unités)
-                    </label>
-                    <input
-                      type="number"
-                      min="0"
-                      value={settings.lowStockAlert}
-                      onChange={(e) => setSettings({ ...settings, lowStockAlert: parseInt(e.target.value) })}
-                      className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                    <p className="text-xs text-gray-500 mt-1">
-                      Recevoir une alerte quand le stock est inférieur à ce nombre
-                    </p>
-                  </div>
-
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        id="newOrderNotification"
-                        checked={settings.newOrderNotification}
-                        onChange={(e) => setSettings({ ...settings, newOrderNotification: e.target.checked })}
-                        className="w-5 h-5 text-blue-600 rounded"
-                      />
-                      <label htmlFor="newOrderNotification" className="text-sm font-semibold text-gray-700">
-                        Notifier pour les nouvelles commandes
-                      </label>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        id="newReviewNotification"
-                        checked={settings.newReviewNotification}
-                        onChange={(e) => setSettings({ ...settings, newReviewNotification: e.target.checked })}
-                        className="w-5 h-5 text-blue-600 rounded"
-                      />
-                      <label htmlFor="newReviewNotification" className="text-sm font-semibold text-gray-700">
-                        Notifier pour les nouveaux avis
-                      </label>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Security Settings */}
-              {activeTab === "security" && (
-                <div className="bg-white rounded-lg shadow-md p-6 space-y-4">
-                  <h2 className="text-xl font-bold text-gray-900 mb-4">Sécurité</h2>
-                  
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        id="requireEmailVerification"
-                        checked={settings.requireEmailVerification}
-                        onChange={(e) => setSettings({ ...settings, requireEmailVerification: e.target.checked })}
-                        className="w-5 h-5 text-blue-600 rounded"
-                      />
-                      <label htmlFor="requireEmailVerification" className="text-sm font-semibold text-gray-700">
-                        Vérification email obligatoire à l'inscription
-                      </label>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="checkbox"
-                        id="enableTwoFactor"
-                        checked={settings.enableTwoFactor}
-                        onChange={(e) => setSettings({ ...settings, enableTwoFactor: e.target.checked })}
-                        className="w-5 h-5 text-blue-600 rounded"
-                      />
-                      <label htmlFor="enableTwoFactor" className="text-sm font-semibold text-gray-700">
-                        Authentification à deux facteurs
-                      </label>
-                    </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
-                      Durée de session (minutes)
-                    </label>
-                    <input
-                      type="number"
-                      min="5"
-                      max="1440"
-                      value={settings.sessionTimeout}
-                      onChange={(e) => setSettings({ ...settings, sessionTimeout: parseInt(e.target.value) })}
-                      className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    />
-                  </div>
-                </div>
-              )}
-
-              {/* Save Button */}
-              <div className="bg-white rounded-lg shadow-md p-6">
-                <button
-                  type="submit"
-                  disabled={saving}
-                  className={`w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2 ${
-                    saving ? "opacity-50 cursor-not-allowed" : ""
-                  }`}
-                >
-                  {saving ? (
-                    <>
-                      <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-white"></div>
-                      Enregistrement...
-                    </>
-                  ) : (
-                    <>
-                      <FaSave /> Enregistrer les paramètres
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
+            {activeTab === "maintenance" && (
+              <Card title="Maintenance" icon={<FaCog />}>
+                <Toggle label="Activer le mode maintenance" checked={settings.maintenance?.enabled} onChange={setNestedBool("maintenance", "enabled")} />
+                <Field label="Message de maintenance" value={settings.maintenance?.message} onChange={setNested("maintenance", "message")} />
+              </Card>
+            )}
           </div>
         </div>
       </div>

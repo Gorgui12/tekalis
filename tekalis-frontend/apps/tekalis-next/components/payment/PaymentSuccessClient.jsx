@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { FaCheckCircle, FaSpinner } from "react-icons/fa";
 import api from "@/lib/api";
+import { trackPurchase } from "@/lib/analytics";
 
 const PaymentSuccess = ({ orderId }) => {
   const router = useRouter();
@@ -11,9 +12,30 @@ const PaymentSuccess = ({ orderId }) => {
   const [status, setStatus] = useState("verifying"); // verifying, success, failed
   const [orderDetails, setOrderDetails] = useState(null);
 
+  const firePurchase = (order) => {
+    const items = (order?.products || []).map((item) => ({
+      _id: item?.product?._id || item?._id,
+      quantity: item?.quantity || 1,
+      price: item?.price,
+    }));
+    trackPurchase({
+      orderId: order?._id,
+      value: order?.totalPrice || 0,
+      currency: "XOF",
+      items,
+    });
+  };
+
   useEffect(() => {
     verifyPayment();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderId]);
+
+  useEffect(() => {
+    if (status === "success" && orderDetails) {
+      firePurchase(orderDetails);
+    }
+  }, [status, orderDetails]);
 
   const verifyPayment = async () => {
     try {

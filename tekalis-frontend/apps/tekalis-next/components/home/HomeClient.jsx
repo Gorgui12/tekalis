@@ -23,6 +23,7 @@ import {
 } from "react-icons/fa";
 import api from "@/lib/api";
 import ProductCard from "@/components/product/ProductCard";
+import { SOCIAL_LINKS } from "@/lib/utils/constants";
 
 // ── Schema.org défini EN DEHORS du composant (évite recréation à chaque render) ──
 const HOME_SCHEMA = {
@@ -67,9 +68,10 @@ const HOME_SCHEMA = {
     ],
   },
   sameAs: [
-    'https://www.facebook.com/share/14MikMhjFhA/',
-    'https://www.instagram.com/_tekalis_',
-    'https://twitter.com/tekalis',
+    SOCIAL_LINKS.facebook,
+    SOCIAL_LINKS.instagram,
+    SOCIAL_LINKS.twitter,
+    SOCIAL_LINKS.linkedin,
   ],
 };
 

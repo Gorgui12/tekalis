@@ -10,6 +10,7 @@ import {
 } from "react-icons/fa";
 import { useToast } from "@/components/shared/ToastProvider";
 import { validateEmail } from "@/lib/utils/validators";
+import { SOCIAL_LINKS } from "@/lib/utils/constants";
 import Button from "../shared/Button";
 
 const Footer = () => {
@@ -189,10 +190,10 @@ const Footer = () => {
               <h5 className="font-semibold mb-3 text-sm">Suivez-nous</h5>
               <div className="flex gap-3">
                 {[
-                  { icon: <FaFacebook size={18} />, href: "https://www.facebook.com/share/14MikMhjFhA/?mibextid=wwXIfr", label: "Facebook", hover: "hover:bg-blue-600" },
-                  { icon: <FaInstagram size={18} />, href: "https://www.instagram.com/_tekalis_?igsh=MWY0am12dDlyNGRpYQ==", label: "Instagram", hover: "hover:bg-pink-600" },
-                  { icon: <FaTwitter size={18} />, href: "https://twitter.com/tekalis", label: "Twitter", hover: "hover:bg-sky-500" },
-                  { icon: <FaLinkedin size={18} />, href: "https://linkedin.com/company/tekalis", label: "LinkedIn", hover: "hover:bg-blue-700" },
+                  { icon: <FaFacebook size={18} />, href: SOCIAL_LINKS.facebook, label: "Facebook", hover: "hover:bg-blue-600" },
+                  { icon: <FaInstagram size={18} />, href: SOCIAL_LINKS.instagram, label: "Instagram", hover: "hover:bg-pink-600" },
+                  { icon: <FaTwitter size={18} />, href: SOCIAL_LINKS.twitter, label: "Twitter", hover: "hover:bg-sky-500" },
+                  { icon: <FaLinkedin size={18} />, href: SOCIAL_LINKS.linkedin, label: "LinkedIn", hover: "hover:bg-blue-700" },
                 ].map((social) => (
                   <a 
                     key={social.label}
@@ -309,10 +310,10 @@ const Footer = () => {
             "availableLanguage": ["fr", "wo"]
           },
           "sameAs": [
-            "https://www.facebook.com/share/14MikMhjFhA",
-            "https://www.instagram.com/_tekalis_",
-            "https://twitter.com/tekalis",
-            "https://linkedin.com/company/tekalis"
+            SOCIAL_LINKS.facebook.replace("/?mibextid=wwXIfr", ""),
+            SOCIAL_LINKS.instagram,
+            SOCIAL_LINKS.twitter,
+            SOCIAL_LINKS.linkedin
           ]
         }) }}
       />

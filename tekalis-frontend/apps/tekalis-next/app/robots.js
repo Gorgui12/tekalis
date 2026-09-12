@@ -3,7 +3,7 @@ export default function robots() {
     rules: [
       {
         userAgent: '*',
-        allow: ['/', '/llms.txt'],
+        allow: ['/', '/llms.txt', '/api/v1/merchant/products.xml'],
         disallow: [
           '/admin',
           '/api/',

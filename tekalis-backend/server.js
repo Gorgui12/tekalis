@@ -46,6 +46,10 @@ const API_PREFIX = "/api/v1";
 const sitemapRouter = require("./routes/sitemap");
 app.use("/api/v1", sitemapRouter);
 
+// Feed Google Merchant (hors rate-limiter : consommé par les bots Google)
+const productFeedRouter = require("./routes/productFeed");
+app.use("/api/v1", productFeedRouter);
+
 // ─── Connexion MongoDB ────────────────────────────────────────────────────────
 connectDB().catch((err) => {
   console.error("❌ Erreur fatale de connexion MongoDB:", err.message);
@@ -168,6 +172,7 @@ loadRoute(`${API_PREFIX}/rma`, "./routes/rmaRoutes");
 loadRoute(`${API_PREFIX}/payment`, "./routes/paymentRoutes");
 loadRoute(`${API_PREFIX}/admin/stats`, "./routes/stats");
 loadRoute(`${API_PREFIX}/admin`, "./routes/adminRoutes");
+loadRoute(`${API_PREFIX}`, "./routes/settingsRoutes");
 
 console.log("✅ Routes chargées\n");
 

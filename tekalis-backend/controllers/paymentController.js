@@ -7,6 +7,7 @@ const paydunya = require("paydunya");
 const Order = require("../models/Order");
 const Cart = require("../models/Cart");
 const crypto = require("crypto");
+const MetaCapi = require("../services/metaCapiService");
 
 // Configuration PayDunya
 const setup = new paydunya.Setup({
@@ -293,6 +294,17 @@ const paydunyaCallback = async (req, res) => {
       await order.save();
 
       console.log(`✅ Paiement confirmé (double vérification) — commande ${order.orderNumber}`);
+
+      // ── Meta CAPI : Purchase serveur→serveur (non bloquant) ────────────
+      // L'event_id = orderId permet la déduplication avec l'événement
+      // browser tiré sur /payment/success (lib/analytics.js).
+      MetaCapi.trackPurchase({
+        orderId: order._id,
+        value: order.totalPrice,
+        items: order.products || [],
+        email: order.user?.email,
+        phone: order.deliveryPhone,
+      }).catch((err) => console.error("[MetaCAPI] Échec trackPurchase:", err.message));
     } else {
       console.log(`ℹ️ Commande ${order.orderNumber} déjà marquée payée`);
     }
@@ -343,6 +355,15 @@ const confirmPayment = async (req, res) => {
       }
 
       await order.save();
+
+      // ── Meta CAPI : Purchase (chemin alternatif au webhook, non bloquant)
+      MetaCapi.trackPurchase({
+        orderId: order._id,
+        value: order.totalPrice,
+        items: order.products || [],
+        email: req.user?.email,
+        phone: order.deliveryPhone,
+      }).catch((err) => console.error("[MetaCAPI] Échec trackPurchase:", err.message));
 
       return res.status(200).json({
         success: true,

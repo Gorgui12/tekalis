@@ -15,6 +15,11 @@ import { useRouter } from "next/navigation";
 import { clearCart } from "@/store/slices/cartSlice";
 import { useToast } from "@/components/shared/ToastProvider";
 import api from "@/lib/api";
+import {
+  trackInitiateCheckout,
+  trackAddPaymentInfo,
+  trackPurchase,
+} from "@/lib/analytics";
 
 import CheckoutSteps from "./CheckoutSteps";
 import DeliveryForm from "./DeliveryForm";
@@ -41,10 +46,20 @@ const CheckoutForm = () => {
     }
   }, [items, navigate]);
 
+  // ── InitiateCheckout ─────────────────────────────────────────────────────
+  useEffect(() => {
+    if (items && items.length > 0) {
+      trackInitiateCheckout({ items, value: totalAmount });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // ── Étape 2 → 3 ──────────────────────────────────────────────────────────
   const handleDeliveryNext = (data) => {
     setDeliveryData(data);
     setStep(3);
+    const deliveryFee = data?.deliveryMode?.price ?? 0;
+    trackAddPaymentInfo({ items, value: totalAmount + deliveryFee });
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
@@ -102,6 +117,14 @@ const CheckoutForm = () => {
         response.data?.order?._id ||
         response.data?._id        ||
         response.data?.orderId;
+
+      // Conversion : commande confirmée (paiement à la livraison)
+      trackPurchase({
+        orderId,
+        value: totalWithDelivery,
+        items,
+        currency: "XOF",
+      });
 
       navigate(
         orderId ? `/dashboard/orders/${orderId}` : "/dashboard/orders",

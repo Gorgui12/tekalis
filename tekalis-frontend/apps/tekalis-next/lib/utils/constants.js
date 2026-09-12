@@ -130,6 +130,16 @@ export const ARTICLE_CATEGORY_LABELS = {
   comparison: "Comparatif"
 };
 
+// 🔥 Social Links (source unique — Ne pas dupliquer dans les composants)
+export const SOCIAL_LINKS = {
+  facebook: "https://www.facebook.com/share/14MikMhjFhA/",
+  instagram: "https://www.instagram.com/_tekalis_",
+  twitter: "https://twitter.com/tekalis",
+  linkedin: "https://linkedin.com/company/tekalis",
+  youtube: "https://www.youtube.com/@Tekalis",
+  whatsapp: "https://wa.me/221771234567"
+};
+
 // 🔥 Shipping Configuration
 export const SHIPPING = {
   FREE_SHIPPING_THRESHOLD: 50000, // FCFA
@@ -233,6 +243,7 @@ export default {
   RATING_LABELS,
   ARTICLE_CATEGORIES,
   ARTICLE_CATEGORY_LABELS,
+  SOCIAL_LINKS,
   SHIPPING,
   PAGINATION,
   IMAGE,

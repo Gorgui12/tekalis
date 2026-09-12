@@ -28,6 +28,7 @@ import {
   FaShoppingCart,
 } from "react-icons/fa";
 import { useToast } from "@/components/shared/ToastProvider";
+import { trackViewContent, trackAddToCart } from "@/lib/analytics";
 
 const ProductDetails = ({ product: initialProduct }) => {
   const { id } = useParams();
@@ -41,7 +42,9 @@ const ProductDetails = ({ product: initialProduct }) => {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-  }, []);
+    if (initialProduct?._id) trackViewContent(initialProduct);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialProduct?._id]);
 
   // Use SSR product
   const product = initialProduct;
@@ -101,6 +104,7 @@ const ProductDetails = ({ product: initialProduct }) => {
     for (let i = 0; i < quantity; i++) {
       dispatch(addToCart(product));
     }
+    trackAddToCart(product, quantity);
     toast.success(`${quantity} × ${product.name} ajouté${quantity > 1 ? "s" : ""} au panier !`);
   };
 
@@ -132,7 +136,7 @@ const ProductDetails = ({ product: initialProduct }) => {
     : 0;
 
   return (
-    <div className="container mx-auto px-4 py-8 mt-32">
+    <div className="container mx-auto px-4 py-8 mt-4 md:mt-8">
 
       {/* ── Fil d'Ariane SEO ─────────────────────────────────────────────── */}
       <Breadcrumb
