@@ -15,6 +15,7 @@ import useProducts from "@/lib/hooks/useProducts";
 import useDebounce from "@/lib/hooks/useDebounce";
 import usePagination from "@/lib/hooks/usePagination";
 import Pagination from "@/components/shared/Pagination";
+import { trackViewCategory, trackProductImpressions } from "@/lib/analytics";
 
 // ─── Helper : normalise une catégorie (objet OU string) en string ─────────────
 const getCatName = (cat) => {
@@ -117,6 +118,19 @@ const Products = ({ initialProducts = [] }) => {
     filteredProducts,
     12
   );
+
+  // ─── Tracking : catégorie vue ─────────────────────────────────────────────
+  useEffect(() => {
+    if (selectedCategory !== "all") trackViewCategory(selectedCategory);
+  }, [selectedCategory]);
+
+  // ─── Tracking : impressions produits (liste affichée) ─────────────────────
+  useEffect(() => {
+    if (loading || filteredProducts.length === 0) return;
+    const visible = selectedCategory === "all" ? filteredProducts : paginatedItems;
+    const t = setTimeout(() => trackProductImpressions(visible), 300);
+    return () => clearTimeout(t);
+  }, [selectedCategory, currentPage, debouncedSearch, loading, filteredProducts, paginatedItems]);
 
   // ─── Grouper par categorie (strings uniquement) ───────────────────────────
   const productsByCategory = useMemo(() => {

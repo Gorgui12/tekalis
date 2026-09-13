@@ -8,6 +8,7 @@ import {
   decreaseQuantity,
   clearCart,
 } from "@/store/slices/cartSlice";
+import { trackRemoveFromCart } from "@/lib/analytics";
 import { FaTrash, FaMinus, FaPlus, FaShieldAlt, FaTruck, FaLock } from "react-icons/fa";
 
 const Cart = () => {
@@ -120,7 +121,10 @@ const Cart = () => {
 
                     {/* Supprimer */}
                     <button
-                      onClick={() => dispatch(removeFromCart(item._id))}
+                      onClick={() => {
+                        trackRemoveFromCart(item, item.quantity || 1);
+                        dispatch(removeFromCart(item._id));
+                      }}
                       className="text-rose-500 hover:text-rose-700 font-semibold flex items-center gap-1.5 text-sm transition"
                     >
                       <FaTrash size={13} />
@@ -146,6 +150,7 @@ const Cart = () => {
           <button
             onClick={() => {
               if (window.confirm("Voulez-vous vraiment vider le panier ?")) {
+                items.forEach((it) => trackRemoveFromCart(it, it.quantity || 1));
                 dispatch(clearCart());
               }
             }}

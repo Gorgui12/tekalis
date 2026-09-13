@@ -61,7 +61,7 @@ const AdminArticles = () => {
     total: articles.length,
     published: articles.filter(a => a.status === "published").length,
     draft: articles.filter(a => a.status === "draft").length,
-    featured: articles.filter(a => a.featured).length
+    featured: articles.filter(a => a.isFeatured || a.featured).length
   };
 
   // Supprimer un article
@@ -80,13 +80,16 @@ const AdminArticles = () => {
   // Badge de catégorie
   const CategoryBadge = ({ category }) => {
     const categories = {
-      test: { label: "Test", color: "blue" },
-      guide: { label: "Guide", color: "green" },
-      tutorial: { label: "Tutoriel", color: "purple" },
-      news: { label: "Actualités", color: "red" },
-      comparison: { label: "Comparatif", color: "orange" }
+      test:        { label: "Test",       color: "green" },
+      comparatif:  { label: "Comparatif", color: "indigo" },
+      guide:       { label: "Guide",      color: "purple" },
+      tutoriel:    { label: "Tutoriel",   color: "orange" },
+      tutorial:    { label: "Tutoriel",   color: "orange" },
+      actualite:   { label: "Actualité",  color: "red" },
+      news:        { label: "Actualité",  color: "red" },
+      comparison:  { label: "Comparatif", color: "indigo" }
     };
-    const config = categories[category] || categories.news;
+    const config = categories[category] || categories.test;
 
     return (
       <span className={`bg-${config.color}-100 text-${config.color}-700 px-3 py-1 rounded-full text-xs font-semibold`}>
@@ -200,10 +203,9 @@ const AdminArticles = () => {
             >
               <option value="all">Toutes les catégories</option>
               <option value="test">Tests</option>
-              <option value="guide">Guides</option>
-              <option value="tutorial">Tutoriels</option>
-              <option value="news">Actualités</option>
-              <option value="comparison">Comparatifs</option>
+              <option value="comparatif">Comparatifs</option>
+              <option value="tutoriel">Tutoriels</option>
+              <option value="actualite">Actualités</option>
             </select>
 
             {/* Status Filter */}
@@ -257,7 +259,7 @@ const AdminArticles = () => {
                           <div className="flex-1">
                             <h3 className="font-semibold text-gray-900 mb-1 flex items-center gap-2">
                               {article.title}
-                              {article.featured && (
+                              {article.isFeatured && (
                                 <span className="text-yellow-500" title="En vedette">⭐</span>
                               )}
                             </h3>
@@ -281,7 +283,7 @@ const AdminArticles = () => {
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-1 text-sm text-gray-700">
                           <FaEye className="text-gray-400" />
-                          <span>{article.views?.toLocaleString() || 0}</span>
+                          <span>{article.viewCount?.toLocaleString() || 0}</span>
                         </div>
                       </td>
                       <td className="py-3 px-4">

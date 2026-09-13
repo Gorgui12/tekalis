@@ -11,9 +11,8 @@ const PaymentCancel = ({ orderId }) => {
 
   useEffect(() => {
     trackEvent("InitiateCheckoutAbandoned", {
-      eventId: orderId,
       category: "checkout",
-    });
+    }, { eventId: orderId });
   }, [orderId]);
 
   return (

@@ -50,6 +50,11 @@ app.use("/api/v1", sitemapRouter);
 const productFeedRouter = require("./routes/productFeed");
 app.use("/api/v1", productFeedRouter);
 
+// Tracking (hors rate-limiter global : voir routes/trackingRoutes.js —
+// un limiter dédié est appliqué à l'intérieur)
+const trackingRouter = require("./routes/trackingRoutes");
+app.use("/api/v1/tracking", trackingRouter);
+
 // ─── Connexion MongoDB ────────────────────────────────────────────────────────
 connectDB().catch((err) => {
   console.error("❌ Erreur fatale de connexion MongoDB:", err.message);

@@ -52,11 +52,14 @@ async function sendEvent({
   userData,
   customData,
   actionSource = "website",
+  quiet = false,
 }) {
   if (!isConfigured) {
-    console.warn(
-      `[MetaCAPI] Pixel ou Access Token non configuré — événement "${eventName}" ignoré.`
-    );
+    if (!quiet) {
+      console.warn(
+        `[MetaCAPI] Pixel ou Access Token non configuré — événement "${eventName}" ignoré.`
+      );
+    }
     return null;
   }
 
@@ -76,22 +79,51 @@ async function sendEvent({
   const testCode = process.env.META_CAPI_TEST_EVENT_CODE;
   if (testCode) payload.test_event_code = testCode;
 
-  try {
-    const res = await fetch(
-      `https://graph.facebook.com/${CAPI_VERSION}/${PIXEL_ID}/events?access_token=${ACCESS_TOKEN}`,
-      { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }
-    );
-    const json = await res.json().catch(() => ({}));
-    if (!res.ok) {
-      console.error("[MetaCAPI] Erreur d'envoi:", json?.error?.message || res.status);
-      return null;
+  const endpoint =
+    `https://graph.facebook.com/${CAPI_VERSION}/${PIXEL_ID}/events` +
+    `?access_token=${ACCESS_TOKEN}`;
+
+  // Timeout de 5 s : un appel CAPI ne doit jamais faire attendre l'API.
+  const sendOnce = async () => {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 5000);
+    try {
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        signal: ctrl.signal,
+      });
+      const json = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        console.error(
+          `[MetaCAPI] Erreur d'envoi ${eventName}:`,
+          json?.error?.message || `HTTP ${res.status}`
+        );
+        return null;
+      }
+      if (!quiet) {
+        console.log(
+          `[MetaCAPI] ✅ ${eventName} envoyé — réponses: ${JSON.stringify({ messages_received: json?.events_received }) }`
+        );
+      }
+      return json;
+    } finally {
+      clearTimeout(timer);
     }
-    console.log(
-      `[MetaCAPI] ✅ ${eventName} envoyé — réponses: ${JSON.stringify({ messages_received: json?.events_received }) }`
-    );
-    return json;
+  };
+
+  try {
+    let result = await sendOnce();
+    // 1 seule relance après 800 ms en cas d'échec (réseau ou API). Un
+    // retry supplémentaire n'apporterait rien pour un trafic temps réel.
+    if (!result) {
+      await new Promise((r) => setTimeout(r, 800));
+      result = await sendOnce();
+    }
+    return result;
   } catch (err) {
-    console.error("[MetaCAPI] Échec réseau:", err.message);
+    console.error(`[MetaCAPI] Échec réseau ${eventName}:`, err.message);
     return null;
   }
 }

@@ -40,7 +40,7 @@ const EditArticle = () => {
         content: article.content || "",
         category: article.category || "test",
         tags: article.tags || [],
-        featuredImage: article.coverImage || "",
+        featuredImage: article.coverImage?.url || "",
         status: article.status || "draft",
         featured: article.isFeatured || false
       });
@@ -59,7 +59,7 @@ const EditArticle = () => {
     try {
       const payload = {
         ...formData,
-        coverImage: formData.featuredImage,
+        coverImage: formData.featuredImage ? { url: formData.featuredImage, alt: "" } : undefined,
         isFeatured: formData.featured
       };
       delete payload.featuredImage;
@@ -235,7 +235,7 @@ const EditArticle = () => {
                     >
                       <option value="draft">Brouillon</option>
                       <option value="published">Publié</option>
-                      <option value="scheduled">Programmé</option>
+                      {formData.status === "scheduled" && <option value="scheduled">Programmé</option>}
                     </select>
                   </div>
 
@@ -264,10 +264,9 @@ const EditArticle = () => {
                   className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <option value="test">Test</option>
-                  <option value="guide">Guide</option>
-                  <option value="tutorial">Tutoriel</option>
-                  <option value="news">Actualités</option>
-                  <option value="comparison">Comparatif</option>
+                  <option value="comparatif">Comparatif</option>
+                  <option value="tutoriel">Tutoriel</option>
+                  <option value="actualite">Actualités</option>
                 </select>
               </div>
 

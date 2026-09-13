@@ -12,14 +12,17 @@ const Blog = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
 
-  // Catégories
+  // Catégories — alignées sur l'enum backend Article.js
+  // + clés legacy démo (guide/news/comparison) pour la fallback
   const categories = [
-    { id: "all", label: "Tous", icon: "📚", color: "blue" },
-    { id: "test", label: "Tests", icon: "🧪", color: "green" },
-    { id: "guide", label: "Guides", icon: "📖", color: "purple" },
-    { id: "tutorial", label: "Tutoriels", icon: "🎓", color: "orange" },
-    { id: "news", label: "Actualités", icon: "📰", color: "red" },
-    { id: "comparison", label: "Comparatifs", icon: "⚖️", color: "indigo" }
+    { id: "all",        label: "Tous",         icon: "📚", color: "blue" },
+    { id: "test",       label: "Tests",        icon: "🧪", color: "green" },
+    { id: "comparatif", label: "Comparatifs",  icon: "⚖️", color: "indigo" },
+    { id: "tutoriel",   label: "Tutoriels",    icon: "🎓", color: "orange" },
+    { id: "actualite",  label: "Actualités",   icon: "📰", color: "red" },
+    { id: "guide",      label: "Guides",       icon: "📖", color: "purple" },
+    { id: "news",       label: "Actualités",   icon: "📰", color: "red" },
+    { id: "comparison", label: "Comparatifs",  icon: "⚖️", color: "indigo" },
   ];
 
   useEffect(() => {
@@ -130,8 +133,8 @@ const Blog = () => {
   // Filtrer les articles
   const filteredArticles = articles.filter(article => {
     const matchesSearch = 
-      article.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      article.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (article.title || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (article.excerpt || "").toLowerCase().includes(searchTerm.toLowerCase()) ||
       article.tags?.some(tag => tag.toLowerCase().includes(searchTerm.toLowerCase()));
     
     const matchesCategory = selectedCategory === "all" || article.category === selectedCategory;
@@ -139,8 +142,8 @@ const Blog = () => {
     return matchesSearch && matchesCategory;
   });
 
-  // Article en vedette (premier featured ou premier article)
-  const featuredArticle = filteredArticles.find(a => a.featured) || filteredArticles[0];
+  // Article en vedette (premier isFeatured ou premier article)
+  const featuredArticle = filteredArticles.find(a => a.isFeatured || a.featured) || filteredArticles[0];
   const otherArticles = filteredArticles.filter(a => a._id !== featuredArticle?._id);
 
   // Badge de catégorie
@@ -270,9 +273,16 @@ const Blog = () => {
             >
               <div className="md:flex">
                 <div className="md:w-1/2 relative">
-                  <div className="aspect-video md:aspect-auto md:h-full bg-surface-200">
-                    {/* Image placeholder */}
-                  </div>
+                  {featuredArticle.coverImage?.url || featuredArticle.image ? (
+                    <img
+                      src={featuredArticle.coverImage?.url || featuredArticle.image}
+                      alt={featuredArticle.title}
+                      onError={(e) => { e.currentTarget.style.display = "none"; }}
+                      className="aspect-video md:aspect-auto md:h-full w-full object-cover"
+                    />
+                  ) : (
+                    <div className="aspect-video md:aspect-auto md:h-full bg-surface-200"></div>
+                  )}
                   <div className="absolute top-4 left-4">
                     <CategoryBadge category={featuredArticle.category} />
                   </div>
@@ -345,7 +355,16 @@ const Blog = () => {
                   className="bg-white dark:bg-surface-800 rounded-2xl shadow-card hover:shadow-xl transition overflow-hidden group"
                 >
                   <div className="relative">
-                    <div className="aspect-video bg-surface-200"></div>
+                    <div className="aspect-video bg-surface-200">
+                      {article.coverImage?.url || article.image ? (
+                        <img
+                          src={article.coverImage?.url || article.image}
+                          alt={article.title}
+                          onError={(e) => { e.currentTarget.style.display = "none"; }}
+                          className="absolute inset-0 w-full h-full object-cover"
+                        />
+                      ) : null}
+                    </div>
                     <div className="absolute top-3 left-3">
                       <CategoryBadge category={article.category} />
                     </div>

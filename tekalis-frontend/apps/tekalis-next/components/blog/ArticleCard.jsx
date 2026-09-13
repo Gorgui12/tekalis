@@ -2,13 +2,17 @@
 import { FaClock, FaEye, FaUser } from "react-icons/fa";
 
 const ArticleCard = ({ article, variant = "default", featured = false }) => {
-  // Catégories avec couleurs
+  // Catégories — alignées sur l'enum backend Article.js
+  // + clés legacy démo (guide/news/comparison)
   const categories = {
-    test: { label: "Test", icon: "🧪", color: "bg-green-100 text-green-700" },
-    guide: { label: "Guide", icon: "📖", color: "bg-purple-100 text-purple-700" },
-    tutorial: { label: "Tutoriel", icon: "🎓", color: "bg-orange-100 text-orange-700" },
-    news: { label: "Actualité", icon: "📰", color: "bg-red-100 text-red-700" },
-    comparison: { label: "Comparatif", icon: "⚖️", color: "bg-indigo-100 text-indigo-700" }
+    test:        { label: "Test",        icon: "🧪", color: "bg-green-100 text-green-700" },
+    comparatif:  { label: "Comparatif",  icon: "⚖️", color: "bg-indigo-100 text-indigo-700" },
+    guide:       { label: "Guide",       icon: "📖", color: "bg-purple-100 text-purple-700" },
+    tutoriel:    { label: "Tutoriel",    icon: "🎓", color: "bg-orange-100 text-orange-700" },
+    tutorial:    { label: "Tutoriel",    icon: "🎓", color: "bg-orange-100 text-orange-700" },
+    actualite:   { label: "Actualité",   icon: "📰", color: "bg-red-100 text-red-700" },
+    news:        { label: "Actualité",   icon: "📰", color: "bg-red-100 text-red-700" },
+    comparison:  { label: "Comparatif",  icon: "⚖️", color: "bg-indigo-100 text-indigo-700" }
   };
 
   const cat = categories[article.category] || categories.test;
@@ -41,7 +45,17 @@ const ArticleCard = ({ article, variant = "default", featured = false }) => {
         className="flex flex-col md:flex-row gap-4 bg-white dark:bg-surface-800 rounded-2xl shadow-card hover:shadow-elevated transition overflow-hidden group"
       >
         <div className="md:w-1/3 relative">
-          <div className="aspect-video md:aspect-auto md:h-full bg-surface-200 dark:bg-surface-700 skeleton"></div>
+          <div className="aspect-video md:aspect-auto md:h-full bg-surface-200 dark:bg-surface-700 skeleton">
+            {article.coverImage?.url || article.image ? (
+              <img
+                src={article.coverImage?.url || article.image}
+                alt={article.title}
+                loading="lazy"
+                onError={(e) => { e.currentTarget.style.display = "none"; }}
+                className="w-full h-full object-cover"
+              />
+            ) : null}
+          </div>
           <div className="absolute top-3 left-3">
             <span className={`${cat.color} px-2 py-1 rounded-full text-xs font-bold uppercase inline-flex items-center gap-1`}>
               <span>{cat.icon}</span>
@@ -84,7 +98,15 @@ const ArticleCard = ({ article, variant = "default", featured = false }) => {
     >
       <div className="relative">
         <div className={`${featured ? "aspect-video md:aspect-[21/9]" : "aspect-video"} bg-surface-200 dark:bg-surface-700 skeleton`}>
-          {/* Image placeholder */}
+          {article.coverImage?.url || article.image ? (
+            <img
+              src={article.coverImage?.url || article.image}
+              alt={article.title}
+              loading="lazy"
+              onError={(e) => { e.currentTarget.style.display = "none"; }}
+              className="w-full h-full object-cover"
+            />
+          ) : null}
         </div>
         
         {/* Category Badge */}

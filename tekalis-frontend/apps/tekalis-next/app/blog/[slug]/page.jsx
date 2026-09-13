@@ -11,6 +11,8 @@ export async function generateMetadata({ params }) {
     const article = data?.article || data;
     if (!article) return {};
 
+    const ogImage = article.coverImage?.url || article.image || '';
+
     return {
       title: `${article.title} | Blog Tekalis`,
       description: article.excerpt || article.title,
@@ -20,7 +22,7 @@ export async function generateMetadata({ params }) {
         type: 'article',
         title: article.title,
         description: article.excerpt,
-        images: article.image ? [{ url: article.image }] : [],
+        images: ogImage ? [{ url: ogImage }] : [],
         publishedTime: article.publishedAt,
         modifiedTime: article.updatedAt,
         authors: [article.author?.name || 'Équipe Tekalis'],
@@ -49,13 +51,14 @@ export default async function ArticlePage({ params }) {
 
   const article = data?.article || data;
   const related = data?.relatedArticles || [];
+  const ogImage = article?.coverImage?.url || article?.image || '';
 
   const schema = {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: article.title,
     description: article.excerpt,
-    image: article.image,
+    image: ogImage,
     datePublished: article.publishedAt,
     dateModified: article.updatedAt || article.publishedAt,
     author: { '@type': 'Person', name: article.author?.name || 'Équipe Tekalis' },

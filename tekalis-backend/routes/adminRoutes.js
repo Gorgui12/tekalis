@@ -42,6 +42,7 @@ const Order = require("../models/Order");
 const Article = require("../models/Article");
 const Product = require("../models/Product");
 const Warranty = require("../models/Warranty");
+const Visit = require("../models/Visit");
 
 // ===============================================
 // Liste blanche de champs — empêche l'assignation de masse (mass
@@ -439,8 +440,13 @@ router.get("/analytics", async (req, res) => {
 
     const prevStart = new Date(start.getTime() - (period === "year" ? 365 : periodDays) * 24 * 60 * 60 * 1000);
 
+    // Bornes "jour" (les visites sont stockées au format YYYY-MM-DD)
+    const dStr = (d) => d.toISOString().split("T")[0];
+    const currentDayStart = dStr(start);
+    const prevDayStart = dStr(prevStart);
+
     // ── Stats globales (vs période précédente)
-    const [currentRev, prevRev, currentOrders, prevOrders, newCustomers, prevCustomers] = await Promise.all([
+    const [currentRev, prevRev, currentOrders, prevOrders, newCustomers, prevCustomers, currentVisits, prevVisits] = await Promise.all([
       Order.aggregate([
         { $match: { isPaid: true, createdAt: { $gte: start } } },
         { $group: { _id: null, total: { $sum: "$totalPrice" }, count: { $sum: 1 } } }
@@ -452,13 +458,29 @@ router.get("/analytics", async (req, res) => {
       Order.countDocuments({ createdAt: { $gte: start } }),
       Order.countDocuments({ createdAt: { $gte: prevStart, $lt: start } }),
       User.countDocuments({ createdAt: { $gte: start } }),
-      User.countDocuments({ createdAt: { $gte: prevStart, $lt: start } })
+      User.countDocuments({ createdAt: { $gte: prevStart, $lt: start } }),
+      Visit.aggregate([
+        { $match: { date: { $gte: currentDayStart } } },
+        { $group: { _id: null, sessions: { $sum: 1 }, views: { $sum: "$visits" } } }
+      ]),
+      Visit.aggregate([
+        { $match: { date: { $gte: prevDayStart, $lt: currentDayStart } } },
+        { $group: { _id: null, sessions: { $sum: 1 }, views: { $sum: "$visits" } } }
+      ])
     ]);
 
     const totalRevenue = currentRev[0]?.total || 0;
     const totalOrders = currentOrders;
     const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
     const prevRevenue = prevRev[0]?.total || 0;
+
+    const sessions = currentVisits[0]?.sessions || 0;
+    const views = currentVisits[0]?.views || 0;
+    const prevSessions = prevVisits[0]?.sessions || 0;
+
+    // Taux de conversion = commandes payées / sessions (visiteurs uniques/jour)
+    const prevRate = prevSessions > 0 ? (prevOrders / prevSessions) * 100 : 0;
+    const conversionRate = sessions > 0 ? (totalOrders / sessions) * 100 : 0;
 
     const pct = (a, b) => b > 0 ? Math.round(((a - b) / b) * 1000) / 10 : 0;
 
@@ -471,8 +493,11 @@ router.get("/analytics", async (req, res) => {
       avgOrderChange: pct(avgOrderValue, prevOrders > 0 ? prevRevenue / prevOrders : 0),
       newCustomers,
       customersChange: pct(newCustomers, prevCustomers),
-      conversionRate: 0,
-      conversionChange: 0
+      sessions,
+      sessionsChange: pct(sessions, prevSessions),
+      views,
+      conversionRate: Math.round(conversionRate * 10) / 10,
+      conversionChange: pct(conversionRate, prevRate)
     };
 
     // ── Série revenu par jour

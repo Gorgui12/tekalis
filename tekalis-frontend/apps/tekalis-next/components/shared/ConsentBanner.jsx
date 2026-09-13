@@ -2,7 +2,14 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { getConsent, grantConsent, revokeConsent, CONSENT } from "@/lib/analytics";
+import {
+  getConsent,
+  grantConsent,
+  revokeConsent,
+  trackPageView,
+  trackPageVisit,
+  CONSENT,
+} from "@/lib/analytics";
 
 /**
  * Bannière de consentement cookies (Modal style) — affichée tant que
@@ -18,9 +25,12 @@ const ConsentBanner = () => {
 
   if (!open) return null;
 
-  const acceptAll = () => {
-    grantConsent();
+  const acceptAll = async () => {
     setOpen(false);
+    await grantConsent();
+    // Première mesure de la page courante (Scripts chargés + sessions).
+    trackPageView();
+    trackPageVisit();
   };
 
   const rejectAll = () => {

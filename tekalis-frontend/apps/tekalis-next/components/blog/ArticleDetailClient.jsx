@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { 
@@ -33,6 +33,7 @@ const ArticleDetails = ({ article: initialArticle, related: initialRelated }) =>
   );
   const [loading, setLoading] = useState(!hasInitialData);
   const [relatedProducts, setRelatedProducts] = useState([]);
+  const contentRef = useRef(null);
 
   useEffect(() => {
     if (hasInitialData) {
@@ -43,6 +44,28 @@ const ArticleDetails = ({ article: initialArticle, related: initialRelated }) =>
     window.scrollTo(0, 0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug]);
+
+  // Masquer proprement les images du contenu introuvables (URL relative,
+  // suppression côté back-office) au lieu d'une icône cassée.
+  useEffect(() => {
+    if (!article?.content) return;
+    const contentNode = contentRef.current;
+    if (!contentNode) return;
+
+    const hideIfBroken = (img) => {
+      if (img.complete && img.naturalWidth === 0) img.style.display = "none";
+    };
+    const onError = (e) => {
+      e.currentTarget.style.display = "none";
+    };
+
+    const imgs = contentNode.querySelectorAll("img");
+    imgs.forEach((img) => {
+      hideIfBroken(img);
+      img.addEventListener("error", onError);
+    });
+    return () => imgs.forEach((img) => img.removeEventListener("error", onError));
+  }, [article?.content]);
 
   const fetchArticle = async () => {
     try {
@@ -172,11 +195,14 @@ const ArticleDetails = ({ article: initialArticle, related: initialRelated }) =>
   };
 
   const categories = {
-    test: { label: "Test", icon: "🧪", color: "bg-green-100 text-green-700" },
-    guide: { label: "Guide", icon: "📖", color: "bg-purple-100 text-purple-700" },
-    tutorial: { label: "Tutoriel", icon: "🎓", color: "bg-orange-100 text-orange-700" },
-    news: { label: "Actualité", icon: "📰", color: "bg-red-100 text-red-700" },
-    comparison: { label: "Comparatif", icon: "⚖️", color: "bg-indigo-100 text-indigo-700" }
+    test:        { label: "Test",       icon: "🧪", color: "bg-green-100 text-green-700" },
+    comparatif:  { label: "Comparatif", icon: "⚖️", color: "bg-indigo-100 text-indigo-700" },
+    comparison:  { label: "Comparatif", icon: "⚖️", color: "bg-indigo-100 text-indigo-700" },
+    tutoriel:    { label: "Tutoriel",   icon: "🎓", color: "bg-orange-100 text-orange-700" },
+    tutorial:    { label: "Tutoriel",   icon: "🎓", color: "bg-orange-100 text-orange-700" },
+    actualite:   { label: "Actualité",  icon: "📰", color: "bg-red-100 text-red-700" },
+    news:        { label: "Actualité",  icon: "📰", color: "bg-red-100 text-red-700" },
+    guide:       { label: "Guide",      icon: "📖", color: "bg-purple-100 text-purple-700" }
   };
 
   if (loading) {
@@ -201,6 +227,7 @@ const ArticleDetails = ({ article: initialArticle, related: initialRelated }) =>
   }
 
   const cat = categories[article.category] || categories.test;
+  const heroImage = article.coverImage?.url || article.image || "";
   const authorName = article.author?.name || "Équipe Tekalis";
   const authorBio = article.author?.bio || "";
   const authorAvatar = article.author?.avatar;
@@ -210,10 +237,11 @@ const ArticleDetails = ({ article: initialArticle, related: initialRelated }) =>
 
       {/* Hero Image */}
       <div className="relative h-[32rem] bg-surface-900 mt-20">
-        {article.image && (
+        {heroImage && (
           <img
-            src={article.image}
+            src={heroImage}
             alt={article.title}
+            onError={(e) => { e.currentTarget.style.display = "none"; }}
             className="w-full h-full object-cover opacity-80"
           />
         )}
@@ -282,16 +310,10 @@ const ArticleDetails = ({ article: initialArticle, related: initialRelated }) =>
                 </div>
               </div>
 
-              {/* Prose content */}
+              {/* Article content (CSS dédiée .article-content, voir globals.css) */}
               <div
-                className="prose max-w-none
-                  prose-headings:font-bold prose-headings:text-surface-900 dark:prose-headings:text-white
-                  prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4 prose-h2:border-b prose-h2:border-surface-100 prose-h2:pb-3
-                  prose-h3:text-xl prose-h3:mt-8 prose-h3:mb-3
-                  prose-p:text-surface-700 dark:prose-p:text-surface-300 prose-p:leading-relaxed prose-p:text-base
-                  prose-ul:my-5 prose-li:text-surface-700 dark:prose-li:text-surface-300 prose-li:leading-relaxed
-                  prose-strong:text-surface-900 dark:prose-strong:text-white prose-strong:font-semibold
-                  prose-a:text-brand-600 dark:prose-a:text-brand-400 prose-a:no-underline hover:prose-a:underline"
+                className="article-content prose max-w-none"
+                ref={contentRef}
                 dangerouslySetInnerHTML={{ __html: sanitizeArticleHtml(article.content) }}
               />
 
@@ -376,8 +398,13 @@ const ArticleDetails = ({ article: initialArticle, related: initialRelated }) =>
                 {relatedArticles.map(related => (
                   <Link key={related._id} href={`/blog/${related.slug}`} className="group">
                     <div className="aspect-video bg-surface-200 rounded-xl mb-3 overflow-hidden">
-                      {related.image && (
-                        <img src={related.image} alt={related.title} className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />
+                      {(related.coverImage?.url || related.image) && (
+                        <img
+                          src={related.coverImage?.url || related.image}
+                          alt={related.title}
+                          onError={(e) => { e.currentTarget.style.display = "none"; }}
+                          className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                        />
                       )}
                     </div>
                     <h3 className="font-bold text-surface-900 dark:text-white group-hover:text-brand-600 transition line-clamp-2 mb-2 text-sm">
@@ -395,17 +422,6 @@ const ArticleDetails = ({ article: initialArticle, related: initialRelated }) =>
         </div>
       </div>
 
-      <style>{`
-        .prose .rating-box {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
-          padding: 1.5rem 2rem;
-          border-radius: 0.75rem;
-          margin-top: 2rem;
-        }
-        .prose .rating-box h3 { color: white; margin: 0 0 0.5rem 0; font-size: 1.25rem; }
-        .prose .rating-box p { color: rgba(255,255,255,0.9); margin: 0; }
-      `}</style>
     </div>
   );
 };

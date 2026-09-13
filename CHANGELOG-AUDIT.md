@@ -1,4 +1,4 @@
-# Changelog — corrections appliquées suite à l'audit du 3 septembre 2026
+# Changelog — corrections appliquées suite à l'audit (3 septembre 2026) + passe tracking (13 septembre 2026)
 
 Ce dossier contient les 3 apps qui comptent (`tekalis-backend`, `tekalis-frontend/apps/admin`,
 `tekalis-frontend/apps/tekalis-next`) avec les correctifs de l'audit **déjà appliqués dans le
@@ -7,6 +7,61 @@ de démarrer.
 
 L'app legacy `tekalis-frontend/apps/client` n'est pas incluse ici (hors périmètre demandé).
 `tekalis-frontend/packages/shared` est inclus car `admin` en dépend.
+
+---
+
+## ✅ Passe tracking (13 septembre 2026)
+
+Travail sur le suivi de conversion (Meta Pixel + GA4 + Meta CAPI), **hors paiement** —
+le paiement en ligne (PayDunya, événement `Purchase` serveur) reste pour une version ultérieure.
+Rappel du cadrage : rien de ce qui touche le paiement n'a été touché dans cette passe.
+
+### `tekalis-backend`
+- **Comptage de visites** (`models/Visit.js`, `routes/trackingRoutes.js`) :
+  `POST /api/v1/tracking/visit` upserté par (jour, session) depuis le navigateur. Permet enfin
+  de calculer un vrai taux de conversion dans l'admin.
+- **Relais Meta CAPI** (`routes/trackingRoutes.js`) : `POST /api/v1/tracking/event` accepte une
+  liste blanche stricte d'événements de funnel (`ViewContent`, `AddToCart`, `RemoveFromCart`,
+  `InitiateCheckout`, `AddPaymentInfo`, `Search`, `AddToWishlist`, `ViewCategory`,
+  `ProductImpressions`, `InitiateCheckoutAbandoned`) et les retransmet à la Conversions API avec
+  le même `event_id` que le navigateur → déduplication browser/CAPI. **`Purchase` est refusé** à
+  l'endpoint : il sera géré serveur avec le paiement (version ultérieure).
+- **Routes `/tracking/*` montées AVANT le rate-limiter global** (comme sitemap/feed Google) pour
+  ne pas consommer le quota d'API, avec leur propre limiter dédié.
+- **Observabilité CAPI** (`services/metaCapiService.js`) : timeout de 5 s, 1 relance après
+  800 ms, option `quiet` pour les relais frontend (logs d'erreur conservés), logging par nom
+  d'événement.
+- **Taux de conversion réel** (`routes/adminRoutes.js` `/analytics`) : départ de la valeur figée
+  à `0` → calcul commandes / sessions (avec sessions/views et variation vs période précédente).
+  La note "stub" du précédent changelog était périmée : l'endpoint faisait déjà de vraies
+  agrégations, elles sont simplement complétées.
+
+### `tekalis-frontend/apps/tekalis-next`
+- **Identifiants pilotables par l'admin** (`lib/analytics.js`) : les IDs Pixel/GA4 sont chargés
+  depuis `/api/v1/settings/public` (admin > Settings > SEO) avec repli sur les variables
+  `NEXT_PUBLIC_*`.
+- **Déduplication événementielle** : un `event_id` unique est généré pour **chaque** événement
+  (même sans id métier) et passé à `fbq` (eventID) ainsi qu'au relais CAPI → plus aucune perte de
+  déduplication sur les événements custom.
+- **Relais CAPI** : chaque événement, en plus de Meta/GA4, est envoyé au backend avec les
+  cookies Meta `_fbc`/`_fbp` (attribution cross-device conservée) — fire-and-forget.
+- **Nouveaux événements** : `RemoveFromCart` (panier), `ViewCategory` (filtre catalogue),
+  `ProductImpressions` (listes produits), comptage serveur de page vue (`trackPageVisit`).
+- **Double `PageView` corrigé** : la page vue initiale n'est plus émise à la fois par le
+  chargement du script et par le router — une seule par route, dédupliquée par URL.
+- **Bug de dédup corrigé** (`components/payment/PaymentCancelClient.jsx`) : `eventId` était passé
+  dans les paramètres au lieu des options → il est désormais dans `options` (pure couche de
+  tracking, aucune logique de paiement touchée).
+
+### `tekalis-frontend/apps/admin`
+- Page Analytics : nouvelle carte **Visiteurs (sessions)** (+ pages vues), taux de conversion
+  réel, correction de la mention "Non suivi (pas de données de visites)".
+
+### Non fait volontairement (paiement — version ultérieure)
+- `Purchase` CAPI serveur déjà en place sur les callbacks `paydunyaCallback`/`confirmPayment` :
+  conservé tel quel, non étendu.
+- Envoi du `Purchase` CAPI pour les commandes cash à la création (nécessiterait de distinguer
+  paiement vs confirmation de commande — à trancher avec le chantier paiement).
 
 ---
 
@@ -101,7 +156,6 @@ l'aveugle aurait pu casser des fonctionnalités qui marchent aujourd'hui.
 - Pas de transaction Mongo sur commande + décrément de stock (`orderController.js`).
 - Aucun test automatisé sur les 3 apps.
 - URLs produits basées sur l'`_id` Mongo plutôt qu'un slug.
-- Endpoint `/admin/analytics` est un stub qui renvoie des données vides.
 
 ---
 

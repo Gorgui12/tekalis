@@ -160,7 +160,7 @@ const AdminAnalytics = () => {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <StatCard
             title="Revenu total"
             value={`${(analyticsData.stats.totalRevenue / 1000000).toFixed(1)}M`}
@@ -195,13 +195,23 @@ const AdminAnalytics = () => {
             icon="👥"
             color="#8b5cf6"
           />
-          
+
+          <StatCard
+            title="Visiteurs (sessions)"
+            value={analyticsData.stats.sessions?.toLocaleString() ?? "—"}
+            change={analyticsData.stats.sessionsChange ?? 0}
+            icon="🌐"
+            color="#06b6d4"
+            subtitle={`${analyticsData.stats.views || 0} pages vues`}
+          />
+
           <StatCard
             title="Taux conversion"
-            value={`${analyticsData.stats.conversionRate}%`}
-            change={analyticsData.stats.conversionChange}
+            value={`${analyticsData.stats.conversionRate ?? "0"}%`}
+            change={analyticsData.stats.conversionChange ?? 0}
             icon="✨"
             color="#ef4444"
+            subtitle="Commandes / visites"
           />
         </div>
 
@@ -352,7 +362,8 @@ const AdminAnalytics = () => {
                 {analyticsData.stats.conversionRate ?? "0"}%
               </p>
               <p className="text-xs text-gray-500 mt-1">
-                Non suivi (pas de données de visites)
+                Contrairement à Meta/GA4, l'admin ne compte que les visites
+                après acceptation des cookies
               </p>
             </div>
           </div>
