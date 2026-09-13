@@ -126,11 +126,11 @@ const localBusinessSchema = {
     '@type': 'OfferCatalog',
     name: 'Catalogue Tekalis',
     itemListElement: [
-      { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Smartphones' } },
-      { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Ordinateurs portables' } },
-      { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Téléviseurs' } },
-      { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Électroménager' } },
-      { '@type': 'Offer', itemOffered: { '@type': 'Product', name: 'Accessoires tech' } },
+      { '@type': 'OfferCatalog', name: 'Smartphones' },
+      { '@type': 'OfferCatalog', name: 'Ordinateurs portables' },
+      { '@type': 'OfferCatalog', name: 'Téléviseurs' },
+      { '@type': 'OfferCatalog', name: 'Électroménager' },
+      { '@type': 'OfferCatalog', name: 'Accessoires tech' },
     ],
   },
   aggregateRating: {
