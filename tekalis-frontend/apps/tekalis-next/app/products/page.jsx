@@ -1,5 +1,7 @@
 ﻿import { serverFetch } from "@/lib/serverFetch";
+import Link from "next/link";
 import ProductsClient from '@/components/product/ProductsClient';
+import { PRIX_GUIDES } from '@/lib/utils/prixGuides';
 
 export const metadata = {
   title: 'Tous les Produits — Électronique Dakar Fann | Tekalis Sénégal',
@@ -44,6 +46,29 @@ export default async function ProductsPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
+      {/* Bandeau "Guides de prix" — cible les requêtes "prix ... fcfa" */}
+      <div className="bg-white dark:bg-surface-800 border-b border-surface-100 dark:border-surface-700">
+        <div className="container mx-auto px-4 py-4 flex flex-wrap items-center gap-3">
+          <span className="text-sm font-bold text-surface-900 dark:text-white">
+            💰 Guides des prix&nbsp;:
+          </span>
+          {PRIX_GUIDES.map((guide) => (
+            <Link
+              key={guide.slug}
+              href={`/prix/${guide.slug}`}
+              className="text-xs text-brand-600 dark:text-brand-400 hover:underline font-semibold"
+            >
+              {guide.h1}
+            </Link>
+          ))}
+          <Link
+            href="/prix"
+            className="text-xs text-surface-600 dark:text-surface-300 hover:text-brand-600 font-semibold"
+          >
+            Voir tout →
+          </Link>
+        </div>
+      </div>
       <ProductsClient initialProducts={products} />
     </>
   );

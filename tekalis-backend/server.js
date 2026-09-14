@@ -175,6 +175,7 @@ loadRoute(`${API_PREFIX}/reviews`, "./routes/reviewRoutes");
 loadRoute(`${API_PREFIX}/warranties`, "./routes/warrantyRoutes");
 loadRoute(`${API_PREFIX}/rma`, "./routes/rmaRoutes");
 loadRoute(`${API_PREFIX}/payment`, "./routes/paymentRoutes");
+loadRoute(`${API_PREFIX}/trends`, "./routes/trendsRoutes");
 loadRoute(`${API_PREFIX}/admin/stats`, "./routes/stats");
 loadRoute(`${API_PREFIX}/admin`, "./routes/adminRoutes");
 loadRoute(`${API_PREFIX}`, "./routes/settingsRoutes");

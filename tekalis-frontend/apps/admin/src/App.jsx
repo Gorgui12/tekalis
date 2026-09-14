@@ -11,6 +11,7 @@ import AdminLogin from "./pages/Login";
 import AdminDashboard from "./pages/Dashboard";
 import Analytics from "./pages/Analytics";
 import Statistiques from "./pages/Statistiques";
+import Trends from "./pages/Trends";
 
 // Commandes
 import AdminOrders from "./pages/Orders";
@@ -67,6 +68,7 @@ function App() {
           {/* Dashboard */}
           <Route path="/dashboard" element={<AdminDashboard />} />
           <Route path="/analytics" element={<Analytics />} />
+          <Route path="/trends" element={<Trends />} />
           <Route path="/statistiques" element={<Statistiques />} />
 
           {/* Commandes */}

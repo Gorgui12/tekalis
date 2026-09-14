@@ -112,6 +112,7 @@ const Footer = () => {
                 { name: "Téléviseurs", path: "/category/tv" },
                 { name: "Électroménager", path: "/category/electromenager" },
                 { name: "Climatiseurs", path: "/category/climatiseurs" },
+                { name: "💰 Guides de prix", path: "/prix" },
               ].map((item) => (
                 <li key={item.path}>
                   <Link href={item.path} 

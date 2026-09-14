@@ -1,8 +1,12 @@
+import { PRIX_GUIDES } from '@/lib/utils/prixGuides';
+
 const SITE_URL = 'https://tekalis.com';
 
 const STATIC_PAGES = [
   { url: '/', priority: 1.0, changeFrequency: 'daily' },
   { url: '/products', priority: 0.9, changeFrequency: 'daily' },
+  { url: '/prix', priority: 0.8, changeFrequency: 'weekly' },
+  { url: '/tendances', priority: 0.7, changeFrequency: 'weekly' },
   { url: '/blog', priority: 0.8, changeFrequency: 'weekly' },
   { url: '/apropos', priority: 0.6, changeFrequency: 'monthly' },
   { url: '/contact', priority: 0.6, changeFrequency: 'monthly' },
@@ -120,5 +124,13 @@ export default async function sitemap() {
     console.error('[sitemap] Articles fetch failed:', err.message);
   }
 
-  return [...staticEntries, ...categoryEntries, ...productEntries, ...articleEntries];
+  // Guides de prix /prix/[slug] — ciblent les requêtes "prix ... fcfa / dakar"
+  const prixEntries = PRIX_GUIDES.map((guide) => ({
+    url: `${SITE_URL}/prix/${guide.slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly',
+    priority: 0.8,
+  }));
+
+  return [...staticEntries, ...categoryEntries, ...productEntries, ...prixEntries, ...articleEntries];
 }

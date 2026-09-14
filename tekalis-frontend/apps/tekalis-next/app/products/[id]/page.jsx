@@ -16,17 +16,19 @@ export async function generateMetadata({ params }) {
     const path = product.slug || id;
     const productUrl = `${SITE_URL}/products/${path}`;
     const primaryImage = product.images?.[0]?.url || product.image || '';
+    const priceStr = product.price?.toLocaleString('fr-FR');
 
     return {
-      title: `${product.name} — Prix ${product.price?.toLocaleString('fr-FR')} FCFA | Tekalis Sénégal`,
+      title: `Prix ${product.name} à Dakar — ${priceStr} FCFA | Tekalis Sénégal`,
       description:
         product.metaDescription ||
-        `Achetez ${product.name} à Dakar au prix de ${product.price?.toLocaleString('fr-FR')} FCFA. ` +
-        `${product.description?.substring(0, 120) || ''}... ` +
-        `Livraison rapide au Sénégal. Garantie constructeur 12 mois. Paiement Wave, Orange Money.`,
+        `En stock à Dakar : ${product.name} au prix de ${priceStr} FCFA. ` +
+        `Livraison 24-48h partout au Sénégal, garantie constructeur 12 mois. ` +
+        `Paiement à la livraison, Wave, Orange Money. Commandez en ligne.`,
       keywords: [
         `${product.name} Dakar`,
         `${product.name} Sénégal`,
+        `prix ${product.name} fcfa`,
         `${product.name} prix`,
         `acheter ${product.name} Dakar`,
         product.brand ? `${product.brand} Dakar` : null,
@@ -35,7 +37,7 @@ export async function generateMetadata({ params }) {
       alternates: { canonical: productUrl },
       openGraph: {
         type: 'website',
-        title: `${product.name} — ${product.price?.toLocaleString('fr-FR')} FCFA | Tekalis`,
+        title: `Prix ${product.name} à Dakar — ${priceStr} FCFA | Tekalis`,
         description: product.metaDescription || product.description?.substring(0, 160) || '',
         url: productUrl,
         siteName: 'Tekalis Sénégal',

@@ -22,6 +22,7 @@ import { fetchProducts } from "@/store/slices/productSlice";
 import ProductCard from "@/components/product/ProductCard";
 import { Breadcrumb } from "@/components/seo/Breadcrumb";
 import { FaFilter, FaThLarge, FaList, FaTruck, FaShieldAlt } from "react-icons/fa";
+import { PRIX_GUIDES } from "@/lib/utils/prixGuides";
 
 // ── Metadata SEO par catégorie ────────────────────────────────────────────────
 const CATEGORY_SEO = {
@@ -269,6 +270,27 @@ const CategoryPage = ({ products: initialProducts = [], seo: initialSeo, slug: i
               <span>Wave · Orange Money · Livraison</span>
             </div>
           </div>
+
+          {/* Guides de prix — liens internes vers les pages ciblées "prix ... fcfa/dakar" */}
+          {slug === "smartphones" && (
+            <div className="mt-4 pt-4 border-t border-surface-100 flex flex-wrap items-center gap-2">
+              <span className="text-sm font-bold text-surface-900 dark:text-white">
+                💰 Guides de prix :
+              </span>
+              {PRIX_GUIDES.map((guide) => (
+                <Link
+                  key={guide.slug}
+                  href={`/prix/${guide.slug}`}
+                  className="text-xs text-brand-600 dark:text-brand-400 hover:underline font-semibold"
+                >
+                  {guide.h1}
+                </Link>
+              ))}
+              <Link href="/prix" className="text-xs text-surface-600 dark:text-surface-300 hover:text-brand-600 font-semibold">
+                Voir tout →
+              </Link>
+            </div>
+          )}
         </div>
 
         <div className="flex flex-col lg:flex-row gap-6">
