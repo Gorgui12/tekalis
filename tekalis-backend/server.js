@@ -50,6 +50,10 @@ app.use("/api/v1", sitemapRouter);
 const productFeedRouter = require("./routes/productFeed");
 app.use("/api/v1", productFeedRouter);
 
+// Feed Catalog Dynamique Meta (hors rate-limiter : consommé par Meta)
+const metaCatalogRouter = require("./routes/metaCatalogFeed");
+app.use("/api/v1", metaCatalogRouter);
+
 // Tracking (hors rate-limiter global : voir routes/trackingRoutes.js —
 // un limiter dédié est appliqué à l'intérieur)
 const trackingRouter = require("./routes/trackingRoutes");
