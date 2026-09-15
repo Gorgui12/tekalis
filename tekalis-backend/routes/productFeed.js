@@ -46,14 +46,19 @@ const itemBlock = (p) => {
     (p.images?.find((img) => img.isPrimary)?.url || p.images?.[0]?.url) || "";
   const price = Number(p.price) || 0;
   const comparePrice = Number(p.comparePrice) || 0;
+  // 🔧 Prix : si comparePrice (prix barré) > price, le produit est en promo.
+  // g:price = prix régulier (comparePrice), g:sale_price = prix de vente (price).
+  // L'inverse (sale_price > price) fait rejeter le produit par Google Shopping.
+  const onSale = comparePrice > price && price > 0;
+  const regularPrice = onSale ? comparePrice : price;
   const availability = GOOGLE_AVAILABILITY[p.status] || "in_stock";
   const brand = xmlEscape(p.brand || "Tekalis");
   const gtin = p.gtin ? `<g:gtin>${xmlEscape(p.gtin)}</g:gtin>` : "";
   const mpn = p.mpn ? `<g:mpn>${xmlEscape(p.mpn)}</g:mpn>` : "";
   const identifierExists = gtin || mpn ? "" : "<g:identifier_exists>false</g:identifier_exists>";
   const weight = p.weight > 0 ? `<g:shipping_weight>${p.weight} kg</g:shipping_weight>` : "";
-  const salePrice = comparePrice > price
-    ? `<g:sale_price>${comparePrice} ${CURRENCY}</g:sale_price>
+  const salePrice = onSale
+    ? `<g:sale_price>${price} ${CURRENCY}</g:sale_price>
      <g:sale_price_effective_date>${new Date().toISOString().split("T")[0]}T00:00:00+00:00/${new Date(Date.now() + 30 * 86400000).toISOString().split("T")[0]}T23:59:59+00:00</g:sale_price_effective_date>`
     : "";
   const category = p.category?.name
@@ -66,7 +71,7 @@ const itemBlock = (p) => {
     <g:description>${desc}</g:description>
     <g:link>${xmlEscape(link)}</g:link>
     <g:image_link>${xmlEscape(primaryImage)}</g:image_link>
-    <g:price>${price} ${CURRENCY}</g:price>
+    <g:price>${regularPrice} ${CURRENCY}</g:price>
     ${salePrice}
     <g:availability>${availability}</g:availability>
     <g:condition>${xmlEscape(p.condition || "new")}</g:condition>

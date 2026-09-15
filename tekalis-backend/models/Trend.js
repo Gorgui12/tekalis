@@ -13,7 +13,7 @@ const mongoose = require("mongoose");
 //  - TTL        : les documents expirés (90 jours sans détection) sont supprimés
 const trendSchema = new mongoose.Schema(
   {
-    query: { type: String, required: true, unique: true },
+    query: { type: String, required: true },
     seed: { type: String, default: "" },
     firstSeen: { type: Date, default: Date.now },
     lastSeen: { type: Date, default: Date.now },

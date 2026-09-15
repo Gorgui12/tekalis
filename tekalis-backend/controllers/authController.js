@@ -89,6 +89,10 @@ exports.register = async (req, res) => {
 
     setAuthCookie(res, token);
 
+    // Email de bienvenue (non bloquant)
+    EmailService.sendWelcomeEmail(user)
+      .catch(err => console.error("⚠️ Email de bienvenue non envoyé:", err.message));
+
     res.status(201).json({
       success: true,
       message: "Inscription réussie",

@@ -146,9 +146,17 @@ exports.createOrder = async (req, res) => {
     const populatedOrder = await Order.findById(newOrder._id)
       .populate("products.product", "name price images");
 
+    const customer = { name: req.user.name, email: req.user.email };
+
+    // Email de confirmation au client (non bloquant)
+    EmailService.sendOrderConfirmation(
+      populatedOrder.toObject(),
+      customer
+    ).catch(err => console.error("⚠️ Email confirmation commande non envoyé:", err.message));
+
     EmailService.notifyAdminNewOrder(
       { ...populatedOrder.toObject(), promoCode },
-      { name: req.user.name, email: req.user.email }
+      customer
     ).catch(err => console.error("⚠️ Email admin non envoyé:", err.message));
 
   } catch (error) {
@@ -265,7 +273,7 @@ exports.updateOrderStatus = async (req, res) => {
       req.params.id,
       { status },
       { new: true }
-    );
+    ).populate("user", "name email");
 
     if (!order) {
       return res.status(404).json({ message: "Commande introuvable" });
@@ -283,6 +291,12 @@ exports.updateOrderStatus = async (req, res) => {
     }
 
     res.status(200).json({ success: true, order });
+
+    // Email de mise à jour de statut au client (non bloquant)
+    if (order.user && order.user.email) {
+      EmailService.sendOrderStatusUpdate(order, order.user, status)
+        .catch(err => console.error("⚠️ Email statut non envoyé:", err.message));
+    }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

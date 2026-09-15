@@ -61,14 +61,19 @@ const itemBlock = (p, categoryPath) => {
     (p.images?.find((img) => img.isPrimary)?.url || p.images?.[0]?.url) || "";
   const price = Number(p.price) || 0;
   const comparePrice = Number(p.comparePrice) || 0;
+  // 🔧 Prix : si comparePrice (prix barré) > price, le produit est en promo.
+  // g:price = prix régulier (comparePrice), g:sale_price = prix de vente (price).
+  // L'inverse (sale_price > price) fait rejeter le produit par Meta.
+  const onSale = comparePrice > price && price > 0;
+  const regularPrice = onSale ? comparePrice : price;
   const availability = META_AVAILABILITY[p.status] || "in stock";
   const condition = xmlEscape(p.condition || "new");
   const brand = xmlEscape(p.brand || "Tekalis");
   const gtin = p.gtin ? `<g:gtin>${xmlEscape(p.gtin)}</g:gtin>` : "";
   const mpn = p.mpn ? `<g:mpn>${xmlEscape(p.mpn)}</g:mpn>` : "";
   const salePrice =
-    comparePrice > price
-      ? `<g:sale_price>${comparePrice} ${CURRENCY}</g:sale_price>`
+    onSale
+      ? `<g:sale_price>${price} ${CURRENCY}</g:sale_price>`
       : "";
   const productType = categoryPath.length
     ? `<g:product_type>${xmlEscape(categoryPath.join(" > "))}</g:product_type>`
@@ -81,7 +86,7 @@ const itemBlock = (p, categoryPath) => {
     <g:link>${xmlEscape(link)}</g:link>
     <g:image_link>${xmlEscape(primaryImage)}</g:image_link>
     <g:availability>${availability}</g:availability>
-    <g:price>${price} ${CURRENCY}</g:price>
+    <g:price>${regularPrice} ${CURRENCY}</g:price>
     ${salePrice}
     <g:condition>${condition}</g:condition>
     <g:brand>${brand}</g:brand>

@@ -135,7 +135,7 @@ async function upsertSuggestions(results) {
     const res = await Trend.updateOne(
       { query: r.query },
       {
-        $setOnInsert: { firstSeen: new Date(), detectionCount: 1, seed: r.seed },
+        $setOnInsert: { firstSeen: new Date() },
         $set: { lastSeen: new Date(), seed: r.seed, hasCover: false },
         $inc: { detectionCount: 1 },
       },
