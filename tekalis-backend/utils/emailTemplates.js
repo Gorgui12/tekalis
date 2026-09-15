@@ -1,325 +1,355 @@
 // ===============================================
 // utils/emailTemplates.js
 // Templates HTML pour les emails Tekalis
+// Rendus inline (compatible Gmail/Outlook), échappement HTML
+// systématique des champs utilisateurs/commandes (anti-XSS email).
 // ===============================================
 
 const siteName = process.env.SITE_NAME || "Tekalis";
-const frontendUrl = process.env.FRONTEND_URL || "http://localhost:3000";
+const frontendUrl = (process.env.FRONTEND_URL || "http://localhost:3000").replace(/\/+$/, "");
+const contactEmail = process.env.CONTACT_EMAIL || "support@tekalis.com";
+const storePhone = process.env.STORE_PHONE || "221 76 214 50 37";
+const storeAddress = process.env.STORE_ADDRESS || "Dakar, Sénégal";
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+const formatFCFA = (n) => (Number(n) || 0).toLocaleString("fr-FR");
+
+const esc = (v) =>
+  String(v == null ? "" : v)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
+const paymentLabel = (method) => {
+  const labels = {
+    cash: "💵 Paiement à la livraison",
+    online: "🌐 Paiement en ligne",
+    wave: "🌊 Wave",
+    om: "📱 Orange Money",
+    free: "📱 Free Money",
+    card: "💳 Carte bancaire",
+  };
+  return labels[method] || (method ? String(method).toUpperCase() : "À déterminer");
+};
 
 // ── Styles communs ────────────────────────────────────────────────────────────
 const baseStyle = `
-  font-family: Arial, sans-serif;
-  color: #333;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #1f2937;
   max-width: 600px;
+  width: 100%;
   margin: 0 auto;
-  padding: 20px;
+  padding: 0;
 `;
 
 const btnStyle = `
   display: inline-block;
-  padding: 12px 24px;
+  padding: 12px 26px;
   background-color: #1E40AF;
   color: #ffffff;
   text-decoration: none;
-  border-radius: 6px;
+  border-radius: 8px;
   font-weight: bold;
   margin-top: 16px;
 `;
 
 const headerHtml = (title) => `
-  <div style="background:#1E40AF;padding:20px;text-align:center;border-radius:8px 8px 0 0">
-    <h1 style="color:#ffffff;margin:0;font-size:24px">${siteName}</h1>
-    <p style="color:#93C5FD;margin:4px 0 0">${title}</p>
+  <div style="background:#1E40AF;background:linear-gradient(135deg,#1E40AF,#1D4ED8);padding:28px 24px;text-align:center;border-radius:12px 12px 0 0">
+    <h1 style="color:#ffffff;margin:0;font-size:26px;letter-spacing:0.5px">${esc(siteName)}</h1>
+    <p style="color:#BFDBFE;margin:6px 0 0;font-size:14px">${esc(title)}</p>
   </div>
 `;
 
 const footerHtml = () => `
-  <div style="text-align:center;margin-top:24px;padding-top:16px;border-top:1px solid #e5e7eb">
-    <p style="color:#9CA3AF;font-size:12px">
-      ${siteName} • Dakar, Sénégal<br>
-      <a href="mailto:support@tekalis.com" style="color:#6B7280">support@tekalis.com</a>
+  <div style="background:#0F172A;border-radius:0 0 12px 12px;padding:22px 24px;text-align:center">
+    <p style="color:#94A3B8;margin:0 0 6px;font-size:13px">
+      ${esc(siteName)} • ${esc(storeAddress)}
     </p>
+    <p style="color:#94A3B8;margin:0 0 6px;font-size:13px">
+      <a href="mailto:${esc(contactEmail)}" style="color:#BFDBFE;text-decoration:none">${esc(contactEmail)}</a>
+      ${storePhone ? ` &nbsp;•&nbsp; ${esc(storePhone)}` : ""}
+    </p>
+    <p style="color:#64748B;margin:12px 0 0;font-size:11px;line-height:1.6">
+      Cet email vous est envoyé automatiquement par ${esc(siteName)}.<br>
+      ${esc(frontendUrl)}
+    </p>
+  </div>
+`;
+
+// Gabarit commun : titre + corps
+const layout = (title, contentHtml) => `
+  <div style="background:#F1F5F9;padding:24px 12px">
+    <div style="${baseStyle}">
+      ${headerHtml(title)}
+      <div style="padding:26px 24px;background:#ffffff;border:1px solid #E2E8F0;border-top:none;border-bottom:none">
+        ${contentHtml}
+      </div>
+      ${footerHtml()}
+    </div>
+  </div>
+`;
+
+// Bouton CTA
+const button = (href, label) => `
+  <div style="text-align:center;margin:24px 0 8px">
+    <a href="${esc(href)}" style="${btnStyle}">${esc(label)}</a>
+  </div>
+`;
+
+// Table de produits
+const productTable = (products) => {
+  const rows = (products || [])
+    .map(item => {
+      const name = item.product?.name || item.product || "Produit";
+      const qty = item.quantity || 1;
+      const price = formatFCFA(item.price || 0);
+      const lineTotal = formatFCFA((item.price || 0) * qty);
+      return `<tr>
+        <td style="padding:10px 8px;border-bottom:1px solid #E2E8F0">${esc(name)}</td>
+        <td style="padding:10px 8px;border-bottom:1px solid #E2E8F0;text-align:center;white-space:nowrap">${qty}</td>
+        <td style="padding:10px 8px;border-bottom:1px solid #E2E8F0;text-align:right;white-space:nowrap">${price} FCFA</td>
+        <td style="padding:10px 8px;border-bottom:1px solid #E2E8F0;text-align:right;white-space:nowrap"><strong>${lineTotal} FCFA</strong></td>
+      </tr>`;
+    })
+    .join("");
+  return `
+    <table style="width:100%;border-collapse:collapse;font-size:14px">
+      <thead>
+        <tr style="background:#F8FAFC">
+          <th style="padding:8px;text-align:left;color:#475569">Produit</th>
+          <th style="padding:8px;text-align:center;color:#475569">Qté</th>
+          <th style="padding:8px;text-align:right;color:#475569">Prix unitaire</th>
+          <th style="padding:8px;text-align:right;color:#475569">Total</th>
+        </tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>`;
+};
+
+// Totaux (sous-total, livraison, total)
+const totalsBlock = (order) => {
+  const products = order.products || [];
+  const subtotal = products.reduce((sum, item) => sum + (item.price || 0) * (item.quantity || 1), 0);
+  const shipping = order.shippingCost || 0;
+  const total = order.totalPrice || subtotal + shipping;
+  return `
+    <table style="width:100%;border-collapse:collapse;font-size:14px;margin-top:10px">
+      <tr>
+        <td style="padding:6px 8px;color:#475569">Sous-total</td>
+        <td style="padding:6px 8px;text-align:right">${formatFCFA(subtotal)} FCFA</td>
+      </tr>
+      <tr>
+        <td style="padding:6px 8px;color:#475569">Livraison</td>
+        <td style="padding:6px 8px;text-align:right">${shipping > 0 ? `${formatFCFA(shipping)} FCFA` : "<em>Offerte</em>"}</td>
+      </tr>
+      <tr style="background:#F8FAFC">
+        <td style="padding:10px 8px;font-weight:bold;color:#1E40AF">Total</td>
+        <td style="padding:10px 8px;text-align:right;font-weight:bold;color:#1E40AF;font-size:16px">${formatFCFA(total)} FCFA</td>
+      </tr>
+    </table>`;
+};
+
+const infoBlock = (lines) => `
+  <div style="background:#F8FAFC;border:1px solid #E2E8F0;border-radius:8px;padding:12px 16px;margin:16px 0;font-size:14px;line-height:1.7">
+    ${lines.join("<br>")}
   </div>
 `;
 
 // ── Confirmation de commande ──────────────────────────────────────────────────
 const orderConfirmation = (order, user) => {
-  const productRows = (order.products || [])
-    .map(item => {
-      const name = item.product?.name || "Produit";
-      const qty  = item.quantity || 1;
-      const price = (item.price || 0).toLocaleString("fr-FR");
-      return `<tr>
-        <td style="padding:8px;border-bottom:1px solid #e5e7eb">${name}</td>
-        <td style="padding:8px;border-bottom:1px solid #e5e7eb;text-align:center">${qty}</td>
-        <td style="padding:8px;border-bottom:1px solid #e5e7eb;text-align:right">${price} FCFA</td>
-      </tr>`;
-    })
-    .join("");
+  const orderId = order.orderNumber || order._id;
+  return layout(
+    "Confirmation de commande",
+    `
+      <p style="margin:0 0 10px;font-size:15px">Bonjour <strong>${esc(user && user.name || "Client")}</strong>,</p>
+      <p style="margin:0 0 16px;font-size:15px">Merci pour votre confiance ! Votre commande a bien été enregistrée et est en préparation.</p>
 
-  return `
-    <div style="${baseStyle}">
-      ${headerHtml("Confirmation de commande")}
-      <div style="padding:24px;background:#ffffff;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
-        <p>Bonjour <strong>${user.name || "Client"}</strong>,</p>
-        <p>Merci pour votre commande ! Voici le récapitulatif :</p>
+      ${infoBlock([
+        `<strong>Commande</strong> : #${esc(orderId)}`,
+        `<strong>Passée le</strong> : ${new Date(order.createdAt || Date.now()).toLocaleDateString("fr-FR")}`,
+        `<strong>Paiement</strong> : ${paymentLabel(order.paymentMethod)}`,
+      ])}
 
-        <div style="background:#f9fafb;padding:12px;border-radius:6px;margin-bottom:16px">
-          <strong>Commande #${order.orderNumber || order._id}</strong><br>
-          <small style="color:#6B7280">Passée le ${new Date(order.createdAt).toLocaleDateString("fr-FR")}</small>
-        </div>
+      ${productTable(order.products)}
+      ${totalsBlock(order)}
 
-        <table style="width:100%;border-collapse:collapse">
-          <thead>
-            <tr style="background:#f3f4f6">
-              <th style="padding:8px;text-align:left">Produit</th>
-              <th style="padding:8px;text-align:center">Qté</th>
-              <th style="padding:8px;text-align:right">Prix</th>
-            </tr>
-          </thead>
-          <tbody>${productRows}</tbody>
-          <tfoot>
-            <tr>
-              <td colspan="2" style="padding:8px;text-align:right"><strong>Total :</strong></td>
-              <td style="padding:8px;text-align:right;color:#1E40AF;font-weight:bold">
-                ${(order.totalPrice || 0).toLocaleString("fr-FR")} FCFA
-              </td>
-            </tr>
-          </tfoot>
-        </table>
-
-        <div style="margin-top:20px">
-          <strong>Livraison :</strong><br>
-          ${order.deliveryName} — ${order.deliveryAddress}, ${order.deliveryCity || "Dakar"}
-        </div>
-
-        <div style="text-align:center;margin-top:24px">
-          <a href="${frontendUrl}/orders/${order._id}" style="${btnStyle}">
-            Suivre ma commande
-          </a>
-        </div>
+      <div style="margin-top:20px;font-size:14px;line-height:1.7">
+        <strong style="color:#1E40AF">Livraison</strong><br>
+        ${esc(order.deliveryName)} — ${esc(order.deliveryPhone || "")}<br>
+        ${esc(order.deliveryAddress)}${order.deliveryCity ? `, ${esc(order.deliveryCity)}` : ""}
       </div>
-      ${footerHtml()}
-    </div>
-  `;
+
+      <p style="font-size:13px;color:#64748B;margin-top:20px">
+        🛡️ Tous vos produits sont couverts par la garantie ${esc(siteName)}.
+      </p>
+
+      ${button(`${frontendUrl}/orders/${order._id}`, "Suivre ma commande")}
+    `
+  );
 };
 
 // ── Mise à jour statut commande ───────────────────────────────────────────────
 const statusLabels = {
-  pending:    "En attente",
+  pending: "En attente",
   processing: "En traitement",
-  shipped:    "Expédiée",
-  delivered:  "Livrée",
-  cancelled:  "Annulée"
+  shipped: "Expédiée",
+  delivered: "Livrée",
+  cancelled: "Annulée",
 };
 
-const orderStatusUpdate = (order, user, newStatus) => `
-  <div style="${baseStyle}">
-    ${headerHtml("Mise à jour de commande")}
-    <div style="padding:24px;background:#ffffff;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
-      <p>Bonjour <strong>${user.name || "Client"}</strong>,</p>
-      <p>Le statut de votre commande <strong>#${order.orderNumber || order._id}</strong> a été mis à jour :</p>
-      <div style="background:#EFF6FF;border-left:4px solid #1E40AF;padding:12px;border-radius:4px;margin:16px 0">
-        <strong style="color:#1E40AF">${statusLabels[newStatus] || newStatus}</strong>
+const orderStatusUpdate = (order, user, newStatus) => {
+  const orderId = order.orderNumber || order._id;
+  return layout(
+    "Mise à jour de commande",
+    `
+      <p style="margin:0 0 10px;font-size:15px">Bonjour <strong>${esc(user && user.name || "Client")}</strong>,</p>
+      <p style="margin:0 0 16px;font-size:15px">Le statut de votre commande <strong>#${esc(orderId)}</strong> a changé :</p>
+
+      <div style="background:#EFF6FF;border-left:4px solid #1E40AF;padding:14px 16px;border-radius:6px;margin:16px 0;font-size:15px">
+        <strong style="color:#1E40AF">${esc(statusLabels[newStatus] || newStatus)}</strong>
       </div>
-      <div style="text-align:center;margin-top:24px">
-        <a href="${frontendUrl}/orders/${order._id}" style="${btnStyle}">
-          Voir ma commande
-        </a>
-      </div>
-    </div>
-    ${footerHtml()}
-  </div>
-`;
+
+      <p style="font-size:14px;color:#475569;margin:0 0 4px"><strong>Suivi</strong> : #${esc(orderId)}</p>
+      <p style="font-size:14px;color:#475569;margin:0 0 4px"><strong>Livrée à</strong> : ${esc(order.deliveryName)} — ${esc(order.deliveryPhone || "")}</p>
+      <p style="font-size:14px;color:#475569;margin:0 0 4px"><strong>Paiement</strong> : ${paymentLabel(order.paymentMethod)}</p>
+      <p style="font-size:14px;color:#475569;margin:0"><strong>Total</strong> : ${formatFCFA(order.totalPrice)} FCFA</p>
+
+      ${button(`${frontendUrl}/orders/${order._id}`, "Voir ma commande")}
+
+      <p style="font-size:13px;color:#64748B;margin-top:18px">
+        Une question sur votre livraison ? Écrivez-nous : <a href="mailto:${esc(contactEmail)}" style="color:#1E40AF">${esc(contactEmail)}</a>
+      </p>
+    `
+  );
+};
 
 // ── Bienvenue ─────────────────────────────────────────────────────────────────
-const welcome = (user) => `
-  <div style="${baseStyle}">
-    ${headerHtml("Bienvenue !")}
-    <div style="padding:24px;background:#ffffff;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
-      <p>Bonjour <strong>${user.name || "nouveau membre"}</strong> 👋,</p>
-      <p>Votre compte <strong>${siteName}</strong> a été créé avec succès.</p>
-      <p>Vous pouvez dès maintenant :</p>
-      <ul style="line-height:1.8">
-        <li>Parcourir notre catalogue de produits tech</li>
-        <li>Passer des commandes et suivre leur livraison</li>
-        <li>Gérer vos garanties et demandes SAV</li>
-      </ul>
-      <div style="text-align:center;margin-top:24px">
-        <a href="${frontendUrl}" style="${btnStyle}">
-          Découvrir la boutique
-        </a>
-      </div>
-    </div>
-    ${footerHtml()}
-  </div>
-`;
+const welcome = (user) => layout(
+  "Bienvenue !",
+  `
+    <p style="margin:0 0 10px;font-size:15px">Bonjour <strong>${esc(user.name || "nouveau membre")}</strong> 👋,</p>
+    <p style="margin:0 0 14px;font-size:15px">Votre compte <strong>${esc(siteName)}</strong> a été créé avec succès. Vous pouvez dès maintenant :</p>
+    <ul style="font-size:14px;line-height:2;color:#475569;padding-left:20px;margin:0 0 16px">
+      <li>🛍️ Parcourir notre catalogue de produits tech</li>
+      <li>🚚 Passer des commandes et suivre leur livraison</li>
+      <li>🛡️ Gérer vos garanties et demandes SAV</li>
+      <li>⭐ Gagner des points de fidélité sur chaque achat</li>
+    </ul>
+    ${button(frontendUrl, "Découvrir la boutique")}
+  `
+);
 
 // ── Reset password ────────────────────────────────────────────────────────────
-const passwordReset = (user, resetUrl) => `
-  <div style="${baseStyle}">
-    ${headerHtml("Réinitialisation du mot de passe")}
-    <div style="padding:24px;background:#ffffff;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
-      <p>Bonjour <strong>${user.name || "Client"}</strong>,</p>
-      <p>Vous avez demandé la réinitialisation de votre mot de passe.</p>
-      <p>Cliquez sur le lien ci-dessous — il est valide pendant <strong>10 minutes</strong> :</p>
-      <div style="text-align:center;margin:24px 0">
-        <a href="${resetUrl}" style="${btnStyle}">
-          Réinitialiser mon mot de passe
-        </a>
-      </div>
-      <p style="color:#6B7280;font-size:13px">
-        Si vous n'avez pas fait cette demande, ignorez cet email. Votre mot de passe ne sera pas modifié.
-      </p>
-      <p style="color:#6B7280;font-size:12px;word-break:break-all">
-        Lien : ${resetUrl}
-      </p>
-    </div>
-    ${footerHtml()}
-  </div>
-`;
+const passwordReset = (user, resetUrl) => layout(
+  "Réinitialisation du mot de passe",
+  `
+    <p style="margin:0 0 10px;font-size:15px">Bonjour <strong>${esc(user.name || "Client")}</strong>,</p>
+    <p style="margin:0 0 16px;font-size:15px">Vous avez demandé la réinitialisation de votre mot de passe. Utilisez le lien ci-dessous — il expire dans <strong>10 minutes</strong> :</p>
+    ${button(resetUrl, "Réinitialiser mon mot de passe")}
+    <p style="font-size:13px;color:#64748B;word-break:break-all">
+      Lien direct : <a href="${esc(resetUrl)}" style="color:#1E40AF">${esc(resetUrl)}</a>
+    </p>
+    <p style="font-size:13px;color:#64748B;margin-top:14px">
+      Si vous n'êtes pas à l'origine de cette demande, ignorez simplement cet email — votre mot de passe reste inchangé.
+    </p>
+  `
+);
 
 // ── Demande d'avis ────────────────────────────────────────────────────────────
-const reviewRequest = (user, order, product) => `
-  <div style="${baseStyle}">
-    ${headerHtml("Donnez votre avis")}
-    <div style="padding:24px;background:#ffffff;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
-      <p>Bonjour <strong>${user.name || "Client"}</strong>,</p>
-      <p>Votre commande <strong>#${order.orderNumber || order._id}</strong> a été livrée. Nous espérons que vous êtes satisfait(e) de votre achat !</p>
-      <p>Partagez votre expérience avec <strong>${product?.name || "ce produit"}</strong> :</p>
-      <div style="text-align:center;margin-top:24px">
-        <a href="${frontendUrl}/products/${product?._id}#reviews" style="${btnStyle}">
-          Laisser un avis ⭐
-        </a>
-      </div>
-    </div>
-    ${footerHtml()}
-  </div>
-`;
+const reviewRequest = (user, order, product) => {
+  const orderId = order.orderNumber || order._id;
+  return layout(
+    "Donnez votre avis",
+    `
+      <p style="margin:0 0 10px;font-size:15px">Bonjour <strong>${esc(user.name || "Client")}</strong>,</p>
+      <p style="margin:0 0 12px;font-size:15px">
+        Votre commande <strong>#${esc(orderId)}</strong> a été livrée. Nous espérons que vous êtes satisfait(e) !
+      </p>
+      <p style="margin:0 0 16px;font-size:14px;color:#475569">
+        Partagez votre expérience avec <strong>${esc(product && product.name || "votre produit")}</strong> — cela aide toute la communauté.
+      </p>
+      ${button(`${frontendUrl}/products/${product && product._id || ""}#reviews`, "Laisser un avis ⭐")}
+    `
+  );
+};
 
 // ── Notification SAV ──────────────────────────────────────────────────────────
 const rmaStatusLabels = {
-  pending:    "En attente de traitement",
-  approved:   "Approuvée",
-  rejected:   "Refusée",
+  pending: "En attente de traitement",
+  approved: "Approuvée",
+  rejected: "Refusée",
   in_transit: "En transit",
-  received:   "Reçue par notre équipe",
+  received: "Reçue par notre équipe",
   processing: "En cours de traitement",
-  resolved:   "Résolue",
-  cancelled:  "Annulée"
+  resolved: "Résolue",
+  cancelled: "Annulée",
 };
 
 const rmaNotification = (user, rma, type = "created") => {
-  const title = type === "created"
-    ? "Demande SAV créée"
-    : "Mise à jour demande SAV";
-
+  const title = type === "created" ? "Demande SAV créée" : "Mise à jour demande SAV";
   const statusText = rmaStatusLabels[rma.status] || rma.status;
 
-  return `
-    <div style="${baseStyle}">
-      ${headerHtml(title)}
-      <div style="padding:24px;background:#ffffff;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
-        <p>Bonjour <strong>${user.name || "Client"}</strong>,</p>
-        ${type === "created"
-          ? `<p>Votre demande SAV <strong>#${rma.rmaNumber}</strong> a été créée avec succès.</p>
-             <p>Nous la traiterons dans les plus brefs délais.</p>`
-          : `<p>Votre demande SAV <strong>#${rma.rmaNumber}</strong> a été mise à jour :</p>
-             <div style="background:#EFF6FF;border-left:4px solid #1E40AF;padding:12px;border-radius:4px;margin:16px 0">
-               <strong style="color:#1E40AF">${statusText}</strong>
-             </div>`
-        }
-        <div style="text-align:center;margin-top:24px">
-          <a href="${frontendUrl}/dashboard/sav/${rma._id}" style="${btnStyle}">
-            Voir ma demande
-          </a>
-        </div>
-      </div>
-      ${footerHtml()}
-    </div>
-  `;
+  return layout(
+    title,
+    `
+      <p style="margin:0 0 10px;font-size:15px">Bonjour <strong>${esc(user.name || "Client")}</strong>,</p>
+      ${type === "created"
+        ? `<p style="margin:0 0 12px;font-size:15px">Votre demande SAV <strong>#${esc(rma.rmaNumber)}</strong> a été créée avec succès. Nous la traiterons dans les plus brefs délais.</p>`
+        : `<p style="margin:0 0 12px;font-size:15px">Votre demande SAV <strong>#${esc(rma.rmaNumber)}</strong> a été mise à jour :</p>
+           <div style="background:#EFF6FF;border-left:4px solid #1E40AF;padding:14px 16px;border-radius:6px;margin:16px 0;font-size:15px">
+             <strong style="color:#1E40AF">${esc(statusText)}</strong>
+           </div>`
+      }
+      ${button(`${frontendUrl}/dashboard/sav/${rma._id}`, "Voir ma demande")}
+    `
+  );
 };
 
 // ── Alerte expiration garantie ────────────────────────────────────────────────
 const warrantyExpiring = (user, warranty, product) => {
   const daysLeft = Math.ceil((new Date(warranty.endDate) - new Date()) / (1000 * 60 * 60 * 24));
 
-  return `
-    <div style="${baseStyle}">
-      ${headerHtml("Garantie bientôt expirée")}
-      <div style="padding:24px;background:#ffffff;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
-        <p>Bonjour <strong>${user.name || "Client"}</strong>,</p>
-        <p>La garantie de votre <strong>${product?.name || "produit"}</strong> expire dans <strong>${daysLeft} jour(s)</strong>.</p>
-        <div style="background:#FEF3C7;border-left:4px solid #D97706;padding:12px;border-radius:4px;margin:16px 0">
-          ⚠️ Date d'expiration : <strong>${new Date(warranty.endDate).toLocaleDateString("fr-FR")}</strong>
-        </div>
-        <p>Pensez à renouveler votre garantie pour continuer à bénéficier de notre couverture.</p>
-        <div style="text-align:center;margin-top:24px">
-          <a href="${frontendUrl}/dashboard/warranties" style="${btnStyle}">
-            Gérer mes garanties
-          </a>
-        </div>
+  return layout(
+    "Garantie bientôt expirée",
+    `
+      <p style="margin:0 0 10px;font-size:15px">Bonjour <strong>${esc(user.name || "Client")}</strong>,</p>
+      <p style="margin:0 0 16px;font-size:15px">
+        La garantie de votre <strong>${esc(product && product.name || "produit")}</strong> expire dans <strong>${daysLeft} jour(s)</strong>.
+      </p>
+      <div style="background:#FEF3C7;border-left:4px solid #D97706;padding:14px 16px;border-radius:6px;margin:16px 0;font-size:14px">
+        ⚠️ Date d'expiration : <strong>${new Date(warranty.endDate).toLocaleDateString("fr-FR")}</strong>
       </div>
-      ${footerHtml()}
-    </div>
-  `;
+      <p style="font-size:14px;color:#475569;margin:0 0 16px">Pensez à prolonger votre garantie pour rester protégé.</p>
+      ${button(`${frontendUrl}/dashboard/warranties`, "Gérer mes garanties")}
+    `
+  );
 };
 
 // ── Notification admin : nouvelle commande ────────────────────────────────────
 const adminOrderNotification = (order, user) => {
-  const productRows = (order.products || [])
-    .map(item => {
-      const name  = item.product?.name || item.product || "Produit";
-      const qty   = item.quantity || 1;
-      const price = (item.price || 0).toLocaleString("fr-FR");
-      return `<tr>
-        <td style="padding:6px;border-bottom:1px solid #e5e7eb">${name}</td>
-        <td style="padding:6px;text-align:center;border-bottom:1px solid #e5e7eb">${qty}</td>
-        <td style="padding:6px;text-align:right;border-bottom:1px solid #e5e7eb">${price} FCFA</td>
-      </tr>`;
-    })
-    .join("");
+  const orderId = order.orderNumber || order._id;
+  return layout(
+    "Nouvelle commande reçue",
+    `
+      <h3 style="margin:0 0 14px;color:#1E40AF;font-size:18px">🛍️ Commande #${esc(orderId)}</h3>
 
-  return `
-    <div style="${baseStyle}">
-      ${headerHtml("Nouvelle commande reçue")}
-      <div style="padding:24px;background:#ffffff;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 8px 8px">
-        <h3 style="margin-top:0;color:#1E40AF">🛍️ Commande #${order.orderNumber || order._id}</h3>
+      ${infoBlock([
+        `<strong>Client</strong> : ${esc((user && user.name) || order.deliveryName)}`,
+        `<strong>Email</strong> : ${esc((user && user.email) || "—")}`,
+        `<strong>Téléphone</strong> : ${esc(order.deliveryPhone || "—")}`,
+        `<strong>Adresse</strong> : ${esc(order.deliveryAddress || "")}${order.deliveryCity ? `, ${esc(order.deliveryCity)}` : ""}`,
+        `<strong>Paiement</strong> : ${paymentLabel(order.paymentMethod)}`,
+        `<strong>Total</strong> : <span style="color:#1E40AF;font-weight:bold">${formatFCFA(order.totalPrice)} FCFA</span>`,
+      ])}
 
-        <div style="background:#f3f4f6;padding:12px;border-radius:6px;margin-bottom:16px">
-          <p style="margin:4px 0"><b>Client :</b> ${user?.name || order.deliveryName}</p>
-          <p style="margin:4px 0"><b>Email :</b> ${user?.email || "—"}</p>
-          <p style="margin:4px 0"><b>Téléphone :</b> ${order.deliveryPhone}</p>
-          <p style="margin:4px 0"><b>Adresse :</b> ${order.deliveryAddress}, ${order.deliveryCity || "Dakar"}</p>
-        </div>
+      ${productTable(order.products)}
+      ${totalsBlock(order)}
 
-        <div style="background:#fef3c7;padding:12px;border-radius:6px;margin-bottom:16px">
-          <p style="margin:4px 0"><b>Mode de paiement :</b> ${
-            order.paymentMethod === "cash" ? "💵 À la livraison" : order.paymentMethod?.toUpperCase()
-          }</p>
-          <p style="margin:4px 0"><b>Total :</b> <strong style="color:#1E40AF;font-size:1.2em">${(order.totalPrice || 0).toLocaleString("fr-FR")} FCFA</strong></p>
-        </div>
-
-        <table style="width:100%;border-collapse:collapse">
-          <thead>
-            <tr style="background:#f3f4f6">
-              <th style="padding:8px;text-align:left">Produit</th>
-              <th style="padding:8px;text-align:center">Qté</th>
-              <th style="padding:8px;text-align:right">Prix</th>
-            </tr>
-          </thead>
-          <tbody>${productRows}</tbody>
-        </table>
-
-        <div style="text-align:center;margin-top:24px">
-          <a href="${frontendUrl}/admin/orders/${order._id}" style="${btnStyle}">
-            Voir la commande (Admin)
-          </a>
-        </div>
-      </div>
-      ${footerHtml()}
-    </div>
-  `;
+      ${button(`${frontendUrl}/admin/orders/${order._id}`, "Voir la commande (Admin)")}
+    `
+  );
 };
 
 module.exports = {
@@ -330,5 +360,5 @@ module.exports = {
   reviewRequest,
   rmaNotification,
   warrantyExpiring,
-  adminOrderNotification
+  adminOrderNotification,
 };

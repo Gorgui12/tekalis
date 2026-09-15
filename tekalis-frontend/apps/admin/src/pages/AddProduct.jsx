@@ -5,7 +5,7 @@ import {
   FaFileExcel, FaFileImport, FaDownload, FaCheck,
   FaStar
 } from "react-icons/fa";
-import * as XLSX from 'xlsx';
+import ExcelJS from 'exceljs';
 import api from "@shared/api/api";
 import { useToast } from '@shared/context/ToastContext';
 
@@ -90,7 +90,7 @@ const AddProduct = () => {
   // IMPORT EN MASSE
   // ══════════════════════════════════════════════════════════════
 
-  const downloadTemplate = () => {
+  const downloadTemplate = async () => {
     const template = [
       {
         name: "HP Pavilion Gaming 15",
@@ -175,10 +175,29 @@ const AddProduct = () => {
         metaDescription: "Le nouveau iPhone 15 Pro avec puce A17 Pro"
       }
     ];
-    const ws = XLSX.utils.json_to_sheet(template);
-    const wb = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(wb, ws, "Produits");
-    XLSX.writeFile(wb, "template_produits_tekalis.xlsx");
+    try {
+      const wb = new ExcelJS.Workbook();
+      const sheet = wb.addWorksheet("Produits");
+      const headers = Object.keys(template[0]);
+      sheet.columns = headers.map((h) => ({ header: h, key: h, width: 22 }));
+      template.forEach((row) => sheet.addRow(row));
+
+      const buffer = await wb.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "template_produits_tekalis.xlsx";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    } catch (error) {
+      console.error("Erreur génération template Excel:", error);
+      toast.error("Erreur lors de la génération du template Excel");
+    }
   };
 
   const transformRowToProduct = (row) => {
@@ -262,12 +281,9 @@ const AddProduct = () => {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Garde-fou 2026-09-03 : XLSX (SheetJS) a 2 CVE non corrigées (ReDoS
-    // + prototype pollution) déclenchables par un fichier malveillant.
-    // Sans correctif upstream disponible, on limite au moins la taille
-    // du fichier accepté pour réduire la surface d'un fichier piégé.
-    // Migration recommandée à terme vers `exceljs`, hors périmètre de
-    // cette passe (réécriture de handleFileUpload nécessaire).
+    // Garde-fou : 5 Mo max sur le fichier accepté.
+    // 2026-09-15 : parsing migré de `xlsx` (SheetJS, 2 CVE non corrigées)
+    // vers `exceljs` (maintenu activement). Support : .xlsx uniquement.
     const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 Mo
     if (file.size > MAX_FILE_SIZE) {
       toast.error("Fichier trop volumineux (5 Mo max)");
@@ -276,19 +292,42 @@ const AddProduct = () => {
     }
 
     const reader = new FileReader();
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
       try {
-        const data = new Uint8Array(event.target.result);
-        const workbook = XLSX.read(data, { type: 'array' });
-        const sheetName = workbook.SheetNames[0];
-        const worksheet = workbook.Sheets[sheetName];
-        const jsonData = XLSX.utils.sheet_to_json(worksheet);
-        const products = jsonData.map(row => transformRowToProduct(row));
+        const wb = new ExcelJS.Workbook();
+        await wb.xlsx.load(event.target.result);
+        const ws = wb.worksheets[0];
+        if (!ws) {
+          toast.error("Fichier Excel vide ou invalide");
+          return;
+        }
+
+        // Ligne 1 = en-têtes (clés du produit)
+        const headerRow = ws.getRow(1);
+        const headers = [];
+        headerRow.eachCell((cell, colNumber) => {
+          const label = cell.value == null ? "" : String(cell.value).trim();
+          headers[colNumber - 1] = label;
+        });
+
+        const rows = [];
+        ws.eachRow((row, rowNumber) => {
+          if (rowNumber === 1) return; // ligne d'en-têtes
+          const obj = {};
+          headers.forEach((header, index) => {
+            if (header) obj[header] = row.getCell(index + 1).value ?? "";
+          });
+          // Ignorer les lignes vides
+          if (Object.values(obj).every((v) => v === "" || v == null)) return;
+          rows.push(obj);
+        });
+
+        const products = rows.map((row) => transformRowToProduct(row));
         setBulkProducts(products);
         toast.success(`${products.length} produit(s) chargé(s) depuis le fichier`);
       } catch (error) {
         console.error("Erreur lecture fichier:", error);
-        toast.error("Erreur lors de la lecture du fichier");
+        toast.error("Erreur lors de la lecture du fichier. Formats supportés : .xlsx");
       }
     };
     reader.readAsArrayBuffer(file);
@@ -495,8 +534,8 @@ const AddProduct = () => {
                 <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition cursor-pointer">
                   <FaFileImport className="text-5xl text-gray-400 mx-auto mb-4" />
                   <p className="text-gray-700 font-semibold mb-2">Cliquez pour sélectionner un fichier Excel ou CSV</p>
-                  <p className="text-sm text-gray-500">Formats acceptés : .xlsx, .xls, .csv</p>
-                  <input type="file" accept=".xlsx,.xls,.csv" onChange={handleFileUpload} className="hidden" />
+                  <p className="text-sm text-gray-500">Formats acceptés : .xlsx (Excel)</p>
+                  <input type="file" accept=".xlsx" onChange={handleFileUpload} className="hidden" />
                 </div>
               </label>
             </div>

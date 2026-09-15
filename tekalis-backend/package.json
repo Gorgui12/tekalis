@@ -24,7 +24,7 @@
     "mongoose": "^8.20.2",
     "morgan": "^1.10.1",
     "multer": "^1.4.5-lts.2",
-    "nodemailer": "^6.10.1",
+    "nodemailer": "^9.1.1",
     "paydunya": "^1.0.12"
   },
   "devDependencies": {

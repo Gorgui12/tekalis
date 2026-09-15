@@ -12,6 +12,7 @@
   "dependencies": {
     "@reduxjs/toolkit": "^2.6.1",
     "axios": "^1.8.4",
+    "exceljs": "^4.4.0",
     "framer-motion": "^12.23.22",
     "lucide-react": "^0.575.0",
     "prop-types": "^15.8.1",
@@ -21,8 +22,7 @@
     "react-redux": "^9.2.0",
     "react-router-dom": "^7.4.1",
     "recharts": "^3.6.0",
-    "redux-persist": "^6.0.0",
-    "xlsx": "^0.18.5"
+    "redux-persist": "^6.0.0"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",

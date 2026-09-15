@@ -1,3 +1,4 @@
+import { lazy, Suspense } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 
 // Guard admin (vérifie le rôle)
@@ -6,109 +7,120 @@ import AdminGuard from "./routes/AdminGuard";
 // Layout admin
 import AdminLayout from "./components/layout/AdminLayout";
 
-// Pages admin
-import AdminLogin from "./pages/Login";
-import AdminDashboard from "./pages/Dashboard";
-import Analytics from "./pages/Analytics";
-import Statistiques from "./pages/Statistiques";
-import Trends from "./pages/Trends";
+// Pages admin — chargées à la demande (code-splitting, réduction du bundle initial)
+const AdminLogin = lazy(() => import("./pages/Login"));
+const AdminDashboard = lazy(() => import("./pages/Dashboard"));
+const Analytics = lazy(() => import("./pages/Analytics"));
+const Statistiques = lazy(() => import("./pages/Statistiques"));
+const Trends = lazy(() => import("./pages/Trends"));
 
 // Commandes
-import AdminOrders from "./pages/Orders";
-import AdminOrderDetails from "./pages/OrderDetails";
-import Payments from "./pages/Payments";
+const AdminOrders = lazy(() => import("./pages/Orders"));
+const AdminOrderDetails = lazy(() => import("./pages/OrderDetails"));
+const Payments = lazy(() => import("./pages/Payments"));
 
 // Produits
-import AdminProducts from "./pages/AdminProducts";
-import AddProduct from "./pages/AddProduct";
-import EditProduct from "./pages/EditProduct";
-import Categories from "./pages/Categories";
+const AdminProducts = lazy(() => import("./pages/AdminProducts"));
+const AddProduct = lazy(() => import("./pages/AddProduct"));
+const EditProduct = lazy(() => import("./pages/EditProduct"));
+const Categories = lazy(() => import("./pages/Categories"));
 
 // Utilisateurs & avis
-import Users from "./pages/Users";
-import Reviews from "./pages/Reviews";
+const Users = lazy(() => import("./pages/Users"));
+const Reviews = lazy(() => import("./pages/Reviews"));
 
 // SAV
-import Warranties from "./pages/Warranties";
-import RMA from "./pages/RMA";
+const Warranties = lazy(() => import("./pages/Warranties"));
+const RMA = lazy(() => import("./pages/RMA"));
 
 // Blog
-import Articles from "./pages/Articles";
-import AddArticle from "./pages/AddArticle";
-import EditArticle from "./pages/EditArticle";
+const Articles = lazy(() => import("./pages/Articles"));
+const AddArticle = lazy(() => import("./pages/AddArticle"));
+const EditArticle = lazy(() => import("./pages/EditArticle"));
 
 // Divers
-import PromoCodes from "./pages/PromoCodes";
-import Settings from "./pages/Settings";
-import HeroSlides from './pages/HeroSlides';
+const PromoCodes = lazy(() => import("./pages/PromoCodes"));
+const Settings = lazy(() => import("./pages/Settings"));
+const HeroSlides = lazy(() => import("./pages/HeroSlides"));
+
+const PageFallback = () => (
+  <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="text-center">
+      <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-blue-600 border-t-transparent" />
+      <p className="mt-4 text-gray-500 text-sm">Chargement…</p>
+    </div>
+  </div>
+);
 
 function App() {
   return (
-    <Routes>
-      {/* ─────────────────────────────────────────
-          PAGE PUBLIQUE : Login admin
-          Accessible sans être connecté
-      ───────────────────────────────────────── */}
-      <Route path="/login" element={<AdminLogin />} />
+    <Suspense fallback={<PageFallback />}>
+      <Routes>
+        {/* ─────────────────────────────────────────
+            PAGE PUBLIQUE : Login admin
+            Accessible sans être connecté
+        ───────────────────────────────────────── */}
+        <Route path="/login" element={<AdminLogin />} />
 
-      {/* ─────────────────────────────────────────
-          ROUTES PROTÉGÉES : admin seulement
-          AdminGuard vérifie token + role === 'admin'
-      ───────────────────────────────────────── */}
-      <Route element={<AdminGuard />}>
-        {/* AdminLayout = sidebar + header communs */}
-        <Route element={<AdminLayout />}>
+        {/* ─────────────────────────────────────────
+            ROUTES PROTÉGÉES : admin seulement
+            AdminGuard vérifie token + rôle === 'admin'
+        ───────────────────────────────────────── */}
+        <Route element={<AdminGuard />}>
+          {/* AdminLayout = sidebar + header communs */}
+          <Route element={<AdminLayout />}>
 
-          {/* Hero slides */}
-          <Route path="/hero-slides" element={<HeroSlides />} />
+            {/* Hero slides */}
+            <Route path="/hero-slides" element={<HeroSlides />} />
 
-          {/* Redirect racine → dashboard */}
-          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+            {/* Redirect racine → dashboard */}
+            <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
-          {/* Dashboard */}
-          <Route path="/dashboard" element={<AdminDashboard />} />
-          <Route path="/analytics" element={<Analytics />} />
-          <Route path="/trends" element={<Trends />} />
-          <Route path="/statistiques" element={<Statistiques />} />
+            {/* Dashboard */}
+            <Route path="/dashboard" element={<AdminDashboard />} />
+            <Route path="/analytics" element={<Analytics />} />
+            <Route path="/trends" element={<Trends />} />
+            <Route path="/statistiques" element={<Statistiques />} />
 
-          {/* Commandes */}
-          <Route path="/orders" element={<AdminOrders />} />
-          <Route path="/orders/:id" element={<AdminOrderDetails />} />
-          <Route path="/payments" element={<Payments />} />
+            {/* Commandes */}
+            <Route path="/orders" element={<AdminOrders />} />
+            <Route path="/orders/:id" element={<AdminOrderDetails />} />
+            <Route path="/payments" element={<Payments />} />
 
-          {/* Produits */}
-          <Route path="/products" element={<AdminProducts />} />
-          <Route path="/products/add" element={<AddProduct />} />
-          <Route path="/products/edit/:id" element={<EditProduct />} />
-          <Route path="/categories" element={<Categories />} />
+            {/* Produits */}
+            <Route path="/products" element={<AdminProducts />} />
+            <Route path="/products/add" element={<AddProduct />} />
+            <Route path="/products/edit/:id" element={<EditProduct />} />
+            <Route path="/categories" element={<Categories />} />
 
-          {/* Utilisateurs */}
-          <Route path="/users" element={<Users />} />
+            {/* Utilisateurs */}
+            <Route path="/users" element={<Users />} />
 
-          {/* Avis */}
-          <Route path="/reviews" element={<Reviews />} />
+            {/* Avis */}
+            <Route path="/reviews" element={<Reviews />} />
 
-          {/* SAV */}
-          <Route path="/warranties" element={<Warranties />} />
-          <Route path="/rma" element={<RMA />} />
+            {/* SAV */}
+            <Route path="/warranties" element={<Warranties />} />
+            <Route path="/rma" element={<RMA />} />
 
-          {/* Blog */}
-          <Route path="/articles" element={<Articles />} />
-          <Route path="/articles/add" element={<AddArticle />} />
-          <Route path="/articles/edit/:id" element={<EditArticle />} />
+            {/* Blog */}
+            <Route path="/articles" element={<Articles />} />
+            <Route path="/articles/add" element={<AddArticle />} />
+            <Route path="/articles/edit/:id" element={<EditArticle />} />
 
-          {/* Promo */}
-          <Route path="/promo-codes" element={<PromoCodes />} />
+            {/* Promo */}
+            <Route path="/promo-codes" element={<PromoCodes />} />
 
-          {/* Paramètres */}
-          <Route path="/settings" element={<Settings />} />
+            {/* Paramètres */}
+            <Route path="/settings" element={<Settings />} />
 
+          </Route>
         </Route>
-      </Route>
 
-      {/* 404 admin */}
-      <Route path="*" element={<Navigate to="/dashboard" replace />} />
-    </Routes>
+        {/* 404 admin */}
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </Suspense>
   );
 }
 

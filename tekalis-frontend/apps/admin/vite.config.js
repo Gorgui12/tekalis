@@ -18,6 +18,22 @@ export default defineConfig({
     },
   },
 
+  build: {
+    rollupOptions: {
+      output: {
+        // Découpe les gros vendors en chunks partagés → cache et init plus rapides
+        manualChunks: {
+          "react-vendor": ["react", "react-dom", "react-router-dom"],
+          "redux-vendor": ["@reduxjs/toolkit", "react-redux", "redux-persist"],
+          charts: ["recharts"],
+          "react-icons": ["react-icons"],
+          icons: ["lucide-react", "framer-motion"],
+          spreadsheet: ["exceljs"],
+        },
+      },
+    },
+  },
+
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
