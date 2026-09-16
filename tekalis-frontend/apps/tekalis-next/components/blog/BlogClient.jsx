@@ -31,7 +31,7 @@ const Blog = () => {
 
   const fetchArticles = async () => {
     try {
-      const { data } = await api.get("/articles");
+      const { data } = await api.get("/articles?limit=100");
       setArticles(data.articles || []);
     } catch (error) {
       console.error("Erreur chargement articles:", error);

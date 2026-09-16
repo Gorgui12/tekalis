@@ -25,7 +25,7 @@ const pickFields = (source, allowedKeys) => {
 // Récupérer tous les articles
 exports.getAllArticles = async (req, res) => {
   try {
-    const { page = 1, limit = 12, category, tag, featured, search } = req.query;
+    const { page = 1, limit = 100, category, tag, featured, search } = req.query;
     
     const filter = { status: "published" };
     

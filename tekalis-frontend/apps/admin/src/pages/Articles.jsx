@@ -29,10 +29,10 @@ const AdminArticles = () => {
 
   const fetchArticles = async () => {
     try {
-      let params = [];
+      let params = ["limit=100"];
       if (categoryFilter !== "all") params.push(`category=${categoryFilter}`);
       if (statusFilter !== "all") params.push(`status=${statusFilter}`);
-      const queryString = params.length > 0 ? `?${params.join("&")}` : "";
+      const queryString = `?${params.join("&")}`;
       
       const { data } = await api.get(`/articles${queryString}`);
       setArticles(data.articles || []);

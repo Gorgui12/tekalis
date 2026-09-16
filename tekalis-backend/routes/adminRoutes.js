@@ -71,7 +71,7 @@ const SETTINGS_FIELDS = [
 // ── Articles (/api/v1/admin/articles) ────────────────────────────────────────
 router.get("/articles", async (req, res) => {
   try {
-    const { page = 1, limit = 12, category, search, status } = req.query;
+    const { page = 1, limit = 100, category, search, status } = req.query;
     const filter = {};
     if (category) filter.category = category;
     if (status) filter.status = status;
