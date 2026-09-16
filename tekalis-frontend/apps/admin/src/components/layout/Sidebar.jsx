@@ -3,7 +3,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, ShoppingCart, Package, Wrench, Shield,
   FileText, BarChart3, Users, Star, Tag, Settings,
-  ChevronDown, ChevronRight, X, Zap, Image, TrendingUp
+  ChevronDown, ChevronRight, X, Zap, Image, TrendingUp, Database
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -37,6 +37,7 @@ const NAV_ITEMS = [
   { label: 'Analytics',    icon: BarChart3, to: '/analytics' },
   { label: 'Tendances Google', icon: TrendingUp, to: '/trends' },
   { label: 'Promo Codes',  icon: Tag,       to: '/promo-codes' },
+  { label: 'Base de données', icon: Database, to: '/database' },
   { label: 'Paramètres',   icon: Settings,  to: '/settings' },
 ];
 

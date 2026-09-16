@@ -42,6 +42,7 @@ const EditArticle = lazy(() => import("./pages/EditArticle"));
 const PromoCodes = lazy(() => import("./pages/PromoCodes"));
 const Settings = lazy(() => import("./pages/Settings"));
 const HeroSlides = lazy(() => import("./pages/HeroSlides"));
+const Database = lazy(() => import("./pages/Database"));
 
 const PageFallback = () => (
   <div className="min-h-screen flex items-center justify-center bg-gray-50">
@@ -110,6 +111,9 @@ function App() {
 
             {/* Promo */}
             <Route path="/promo-codes" element={<PromoCodes />} />
+
+            {/* Base de données */}
+            <Route path="/database" element={<Database />} />
 
             {/* Paramètres */}
             <Route path="/settings" element={<Settings />} />

@@ -777,4 +777,134 @@ router.delete("/users/:id", async (req, res) => {
   } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
+// ===============================================
+// Explorateur Base de données (GET /api/v1/admin/db/*)
+// Permet de lister les collections, parcourir et supprimer des
+// documents — utile pour les données sans page de gestion dédiée.
+// ===============================================
+const mongoose = require("mongoose");
+
+const DB_COLLECTION_RX = /^[A-Za-z0-9_-]{1,64}$/;
+const SENSITIVE_FIELDS = {
+  users: ["password", "resetPasswordToken", "resetPasswordExpires"]
+};
+
+// Sérialise un document BSON (ObjectId / Date / Buffer) en JSON navigable
+const serializeDoc = (doc) => {
+  const toPlain = (value) => {
+    if (value === null || value === undefined) return value;
+    if (value instanceof mongoose.Types.ObjectId) return value.toString();
+    if (value instanceof Date) return value.toISOString();
+    if (Buffer.isBuffer(value)) return `Buffer(${value.length})`;
+    if (Array.isArray(value)) return value.map(toPlain);
+    if (typeof value === "object") {
+      const out = {};
+      for (const [k, v] of Object.entries(value)) out[k] = toPlain(v);
+      return out;
+    }
+    return value;
+  };
+  return toPlain(doc);
+};
+
+router.get("/db/collections", async (req, res) => {
+  try {
+    const db = mongoose.connection.db;
+    const list = await db.listCollections().toArray();
+    const cols = list
+      .filter(c => !c.name.startsWith("system.") && DB_COLLECTION_RX.test(c.name))
+      .map(c => ({ name: c.name, count: 0 }));
+
+    await Promise.all(cols.map(async (c) => {
+      try { c.count = await db.collection(c.name).countDocuments(); } catch { c.count = 0; }
+    }));
+
+    cols.sort((a, b) => b.count - a.count || a.name.localeCompare(b.name));
+    res.json({ success: true, collections: cols, total: cols.reduce((s, c) => s + c.count, 0) });
+  } catch (e) {
+    console.error("❌ Erreur db/collections:", e.message);
+    res.status(500).json({ success: false, message: e.message });
+  }
+});
+
+router.get("/db/:collection", async (req, res) => {
+  const { collection } = req.params;
+  if (!DB_COLLECTION_RX.test(collection)) {
+    return res.status(400).json({ success: false, message: "Nom de collection invalide" });
+  }
+
+  const { page = 1, limit = 25, search } = req.query;
+  const pageNum = Math.max(1, parseInt(page, 10) || 1);
+  const limitNum = Math.min(100, Math.max(1, parseInt(limit, 10) || 25));
+
+  try {
+    const db = mongoose.connection.db;
+    const coll = db.collection(collection);
+
+    const filter = {};
+    if (search) {
+      const rx = { $regex: escapeRegex(search.trim()), $options: "i" };
+      const or = [
+        "name", "title", "code", "email", "slug", "orderNumber", "query",
+        "status", "label", "brand", "serialNumber", "city", "message", "phone",
+        "firstName", "lastName", "product", "category"
+      ].map(f => ({ [f]: rx }));
+      if (mongoose.Types.ObjectId.isValid(search.trim())) {
+        or.push({ _id: new mongoose.Types.ObjectId(search.trim()) });
+      }
+      filter.$or = or;
+    }
+
+    const total = await coll.countDocuments(filter);
+    const docs = await coll.find(filter)
+      .sort({ _id: -1 })
+      .skip((pageNum - 1) * limitNum)
+      .limit(limitNum)
+      .toArray();
+
+    const sensitive = SENSITIVE_FIELDS[collection] || [];
+    const cleaned = docs.map(d => {
+      for (const key of sensitive) delete d[key];
+      return serializeDoc(d);
+    });
+
+    res.json({
+      success: true,
+      collection,
+      docs: cleaned,
+      pagination: {
+        page: pageNum,
+        limit: limitNum,
+        total,
+        totalPages: Math.max(1, Math.ceil(total / limitNum))
+      }
+    });
+  } catch (e) {
+    console.error("❌ Erreur db/:collection:", e.message);
+    res.status(500).json({ success: false, message: e.message });
+  }
+});
+
+router.delete("/db/:collection/:id", async (req, res) => {
+  const { collection, id } = req.params;
+  if (!DB_COLLECTION_RX.test(collection)) {
+    return res.status(400).json({ success: false, message: "Nom de collection invalide" });
+  }
+  if (collection === "users" && mongoose.Types.ObjectId.isValid(id) && req.user._id.equals(id)) {
+    return res.status(400).json({ success: false, message: "Vous ne pouvez pas supprimer votre propre compte" });
+  }
+  try {
+    const db = mongoose.connection.db;
+    const queryId = mongoose.Types.ObjectId.isValid(id) ? new mongoose.Types.ObjectId(id) : id;
+    const result = await db.collection(collection).deleteOne({ _id: queryId });
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ success: false, message: "Document introuvable" });
+    }
+    res.json({ success: true, message: "Document supprimé", deletedCount: result.deletedCount });
+  } catch (e) {
+    console.error("❌ Erreur db delete:", e.message);
+    res.status(500).json({ success: false, message: e.message });
+  }
+});
+
 module.exports = router;
