@@ -9,7 +9,7 @@ import {
   clearCart,
 } from "@/store/slices/cartSlice";
 import { trackRemoveFromCart } from "@/lib/analytics";
-import { FaTrash, FaMinus, FaPlus, FaShieldAlt, FaTruck, FaLock } from "react-icons/fa";
+import { FaTrash, FaMinus, FaPlus, FaShieldAlt, FaTruck, FaLock, FaShoppingCart } from "react-icons/fa";
 
 const Cart = () => {
   const dispatch = useDispatch();

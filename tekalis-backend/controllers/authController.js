@@ -107,7 +107,11 @@ exports.register = async (req, res) => {
   } catch (error) {
     console.error("❌ Erreur register:", error);
     if (error.code === 11000) {
-      return res.status(400).json({ message: "Cet email est déjà utilisé" });
+      const dupField = error.keyPattern ? Object.keys(error.keyPattern)[0] : "email";
+      if (dupField === "email") {
+        return res.status(400).json({ message: "Cet email est déjà utilisé" });
+      }
+      return res.status(500).json({ message: `Conflit de données sur le champ "${dupField}"` });
     }
     res.status(500).json({ message: error.message });
   }
@@ -139,6 +143,13 @@ exports.registerAdmin = async (req, res) => {
     });
   } catch (error) {
     console.error("❌ Erreur registerAdmin:", error);
+    if (error.code === 11000) {
+      const dupField = error.keyPattern ? Object.keys(error.keyPattern)[0] : "email";
+      if (dupField === "email") {
+        return res.status(400).json({ message: "Cet email est déjà utilisé" });
+      }
+      return res.status(500).json({ message: `Conflit de données sur le champ "${dupField}"` });
+    }
     res.status(500).json({ message: error.message });
   }
 };

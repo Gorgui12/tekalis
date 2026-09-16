@@ -728,7 +728,11 @@ router.put("/users/:id", async (req, res) => {
       }
     });
   } catch (e) {
-    if (e.code === 11000) return res.status(400).json({ success: false, message: "Cet email est déjà utilisé" });
+    if (e.code === 11000) {
+      const dupField = e.keyPattern ? Object.keys(e.keyPattern)[0] : "email";
+      if (dupField === "email") return res.status(400).json({ success: false, message: "Cet email est déjà utilisé" });
+      return res.status(500).json({ success: false, message: `Conflit de données sur le champ "${dupField}"` });
+    }
     res.status(500).json({ success: false, message: e.message });
   }
 });

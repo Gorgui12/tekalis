@@ -48,16 +48,21 @@ exports.getWarranty = async (req, res) => {
 exports.createWarranty = async (orderData) => {
   try {
     const warranties = [];
-    
+    const VALID_WARRANTY_TYPES = ["constructeur", "extension", "commerciale"];
+
     for (const item of orderData.products) {
       const product = await Product.findById(item.product);
-      
+
       if (!product || !product.warranty) continue;
-      
+
       const startDate = new Date();
       const endDate = new Date();
       endDate.setMonth(endDate.getMonth() + product.warranty.duration);
-      
+
+      const warrantyType = VALID_WARRANTY_TYPES.includes(product.warranty.type)
+        ? product.warranty.type
+        : "constructeur";
+
       const warranty = await Warranty.create({
         product: product._id,
         user: orderData.user,
@@ -65,14 +70,14 @@ exports.createWarranty = async (orderData) => {
         purchaseDate: startDate,
         startDate,
         endDate,
-        warrantyType: product.warranty.type,
+        warrantyType,
         duration: product.warranty.duration,
         status: "active"
       });
-      
+
       warranties.push(warranty);
     }
-    
+
     return warranties;
   } catch (error) {
     console.error("Erreur création garantie:", error);
