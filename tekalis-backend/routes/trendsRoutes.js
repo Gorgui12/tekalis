@@ -48,13 +48,35 @@ const normalize = (s) =>
     .trim();
 
 // ── Groupe d'affichage dérivé de la seed d'origine ───────────────────────────
+// L'ordre des branches est important : les groupes les plus spécifiques sont
+// testés en premier (ex. "casque gaming" → Gaming avant Audio).
 function groupOf(seed) {
   const s = normalize(seed);
   if (s.includes("iphone")) return "iPhone";
   if (s.includes("samsung")) return "Samsung";
+  if (s.includes("gaming") || s.includes("gamer") || s.includes("ps5") ||
+      s.includes("playstation") || s.includes("xbox") || s.includes("manette") ||
+      s.includes("gamepad") || s.includes("console") || s.includes("144hz")) return "Gaming";
+  if (s.includes("tablette") || s.includes("ipad")) return "Tablettes";
+  if (s.includes("ordinateur") || s.includes("laptop") || s.includes("pc portable") ||
+      s.includes("pc fixe") || s.includes("pc pas cher") || s.includes("elitebook")) return "Ordinateurs";
+  if (s.includes("tv") || s.includes("television") || s.includes("televiseur") ||
+      s.includes("ecran") || s.includes("4k")) return "TV";
+  if (s.includes("enceinte") || s.includes("casque") || s.includes("jbl") ||
+      s.includes("beats") || s.includes("sonorisation") || s.includes("barre de son")) return "Audio";
+  if (s.includes("refrigerateur") || s.includes("frigo") || s.includes("machine a laver") ||
+      s.includes("lave linge") || s.includes("micro onde") || s.includes("four") ||
+      s.includes("cuisiniere") || s.includes("mixeur") || s.includes("electromenager")) return "Électroménager";
+  if (s.includes("climatiseur") || s.includes("climatisation") || s.includes("clim")) return "Climatiseurs";
+  if (s.includes("ventilateur") || s.includes("ventilo")) return "Ventilation";
+  if (s.includes("solaire") || s.includes("panneau") || s.includes("onduleur") ||
+      s.includes("kit solaire")) return "Énergie solaire";
+  if (s.includes("routeur") || s.includes("wifi") || s.includes("modem") || s.includes("reseau")) return "Réseau";
+  if (s.includes("power bank") || s.includes("powerbank") || s.includes("batterie externe") ||
+      s.includes("chargeur portable")) return "Mobilité";
   if (s.includes("ecouteur") || s.includes("coque") || s.includes("accessoire")) return "Accessoires";
   if (s.includes("telephone") || s.includes("smartphone")) return "Téléphones";
-  return "Téléphones";
+  return "Autre";
 }
 
 // ── Extraction des mots-clés significatifs d'une suggestion ──────────────────
@@ -224,7 +246,7 @@ router.get("/stats", verifyToken, isAdmin, async (req, res) => {
     const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
     const baseFilter = { isSeed: { $ne: true } };
 
-    const [total, recentAgg, coveredAgg, byGroupAgg] = await Promise.all([
+    const [total, recentAgg, coveredAgg, allDocs] = await Promise.all([
       Trend.countDocuments(baseFilter),
       Trend.aggregate([
         { $match: { ...baseFilter, firstSeen: { $gte: sevenDaysAgo } } },
@@ -234,15 +256,20 @@ router.get("/stats", verifyToken, isAdmin, async (req, res) => {
         { $match: { ...baseFilter, hasCover: true } },
         { $count: "n" },
       ]),
-      Trend.aggregate([
-        { $match: baseFilter },
-        { $project: { group: { $literal: "Téléphones" } } },
-        { $group: { _id: "$group", count: { $sum: 1 } } },
-      ]),
+      Trend.find(baseFilter).select("seed").lean(),
     ]);
 
     const recent = recentAgg.length ? recentAgg[0].n : 0;
     const covered = coveredAgg.length ? coveredAgg[0].n : 0;
+
+    const groupCounts = new Map();
+    for (const doc of allDocs) {
+      const group = groupOf(doc.seed);
+      groupCounts.set(group, (groupCounts.get(group) || 0) + 1);
+    }
+    const byGroup = [...groupCounts.entries()]
+      .map(([group, count]) => ({ _id: group, count }))
+      .sort((a, b) => b.count - a.count);
 
     res.json({
       success: true,
@@ -252,7 +279,7 @@ router.get("/stats", verifyToken, isAdmin, async (req, res) => {
         covered,
         uncovered: total - covered,
         coverageRate: total > 0 ? Math.round((covered / total) * 100) : 0,
-        byGroup: byGroupAgg,
+        byGroup,
       },
       generatedAt: new Date(),
     });

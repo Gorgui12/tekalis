@@ -97,7 +97,8 @@ const AdminTrends = () => {
             🔥 Tendances Google
           </h1>
           <p className="text-gray-400 text-sm mt-1">
-            Recherches téléphones au Sénégal détectées via Google Autocomplete. Créez des guides de
+            Recherches au Sénégal détectées via Google Autocomplete, sur toute la boutique
+            (téléphones, PC, gaming, TV, électroménager, climatisation, audio…). Créez des guides de
             prix pour les requêtes non couvertes.
           </p>
         </div>
@@ -139,6 +140,32 @@ const AdminTrends = () => {
           </div>
         ))}
       </div>
+
+      {/* ── Répartition par groupe ──────────────────────────────── */}
+      {stats.byGroup?.length > 0 && (
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-5">
+          <h3 className="text-sm font-semibold text-white mb-3">Répartition par catégorie</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            {stats.byGroup.map((g) => {
+              const pct = stats.total > 0 ? Math.round((g.count / stats.total) * 100) : 0;
+              return (
+                <div key={g._id} className="flex items-center gap-3">
+                  <span className="w-32 shrink-0 text-sm text-gray-300 truncate">{g._id}</span>
+                  <div className="flex-1 bg-white/5 rounded-full h-2 overflow-hidden">
+                    <div
+                      className="h-2 rounded-full bg-blue-500"
+                      style={{ width: `${Math.max(pct * 2, 2)}%` }}
+                    />
+                  </div>
+                  <span className="w-16 shrink-0 text-right text-xs text-gray-400">
+                    {g.count} · {pct}%
+                  </span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* ── Filtres + recherche ─────────────────────────────────── */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">

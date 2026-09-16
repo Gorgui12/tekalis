@@ -24,6 +24,74 @@ const DEFAULT_SEEDS = [
   "ecouteur bluetooth pas cher", "coque iphone dakar",
   // Generiques
   "smartphone pas cher dakar", "prix telephone senegal",
+
+  // Ordinateurs
+  "prix ordinateur portable dakar", "ordinateur portable pas cher senegal",
+  "prix pc portable dakar", "pc portable pas cher senegal",
+  "meilleur pc portable 2026", "meilleur ordinateur portable 2026",
+  "laptop hp prix dakar", "ordinateur hp elitebook prix",
+  "prix pc fixe dakar", "pc pas cher 150000 fcfa",
+  "ordinateur portable 8 go ram pas cher", "prix ordinateur dell dakar",
+  "ordinateur portable ssd 256 go prix", "ordinateur reconditionne dakar",
+
+  // Gaming
+  "prix ps5 dakar", "playstation 5 pas cher senegal", "prix xbox series senegal",
+  "console ps5 prix fcfa", "manette ps5 prix dakar", "manette bluetooth pas cher senegal",
+  "casque gaming pas cher dakar", "prix pc gaming dakar", "pc gamer prix senegal",
+  "gamepad pc pas cher", "prix xbox senegal", "ecran gamer 144hz prix",
+  "console de jeux pas cher dakar",
+
+  // Tablettes
+  "prix ipad dakar", "ipad pas cher senegal", "meilleure tablette 2026",
+  "prix tablette android dakar", "tablette android pas cher senegal",
+  "tablette 100000 fcfa", "prix tablette 8 pouces dakar", "tablette pas cher 50000 fcfa",
+
+  // TV
+  "prix smart tv dakar", "smart tv pas cher senegal", "tv 4k pas cher dakar",
+  "meilleure tv 2026", "meilleure marque de tv senegal", "prix tv 43 pouces dakar",
+  "prix tv 55 pouces senegal", "tv 32 pouces pas cher", "television pas cher dakar",
+  "tv smart 50000 fcfa", "prix tv 42 pouces dakar", "tv lg prix senegal",
+  "ecran tv pas cher dakar",
+
+  // Électroménager
+  "prix refrigerateur dakar", "refrigerateur pas cher senegal",
+  "prix machine a laver dakar", "machine a laver pas cher senegal",
+  "meilleur refrigerateur 2026", "prix frigo senegal", "prix micro onde dakar",
+  "micro onde pas cher senegal", "prix cuisiniere dakar", "cuisiniere pas cher senegal",
+  "prix mixeur dakar", "meilleure machine a laver 2026",
+  "refrigerateur 200 litres prix", "electromenager pas cher dakar",
+
+  // Climatiseurs
+  "prix climatiseur dakar", "climatiseur pas cher senegal", "meilleur climatiseur 2026",
+  "prix climatiseur 1.5 cv", "climatiseur 9000 btu prix", "climatiseur split dakar",
+  "climatiseur inverter pas cher", "installation climatiseur dakar", "prix clim dakar",
+  "climatiseur 12000 btu prix", "meilleur climatiseur senegal", "climatiseur neuf pas cher",
+
+  // Ventilation
+  "prix ventilateur dakar", "ventilateur pas cher senegal", "meilleur ventilateur 2026",
+  "ventilateur sur pied prix", "prix ventilateur plafonnier dakar", "ventilateur electrique pas cher",
+
+  // Audio
+  "prix enceinte bluetooth dakar", "enceinte bluetooth pas cher senegal",
+  "casque bluetooth pas cher senegal", "meilleur casque audio 2026",
+  "casque sans fil prix dakar", "enceinte portable pas cher", "prix jbl dakar",
+  "enceinte jbl prix senegal", "sonorisation pas cher dakar",
+  "meilleures enceintes bluetooth senegal", "prix beats dakar",
+  "casque sans fil pas cher dakar", "barre de son pas cher dakar", "micro casque pas cher dakar",
+
+  // Énergie solaire
+  "prix panneau solaire dakar", "panneau solaire pas cher senegal",
+  "prix onduleur solaire dakar", "kit solaire prix senegal", "meilleur panneau solaire 2026",
+  "batterie solaire prix dakar", "panneau solaire 300w prix", "prix installation panneau solaire dakar",
+
+  // Réseau
+  "prix routeur wifi dakar", "routeur wifi pas cher senegal", "meilleur routeur 2026",
+  "prix modem wifi senegal", "repeater wifi pas cher dakar", "routeur fibre pas cher senegal",
+  "prix switch reseau dakar",
+
+  // Mobilité / batteries
+  "prix power bank dakar", "power bank pas cher senegal", "batterie externe pas cher dakar",
+  "meilleure batterie externe 2026", "chargeur portable pas cher senegal", "powerbank 20000mah prix",
 ];
 
 // ── Fetch une seule seed ─────────────────────────────────────────────────────
