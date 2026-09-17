@@ -14,6 +14,7 @@ const express = require("express");
 const router = express.Router();
 const Product = require("../models/Product");
 const Category = require("../models/Category");
+const { getInactiveCategoryIds } = require("../utils/categoryVisibility");
 
 const SITE_URL = process.env.SITE_URL || "https://tekalis.com";
 const CURRENCY = "XOF";
@@ -88,9 +89,13 @@ const itemBlock = (p) => {
 
 router.get("/merchant/products.xml", async (req, res) => {
   try {
-    const products = await Product.find(
-      { status: { $ne: "discontinued" } }
-    )
+    const inactiveCategoryIds = await getInactiveCategoryIds();
+    const productFilter = { status: { $ne: "discontinued" } };
+    if (inactiveCategoryIds.length) {
+      productFilter.category = { $nin: inactiveCategoryIds };
+    }
+
+    const products = await Product.find(productFilter)
       .populate("category", "name")
       .lean();
 

@@ -9,6 +9,7 @@ const Product = require("../models/Product");
 const Cart = require("../models/Cart");
 const PromoCode = require("../models/PromoCode");
 const { escapeRegex } = require("../utils/regexEscape");
+const { getInactiveCategoryIds, isProductInInactiveCategory } = require("../utils/categoryVisibility");
 const EmailService = require("../services/emailService");
 const warrantyController = require("./warrantyController");
 const PricingService = require("../services/pricingService");
@@ -41,10 +42,15 @@ exports.createOrder = async (req, res) => {
     dbProducts.forEach(p => { productMap[p._id.toString()] = p; });
 
     const stockErrors = [];
+    const inactiveCategoryIds = await getInactiveCategoryIds();
     for (const item of products) {
       const dbProduct = productMap[item.product];
       if (!dbProduct) {
         stockErrors.push(`Produit ${item.product} introuvable`);
+        continue;
+      }
+      if (isProductInInactiveCategory(dbProduct.category, inactiveCategoryIds)) {
+        stockErrors.push(`"${dbProduct.name}" n'est plus disponible`);
         continue;
       }
       if (dbProduct.stock < item.quantity) {

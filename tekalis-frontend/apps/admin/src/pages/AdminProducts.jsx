@@ -40,7 +40,7 @@ const AdminProducts = () => {
       if (statusFilter !== "all") params.append("status", statusFilter);
       if (sortBy) params.append("sort", sortBy);
 
-      const { data } = await api.get(`/products?${params.toString()}`);
+      const { data } = await api.get(`/admin/products?${params.toString()}`);
 
       const items = Array.isArray(data) ? data
         : Array.isArray(data.data) ? data.data
@@ -271,6 +271,11 @@ const AdminProducts = () => {
                   <div className="flex flex-wrap gap-2 mb-3">
                     <StatusBadge status={product.status} />
                     <StockBadge stock={product.stock} />
+                    {(product.category || []).some(c => c && c.isActive === false) && (
+                      <span className="bg-orange-100 text-orange-700 px-3 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1">
+                        <FaExclamationTriangle /> Catégorie inactive
+                      </span>
+                    )}
                   </div>
 
                   {/* Actions */}

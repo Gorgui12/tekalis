@@ -1,6 +1,7 @@
 const Product = require("../models/Product");
 const Category = require("../models/Category");
 const { escapeRegex } = require("../utils/regexEscape");
+const { getInactiveCategoryIds, isProductInInactiveCategory, applyActiveCategoryFilter } = require("../utils/categoryVisibility");
 
 // ===============================================
 // Liste blanche de champs produit — empêche l'assignation
@@ -49,8 +50,11 @@ const resolveCategoryIds = async (categoryInput) => {
 
 // ===============================================
 // GET /api/v1/products
+// Implémentation commune. `includeInactiveCategories` permet à
+// l'admin de voir aussi les produits des catégories désactivées
+// (vue publique : ils sont masqués).
 // ===============================================
-exports.getProducts = async (req, res) => {
+const listProducts = async (req, res, { includeInactiveCategories = false } = {}) => {
   try {
     const {
       sort = "newest",
@@ -85,6 +89,12 @@ exports.getProducts = async (req, res) => {
       if (maxPrice) filter.price.$lte = Number(maxPrice);
     }
 
+    // Exclure les produits rattachés à une catégorie inactive (vue publique)
+    if (!includeInactiveCategories) {
+      const inactiveCategoryIds = await getInactiveCategoryIds();
+      applyActiveCategoryFilter(filter, inactiveCategoryIds);
+    }
+
     const sortMap = {
       newest: { createdAt: -1 },
       oldest: { createdAt: 1 },
@@ -115,7 +125,7 @@ exports.getProducts = async (req, res) => {
         .sort(sortQuery)
         .skip(skip)
         .limit(limitNum)
-        .populate("category", "name slug")
+        .populate("category", "name slug isActive")
         .lean(),
       Product.countDocuments(filter)
     ]);
@@ -138,10 +148,17 @@ exports.getProducts = async (req, res) => {
   }
 };
 
+// GET /api/v1/products — vue publique (produits des catégories inactives masqués)
+exports.getProducts = (req, res) => listProducts(req, res);
+
+// GET /api/v1/admin/products — vue admin (inclut les catégories inactives)
+exports.getAdminProducts = (req, res) =>
+  listProducts(req, res, { includeInactiveCategories: true });
+
 // ===============================================
 // GET /api/v1/products/:id
 // ===============================================
-exports.getProductById = async (req, res) => {
+const findProductByIdOrSlug = async (req, res, { includeInactiveCategories = false } = {}) => {
   try {
     const { id } = req.params;
     const query = /^[a-f\d]{24}$/i.test(id) ? { _id: id } : { slug: id };
@@ -154,6 +171,14 @@ exports.getProductById = async (req, res) => {
       return res.status(404).json({ success: false, message: "Produit introuvable" });
     }
 
+    // Produit rattaché à une catégorie inactive → considéré comme inactif
+    if (!includeInactiveCategories) {
+      const inactiveCategoryIds = await getInactiveCategoryIds();
+      if (isProductInInactiveCategory(product.category, inactiveCategoryIds)) {
+        return res.status(404).json({ success: false, message: "Produit introuvable" });
+      }
+    }
+
     // Incrémenter les vues de façon non bloquante
     Product.findByIdAndUpdate(product._id, { $inc: { viewCount: 1 } }).exec();
 
@@ -163,6 +188,13 @@ exports.getProductById = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// GET /api/v1/products/:id — vue publique
+exports.getProductById = (req, res) => findProductByIdOrSlug(req, res);
+
+// GET /api/v1/admin/products/:id — vue admin (inclut les catégories inactives)
+exports.getAdminProductById = (req, res) =>
+  findProductByIdOrSlug(req, res, { includeInactiveCategories: true });
 
 // ===============================================
 // POST /api/v1/products — Admin uniquement

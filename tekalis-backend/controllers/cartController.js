@@ -1,6 +1,7 @@
 const Cart = require("../models/Cart");
 const Product = require("../models/Product");
 const PromoCode = require("../models/PromoCode");
+const { getInactiveCategoryIds, isProductInInactiveCategory } = require("../utils/categoryVisibility");
 
 // ===============================================
 // GET /api/v1/cart
@@ -38,6 +39,12 @@ exports.addToCart = async (req, res) => {
     }
 
     if (product.status === "discontinued") {
+      return res.status(400).json({ message: "Ce produit n'est plus disponible" });
+    }
+
+    // Produit rattaché à une catégorie désactivée → inactif
+    const inactiveCategoryIds = await getInactiveCategoryIds();
+    if (isProductInInactiveCategory(product.category, inactiveCategoryIds)) {
       return res.status(400).json({ message: "Ce produit n'est plus disponible" });
     }
 
@@ -97,6 +104,12 @@ exports.updateCartItem = async (req, res) => {
 
     const product = await Product.findById(productId);
     if (!product) return res.status(404).json({ message: "Produit introuvable" });
+
+    // Produit rattaché à une catégorie désactivée → inactif
+    const inactiveCategoryIds = await getInactiveCategoryIds();
+    if (isProductInInactiveCategory(product.category, inactiveCategoryIds)) {
+      return res.status(400).json({ message: "Ce produit n'est plus disponible" });
+    }
 
     if (product.stock < quantity) {
       return res.status(400).json({

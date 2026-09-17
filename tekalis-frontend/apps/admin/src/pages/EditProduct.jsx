@@ -73,7 +73,7 @@ const EditProduct = () => {
 
   const fetchProduct = async () => {
     try {
-      const { data } = await api.get(`/products/${id}`);
+      const { data } = await api.get(`/admin/products/${id}`);
       const product = data.data;
       
       // Formatter les données pour le formulaire

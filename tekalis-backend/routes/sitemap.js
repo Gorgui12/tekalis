@@ -13,6 +13,8 @@ const express = require("express");
 const router = express.Router();
 const Product = require("../models/Product");   // adapter si ton modèle est ailleurs
 const Article = require("../models/Article");   // idem
+const Category = require("../models/Category");
+const { getInactiveCategoryIds } = require("../utils/categoryVisibility");
 
 const SITE_URL = process.env.SITE_URL || "https://tekalis.com";
 
@@ -66,10 +68,23 @@ router.get("/sitemap.xml", async (req, res) => {
     // 1. Produits publiés (status disponible) — on exclut les produits
     //    discontinués ("discontinued") qui sur un site marchand sont des
     //    pages mortes (supprimées en front → 404 ou redirect).
+    //    On exclut aussi les produits liés à une catégorie inactive.
+    const inactiveCategoryIds = await getInactiveCategoryIds();
+    const productFilter = { status: { $ne: "discontinued" } };
+    if (inactiveCategoryIds.length) {
+      productFilter.category = { $nin: inactiveCategoryIds };
+    }
+
     const products = await Product.find(
-      { status: { $ne: "discontinued" } },
+      productFilter,
       { _id: 1, slug: 1, updatedAt: 1, createdAt: 1 }
     ).lean();
+
+    // Catégories inactives → pas de page catégorie dans le sitemap
+    const inactiveSlugs = await Category.find({ isActive: false }).distinct("slug");
+    const activeCategorySlugs = CATEGORY_SLUGS.filter(
+      (slug) => !inactiveSlugs.includes(slug)
+    );
 
     // 2. Articles publiés (les articles n'ont PAS de champ stock !)
     const articles = await Article.find(
@@ -83,7 +98,7 @@ router.get("/sitemap.xml", async (req, res) => {
       ...STATIC_PAGES.map(urlBlock),
 
       // Catégories
-      ...CATEGORY_SLUGS.map((slug) =>
+      ...activeCategorySlugs.map((slug) =>
         urlBlock({
           loc: `/category/${slug}`,
           changefreq: "daily",

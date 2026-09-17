@@ -8,7 +8,8 @@ import {
   FaSearch,
   FaTimes,
   FaFolder,
-  FaLayerGroup
+  FaToggleOn,
+  FaToggleOff
 } from "react-icons/fa";
 import api from "@shared/api/api";
 import { useToast } from '@shared/context/ToastContext';
@@ -25,9 +26,8 @@ const AdminCategories = () => {
   const [formData, setFormData] = useState({
     name: "",
     slug: "",
-    description: "",
+    seoDescription: "",
     icon: "",
-    parentCategory: "",
     isActive: true,
     order: 0
   });
@@ -64,7 +64,7 @@ const AdminCategories = () => {
       
       fetchCategories();
       resetForm();
-    } catch (error) {
+    } catch {
       toast.error("Erreur lors de l'enregistrement");
     }
   };
@@ -82,8 +82,28 @@ const AdminCategories = () => {
       await api.delete(`/admin/categories/${id}`);
       toast.success("Catégorie supprimée avec succès");
       fetchCategories();
-    } catch (error) {
+    } catch {
       toast.error("Erreur lors de la suppression");
+    }
+  };
+
+  // Active/désactive une catégorie. Les produits de la catégorie
+  // deviennent automatiquement inactifs (masqués du site) ou le redeviennent.
+  const handleToggleStatus = async (category) => {
+    const nextState = !category.isActive;
+    try {
+      const { data } = await api.put(`/admin/categories/${category._id}/status`, {
+        isActive: nextState
+      });
+      setCategories(prev =>
+        prev.map(c => c._id === category._id ? { ...c, isActive: nextState } : c)
+      );
+      toast.success(
+        data?.message ||
+        (nextState ? "Catégorie activée" : "Catégorie désactivée")
+      );
+    } catch {
+      toast.error("Erreur lors du changement de statut");
     }
   };
 
@@ -91,9 +111,8 @@ const AdminCategories = () => {
     setFormData({
       name: "",
       slug: "",
-      description: "",
+      seoDescription: "",
       icon: "",
-      parentCategory: "",
       isActive: true,
       order: 0
     });
@@ -131,7 +150,7 @@ const AdminCategories = () => {
                 📁 Gestion des catégories
               </h1>
               <p className="text-gray-600">
-                {filteredCategories.length} catégorie(s) • {categories.reduce((sum, cat) => sum + cat.productsCount, 0)} produits total
+                {filteredCategories.length} catégorie(s) • {categories.reduce((sum, cat) => sum + (cat.productCount || 0), 0)} produits total
               </p>
             </div>
 
@@ -196,7 +215,7 @@ const AdminCategories = () => {
                 </div>
 
                 <p className="text-sm text-gray-600 line-clamp-2">
-                  {category.description}
+                  {category.seoDescription}
                 </p>
               </div>
 
@@ -205,33 +224,52 @@ const AdminCategories = () => {
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-600">Produits</span>
                   <span className="font-bold text-blue-600">
-                    {category.productsCount}
+                    {category.productCount ?? 0}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-xs text-gray-500 mt-1">
+                  <span>Statut des produits</span>
+                  <span className={category.isActive ? "text-green-600" : "text-red-600"}>
+                    {category.isActive ? "Actifs" : "Inactifs"}
                   </span>
                 </div>
               </div>
 
               {/* Card Actions */}
-              <div className="p-3 flex gap-2">
-                <a
-                  href={`${CLIENT_URL}/category/${category.slug}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg font-semibold text-sm text-center flex items-center justify-center gap-2"
-                >
-                  <FaEye /> Voir
-                </a>
+              <div className="p-3 space-y-2">
                 <button
-                  onClick={() => handleEdit(category)}
-                  className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold text-sm flex items-center justify-center gap-2"
+                  onClick={() => handleToggleStatus(category)}
+                  className={`w-full py-2 rounded-lg font-semibold text-sm flex items-center justify-center gap-2 transition ${
+                    category.isActive
+                      ? "bg-green-100 text-green-700 hover:bg-green-200"
+                      : "bg-red-100 text-red-700 hover:bg-red-200"
+                  }`}
                 >
-                  <FaEdit /> Modifier
+                  {category.isActive ? <FaToggleOn size={18} /> : <FaToggleOff size={18} />}
+                  {category.isActive ? "Désactiver la catégorie" : "Activer la catégorie"}
                 </button>
-                <button
-                  onClick={() => handleDelete(category._id)}
-                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
-                >
-                  <FaTrash />
-                </button>
+                <div className="flex gap-2">
+                  <a
+                    href={`${CLIENT_URL}/category/${category.slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg font-semibold text-sm text-center flex items-center justify-center gap-2"
+                  >
+                    <FaEye /> Voir
+                  </a>
+                  <button
+                    onClick={() => handleEdit(category)}
+                    className="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 rounded-lg font-semibold text-sm flex items-center justify-center gap-2"
+                  >
+                    <FaEdit /> Modifier
+                  </button>
+                  <button
+                    onClick={() => handleDelete(category._id)}
+                    className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg"
+                  >
+                    <FaTrash />
+                  </button>
+                </div>
               </div>
             </div>
           ))}
@@ -305,8 +343,8 @@ const AdminCategories = () => {
                   </label>
                   <textarea
                     rows={3}
-                    value={formData.description}
-                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                    value={formData.seoDescription || ""}
+                    onChange={(e) => setFormData({ ...formData, seoDescription: e.target.value })}
                     className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Courte description de la catégorie..."
                   ></textarea>

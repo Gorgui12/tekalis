@@ -4,6 +4,7 @@
 // ===============================================
 const Product = require("../models/Product");
 const Category = require("../models/Category");
+const { getInactiveCategoryIds, applyActiveCategoryFilter } = require("../utils/categoryVisibility");
 
 exports.getProductsByCategory = async (req, res) => {
   try {
@@ -86,6 +87,10 @@ exports.getProductsByCategory = async (req, res) => {
       filter.stock = { $gt: 0 };
     }
 
+    // Exclure les produits rattachés à une catégorie inactive
+    const inactiveCategoryIds = await getInactiveCategoryIds();
+    applyActiveCategoryFilter(filter, inactiveCategoryIds);
+
     // Tri
     let sortOption = {};
     switch (sort) {
@@ -122,7 +127,11 @@ exports.getProductsByCategory = async (req, res) => {
 
     // 🔍 Récupérer les options de filtres disponibles pour cette catégorie
     const availableFilters = await Product.aggregate([
-      { $match: { category: category._id } },
+      {
+        $match: inactiveCategoryIds.length
+          ? { $and: [{ category: category._id }, { category: { $nin: inactiveCategoryIds } }] }
+          : { category: category._id }
+      },
       {
         $group: {
           _id: null,

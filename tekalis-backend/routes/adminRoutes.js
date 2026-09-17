@@ -57,7 +57,7 @@ const pickFields = (source = {}, allowedKeys = []) => {
 };
 
 const CATEGORY_FIELDS = [
-  "name", "seoDescription", "seoTitle", "parent",
+  "name", "slug", "seoDescription", "seoTitle", "parent",
   "banner", "icon", "order", "isActive"
 ];
 
@@ -282,7 +282,9 @@ router.get("/warranties", async (req, res) => {
 router.put("/warranties/:id/status", warrantyController.updateWarrantyStatus);
 
 // ── Produits (/api/v1/admin/products) ────────────────────────────────────────
-router.get("/products", productController.getProducts);
+// Vue admin : inclut les produits des catégories désactivées (masqués côté site).
+router.get("/products", productController.getAdminProducts);
+router.get("/products/:id", productController.getAdminProductById);
 router.post("/products/bulk", productController.bulkCreateProducts);
 router.post("/products", productController.createProduct);
 router.put("/products/:id", productController.updateProduct);
@@ -310,8 +312,24 @@ router.put("/settings", async (req, res) => {
 // ── Catégories (/api/v1/admin/categories) ────────────────────────────────────
 router.get("/categories", async (req, res) => {
   try {
-    const categories = await Category.find().sort({ order: 1 });
-    res.json({ success: true, categories });
+    const categories = await Category.find().sort({ order: 1 }).lean();
+
+    // Compteur de produits par catégorie (pour affichage admin)
+    const counts = await Product.aggregate([
+      { $unwind: "$category" },
+      { $group: { _id: "$category", count: { $sum: 1 } } }
+    ]);
+    const countMap = counts.reduce((acc, c) => {
+      acc[String(c._id)] = c.count;
+      return acc;
+    }, {});
+
+    const withCounts = categories.map(c => ({
+      ...c,
+      productCount: countMap[String(c._id)] || 0
+    }));
+
+    res.json({ success: true, categories: withCounts });
   } catch (e) { res.status(500).json({ message: e.message }); }
 });
 
@@ -335,6 +353,36 @@ router.put("/categories/:id", async (req, res) => {
     if (!cat) return res.status(404).json({ success: false, message: "Catégorie introuvable" });
     res.json({ success: true, category: cat });
   } catch (e) { res.status(500).json({ message: e.message }); }
+});
+
+// PUT /admin/categories/:id/status — activation/désactivation rapide.
+// Les produits de la catégorie deviennent inactifs automatiquement :
+// ils sont masqués du catalogue, de la fiche produit et des feeds.
+router.put("/categories/:id/status", async (req, res) => {
+  try {
+    const { isActive } = req.body;
+    if (typeof isActive !== "boolean") {
+      return res.status(400).json({ success: false, message: "Le champ isActive (booléen) est requis" });
+    }
+
+    const cat = await Category.findByIdAndUpdate(
+      req.params.id,
+      { isActive },
+      { new: true, runValidators: true }
+    );
+    if (!cat) return res.status(404).json({ success: false, message: "Catégorie introuvable" });
+
+    const affectedProducts = await Product.countDocuments({ category: cat._id });
+
+    res.json({
+      success: true,
+      message: isActive
+        ? `Catégorie activée — ${affectedProducts} produit(s) de nouveau visible(s)`
+        : `Catégorie désactivée — ${affectedProducts} produit(s) masqué(s)`,
+      category: cat,
+      affectedProducts
+    });
+  } catch (e) { res.status(500).json({ success: false, message: e.message }); }
 });
 
 router.delete("/categories/:id", async (req, res) => {
