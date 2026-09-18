@@ -253,6 +253,7 @@ export async function grantConsent() {
   loadGtag();
   ensureFbq();
   loadMetaPixel();
+  notifyConsentChanged();
 }
 
 export function revokeConsent() {
@@ -260,6 +261,20 @@ export function revokeConsent() {
   gtagConsentRevoke();
   if (typeof window !== "undefined" && window.fbq) {
     window.fbq("consent", "revoke");
+  }
+  notifyConsentChanged();
+}
+
+// Événement custom — permet aux composants React (AnalyticsProvider, etc.)
+// de réagir au changement de consentement sans polling localStorage.
+function notifyConsentChanged() {
+  if (typeof window === "undefined") return;
+  try {
+    window.dispatchEvent(
+      new CustomEvent("tekalis:consent-changed", { detail: getConsent() })
+    );
+  } catch {
+    /* no-op */
   }
 }
 

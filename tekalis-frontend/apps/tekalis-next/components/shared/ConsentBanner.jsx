@@ -47,9 +47,10 @@ const ConsentBanner = () => {
 
         <p className="text-sm text-surface-600 dark:text-surface-300 mb-5 leading-relaxed">
           Nous utilisons des cookies et outils de mesure d&apos;audience
-          (Meta Pixel, Google Analytics) pour améliorer votre expérience et
-          mesurer nos campagnes. Vous pouvez accepter ou refuser ces traceurs.
-          Sans votre accord, aucun pixel publicitaire n&apos;est chargé.
+          (Meta Pixel, Google Analytics, Vercel Analytics) pour améliorer
+          votre expérience et mesurer nos campagnes. Vous pouvez accepter ou
+          refuser ces traceurs. Sans votre accord, aucun pixel publicitaire
+          n&apos;est chargé.
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 mb-4">
