@@ -67,9 +67,58 @@ const AdminAnalytics = () => {
   // Colors for charts
   const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"];
 
+  const periodLabel = (p) =>
+    p === "7days" ? "7 jours" : p === "30days" ? "30 jours" : p === "90days" ? "90 jours" : "l'année";
+
+  const toCSV = (rows) => {
+    const header = Object.keys(rows[0] || {});
+    // Colonne "date" en premier si présente (lisibilité des séries)
+    header.sort((a, b) => (a === "date" ? -1 : b === "date" ? 1 : 0));
+    return [header, ...rows.map((r) => header.map((k) => `"${String(r?.[k] ?? "").replace(/"/g, '""')}"`))]
+      .map((line) => line.join(";"))
+      .join("\n");
+  };
+
+  const download = (filename, content) => {
+    const blob = new Blob(["\ufeff" + content], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+
+  const handleExport = () => {
+    const { stats = {}, revenue = [], topProducts = [], categories = [], customers = [] } = analyticsData;
+    const sections = [];
+    sections.push("=== KPIs ===");
+    sections.push(toCSV([
+      { metric: "Revenu total (FCFA)", value: stats.totalRevenue ?? 0 },
+      { metric: "Commandes", value: stats.totalOrders ?? 0 },
+      { metric: "Panier moyen (FCFA)", value: stats.avgOrderValue ?? 0 },
+      { metric: "Nouveaux clients", value: stats.newCustomers ?? 0 },
+      { metric: "Sessions", value: stats.sessions ?? 0 },
+      { metric: "Pages vues", value: stats.views ?? 0 },
+      { metric: "Taux de conversion (%)", value: stats.conversionRate ?? 0 },
+    ]));
+    sections.push("=== Revenu par jour ===");
+    sections.push(toCSV(revenue));
+    sections.push("=== Top produits ===");
+    sections.push(toCSV(topProducts.map((p) => ({ name: p.name, sales: p.sales, revenue: p.revenue }))));
+    sections.push("=== Ventes par catégorie ===");
+    sections.push(toCSV(categories.map((c) => ({ name: c.name, value: c.value, revenue: c.revenue }))));
+    sections.push("=== Clients ===");
+    sections.push(toCSV(customers));
+    download(`analytics-${period}-${new Date().toISOString().split("T")[0]}.csv`, sections.join("\n\n"));
+  };
+
   // StatCard Component
   const StatCard = ({ title, value, change, icon, color, subtitle }) => {
-    const isPositive = change >= 0;
+    const changeVal = change ?? 0;
+    const isPositive = changeVal >= 0;
     
     return (
       <div className="bg-white rounded-lg shadow-md p-6 border-l-4" style={{ borderColor: color }}>
@@ -81,7 +130,7 @@ const AdminAnalytics = () => {
             isPositive ? "text-green-600" : "text-red-600"
           }`}>
             {isPositive ? <FaArrowUp /> : <FaArrowDown />}
-            {Math.abs(change)}%
+            {Math.abs(changeVal)}%
           </span>
         </div>
         <h3 className="text-gray-600 text-sm font-medium mb-1">{title}</h3>
@@ -152,7 +201,10 @@ const AdminAnalytics = () => {
               </select>
 
               {/* Export Button */}
-              <button className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2">
+              <button
+                onClick={handleExport}
+                className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2"
+              >
                 <FaDownload /> Exporter
               </button>
             </div>
@@ -163,7 +215,7 @@ const AdminAnalytics = () => {
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <StatCard
             title="Revenu total"
-            value={`${(analyticsData.stats.totalRevenue / 1000000).toFixed(1)}M`}
+            value={`${((analyticsData.stats.totalRevenue ?? 0) / 1000000).toFixed(1)}M`}
             change={analyticsData.stats.revenueChange}
             icon="💰"
             color="#10b981"
@@ -172,16 +224,16 @@ const AdminAnalytics = () => {
           
           <StatCard
             title="Commandes"
-            value={analyticsData.stats.totalOrders.toLocaleString()}
+            value={(analyticsData.stats.totalOrders ?? 0).toLocaleString()}
             change={analyticsData.stats.ordersChange}
             icon="🛒"
             color="#3b82f6"
-            subtitle={`${period === "7days" ? "7" : period === "30days" ? "30" : "90"} jours`}
+            subtitle={periodLabel(period)}
           />
           
           <StatCard
             title="Panier moyen"
-            value={`${Math.round(analyticsData.stats.avgOrderValue / 1000)}K`}
+            value={`${Math.round((analyticsData.stats.avgOrderValue ?? 0) / 1000)}K`}
             change={analyticsData.stats.avgOrderChange}
             icon="📈"
             color="#f59e0b"
@@ -190,7 +242,7 @@ const AdminAnalytics = () => {
           
           <StatCard
             title="Nouveaux clients"
-            value={analyticsData.stats.newCustomers}
+            value={analyticsData.stats.newCustomers ?? 0}
             change={analyticsData.stats.customersChange}
             icon="👥"
             color="#8b5cf6"
@@ -225,23 +277,26 @@ const AdminAnalytics = () => {
             <LineChart data={analyticsData.revenue}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="date" />
-              <YAxis />
+              <YAxis yAxisId="revenue" tickFormatter={(v) => `${(v / 1000000).toFixed(1)}M`} />
+              <YAxis yAxisId="orders" orientation="right" allowDecimals={false} />
               <Tooltip content={<CustomTooltip />} />
               <Legend />
-              <Line 
-                type="monotone" 
-                dataKey="revenue" 
+              <Line
+                type="monotone"
+                yAxisId="revenue"
+                dataKey="revenue"
                 name="Revenu (FCFA)"
-                stroke="#3b82f6" 
+                stroke="#3b82f6"
                 strokeWidth={3}
                 dot={{ r: 5 }}
                 activeDot={{ r: 8 }}
               />
-              <Line 
-                type="monotone" 
-                dataKey="orders" 
+              <Line
+                type="monotone"
+                yAxisId="orders"
+                dataKey="orders"
                 name="Commandes"
-                stroke="#10b981" 
+                stroke="#10b981"
                 strokeWidth={2}
               />
             </LineChart>
@@ -304,7 +359,7 @@ const AdminAnalytics = () => {
                     <span className="text-gray-700">{cat.name}</span>
                   </div>
                   <span className="font-semibold text-gray-900">
-                    {(cat.revenue / 1000000).toFixed(1)}M FCFA
+                    {((cat.revenue ?? 0) / 1000000).toFixed(1)}M FCFA
                   </span>
                 </div>
               ))}

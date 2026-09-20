@@ -13,6 +13,7 @@
   "description": "API Backend Tekalis - E-commerce Tech Sénégal",
   "dependencies": {
     "bcryptjs": "^3.0.3",
+    "cloudinary": "^2.11.0",
     "cors": "^2.8.6",
     "dotenv": "^16.6.1",
     "express": "^4.22.1",

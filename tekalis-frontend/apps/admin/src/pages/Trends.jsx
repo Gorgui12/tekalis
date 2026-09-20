@@ -18,6 +18,7 @@ const AdminTrends = () => {
   const [stats, setStats] = useState({ total: 0, recent: 0, covered: 0, uncovered: 0, coverageRate: 0 });
   const [suggestions, setSuggestions] = useState([]);
   const [filter, setFilter] = useState("all"); // all | new | uncovered
+  const [sortBy, setSortBy] = useState("detections"); // detections | date
   const [search, setSearch] = useState("");
   const [seedInput, setSeedInput] = useState("");
   const [seedMsg, setSeedMsg] = useState("");
@@ -78,7 +79,12 @@ const AdminTrends = () => {
       if (filter === "covered" && !s.hasCover) return false;
       if (search && !s.query.toLowerCase().includes(search.toLowerCase())) return false;
       return true;
-    });
+    })
+    .sort((a, b) =>
+      sortBy === "detections"
+        ? (b.detectionCount || 0) - (a.detectionCount || 0)
+        : new Date(b.firstSeen) - new Date(a.firstSeen)
+    );
 
   const kpis = [
     { label: "Suggestions", value: stats.total || 0, icon: <FaSearch size={16} />, color: "text-blue-400", bg: "bg-blue-500/10" },
@@ -198,6 +204,16 @@ const AdminTrends = () => {
             className="w-full md:w-64 pl-9 pr-3 py-2 bg-white/5 border border-white/10 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
+        <div>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-xs font-semibold text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="detections">Tri : Détections ↓</option>
+            <option value="date">Tri : Détectée le ↓</option>
+          </select>
+        </div>
       </div>
 
       {/* ── Tableau ─────────────────────────────────────────────── */}
@@ -212,6 +228,7 @@ const AdminTrends = () => {
                   <th className="px-4 py-3">Requête</th>
                   <th className="px-4 py-3">Groupe</th>
                   <th className="px-4 py-3">Détectée le</th>
+                  <th className="px-4 py-3">Détections</th>
                   <th className="px-4 py-3">Status</th>
                   <th className="px-4 py-3">Actions</th>
                 </tr>
@@ -219,7 +236,7 @@ const AdminTrends = () => {
               <tbody>
                 {filtered.length === 0 && (
                   <tr>
-                    <td colSpan={5} className="px-4 py-10 text-center text-gray-500">
+                    <td colSpan={6} className="px-4 py-10 text-center text-gray-500">
                       Aucune suggestion trouvée avec ces filtres.
                     </td>
                   </tr>
@@ -236,6 +253,7 @@ const AdminTrends = () => {
                     </td>
                     <td className="px-4 py-3 text-gray-400">{s.group || "—"}</td>
                     <td className="px-4 py-3 text-gray-400">{formatDate(s.firstSeen)}</td>
+                    <td className="px-4 py-3 text-gray-300">{s.detectionCount || 0}</td>
                     <td className="px-4 py-3">
                       {s.hasGuide ? (
                         <span className="text-emerald-400 text-xs font-semibold">✓ Guide</span>
