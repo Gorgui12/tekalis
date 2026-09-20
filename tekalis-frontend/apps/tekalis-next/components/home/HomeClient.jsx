@@ -82,6 +82,7 @@ const Home = ({ initialProducts = [], initialArticles = [] }) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [bestSellers, setBestSellers] = useState([]);
+  const [promoProducts, setPromoProducts] = useState([]);
   const [articles, setArticles] = useState(initialArticles);
   const [loading, setLoading] = useState(false);
   
@@ -141,14 +142,35 @@ const Home = ({ initialProducts = [], initialArticles = [] }) => {
 
   useEffect(() => {
     if (products && products.length > 0) {
-      const featured = products.filter(p => p.isFeatured).slice(0, 8);
-      setFeaturedProducts(featured.length > 0 ? featured : products.slice(0, 8));
-      
-      const sorted = [...products].sort((a, b) => 
-        (b.salesCount || 0) - (a.salesCount || 0) || 
-        (b.rating?.average || 0) - (a.rating?.average || 0)
-      );
-      setBestSellers(sorted.slice(0, 8));
+      // Section "Nouveautés" : produits choisis en admin,
+      // sinon les produits en vedette, sinon les plus récents
+      let newItems = products.filter(p => p.homepageSection === "new");
+      if (newItems.length === 0) newItems = products.filter(p => p.isFeatured);
+      if (newItems.length === 0) {
+        newItems = [...products].sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+      }
+      setFeaturedProducts(newItems.slice(0, 8));
+
+      // Section "Meilleures ventes" : produits choisis en admin,
+      // sinon classés par ventes / note
+      let best = products.filter(p => p.homepageSection === "bestseller");
+      if (best.length === 0) {
+        best = [...products].sort((a, b) =>
+          (b.salesCount || 0) - (a.salesCount || 0) ||
+          (b.rating?.average || 0) - (a.rating?.average || 0)
+        );
+      }
+      setBestSellers(best.slice(0, 8));
+
+      // Section "Promotions" : produits choisis en admin,
+      // sinon ceux affichant un prix barré (remise)
+      let promos = products.filter(p => p.homepageSection === "promo");
+      if (promos.length === 0) {
+        promos = products.filter(p => p.comparePrice && p.comparePrice > p.price);
+      }
+      setPromoProducts(promos.slice(0, 8));
     }
   }, [products]);
 
@@ -300,6 +322,23 @@ const Home = ({ initialProducts = [], initialArticles = [] }) => {
           </div>
         </div>
       </section>
+
+      {/* Promotions */}
+      {promoProducts.length > 0 && (
+        <section className="container mx-auto px-4 py-16">
+          <div className="flex items-center justify-between mb-8">
+            <h2 className="text-3xl font-bold font-display text-surface-900 dark:text-white">Promotions</h2>
+            <Link href="/products?sort=discount" className="text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-semibold flex items-center gap-2 transition">
+              Voir tout <FaArrowRight />
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {promoProducts.map((product) => (
+              <ProductCard key={product._id} product={product} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Features */}
       <section className="container mx-auto px-4 py-16">

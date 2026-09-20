@@ -58,6 +58,7 @@ const AddProduct = () => {
     tags: [],
     status: "available",
     isFeatured: false,
+    homepageSection: "none",
     gtin: "",
     mpn: "",
     weight: 1,
@@ -1062,8 +1063,24 @@ const AddProduct = () => {
 
                 {/* Options */}
                 <div className="bg-white rounded-lg shadow-md p-6">
-                  <h2 className="text-lg font-bold text-gray-900 mb-3">Options</h2>
-                  <label className="flex items-center gap-3 cursor-pointer">
+                  <h2 className="text-lg font-bold text-gray-900 mb-3">Page d'accueil</h2>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Section de la page d'accueil
+                  </label>
+                  <select
+                    value={formData.homepageSection}
+                    onChange={e => setFormData(prev => ({ ...prev, homepageSection: e.target.value }))}
+                    className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="none">Aucune — pas affiché sur l'accueil</option>
+                    <option value="new">Nouveautés</option>
+                    <option value="bestseller">Meilleures ventes</option>
+                    <option value="promo">Promotions</option>
+                  </select>
+                  <p className="text-xs text-gray-400 mt-2">
+                    Le produit apparaît dans la section choisie sur la page d'accueil.
+                  </p>
+                  <label className="flex items-center gap-3 cursor-pointer mt-4">
                     <input
                       type="checkbox"
                       checked={formData.isFeatured}

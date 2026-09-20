@@ -101,6 +101,17 @@ const productSchemaEnhanced = new mongoose.Schema({
   // 🆕 Mise en avant
   isFeatured: { type: Boolean, default: false },
   
+  // 🆕 Section de la page d'accueil où afficher le produit
+  //    "none"       → pas affiché dans les sections produits de l'accueil
+  //    "new"        → section "Nouveautés"
+  //    "bestseller" → section "Meilleures ventes"
+  //    "promo"      → section "Promotions"
+  homepageSection: {
+    type: String,
+    enum: ["none", "new", "bestseller", "promo"],
+    default: "none"
+  },
+  
   // 🆕 Statistiques
   viewCount: { type: Number, default: 0 },
   salesCount: { type: Number, default: 0 },

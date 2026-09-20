@@ -168,6 +168,12 @@ const useProducts = (options = {}) => {
         return sorted.sort((a, b) => (b.rating?.average || 0) - (a.rating?.average || 0));
       case "popular":
         return sorted.sort((a, b) => (b.sold || 0) - (a.sold || 0));
+      case "discount":
+        return sorted.sort((a, b) => {
+          const discountA = a.comparePrice && a.comparePrice > a.price ? a.comparePrice - a.price : 0;
+          const discountB = b.comparePrice && b.comparePrice > b.price ? b.comparePrice - b.price : 0;
+          return discountB - discountA;
+        });
       case "newest":
       default:
         return sorted.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));

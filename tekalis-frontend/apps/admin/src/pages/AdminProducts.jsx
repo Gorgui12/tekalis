@@ -70,16 +70,13 @@ const AdminProducts = () => {
 
   // MINEUR 13 : Correction PATCH → PUT
   // La route backend est `router.put("/:id")`, pas PATCH.
-  // On passe uniquement le champ isFeatured pour ne pas écraser les autres.
-  const toggleFeatured = async (id, currentStatus) => {
+  const setHomepageSection = async (id, section) => {
     try {
-      await api.put(`/products/${id}`, { isFeatured: !currentStatus });
+      await api.put(`/products/${id}`, { homepageSection: section });
       setProducts(prev =>
-        prev.map(p => p._id === id ? { ...p, isFeatured: !currentStatus } : p)
+        prev.map(p => p._id === id ? { ...p, homepageSection: section } : p)
       );
-      toast.success(
-        !currentStatus ? "Produit mis en vedette" : "Produit retiré de la vedette"
-      );
+      toast.success("Section de la page d'accueil mise à jour");
     } catch (error) {
       console.error("Erreur mise à jour produit:", error);
       toast.error("Erreur lors de la mise à jour du produit");
@@ -105,7 +102,22 @@ const AdminProducts = () => {
     available: products.filter(p => p.status === "available").length,
     outOfStock: products.filter(p => p.stock === 0).length,
     lowStock: products.filter(p => p.stock > 0 && p.stock < 10).length,
-    featured: products.filter(p => p.isFeatured).length
+    onHomepage: products.filter(p => p.homepageSection && p.homepageSection !== "none").length
+  };
+
+  const SectionBadge = ({ section }) => {
+    if (!section || section === "none") return null;
+    const configs = {
+      new:        { bg: "bg-blue-100", text: "text-blue-700", label: "Nouveautés" },
+      bestseller: { bg: "bg-green-100", text: "text-green-700", label: "Meilleures ventes" },
+      promo:      { bg: "bg-red-100", text: "text-red-700", label: "Promotions" }
+    };
+    const config = configs[section] || configs.new;
+    return (
+      <span className={`${config.bg} ${config.text} px-3 py-1 rounded-full text-xs font-bold`}>
+        {config.label}
+      </span>
+    );
   };
 
   const StatusBadge = ({ status }) => {
@@ -166,7 +178,7 @@ const AdminProducts = () => {
             { label: "Disponibles", value: stats.available,  bg: "bg-green-50",  text: "text-green-700" },
             { label: "Rupture",     value: stats.outOfStock, bg: "bg-red-50",    text: "text-red-700" },
             { label: "Stock faible",value: stats.lowStock,   bg: "bg-orange-50", text: "text-orange-700" },
-            { label: "En vedette",  value: stats.featured,   bg: "bg-yellow-50", text: "text-yellow-700" }
+            { label: "À l'accueil", value: stats.onHomepage, bg: "bg-blue-50",   text: "text-blue-700" }
           ].map(s => (
             <div key={s.label} className={`${s.bg || "bg-white"} rounded-lg shadow-md p-4 text-center`}>
               <p className={`text-2xl font-bold ${s.text || "text-gray-900"}`}>{s.value}</p>
@@ -236,11 +248,9 @@ const AdminProducts = () => {
                     alt={product.name}
                     className="w-full h-48 object-cover"
                   />
-                  {product.isFeatured && (
-                    <span className="absolute top-2 left-2 bg-yellow-500 text-white px-3 py-1 rounded-full text-xs font-bold">
-                      ⭐ Vedette
-                    </span>
-                  )}
+                  <div className="absolute top-2 left-2 flex flex-col gap-1">
+                    <SectionBadge section={product.homepageSection} />
+                  </div>
                   {product.comparePrice && (
                     <span className="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 rounded-full text-xs font-bold">
                       -{Math.round((1 - product.price / product.comparePrice) * 100)}%
@@ -302,17 +312,17 @@ const AdminProducts = () => {
                     </button>
                   </div>
 
-                  {/* MINEUR 13 : PUT au lieu de PATCH */}
-                  <button
-                    onClick={() => toggleFeatured(product._id, product.isFeatured)}
-                    className={`w-full py-2 rounded-lg font-semibold text-xs ${
-                      product.isFeatured
-                        ? "bg-yellow-100 text-yellow-700 hover:bg-yellow-200"
-                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                    }`}
+                  {/* Section accueil */}
+                  <select
+                    value={product.homepageSection || "none"}
+                    onChange={e => setHomepageSection(product._id, e.target.value)}
+                    className="w-full py-2 px-2 rounded-lg font-semibold text-xs border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
-                    {product.isFeatured ? "⭐ Retirer de la vedette" : "⭐ Mettre en vedette"}
-                  </button>
+                    <option value="none">Aucune (pas à l'accueil)</option>
+                    <option value="new">Nouveautés</option>
+                    <option value="bestseller">Meilleures ventes</option>
+                    <option value="promo">Promotions</option>
+                  </select>
                 </div>
               </div>
             ))}

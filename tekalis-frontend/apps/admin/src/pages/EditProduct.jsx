@@ -53,6 +53,7 @@ const EditProduct = () => {
     tags: [],
     status: "available",
     isFeatured: false,
+    homepageSection: "none",
     gtin: "",
     mpn: "",
     weight: 1,
@@ -120,6 +121,7 @@ const EditProduct = () => {
         tags: product.tags || [],
         status: product.status || "available",
         isFeatured: product.isFeatured || false,
+        homepageSection: product.homepageSection || (product.isFeatured ? "new" : "none"),
         gtin: product.gtin || "",
         mpn: product.mpn || "",
         weight: product.weight || 1,
@@ -475,6 +477,22 @@ const EditProduct = () => {
                       <option value="preorder">Précommande</option>
                       <option value="outofstock">Rupture de stock</option>
                       <option value="discontinued">Arrêté</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Section page d'accueil
+                    </label>
+                    <select
+                      value={formData.homepageSection}
+                      onChange={(e) => setFormData({ ...formData, homepageSection: e.target.value })}
+                      className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="none">Aucune — pas affiché sur l'accueil</option>
+                      <option value="new">Nouveautés</option>
+                      <option value="bestseller">Meilleures ventes</option>
+                      <option value="promo">Promotions</option>
                     </select>
                   </div>
 
