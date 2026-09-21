@@ -48,18 +48,21 @@ router.get("/debug", (req, res) => {
   });
 });
 
-// ── Diagnostic temporaire (retirer après validation) : compare le token ──────
+// ── Diagnostic temporaire (retirer après validation) : rejoue la condition ────
 router.get("/check", (req, res) => {
-  const given = req.query.token || "";
+  const mode = req.query["hub.mode"];
+  const token = req.query["hub.verify_token"];
+  const challenge = req.query["hub.challenge"];
   const envVal = process.env.WHATSAPP_VERIFY_TOKEN || "";
   res.json({
-    givenLen: given.length,
+    query: req.query,
+    mode,
+    challenge,
+    tokenLen: (token || "").length,
     envLen: envVal.length,
-    equal: given === envVal,
-    envHead4: envVal.slice(0, 4),
-    givenHead4: given.slice(0, 4),
-    envTail4: envVal.slice(-4),
-    givenTail4: given.slice(-4),
+    tokenEqual: token === envVal,
+    modeIsSubscribe: mode === "subscribe",
+    wouldPass: mode === "subscribe" && token === envVal,
   });
 });
 
