@@ -48,24 +48,6 @@ router.get("/debug", (req, res) => {
   });
 });
 
-// ── Diagnostic temporaire (retirer après validation) : rejoue la condition ────
-router.get("/check", (req, res) => {
-  const mode = req.query["hub.mode"];
-  const token = req.query["hub.verify_token"];
-  const challenge = req.query["hub.challenge"];
-  const envVal = process.env.WHATSAPP_VERIFY_TOKEN || "";
-  res.json({
-    query: req.query,
-    mode,
-    challenge,
-    tokenLen: (token || "").length,
-    envLen: envVal.length,
-    tokenEqual: token === envVal,
-    modeIsSubscribe: mode === "subscribe",
-    wouldPass: mode === "subscribe" && token === envVal,
-  });
-});
-
 // ── Vérification du webhook (obligatoire, appelée une fois par Meta) ────────
 router.get("/webhook", (req, res) => {
   const mode = req.query["hub.mode"];

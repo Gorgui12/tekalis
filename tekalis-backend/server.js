@@ -101,7 +101,7 @@ app.use(express.json({
   verify: (req, res, buf) => { req.rawBody = buf; }
 }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
-app.use(mongoSanitize());
+app.use(mongoSanitize({ allowDots: true }));
 
 if (isDev) {
   app.use(morgan("dev"));
