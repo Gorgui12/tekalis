@@ -37,6 +37,17 @@ function verifyMetaSignature(req) {
   }
 }
 
+// ── Diagnostic temporaire (retirer après validation) ─────────────────────────
+router.get("/debug", (req, res) => {
+  res.json({
+    verifySet: !!process.env.WHATSAPP_VERIFY_TOKEN,
+    verifyLen: (process.env.WHATSAPP_VERIFY_TOKEN || "").length,
+    phoneSet: !!process.env.WHATSAPP_PHONE_NUMBER_ID,
+    accessTokenSet: !!process.env.WHATSAPP_ACCESS_TOKEN,
+    appSecretSet: !!process.env.WHATSAPP_APP_SECRET
+  });
+});
+
 // ── Vérification du webhook (obligatoire, appelée une fois par Meta) ────────
 router.get("/webhook", (req, res) => {
   const mode = req.query["hub.mode"];
