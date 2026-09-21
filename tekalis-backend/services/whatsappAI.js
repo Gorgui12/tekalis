@@ -1,6 +1,7 @@
 const Product = require("../models/Product");
 const Order = require("../models/Order");
 const Settings = require("../models/Settings");
+const Category = require("../models/Category");
 const { escapeRegex } = require("../utils/regexEscape");
 
 // ===============================================
@@ -119,7 +120,17 @@ async function executeTool(name, input) {
           { description: { $regex: safe, $options: "i" } },
         ];
       }
-      if (input.category) filter.category = input.category;
+      if (input.category) {
+        const cat = await Category.findOne({
+          slug: String(input.category).toLowerCase().trim(),
+          isActive: true,
+        });
+        if (!cat) {
+          return { erreur: `Catégorie « ${input.category} » introuvable` };
+        }
+        const childIds = await Category.find({ parent: cat._id }).select("_id");
+        filter.category = { $in: [cat._id, ...childIds.map((c) => c._id)] };
+      }
       if (input.maxPrice) filter.price = { $lte: Number(input.maxPrice) };
 
       const products = await Product.find(filter)
