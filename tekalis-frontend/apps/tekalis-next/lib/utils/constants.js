@@ -137,7 +137,7 @@ export const SOCIAL_LINKS = {
   twitter: "https://twitter.com/tekalis",
   linkedin: "https://linkedin.com/company/tekalis",
   youtube: "https://www.youtube.com/@Tekalis",
-  whatsapp: "https://wa.me/221771234567"
+  whatsapp: "https://wa.me/221786346946"
 };
 
 // 🔥 Shipping Configuration
