@@ -326,12 +326,27 @@ exports.bulkCreateProducts = async (req, res) => {
 exports.updateProduct = async (req, res) => {
   try {
     const data = pickFields(req.body, PRODUCT_FIELDS);
-    const categoryIds = await resolveCategoryIds(data.category || []);
-    const images = (data.images || []).filter(img => img.url?.trim());
+
+    // ⚠️ Mise à jour partielle : on ne réécrit que les champs réellement
+    // envoyés dans le body. L'action rapide "Section accueil" de l'admin
+    // n'envoie que `homepageSection` → il ne faut SURTOUT pas écraser
+    // `category` et `images` par des tableaux vides.
+    const update = { ...data };
+    if (data.category !== undefined) {
+      update.category = await resolveCategoryIds(data.category || []);
+    }
+    if (data.images !== undefined) {
+      update.images = (data.images || []).filter(img => img.url?.trim());
+    }
+    if (data.price !== undefined) update.price = Number(data.price) || 0;
+    if (data.comparePrice !== undefined) {
+      update.comparePrice = data.comparePrice ? Number(data.comparePrice) : undefined;
+    }
+    if (data.stock !== undefined) update.stock = Number(data.stock) || 0;
 
     const updated = await Product.findByIdAndUpdate(
       req.params.id,
-      { ...data, category: categoryIds, images },
+      update,
       { new: true, runValidators: true }
     ).populate("category", "name slug");
 
