@@ -3,7 +3,8 @@ import { NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, ShoppingCart, Package, Wrench, Shield,
   FileText, BarChart3, Users, Star, Tag, Settings,
-  ChevronDown, ChevronRight, X, Zap, Image, TrendingUp, Database
+  ChevronDown, ChevronRight, X, Zap, Image, TrendingUp, Database,
+  Handshake
 } from 'lucide-react';
 
 const NAV_ITEMS = [
@@ -19,6 +20,13 @@ const NAV_ITEMS = [
     ],
   },
   { label: 'Utilisateurs',  icon: Users,    to: '/users' },
+  {
+    label: 'Fournisseurs', icon: Handshake, to: '/suppliers',
+    children: [
+      { label: 'Partenaires',            to: '/suppliers' },
+      { label: 'Commandes fournisseurs', to: '/supplier-orders' },
+    ],
+  },
   { label: 'Avis',          icon: Star,     to: '/reviews' },
   {
     label: 'SAV / RMA', icon: Wrench, to: '/rma',

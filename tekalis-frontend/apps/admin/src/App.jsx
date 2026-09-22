@@ -44,6 +44,10 @@ const Settings = lazy(() => import("./pages/Settings"));
 const HeroSlides = lazy(() => import("./pages/HeroSlides"));
 const Database = lazy(() => import("./pages/Database"));
 
+// Fournisseurs & partenaires (dropshipping — pas de stock en interne)
+const Suppliers = lazy(() => import("./pages/Suppliers"));
+const SupplierOrders = lazy(() => import("./pages/SupplierOrders"));
+
 const PageFallback = () => (
   <div className="min-h-screen flex items-center justify-center bg-gray-50">
     <div className="text-center">
@@ -96,6 +100,10 @@ function App() {
 
             {/* Utilisateurs */}
             <Route path="/users" element={<Users />} />
+
+            {/* Fournisseurs & partenaires */}
+            <Route path="/suppliers" element={<Suppliers />} />
+            <Route path="/supplier-orders" element={<SupplierOrders />} />
 
             {/* Avis */}
             <Route path="/reviews" element={<Reviews />} />

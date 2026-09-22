@@ -34,6 +34,8 @@ const rmaController = require("../controllers/rmaController");
 const orderController = require("../controllers/orderController");
 const productController = require("../controllers/productController");
 const warrantyController = require("../controllers/warrantyController");
+const supplierController = require("../controllers/supplierController");
+const supplierOrderController = require("../controllers/supplierOrderController");
 const Settings = require("../models/Settings");
 const Category = require("../models/Category");
 const PromoCode = require("../models/PromoCode");
@@ -132,6 +134,25 @@ router.get("/orders/:id", orderController.getOrderById);
 router.put("/orders/:id/status", orderController.updateOrderStatus);
 router.put("/orders/:id/pay", orderController.markAsPaid);
 router.delete("/orders/:id", orderController.deleteOrder);
+
+// ── Fournisseurs (/api/v1/admin/suppliers) ───────────────────────────────────
+// Modèle de partenariat : Tekalis n'a pas de stock, les commandes sont
+// passées auprès de fournisseurs qui détiennent le stock.
+// ATTENTION : /suppliers/stats doit rester AVANT /suppliers/:id.
+router.get("/suppliers/stats", supplierController.getSupplierStats);
+router.get("/suppliers", supplierController.listSuppliers);
+router.get("/suppliers/:id", supplierController.getSupplierById);
+router.post("/suppliers", supplierController.createSupplier);
+router.put("/suppliers/:id", supplierController.updateSupplier);
+router.delete("/suppliers/:id", supplierController.deleteSupplier);
+
+// ── Commandes fournisseurs (/api/v1/admin/supplier-orders) ───────────────────
+router.get("/supplier-orders", supplierOrderController.listSupplierOrders);
+router.get("/supplier-orders/:id", supplierOrderController.getSupplierOrderById);
+router.post("/supplier-orders", supplierOrderController.createSupplierOrder);
+router.put("/supplier-orders/:id/status", supplierOrderController.updateSupplierOrderStatus);
+router.put("/supplier-orders/:id", supplierOrderController.updateSupplierOrder);
+router.delete("/supplier-orders/:id", supplierOrderController.deleteSupplierOrder);
 
 // ── Paiements (/api/v1/admin/payments) — pilotés via le statut de commande ───
 const PAYMENT_STATUS_MAP = {
