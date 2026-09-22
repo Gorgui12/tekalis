@@ -7,6 +7,7 @@ import {
   FaEnvelope,
   FaPhone,
   FaMapMarkerAlt,
+  FaCookie,
 } from "react-icons/fa";
 
 const sections = [
@@ -21,11 +22,18 @@ const sections = [
         </p>
         <ul className="space-y-1.5 text-gray-700">
           <li><strong>Nom commercial :</strong> Tekalis</li>
+          <li><strong>Forme juridique :</strong> Activité commerciale enregistrée, Sénégal</li>
+          <li><strong>Numéro d'identification :</strong> NINEA / RCCM disponible sur demande à l'adresse <span className="text-blue-600">contact@tekalis.com</span></li>
           <li><strong>Adresse :</strong> Fann, Rue 14, Dakar, Sénégal</li>
+          <li><strong>Site web :</strong> https://tekalis.com</li>
           <li><strong>Email :</strong> contact@tekalis.com</li>
           <li><strong>Téléphone :</strong> +221 78 634 69 46</li>
           <li><strong>Responsable de la publication :</strong> La direction de Tekalis</li>
         </ul>
+        <p className="mt-3 text-sm text-gray-500">
+          Les mentions SIRET / SIREN / RCS ne s'appliquent pas : Tekalis est une entreprise
+          sénégalaise, immatriculée auprès des registres NINEA et RCCM du Sénégal.
+        </p>
       </>
     ),
   },
@@ -72,6 +80,31 @@ const sections = [
       </p>
     ),
   },
+{
+    id: "donnees",
+    title: "Données personnelles et cookies (RGPD)",
+    icon: <FaCookie />,
+    content: (
+      <p>
+        Tekalis traite vos données personnelles (nom, email, téléphone, adresse de livraison)
+        uniquement pour traiter vos commandes, conformément au RGPD. Des cookies de mesure
+        d&apos;audience et de publicité ne sont déposés qu&apos;après votre consentement via le
+        bandeau cookies. Pour en savoir plus, consultez notre{" "}
+        <Link href="/politique" className="text-blue-600 hover:underline">
+          Politique de confidentialité
+        </Link>{" "}
+        et notre{" "}
+        <Link href="/cookies" className="text-blue-600 hover:underline">
+          politique de gestion des cookies
+        </Link>
+        . Pour exercer vos droits, écrivez à{" "}
+        <a href="mailto:privacy@tekalis.com" className="text-blue-600 hover:underline">
+          privacy@tekalis.com
+        </a>
+        .
+      </p>
+    ),
+  },
 ];
 
 export const metadata = {
@@ -100,6 +133,9 @@ export default function MentionsLegalesPage() {
           <h1 className="text-4xl font-bold text-gray-900 mb-4">Mentions légales</h1>
           <p className="text-lg text-gray-600">
             Informations légales relatives au site tekalis.com
+          </p>
+          <p className="mt-3 text-sm text-gray-400">
+            Dernière mise à jour : 22 septembre 2026
           </p>
         </div>
 

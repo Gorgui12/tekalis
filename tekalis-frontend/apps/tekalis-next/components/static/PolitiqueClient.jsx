@@ -32,7 +32,7 @@ const Politique = () => {
       id: "cookies",
       title: "Cookies et technologies similaires",
       icon: <FaCookie />,
-      content: `Notre site utilise des cookies pour améliorer votre expérience de navigation, mémoriser vos préférences et analyser le trafic du site. Vous pouvez gérer vos préférences de cookies dans les paramètres de votre navigateur.`
+      content: `Notre site utilise des cookies pour améliorer votre expérience de navigation, mémoriser vos préférences et analyser le trafic du site. Conformément au RGPD et aux recommandations de la CNIL, nous obtenons votre consentement avant de déposer des cookies de mesure d'audience et de publicité : un bandeau s'affiche à votre première visite. Vous pouvez modifier vos choix à tout moment en cliquant sur « Cookies ».`
     }
   ];
 
@@ -157,6 +157,42 @@ const Politique = () => {
           </p>
         </div>
 
+        {/* RGPD / CNIL */}
+        <div className="bg-white dark:bg-surface-800 rounded-xl shadow-card p-8 mb-8">
+          <h2 className="text-2xl font-bold text-surface-900 dark:text-white mb-4">
+            8. Conformité RGPD et CNIL
+          </h2>
+          <p className="text-surface-700 dark:text-surface-300 leading-relaxed mb-4">
+            En tant que boutique en ligne au Sénégal, Tekalis applique les principes de protection
+            des données issus du RGPD : minimisation, finalité, consentement et transparence.
+            La base légale de nos traitements est le traitement de vos commandes (exécution du
+            contrat) et votre consentement pour les communications marketing.
+          </p>
+          <ul className="space-y-2 text-surface-700 dark:text-surface-300">
+            <li className="flex items-start gap-2">
+              <span className="text-brand-600 font-bold">•</span>
+              <span><strong>Responsable du traitement :</strong> Tekalis, Fann, Rue 14, Dakar, Sénégal</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-brand-600 font-bold">•</span>
+              <span>
+                <strong>Gestion des cookies :</strong> consultez notre{" "}
+                <Link href="/cookies" className="text-brand-600 dark:text-brand-400 hover:underline">politique cookies</Link>
+                {" "}et les{" "}
+                <Link href="/mentions-legales" className="text-brand-600 dark:text-brand-400 hover:underline">mentions légales</Link>.
+              </span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-brand-600 font-bold">•</span>
+              <span>
+                <strong>Plateforme de réclamation :</strong> pour toute réclamation relative à vos
+                données, contactez-nous à{" "}
+                <a href="mailto:privacy@tekalis.com" className="text-brand-600 dark:text-brand-400 hover:underline">privacy@tekalis.com</a>.
+              </span>
+            </li>
+          </ul>
+        </div>
+
         {/* Contact */}
         <div className="bg-gradient-to-br from-surface-800 to-surface-900 rounded-xl shadow-card p-8 text-white">
           <h2 className="text-2xl font-bold mb-4 font-display">Nous contacter</h2>
@@ -187,10 +223,10 @@ const Politique = () => {
               <div>
                 <p className="font-semibold mb-1">Téléphone</p>
                 <a 
-                  href="tel:+221331234567" 
+                  href="tel:+221786346946" 
                   className="text-brand-300 hover:text-brand-200 transition"
                 >
-                  +221 33 123 45 67
+                  +221 78 634 69 46
                 </a>
               </div>
             </div>

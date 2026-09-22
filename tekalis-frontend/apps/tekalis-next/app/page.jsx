@@ -1,5 +1,6 @@
 ﻿import { serverFetch } from "@/lib/serverFetch";
 import HomeClient from '@/components/home/HomeClient';
+import HomeSeoContent from '@/components/home/HomeSeoContent';
 
 export const metadata = {
   title: 'Tekalis — Boutique Électronique Dakar Fann | Livraison Sénégal',
@@ -65,6 +66,8 @@ export default async function HomePage() {
       />
       {/* Passe les données SSR au composant client pour SEO */}
       <HomeClient initialProducts={products} initialArticles={articles} />
+      {/* Contenu SEO server-rendered : volume, maillage interne, NAP, FAQ */}
+      <HomeSeoContent />
     </>
   );
 }

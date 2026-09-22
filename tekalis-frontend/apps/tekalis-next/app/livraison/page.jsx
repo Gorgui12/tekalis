@@ -60,17 +60,17 @@ export default function LivraisonPage() {
         <div className="grid sm:grid-cols-3 gap-6 mb-12">
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
             <FaClock className="text-3xl text-blue-600 mx-auto mb-3" />
-            <h3 className="font-bold text-gray-900 mb-1">24 - 48h</h3>
+            <h2 className="font-bold text-gray-900 mb-1">24 - 48h</h2>
             <p className="text-sm text-gray-600">Délai moyen à Dakar et banlieue</p>
           </div>
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
             <FaMoneyBillWave className="text-3xl text-green-600 mx-auto mb-3" />
-            <h3 className="font-bold text-gray-900 mb-1">Offerte dès 50 000 FCFA</h3>
+            <h2 className="font-bold text-gray-900 mb-1">Offerte dès 50 000 FCFA</h2>
             <p className="text-sm text-gray-600">Livraison gratuite au-delà de ce montant</p>
           </div>
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
             <FaMapMarkerAlt className="text-3xl text-red-500 mx-auto mb-3" />
-            <h3 className="font-bold text-gray-900 mb-1">Tout Dakar</h3>
+            <h2 className="font-bold text-gray-900 mb-1">Tout Dakar</h2>
             <p className="text-sm text-gray-600">Centre, banlieue et environs</p>
           </div>
         </div>

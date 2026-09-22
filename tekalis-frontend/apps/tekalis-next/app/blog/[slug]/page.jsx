@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { serverFetch } from '@/lib/serverFetch';
 import ArticleDetailClient from '@/components/blog/ArticleDetailClient';
+import { SOCIAL_LINKS } from '@/lib/utils/constants';
 
 const SITE_URL = 'https://tekalis.com';
 
@@ -67,7 +68,28 @@ export default async function ArticlePage({ params }) {
       name: 'Tekalis',
       logo: { '@type': 'ImageObject', url: `${SITE_URL}/og-image.png` },
     },
+    speakable: { '@type': 'SpeakableSpecification', cssSelector: ['h1'] },
     mainEntityOfPage: { '@type': 'WebPage', '@id': `${SITE_URL}/blog/${article.slug}` },
+  };
+
+  // Person — l'auteur en entité autonome (mieux compris par les moteurs/IA)
+  const authorName = article.author?.name || 'Équipe Tekalis';
+  const personSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'Person',
+    name: authorName,
+    jobTitle: article.author?.role || 'Rédacteur Tekalis',
+    description: article.author?.bio || `Rédacteur du blog Tekalis, spécialiste tech au Sénégal.`,
+    url: `${SITE_URL}/blog`,
+    worksFor: {
+      '@type': 'Organization',
+      name: 'Tekalis',
+      url: SITE_URL,
+    },
+    sameAs: [
+      SOCIAL_LINKS.linkedin,
+      SOCIAL_LINKS.twitter,
+    ].filter(Boolean),
   };
 
   const breadcrumb = {
@@ -83,6 +105,7 @@ export default async function ArticlePage({ params }) {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
       <ArticleDetailClient article={article} related={related} />
     </>

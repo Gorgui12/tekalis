@@ -310,6 +310,18 @@ const ArticleDetails = ({ article: initialArticle, related: initialRelated }) =>
                 </div>
               </div>
 
+              {/* TL;DR — l'essentiel à retenir (citabilité IA / SERP) */}
+              {article.excerpt && (
+                <div className="mb-8 rounded-xl border border-brand-200 bg-brand-50/60 dark:bg-surface-700/40 p-5">
+                  <h2 className="text-sm font-bold uppercase tracking-wide text-brand-700 dark:text-brand-400 mb-2 flex items-center gap-2">
+                    <span aria-hidden="true">✨</span> TL;DR — L&apos;essentiel
+                  </h2>
+                  <p className="text-sm md:text-base text-surface-700 dark:text-surface-200 leading-relaxed">
+                    {article.excerpt}
+                  </p>
+                </div>
+              )}
+
               {/* Article content (CSS dédiée .article-content, voir globals.css) */}
               <div
                 className="article-content prose max-w-none"

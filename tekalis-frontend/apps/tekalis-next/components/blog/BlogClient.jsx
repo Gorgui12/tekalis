@@ -5,9 +5,9 @@ import Link from "next/link";
 import { FaSearch, FaFilter, FaClock, FaEye, FaTimes } from "react-icons/fa";
 import api from "@/lib/api";
 
-const Blog = () => {
-  const [articles, setArticles] = useState([]);
-  const [loading, setLoading] = useState(true);
+const Blog = ({ initialArticles = [] }) => {
+  const [articles, setArticles] = useState(initialArticles || []);
+  const [loading, setLoading] = useState(initialArticles && initialArticles.length > 0 ? false : true);
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
@@ -417,6 +417,7 @@ const Blog = () => {
             <input
               type="email"
               placeholder="Votre email"
+              aria-label="Votre email pour la newsletter du blog"
               className="flex-1 px-4 py-3 rounded-xl text-surface-900 focus:outline-none focus:ring-2 focus:ring-white"
             />
             <button className="bg-white text-purple-600 px-6 py-3 rounded-xl font-bold hover:bg-surface-100 transition">

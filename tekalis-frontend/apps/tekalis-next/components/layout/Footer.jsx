@@ -1,7 +1,6 @@
 ﻿"use client";
 
 import Link from "next/link";
-import Script from "next/script";
 import { useState } from "react";
 import { 
   FaFacebook, FaInstagram, FaLinkedin, FaTwitter,
@@ -143,7 +142,7 @@ const Footer = () => {
             <div className="mt-6 bg-white/5 border border-white/10 rounded-2xl p-4">
               <div className="flex items-center gap-2 mb-2">
                 <FaClock className="text-amber-400" />
-                <h5 className="font-semibold text-sm">Horaires Fann</h5>
+                <h4 className="font-semibold text-sm">Horaires Fann</h4>
               </div>
               <p className="text-sm text-surface-400">
                 Lun - Ven: 8h - 19h<br/>
@@ -190,7 +189,7 @@ const Footer = () => {
 
             {/* Réseaux sociaux */}
             <div>
-              <h5 className="font-semibold mb-3 text-sm">Suivez-nous</h5>
+              <h4 className="font-semibold mb-3 text-sm">Suivez-nous</h4>
               <div className="flex gap-3">
                 {[
                   { icon: <FaFacebook size={18} />, href: SOCIAL_LINKS.facebook, label: "Facebook", hover: "hover:bg-blue-600" },
@@ -214,7 +213,7 @@ const Footer = () => {
 
             {/* Moyens de paiement */}
             <div className="mt-6">
-              <h5 className="font-semibold mb-3 text-sm">Moyens de paiement</h5>
+              <h4 className="font-semibold mb-3 text-sm">Moyens de paiement</h4>
               <div className="flex flex-wrap gap-2">
                 <div className="bg-white/5 border border-white/10 px-3 py-1.5 rounded-lg text-xs font-semibold text-surface-300">
                   VISA
@@ -262,7 +261,7 @@ const Footer = () => {
             <Link href="/politique" 
               className="hover:text-brand-400 transition"
             >
-              Confidentialité
+              Politique de confidentialité
             </Link>
             <span className="text-surface-700">•</span>
             <Link href="/cgv" 
@@ -289,7 +288,7 @@ const Footer = () => {
         <FaArrowUp size={20} />
       </button>
 
-      <Script
+      <script
         id="footer-organization-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify({

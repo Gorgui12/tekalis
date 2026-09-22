@@ -1,6 +1,5 @@
 import './globals.css';
 import { Space_Grotesk, DM_Sans } from 'next/font/google';
-import Script from 'next/script';
 import Providers from '@/components/shared/Providers';
 import AnalyticsProvider from '@/components/shared/AnalyticsProvider';
 import Navbar from '@/components/layout/Navbar';
@@ -145,6 +144,7 @@ const localBusinessSchema = {
     SOCIAL_LINKS.instagram,
     SOCIAL_LINKS.twitter,
     SOCIAL_LINKS.linkedin,
+    SOCIAL_LINKS.youtube,
   ],
 };
 
@@ -178,12 +178,17 @@ export default function RootLayout({ children }) {
           }}
         />
       </head>
-      <Script
-        id="local-business-schema"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
-      />
       <body className="bg-white dark:bg-surface-950 text-surface-900 dark:text-surface-50 font-body antialiased">
+        {/*
+          Schema.org LocalBusiness — rendu serveur (présent dans le HTML brut).
+          Un JSON-LD injecté en next/script (afterInteractive) n'apparaît pas
+          dans le HTML source et n'est pas vu par les crawlers.
+        */}
+        <script
+          id="local-business-schema"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
+        />
         <Providers>
           <div className="pt-[100px]">
             <AnalyticsProvider>

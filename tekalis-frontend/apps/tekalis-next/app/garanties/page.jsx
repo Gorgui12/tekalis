@@ -62,17 +62,17 @@ export default function GarantiesPage() {
         {/* Durées */}
         <div className="grid sm:grid-cols-3 gap-6 mb-12">
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <h3 className="font-bold text-gray-900 mb-1">Smartphones</h3>
+            <h2 className="font-bold text-gray-900 mb-1">Smartphones</h2>
             <p className="text-3xl font-extrabold text-blue-600 mb-1">12 mois</p>
             <p className="text-sm text-gray-600">Garantie constructeur</p>
           </div>
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <h3 className="font-bold text-gray-900 mb-1">Laptops &amp; TV</h3>
+            <h2 className="font-bold text-gray-900 mb-1">Laptops &amp; TV</h2>
             <p className="text-3xl font-extrabold text-blue-600 mb-1">12 mois</p>
             <p className="text-sm text-gray-600">Garantie constructeur</p>
           </div>
           <div className="bg-white rounded-lg shadow-md p-6 text-center">
-            <h3 className="font-bold text-gray-900 mb-1">Accessoires</h3>
+            <h2 className="font-bold text-gray-900 mb-1">Accessoires</h2>
             <p className="text-3xl font-extrabold text-blue-600 mb-1">3 - 6 mois</p>
             <p className="text-sm text-gray-600">Selon le produit</p>
           </div>
