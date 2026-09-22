@@ -21,11 +21,11 @@ export const metadata = {
   },
 };
 
-export const revalidate = 3600;
+export const revalidate = 300;
 
 async function getHomeData() {
   const [productsData, articlesData] = await Promise.allSettled([
-    serverFetch('/products'),
+    serverFetch('/products', { revalidate: 300 }),
     serverFetch('/articles?limit=3'),
   ]);
 

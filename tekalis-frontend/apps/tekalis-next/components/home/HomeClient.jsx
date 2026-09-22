@@ -86,8 +86,8 @@ const Home = ({ initialProducts = [], initialArticles = [] }) => {
   const [articles, setArticles] = useState(initialArticles);
   const [loading, setLoading] = useState(false);
   
-  // Utiliser les données SSR initiales, puis Redux si disponible
-  const products = initialProducts.length > 0 ? initialProducts : reduxProducts;
+  // Données fraîches (Redux) dès qu'elles sont chargées, sinon les données SSR initiales
+  const products = !isLoading && reduxProducts.length > 0 ? reduxProducts : initialProducts;
    
   useEffect(() => {
     const fetchArticles = async () => {
