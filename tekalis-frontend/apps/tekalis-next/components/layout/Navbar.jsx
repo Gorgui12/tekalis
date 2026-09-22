@@ -107,6 +107,7 @@ const Navbar = () => {
                 className="lg:hidden text-surface-700 dark:text-surface-300 hover:text-brand-600 dark:hover:text-brand-400 transition p-2"
                 aria-label="Menu"
                 aria-expanded={mobileMenuOpen}
+                aria-controls="mobile-menu"
               >
                 {mobileMenuOpen ? <FaTimes size={22} /> : <FaBars size={22} />}
               </button>
@@ -224,7 +225,14 @@ const Navbar = () => {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 lg:hidden" onClick={() => setMobileMenuOpen(false)} aria-hidden="true" />
       )}
 
-      <div className={`fixed top-0 left-0 h-full w-80 bg-white dark:bg-surface-950 shadow-2xl z-50 lg:hidden overflow-y-auto transform transition-transform duration-300 ease-in-out ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`} aria-label="Menu principal mobile">
+      <div
+        id="mobile-menu"
+        role="dialog"
+        aria-modal="false"
+        aria-label="Menu principal mobile"
+        inert={!mobileMenuOpen}
+        className={`fixed top-0 left-0 h-full w-80 bg-white dark:bg-surface-950 shadow-2xl z-50 lg:hidden overflow-y-auto transform transition-transform duration-300 ease-in-out ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full"}`}
+      >
 
         <div className="sticky top-0 z-10 bg-gradient-to-r from-brand-500 to-brand-600 px-5 py-4 flex items-center justify-between shadow-md">
           <Link href="/" className="text-xl font-extrabold font-display text-white tracking-tight" onClick={() => setMobileMenuOpen(false)}>Tekalis</Link>

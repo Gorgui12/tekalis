@@ -1,43 +1,44 @@
-# Tekalis - Boutique Électronique & High-Tech au Sénégal
+# Tekalis
+
+> Tekalis is an online electronics and high-tech store based in Dakar Fann, Senegal. We sell smartphones, laptops, TVs, home appliances, gaming equipment, air conditioners, solar energy systems, and tech accessories, with delivery throughout Senegal.
+
+Welcome to Tekalis. The catalogue and store pages below are organized by product range and company information. Prices are shown in FCFA (XOF) on each product page; every product includes a minimum 12-month manufacturer warranty.
 
 ## About
-Tekalis is an online electronics and high-tech store based in Dakar Fann, Senegal. We sell smartphones, laptops, TVs, home appliances, gaming equipment, air conditioners, solar energy systems, and tech accessories. We offer delivery throughout Senegal with express delivery in the Dakar region.
 
-## Location
-- Address: Fann, Rue 14, Dakar, Sénégal
-- Phone: +221 78 634 69 46
-- Email: contact@tekalis.com
-- Service area: Dakar and all regions of Senegal
+- [About Tekalis](https://tekalis.com/apropos): Company history, values and the Tekalis team in Dakar.
+- [Contact](https://tekalis.com/contact): Contact form, phone +221 78 634 69 46 and email contact@tekalis.com.
+- [Frequently asked questions](https://tekalis.com/faq): Answers to common questions about ordering, delivery and payment.
+- [Delivery](https://tekalis.com/livraison): Free express delivery in Dakar (24–48h) and 3–5 days for other regions.
+- [Warranties](https://tekalis.com/garanties): Manufacturer warranty coverage on all products.
+- [Returns](https://tekalis.com/retours): 14-day return and exchange policy.
+- [Terms and conditions](https://tekalis.com/cgv): General terms and conditions of sale.
 
-## Payment Methods
-- Wave
-- Orange Money
-- Free Money
-- Cash on delivery
-- Visa / Mastercard
+## Shop
 
-## Key Pages
-- Catalogue: https://tekalis.com/products
-- Smartphones: https://tekalis.com/category/smartphones
-- Laptops: https://tekalis.com/category/ordinateurs
-- Gaming: https://tekalis.com/category/gaming
-- TV: https://tekalis.com/category/tv
-- Home Appliances: https://tekalis.com/category/electromenager
-- Air Conditioners: https://tekalis.com/category/climatiseurs
-- Solar Energy: https://tekalis.com/category/energie-solaire
-- Accessories: https://tekalis.com/category/accessoires
-- Audio: https://tekalis.com/category/audio
-- Blog: https://tekalis.com/blog
-- Contact: https://tekalis.com/contact
-- About: https://tekalis.com/apropos
-- Delivery Info: https://tekalis.com/livraison
-- Warranties: https://tekalis.com/garanties
+- [Full catalogue](https://tekalis.com/products): All products available at Tekalis.
+- [Smartphones](https://tekalis.com/category/smartphones): Latest smartphones and brands in stock.
+- [Laptops](https://tekalis.com/category/ordinateurs): Laptops, ultrabooks and office PCs.
+- [Gaming](https://tekalis.com/category/gaming): Gaming PCs, consoles and accessories.
+- [TV](https://tekalis.com/category/tv): TVs and home-cinema equipment.
+- [Home appliances](https://tekalis.com/category/electromenager): Household appliances.
+- [Air conditioners](https://tekalis.com/category/climatiseurs): Air-conditioning units.
+- [Solar energy](https://tekalis.com/category/energie-solaire): Solar panels and energy systems.
+- [Accessories](https://tekalis.com/category/accessoires): Cables, chargers and tech accessories.
+- [Audio](https://tekalis.com/category/audio): Headphones, speakers and audio gear.
 
-## Brands Available
-HP, Dell, Lenovo, Asus, MSI, Apple, Samsung, Xiaomi, Sony, LG, JBL, Bose, Hisense, Tecno, and more.
+## Blog
 
-## Policies
-- Manufacturer warranty on all products (minimum 12 months)
-- Free delivery in Dakar
-- Express delivery 24-48h in Dakar, 3-5 days for other regions
-- Easy returns within 14 days
+- [Tech blog](https://tekalis.com/blog): Product tests, buying guides and tech news.
+
+## Payment
+
+Payment methods accepted: Wave, Orange Money, Free Money, cash on delivery, Visa and Mastercard.
+
+## Optional
+
+- [Prices](https://tekalis.com/prix): Price ranges and offers.
+- [Trends](https://tekalis.com/tendances): Current trending products.
+- [Privacy policy](https://tekalis.com/politique): How we handle your personal data.
+- [Cookies](https://tekalis.com/cookies): Cookie usage on tekalis.com.
+- [Legal notice](https://tekalis.com/mentions-legales): Legal information about the company.

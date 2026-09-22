@@ -87,9 +87,12 @@ const ProductCard = ({ product, showSpecs = false }) => {
   };
 
   return (
-    <Link href={`/products/${product.slug || product._id}`}
-      className="group bg-white dark:bg-surface-800 rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-300 overflow-hidden flex flex-col h-full border border-surface-100 dark:border-surface-700 hover:-translate-y-1"
-    >
+    <div className="group bg-white dark:bg-surface-800 rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-300 overflow-hidden relative flex flex-col h-full border border-surface-100 dark:border-surface-700 hover:-translate-y-1">
+      <Link
+        href={`/products/${product.slug || product._id}`}
+        onClick={(e) => e.stopPropagation()}
+        className="flex flex-col h-full flex-grow"
+      >
       {/* ─── Image ─────────────────────────────────────────────────────────── */}
       <div className="relative overflow-hidden bg-surface-50 dark:bg-surface-900 aspect-square">
         {!imageLoaded && (
@@ -126,37 +129,7 @@ const ProductCard = ({ product, showSpecs = false }) => {
           )}
         </div>
 
-        {/* Wishlist — bouton haut droite */}
-        <button
-          onClick={handleToggleWishlist}
-          aria-label={isInWishlist ? "Retirer des favoris" : "Ajouter aux favoris"}
-          className={`absolute top-1.5 right-1.5 md:top-2 md:right-2 w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-lg transition-all z-10 ${
-            isInWishlist
-              ? "bg-rose-500 text-white"
-              : "bg-white/90 dark:bg-surface-800/90 text-surface-700 dark:text-surface-300 hover:bg-rose-50 hover:text-rose-500 border border-surface-100 dark:border-surface-700"
-          }`}
-        >
-          {isInWishlist ? <FaHeart size={14} /> : <FaRegHeart size={14} />}
-        </button>
-
-        {/* Overlay hover desktop */}
-        <div className="hidden md:flex absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-300 items-center justify-center opacity-0 group-hover:opacity-100 gap-2">
-          <button
-            onClick={handleAddToCart}
-            disabled={isOutOfStock}
-            aria-label="Ajouter au panier"
-            className="bg-brand-500 hover:bg-brand-600 text-white p-3 rounded-full transition disabled:bg-surface-400 disabled:cursor-not-allowed shadow-lg hover:scale-110"
-          >
-            <FaShoppingCart size={18} />
-          </button>
-          <span
-            className="bg-white hover:bg-surface-100 text-surface-800 p-3 rounded-full transition shadow-lg hover:scale-110"
-            title="Voir détails"
-          >
-            <FaEye size={18} />
-          </span>
         </div>
-      </div>
 
       {/* ─── Infos ─────────────────────────────────────────────────────────── */}
       <div className="p-2.5 md:p-4 flex flex-col flex-grow">
@@ -239,22 +212,54 @@ const ProductCard = ({ product, showSpecs = false }) => {
             </div>
           )}
         </div>
+      </div>
+    </Link>
 
-        {/* Bouton Ajouter au panier */}
+      {/* Wishlist — bouton haut droite */}
+      <button
+        onClick={handleToggleWishlist}
+        aria-label={isInWishlist ? "Retirer des favoris" : "Ajouter aux favoris"}
+        className={`absolute top-1.5 right-1.5 md:top-2 md:right-2 w-9 h-9 md:w-10 md:h-10 rounded-full flex items-center justify-center shadow-lg transition-all z-20 ${
+          isInWishlist
+            ? "bg-rose-500 text-white"
+            : "bg-white/90 dark:bg-surface-800/90 text-surface-700 dark:text-surface-300 hover:bg-rose-50 hover:text-rose-500 border border-surface-100 dark:border-surface-700"
+        }`}
+      >
+        {isInWishlist ? <FaHeart size={14} /> : <FaRegHeart size={14} />}
+      </button>
+
+      {/* Overlay hover desktop */}
+      <div className="hidden md:flex absolute top-0 left-0 right-0 aspect-square bg-black/0 group-hover:bg-black/40 transition-all duration-300 items-center justify-center opacity-0 group-hover:opacity-100 gap-2">
         <button
           onClick={handleAddToCart}
           disabled={isOutOfStock}
-          className={`w-full py-2 md:py-2.5 px-2 rounded-xl font-semibold text-xs md:text-sm transition-all flex items-center justify-center gap-1.5 active:scale-95 ${
-            isOutOfStock
-              ? "bg-surface-200 dark:bg-surface-700 text-surface-500 dark:text-surface-400 cursor-not-allowed"
-              : "bg-brand-500 hover:bg-brand-600 text-white shadow-sm hover:shadow-md"
-          }`}
+          aria-label="Ajouter au panier"
+          className="bg-brand-500 hover:bg-brand-600 text-white p-3 rounded-full transition disabled:bg-surface-400 disabled:cursor-not-allowed shadow-lg hover:scale-110"
         >
-          <FaShoppingCart size={12} className="md:w-[14px] md:h-[14px]" />
-          {isOutOfStock ? "Rupture de stock" : "Ajouter au panier"}
+          <FaShoppingCart size={18} />
         </button>
+        <span
+          className="bg-white hover:bg-surface-100 text-surface-800 p-3 rounded-full transition shadow-lg hover:scale-110"
+          title="Voir détails"
+        >
+          <FaEye size={18} />
+        </span>
       </div>
-    </Link>
+
+      {/* Bouton Ajouter au panier */}
+      <button
+        onClick={handleAddToCart}
+        disabled={isOutOfStock}
+        className={`w-full py-2 md:py-2.5 px-2 rounded-xl font-semibold text-xs md:text-sm transition-all flex items-center justify-center gap-1.5 active:scale-95 ${
+          isOutOfStock
+            ? "bg-surface-200 dark:bg-surface-700 text-surface-500 dark:text-surface-400 cursor-not-allowed"
+            : "bg-brand-500 hover:bg-brand-600 text-white shadow-sm hover:shadow-md"
+        }`}
+      >
+        <FaShoppingCart size={12} className="md:w-[14px] md:h-[14px]" />
+        {isOutOfStock ? "Rupture de stock" : "Ajouter au panier"}
+      </button>
+    </div>
   );
 };
 

@@ -171,6 +171,8 @@ const Footer = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Votre email"
+                  aria-label="Adresse email pour la newsletter"
+                  autoComplete="email"
                   className="w-full px-4 py-3 bg-white/5 border border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-white placeholder-surface-500 transition"
                   required
                 />

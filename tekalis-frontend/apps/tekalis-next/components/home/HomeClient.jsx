@@ -231,7 +231,7 @@ const Home = ({ initialProducts = [], initialArticles = [] }) => {
                 <FaLaptop className="text-brand-600 dark:text-brand-400 text-2xl" />
               </div>
               <div>
-                <h3 className="font-bold font-display text-surface-900 dark:text-white text-lg">Tous les produits</h3>
+                <h2 className="font-bold font-display text-surface-900 dark:text-white text-lg">Tous les produits</h2>
                 <p className="text-sm text-surface-500">Explorez notre catalogue</p>
               </div>
             </div>
@@ -243,7 +243,7 @@ const Home = ({ initialProducts = [], initialArticles = [] }) => {
                 <FaStar className="text-amber-600 dark:text-amber-400 text-2xl" />
               </div>
               <div>
-                <h3 className="font-bold font-display text-surface-900 dark:text-white text-lg">Labo Tech</h3>
+                <h2 className="font-bold font-display text-surface-900 dark:text-white text-lg">Labo Tech</h2>
                 <p className="text-sm text-surface-500">Tests & guides d'achat</p>
               </div>
             </div>
