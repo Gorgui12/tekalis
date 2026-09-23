@@ -24,8 +24,14 @@ export const metadata = {
 export const revalidate = 3600;
 
 async function getProducts() {
-  const data = await serverFetch('/products?limit=200');
-  return data?.data || data?.products || (Array.isArray(data) ? data : []);
+  try {
+    const data = await serverFetch('/products?limit=200');
+    return data?.data || data?.products || (Array.isArray(data) ? data : []);
+  } catch {
+    // API injoignable / rate-limit au moment du build : la page se rend
+    // vide et le client component rafraîchit les données.
+    return [];
+  }
 }
 
 export default async function ProductsPage() {

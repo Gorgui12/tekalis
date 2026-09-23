@@ -19,8 +19,14 @@ export const metadata = {
 export const revalidate = 1800;
 
 async function getArticles() {
-  const data = await serverFetch('/articles?limit=50');
-  return data?.articles || data?.data || [];
+  try {
+    const data = await serverFetch('/articles?limit=50');
+    return data?.articles || data?.data || [];
+  } catch {
+    // API injoignable / rate-limit au moment du build : rendu vide,
+    // le client component rafraîchit les données.
+    return [];
+  }
 }
 
 export default async function BlogPage() {
