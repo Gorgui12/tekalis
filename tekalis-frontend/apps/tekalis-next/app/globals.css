@@ -116,6 +116,85 @@ img {
   animation: hero-progress var(--hero-duration, 5500ms) linear forwards;
 }
 
+/* ── Titres de section animés (arrière-plan en mouvement) ──────────────── */
+@keyframes title-gradient {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes title-pulse {
+  0%, 100% { box-shadow: 0 4px 16px rgba(245, 158, 11, 0.35), 0 0 0 0 rgba(245, 158, 11, 0.4); }
+  40%      { box-shadow: 0 6px 28px rgba(239, 68, 68, 0.5), 0 0 0 6px rgba(245, 158, 11, 0); }
+  60%      { box-shadow: 0 6px 28px rgba(168, 85, 247, 0.5), 0 0 0 0 rgba(168, 85, 247, 0.4); }
+}
+
+@keyframes title-dot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50%      { transform: scale(0.4); opacity: 0.55; }
+}
+
+.title-animated {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.4rem 1.35rem;
+  border-radius: 9999px;
+  color: #fff !important;
+  background: linear-gradient(90deg, #f59e0b, #d97706, #ef4444, #a855f7, #d97706, #f59e0b);
+  background-size: 300% 100%;
+  animation: title-gradient 7s linear infinite, title-pulse 4s ease-in-out infinite;
+  will-change: background-position;
+}
+
+.title-animated::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 9999px;
+  background: #fff;
+  animation: title-dot 1.3s ease-in-out infinite;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+}
+
+/* ── Apparition au scroll ─────────────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+  will-change: opacity, transform;
+}
+
+.reveal.reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── Éléments vivants ─────────────────────────────────────────────────── */
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-9px); }
+}
+
+.animate-float {
+  animation: float-y 4s ease-in-out infinite;
+}
+
+@keyframes glow-spin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes cta-bounce {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-5px); }
+}
+
+.animate-cta {
+  animation: cta-bounce 3s ease-in-out infinite;
+}
+
 /* ── Focus ring ────────────────────────────────────────────────────────── */
 :focus-visible {
   outline: 2px solid var(--color-primary);
