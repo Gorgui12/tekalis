@@ -132,13 +132,6 @@ const localBusinessSchema = {
       { '@type': 'OfferCatalog', name: 'Accessoires tech' },
     ],
   },
-  aggregateRating: {
-    '@type': 'AggregateRating',
-    ratingValue: '4.5',
-    reviewCount: '150',
-    bestRating: '5',
-    worstRating: '1',
-  },
   sameAs: [
     SOCIAL_LINKS.facebook,
     SOCIAL_LINKS.instagram,

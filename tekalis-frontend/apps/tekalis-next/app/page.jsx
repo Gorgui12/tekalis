@@ -64,6 +64,11 @@ export default async function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
       />
+      {/* H1 server-rendered : le hero est un client component, cf. RSC / HW curl.
+          Invisible (sr-only), conservé pour les crawlers / l'accessibilité. */}
+      <h1 className="sr-only">
+        Tekalis — Boutique électronique high-tech à Dakar Fann, livraison partout au Sénégal
+      </h1>
       {/* Passe les données SSR au composant client pour SEO */}
       <HomeClient initialProducts={products} initialArticles={articles} />
       {/* Contenu SEO server-rendered : volume, maillage interne, NAP, FAQ */}

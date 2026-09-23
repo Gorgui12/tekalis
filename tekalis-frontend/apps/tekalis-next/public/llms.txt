@@ -2,16 +2,16 @@
 
 > Tekalis is an online electronics and high-tech store based in Dakar Fann, Senegal. We sell smartphones, laptops, TVs, home appliances, gaming equipment, air conditioners, solar energy systems, and tech accessories, with delivery throughout Senegal.
 
-Welcome to Tekalis. The catalogue and store pages below are organized by product range and company information. Prices are shown in FCFA (XOF) on each product page; every product includes a minimum 12-month manufacturer warranty.
+Welcome to Tekalis. The catalogue and store pages below are organized by product range and company information. Prices are shown in FCFA (XOF) on each product page; every product is covered by the manufacturer warranty (duration depends on the product).
 
 ## About
 
 - [About Tekalis](https://tekalis.com/apropos): Company history, values and the Tekalis team in Dakar.
 - [Contact](https://tekalis.com/contact): Contact form, phone +221 78 634 69 46 and email contact@tekalis.com.
 - [Frequently asked questions](https://tekalis.com/faq): Answers to common questions about ordering, delivery and payment.
-- [Delivery](https://tekalis.com/livraison): Free express delivery in Dakar (24–48h) and 3–5 days for other regions.
-- [Warranties](https://tekalis.com/garanties): Manufacturer warranty coverage on all products.
-- [Returns](https://tekalis.com/retours): 14-day return and exchange policy.
+- [Delivery](https://tekalis.com/livraison): Express delivery in Dakar (24–48h), free from 50 000 FCFA of purchase, and 2–5 days for other regions.
+- [Warranties](https://tekalis.com/garanties): Manufacturer warranty coverage on all products (duration depends on the product).
+- [Returns](https://tekalis.com/retours): 7-day return and exchange policy.
 - [Terms and conditions](https://tekalis.com/cgv): General terms and conditions of sale.
 
 ## Shop

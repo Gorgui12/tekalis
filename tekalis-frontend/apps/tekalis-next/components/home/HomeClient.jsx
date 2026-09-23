@@ -5,11 +5,11 @@ import Link from "next/link";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchProducts } from "@/store/slices/productSlice";
 import DynamicHero from "@/components/home/DynamicHero";
-import { 
-  FaChevronLeft, 
-  FaChevronRight, 
-  FaTruck, 
-  FaShieldAlt, 
+import {
+  FaChevronLeft,
+  FaChevronRight,
+  FaTruck,
+  FaShieldAlt,
   FaHeadset,
   FaCreditCard,
   FaStar,
@@ -17,8 +17,8 @@ import {
   FaLaptop,
   FaMobileAlt,
   FaGamepad,
-  FaCamera,
-  FaDesktop,
+  FaTv,
+  FaBlender,
   FaKeyboard
 } from "react-icons/fa";
 import api from "@/lib/api";
@@ -98,35 +98,7 @@ const Home = ({ initialProducts = [], initialArticles = [] }) => {
         setArticles(data.articles || []);
       } catch (error) {
         console.error("Erreur chargement articles :", error);
-        setArticles([
-          {
-            _id: "1",
-            title: "Test exclusif - Le PC portable gaming ultime de 2025",
-            slug: "test-pc-gaming-ultime-2025",
-            excerpt: "Nous avons testé pendant 2 semaines le dernier né des PC gaming...",
-            category: "test",
-            publishedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-            readTime: 5
-          },
-          {
-            _id: "2",
-            title: "Guide complet : Choisir son ordinateur portable en 2025",
-            slug: "guide-choisir-ordinateur-portable-2025",
-            excerpt: "Entre ultrabook, PC gaming et workstation, comment faire le bon choix...",
-            category: "guide",
-            publishedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
-            readTime: 8
-          },
-          {
-            _id: "3",
-            title: "Les tendances tech à suivre cette année",
-            slug: "tendances-tech-2025",
-            excerpt: "IA, gaming, télétravail : découvrez les technologies qui vont marquer 2025...",
-            category: "news",
-            publishedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
-            readTime: 6
-          }
-        ]);
+        setArticles([]);
       } finally {
         setLoading(false);
       }
@@ -200,10 +172,10 @@ const Home = ({ initialProducts = [], initialArticles = [] }) => {
 
   const categories = [
     { name: "Smartphones", icon: <FaMobileAlt />, slug: "smartphones", color: "from-blue-500 to-cyan-500", image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=400&h=400&fit=crop" },
+    { name: "Ordinateurs", icon: <FaLaptop />, slug: "ordinateurs", color: "from-indigo-500 to-purple-500", image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&h=400&fit=crop" },
     { name: "Gaming", icon: <FaGamepad />, slug: "gaming", color: "from-purple-500 to-pink-500", image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=400&h=400&fit=crop" },
-    { name: "Home Cinema", icon: <FaDesktop />, slug: "home-cinema", color: "from-red-500 to-orange-500", image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=400&h=400&fit=crop" },
-    { name: "Caméras", icon: <FaCamera />, slug: "cameras", color: "from-green-500 to-teal-500", image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=400&h=400&fit=crop" },
-    { name: "Laptops", icon: <FaLaptop />, slug: "ordinateurs", color: "from-indigo-500 to-purple-500", image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=400&h=400&fit=crop" },
+    { name: "Téléviseurs", icon: <FaTv />, slug: "tv", color: "from-red-500 to-orange-500", image: "https://images.unsplash.com/photo-1593359677879-a4bb92f829d1?w=400&h=400&fit=crop" },
+    { name: "Électroménager", icon: <FaBlender />, slug: "electromenager", color: "from-emerald-500 to-teal-500", image: "https://images.unsplash.com/photo-1590513522611-a8c3a2c3c9b0?w=400&h=400&fit=crop" },
     { name: "Accessoires", icon: <FaKeyboard />, slug: "accessoires", color: "from-yellow-500 to-orange-500", image: "https://images.unsplash.com/photo-1587829741301-dc798b91add1?w=400&h=400&fit=crop" }
   ];
 
@@ -219,8 +191,8 @@ const Home = ({ initialProducts = [], initialArticles = [] }) => {
     <div className="min-h-screen bg-surface-50 dark:bg-surface-950">
 
       {/* Hero Section - Carousel */}
-
-      <DynamicHero isHomePage={true} />
+      {/* isHomePage=false : le H1 home est rendu serveur (app/page.jsx), le hero est en H2. */}
+      <DynamicHero isHomePage={false} />
 
       {/* Quick Actions */}
       <section className="container mx-auto px-4 -mt-16 relative z-10 mb-16">
@@ -348,21 +320,21 @@ const Home = ({ initialProducts = [], initialArticles = [] }) => {
               <FaTruck className="text-brand-600 dark:text-brand-400 text-3xl" />
             </div>
             <h3 className="font-bold font-display text-surface-900 dark:text-white mb-2">Livraison rapide</h3>
-            <p className="text-sm text-surface-500">Livraison gratuite à Dakar sous 2-3 jours</p>
+            <p className="text-sm text-surface-500">Livraison à Dakar en 24-48h, offerte dès 50 000 FCFA d&apos;achat</p>
           </div>
           <div className="text-center group">
             <div className="bg-emerald-100 dark:bg-emerald-900/30 rounded-2xl w-20 h-20 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
               <FaShieldAlt className="text-emerald-600 dark:text-emerald-400 text-3xl" />
             </div>
-            <h3 className="font-bold font-display text-surface-900 dark:text-white mb-2">Garantie constructeur</h3>
-            <p className="text-sm text-surface-500">Tous nos produits sont garantis 12 mois minimum</p>
+            <h3 className="font-bold font-display text-surface-900 dark:text-white mb-2">Garantie incluse</h3>
+            <p className="text-sm text-surface-500">Garantie constructeur selon produit et SAV réactif depuis votre espace client</p>
           </div>
           <div className="text-center group">
             <div className="bg-amber-100 dark:bg-amber-900/30 rounded-2xl w-20 h-20 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
               <FaHeadset className="text-amber-600 dark:text-amber-400 text-3xl" />
             </div>
-            <h3 className="font-bold font-display text-surface-900 dark:text-white mb-2">Support 24/7</h3>
-            <p className="text-sm text-surface-500">Notre équipe est disponible pour vous aider</p>
+            <h3 className="font-bold font-display text-surface-900 dark:text-white mb-2">Support client</h3>
+            <p className="text-sm text-surface-500">Notre équipe vous répond du lundi au samedi, par téléphone ou WhatsApp</p>
           </div>
           <div className="text-center group">
             <div className="bg-orange-100 dark:bg-orange-900/30 rounded-2xl w-20 h-20 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
@@ -389,6 +361,10 @@ const Home = ({ initialProducts = [], initialArticles = [] }) => {
 
           {loading ? (
             <div className="text-center py-12 text-surface-500">Chargement des articles...</div>
+          ) : articles.length === 0 ? (
+            <div className="text-center py-12 text-surface-500">
+              Aucun article publié pour le moment. Revenez bientôt pour découvrir nos tests et guides d&apos;achat.
+            </div>
           ) : (
             <div className="grid md:grid-cols-3 gap-6">
               {articles.slice(0, 3).map(article => (

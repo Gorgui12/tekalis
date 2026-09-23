@@ -1,6 +1,7 @@
 import { permanentRedirect } from "next/navigation";
 import { serverFetch } from "@/lib/serverFetch";
 import ProductDetailClient from '@/components/product/ProductDetailClient';
+import ProductSeoContent from '@/components/product/ProductSeoContent';
 
 const SITE_URL = 'https://tekalis.com';
 
@@ -23,7 +24,7 @@ export async function generateMetadata({ params }) {
       description:
         product.metaDescription ||
         `En stock à Dakar : ${product.name} au prix de ${priceStr} FCFA. ` +
-        `Livraison 24-48h partout au Sénégal, garantie constructeur 12 mois. ` +
+        `Livraison rapide au Sénégal, garantie incluse. ` +
         `Paiement à la livraison, Wave, Orange Money. Commandez en ligne.`,
       keywords: [
         `${product.name} Dakar`,
@@ -113,6 +114,9 @@ export default async function ProductPage({ params }) {
       ...(rev.comment ? { reviewBody: rev.comment } : {}),
     }));
 
+  // Produits de la même catégorie — rendus côté serveur pour le maillage interne
+  const related = await fetchRelated(product.category?.[0]?._id);
+
   const productSchema = {
     '@context': 'https://schema.org',
     '@type': 'Product',
@@ -120,17 +124,22 @@ export default async function ProductPage({ params }) {
     image: allImages.length > 0 ? allImages : primaryImage ? [primaryImage] : undefined,
     description: product.description || product.metaDescription || '',
     sku: product._id,
-    mpn: product._id,
+    mpn: product.mpn || product._id,
+    ...(product.gtin ? { gtin: product.gtin } : {}),
+    ...(product.specs && Object.keys(product.specs).length > 0 ? {
+      additionalProperty: Object.entries(product.specs)
+        .map(([key, value]) => ({
+          '@type': 'PropertyValue',
+          name: key,
+          value: String(value),
+        })),
+    } : {}),
     brand: { '@type': 'Brand', name: product.brand || 'Tekalis' },
     offers: {
       '@type': 'Offer',
       url: productUrl,
       priceCurrency: 'XOF',
       price: product.price,
-      priceValidUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
-      validFrom: product.createdAt
-        ? new Date(product.createdAt).toISOString()
-        : new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
       itemCondition: 'https://schema.org/NewCondition',
       availability: product.stock > 0
         ? 'https://schema.org/InStock'
@@ -144,7 +153,7 @@ export default async function ProductPage({ params }) {
         '@type': 'MerchantReturnPolicy',
         applicableCountry: 'SN',
         returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
-        merchantReturnDays: 14,
+        merchantReturnDays: 7,
         returnMethod: 'https://schema.org/ReturnByMail',
         returnFees: 'https://schema.org/FreeReturn',
       },
@@ -204,9 +213,23 @@ export default async function ProductPage({ params }) {
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      {/* H1 server-rendered : la fiche produit est un client component, cf. RSC / HW curl. */}
+      <h1 className="sr-only">{product.name}</h1>
       <ProductDetailClient product={product} />
+      <ProductSeoContent product={product} related={related} />
     </>
   );
+}
+
+async function fetchRelated(categoryId) {
+  if (!categoryId) return [];
+  try {
+    const res = await serverFetch(`/products?category=${categoryId}&limit=8`);
+    const list = res?.data || res?.products || res || [];
+    return Array.isArray(list) ? list : [];
+  } catch {
+    return [];
+  }
 }
 
 async function fetchProduct(id) {

@@ -41,6 +41,10 @@ export default async function BlogPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
+      {/* H1 server-rendered : les articles sont un client component, cf. RSC / HW curl. */}
+      <h1 className="sr-only">
+        Blog Tech Sénégal — tests, guides d&apos;achat et actualités tech
+      </h1>
       <BlogClient initialArticles={articles} />
     </>
   );

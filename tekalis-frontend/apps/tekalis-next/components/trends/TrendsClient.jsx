@@ -36,9 +36,9 @@ export default function TrendsClient({ suggestions = [], products = [] }) {
           <p className="text-sm text-surface-500 dark:text-surface-400 mb-2 font-semibold uppercase tracking-wide">
             Powered by Google Suggestions · Sénégal
           </p>
-          <h1 className="text-2xl md:text-4xl font-bold font-display text-surface-900 dark:text-white mb-4">
+          <h2 className="text-2xl md:text-4xl font-bold font-display text-surface-900 dark:text-white mb-4">
             Les recherches de téléphones les plus populaires au Sénégal en ce moment
-          </h1>
+          </h2>
           <p className="text-surface-600 dark:text-surface-300 leading-relaxed max-w-3xl">
             Voici les requêtes que les Sénégalais tapent sur Google au sujet des iPhone et Samsung.
             Cliquez sur une recherche pour voir les modèles correspondants au prix du jour chez

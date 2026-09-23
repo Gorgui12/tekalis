@@ -17,8 +17,8 @@ const CONTACT_INFO = [
   {
     icon: <FaPhone />,
     label: "Téléphone",
-    value: "+221 77 123 45 67",
-    href: "tel:+221771234567",
+    value: "+221 78 634 69 46",
+    href: "tel:+221786346946",
     color: "bg-green-100 text-green-600"
   },
   {
@@ -47,8 +47,8 @@ const CONTACT_INFO = [
 ];
 
 const HORAIRES = [
-  { jour: "Lundi — Vendredi", heures: "09h00 – 18h00" },
-  { jour: "Samedi", heures: "09h00 – 13h00" },
+  { jour: "Lundi — Vendredi", heures: "08h00 – 19h00" },
+  { jour: "Samedi", heures: "09h00 – 17h00" },
   { jour: "Dimanche", heures: "Fermé" }
 ];
 
@@ -299,9 +299,9 @@ const Contact = () => {
 
           {/* Hero */}
           <div className="text-center mb-12 mt-4">
-            <h1 className="text-4xl md:text-5xl font-bold text-surface-900 dark:text-white mb-4 font-display">
+            <h2 className="text-4xl md:text-5xl font-bold text-surface-900 dark:text-white mb-4 font-display">
               Contactez-nous
-            </h1>
+            </h2>
             <p className="text-lg text-surface-600 dark:text-surface-400 max-w-xl mx-auto">
               Une question sur un produit ou une commande ? Notre équipe vous répond rapidement.
               Livraison rapide à Dakar, paiement à la livraison ou par Wave — passez aussi nous voir

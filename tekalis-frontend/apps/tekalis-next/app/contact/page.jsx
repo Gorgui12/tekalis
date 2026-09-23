@@ -14,4 +14,12 @@ export const metadata = {
   },
 };
 
-export default function ContactPage() { return <ContactClient />; }
+export default function ContactPage() {
+  return (
+    <>
+      {/* H1 server-rendered : le formulaire est un client component, cf. RSC / HW curl. */}
+      <h1 className="sr-only">Contact — Tekalis, boutique électronique à Dakar Fann</h1>
+      <ContactClient />
+    </>
+  );
+}

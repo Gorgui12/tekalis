@@ -11,7 +11,7 @@ const FAQ_ITEMS = [
   {
     question: "Combien de temps prend la livraison au Sénégal ?",
     answer:
-      "La livraison est assurée en 2 à 3 jours ouvrés à Dakar et dans sa région, et en 4 à 7 jours dans les autres régions du Sénégal.",
+      "La livraison est assurée en 24 à 48 heures à Dakar et dans sa banlieue, et en 2 à 5 jours dans les autres régions du Sénégal. Elle est offerte dès 50 000 FCFA d'achat.",
   },
   {
     question: "Les produits sous garantie ?",
@@ -38,6 +38,9 @@ const CATEGORY_LINKS = [
   { name: 'Téléviseurs TV et home cinéma', path: '/category/tv' },
   { name: 'Électroménager et petit électroménager', path: '/category/electromenager' },
   { name: 'Climatiseurs et refroidissement', path: '/category/climatiseurs' },
+  { name: 'Énergie solaire et kits panneaux', path: '/category/energie-solaire' },
+  { name: 'Accessoires et câbles', path: '/category/accessoires' },
+  { name: 'Audio, casques et enceintes', path: '/category/audio' },
 ];
 
 export default function HomeSeoContent() {
@@ -68,7 +71,7 @@ export default function HomeSeoContent() {
         <h3 className="text-xl font-bold font-display text-surface-900 dark:text-white mb-3">
           Ce que vous trouverez chez Tekalis
         </h3>
-        <ul className="grid sm:grid-cols-2 gap-2 mb-6 list-none">
+        <ul className="grid sm:grid-cols-3 gap-2 mb-6 list-none">
           {CATEGORY_LINKS.map((cat) => (
             <li key={cat.path}>
               <Link
@@ -89,8 +92,8 @@ export default function HomeSeoContent() {
         <ul className="space-y-2 mb-6 text-surface-700 dark:text-surface-300 text-sm">
           <li><strong>Paiement à la livraison et mobile money :</strong> réglez quand vous recevez, en espèces, Wave, Orange Money ou Free Money.</li>
           <li><strong>Garantie incluse :</strong> chaque produit est couvert. Voir nos conditions de <Link href="/garanties" className="text-brand-600 dark:text-brand-400 hover:underline">garantie</Link>.</li>
-          <li><strong>Livraison rapide :</strong> 2 à 3 jours à Dakar, 4 à 7 jours ailleurs au <Link href="/livraison" className="text-brand-600 dark:text-brand-400 hover:underline">Sénégal</Link>.</li>
-          <li><strong>Avis vérifiés :</strong> note moyenne de 4,5/5 basée sur les avis de nos clients sur nos <Link href="/products" className="text-brand-600 dark:text-brand-400 hover:underline">produits</Link>.</li>
+          <li><strong>Livraison rapide :</strong> 24 à 48h à Dakar, 2 à 5 jours ailleurs au <Link href="/livraison" className="text-brand-600 dark:text-brand-400 hover:underline">Sénégal</Link>, offerte dès 50 000 FCFA d&apos;achat.</li>
+          <li><strong>Avis vérifiés :</strong> consultez la note et les avis de nos clients directement sur chaque fiche <Link href="/products" className="text-brand-600 dark:text-brand-400 hover:underline">produit</Link>.</li>
           <li><strong>Service client réactif :</strong> au <a href="tel:+221786346946" className="text-brand-600 dark:text-brand-400 hover:underline">+221 78 634 69 46</a> et sur WhatsApp, du lundi au samedi.</li>
         </ul>
 

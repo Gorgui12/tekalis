@@ -146,8 +146,8 @@ export const SHIPPING = {
   STANDARD_SHIPPING_COST: 2500, // FCFA
   EXPRESS_SHIPPING_COST: 5000, // FCFA
   DELIVERY_TIME: {
-    DAKAR: "2-3 jours",
-    REGIONS: "4-7 jours"
+    DAKAR: "24-48h",
+    REGIONS: "2-5 jours"
   }
 };
 

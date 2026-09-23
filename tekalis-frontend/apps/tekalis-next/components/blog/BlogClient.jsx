@@ -179,9 +179,9 @@ const Blog = ({ initialArticles = [] }) => {
       {/* Header */}
       <div className="bg-gradient-to-r from-surface-900 to-surface-800 text-white py-16 mt-20">
         <div className="container mx-auto px-4">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4 text-center font-display">
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-center font-display">
             📝 Le Labo Tech
-          </h1>
+          </h2>
           <p className="text-xl text-surface-300 text-center max-w-2xl mx-auto">
             Tests, guides d'achat, tutoriels et actualités tech pour vous aider à faire les bons choix
           </p>

@@ -74,7 +74,7 @@ const faqCategories = [
     faqs: [
       {
         q: "Vos produits sont-ils garantis ?",
-        a: "Oui, tous nos produits sont neufs et couverts par la garantie constructeur (12 mois en moyenne, selon les produits).",
+        a: "Oui, tous nos produits sont neufs et couverts par la garantie du constructeur, dont la durée varie selon le produit. Consultez la page garanties pour le détail.",
       },
       {
         q: "Que faire en cas de panne ?",

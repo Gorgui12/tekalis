@@ -46,6 +46,10 @@ export default async function ProductsPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
+      {/* H1 server-rendered : le catalogue est un client component, cf. RSC / HW curl. */}
+      <h1 className="sr-only">
+        Tous les Produits — Électronique high-tech à Dakar Fann, livraison partout au Sénégal
+      </h1>
       {/* Bandeau "Guides de prix" — cible les requêtes "prix ... fcfa" */}
       <div className="bg-white dark:bg-surface-800 border-b border-surface-100 dark:border-surface-700">
         <div className="container mx-auto px-4 py-4 flex flex-wrap items-center gap-3">

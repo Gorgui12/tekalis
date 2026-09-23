@@ -61,9 +61,6 @@ const ProductDetails = ({ product: initialProduct }) => {
     );
   }
 
-  // Log product structure for debugging
-  console.log('ProductDetailClient - Rendering product:', product);
-
   // ── Images ────────────────────────────────────────────────────────────────
   const productImages = product.images?.length
     ? product.images
@@ -161,10 +158,10 @@ const ProductDetails = ({ product: initialProduct }) => {
             </p>
           )}
 
-          {/* H1 produit */}
-          <h1 className="text-3xl font-bold font-display text-surface-900 dark:text-white mb-4">
+          {/* H1 produit — serveur dans app/products/[id]/page.jsx ; ici H2 pour la hiérarchie */}
+          <h2 className="text-3xl font-bold font-display text-surface-900 dark:text-white mb-4">
             {product.name}
-          </h1>
+          </h2>
 
           {/* Note */}
           {product.rating?.average > 0 && (
@@ -222,7 +219,7 @@ const ProductDetails = ({ product: initialProduct }) => {
             </div>
             <div className="flex items-center gap-2 bg-brand-50 dark:bg-brand-900/20 text-brand-700 dark:text-brand-300 px-3 py-2 rounded-xl text-sm font-medium">
               <FaShieldAlt />
-              Garantie 12 mois
+              Garantie incluse
             </div>
           </div>
 
@@ -292,8 +289,8 @@ const ProductDetails = ({ product: initialProduct }) => {
             <div className="flex items-start gap-3 text-sm text-surface-700 dark:text-surface-300">
               <FaTruck className="text-brand-600 dark:text-brand-400 text-lg mt-0.5" />
               <div>
-                <p className="font-semibold">Livraison gratuite à Dakar</p>
-                <p className="text-surface-500 dark:text-surface-400">Estimée sous 2-3 jours ouvrés</p>
+                <p className="font-semibold">Livraison à Dakar en 24-48h</p>
+                <p className="text-surface-500 dark:text-surface-400">Offerte dès 50 000 FCFA d&apos;achat, paiement à la réception</p>
               </div>
             </div>
           </div>

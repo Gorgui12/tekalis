@@ -164,9 +164,9 @@ const Products = ({ initialProducts = [] }) => {
     <div className="min-h-screen bg-surface-50 py-8">
       <div className="container mx-auto px-4 max-w-7xl">
         {/* Header */}
-        <h1 className="text-4xl font-bold text-surface-900 dark:text-white mb-6 font-display">
+        <h2 className="text-4xl font-bold text-surface-900 dark:text-white mb-6 font-display">
           Tous les Produits
-        </h1>
+        </h2>
 
         {/* Search */}
         <div className="relative mb-6">

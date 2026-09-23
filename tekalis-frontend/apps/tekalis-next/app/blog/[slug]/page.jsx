@@ -107,6 +107,8 @@ export default async function ArticlePage({ params }) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(personSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
+      {/* H1 server-rendered : la fiche article est un client component, cf. RSC / HW curl. */}
+      <h1 className="sr-only">{article.title}</h1>
       <ArticleDetailClient article={article} related={related} />
     </>
   );

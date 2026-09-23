@@ -19,6 +19,28 @@ export default function robots() {
         ],
       },
       {
+        // Crawlers IA et LLM — autorisés explicitement pour la citabilité GEO
+        userAgent: [
+          'GPTBot',
+          'OAI-SearchBot',
+          'ChatGPT-User',
+          'ClaudeBot',
+          'PerplexityBot',
+          'Google-Extended',
+          'GoogleOther',
+          'Bingbot',
+          'Applebot',
+          'anthropic-ai',
+          'cohere-ai',
+          'Bytespider',
+          'CCBot',
+          'Diffbot',
+          'FacebookBot',
+          'PetalBot',
+        ],
+        allow: ['/', '/llms.txt'],
+      },
+      {
         userAgent: ['AhrefsBot', 'SemrushBot', 'MJ12bot', 'AhrefsSiteAudit'],
         disallow: '/',
       },

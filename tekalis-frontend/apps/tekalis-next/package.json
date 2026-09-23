@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "audit:geo": "node scripts/audit-geo.mjs"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.3.0",

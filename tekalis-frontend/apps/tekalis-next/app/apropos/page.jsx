@@ -18,13 +18,13 @@ export const metadata = {
 const engagements = [
   { icon: <FaMoneyBillWave />, title: "Paiement à la livraison", text: "Payez en espèces ou par Wave / Orange Money / Free Money à la réception de votre produit." },
   { icon: <FaShieldAlt />, title: "Produits garantis", text: "Chaque commande bénéficie de la garantie constructeur et d'un SAV réactif depuis votre espace client." },
-  { icon: <FaTruck />, title: "Livraison rapide", text: "2 à 3 jours ouvrés à Dakar et sa région, 4 à 7 jours au-delà, avec suivi et paiement à la réception." },
-  { icon: <FaCheckCircle />, title: "Avis vérifiés", text: "Note moyenne de 4,5/5 basée sur les avis de nos clients sur nos produits, disponibles directement sur la boutique." },
+  { icon: <FaTruck />, title: "Livraison rapide", text: "24 à 48 heures à Dakar et sa région, 2 à 5 jours dans les autres régions du Sénégal, avec suivi et paiement à la réception." },
+  { icon: <FaCheckCircle />, title: "Avis clients disponibles", text: "Note moyenne et avis vérifiés de nos clients, affichés sur chaque fiche produit après leurs achats." },
 ];
 
 export default function AProposPage() {
   return (
-    <main className="max-w-4xl mx-auto px-4 py-16">
+    <div className="max-w-4xl mx-auto px-4 py-16">
       <h1 className="text-3xl md:text-4xl font-bold mb-4">À propos de Tekalis</h1>
       <p className="text-sm text-gray-400 mb-6">Dernière mise à jour : 22 septembre 2026</p>
 
@@ -100,6 +100,6 @@ export default function AProposPage() {
           </li>
         </ul>
       </div>
-    </main>
+    </div>
   );
 }

@@ -5,7 +5,7 @@ import { SITE_URL } from '@/lib/utils/prixGuides';
 export const metadata = {
   title: 'Tendances des recherches de téléphones au Sénégal — Tekalis',
   description:
-    "Les recherches de téléphones les plus populaires au Sénégal en ce moment : prix iPhone, Samsung Galaxy, téléphones pas chers en FCFA. Retrouvez les modèles demandés en stock chez Tekalis.",
+    "Les recherches de téléphones les plus populaires au Sénégal en ce moment : prix iPhone, Samsung Galaxy, téléphones pas chers en FCFA. Comparez les prix avant d'acheter chez Tekalis.",
   keywords: [
     'tendance recherche téléphone senegal', 'phone le plus recherché dakar',
     'prix téléphone en fcfa', 'smartphone tendance senegal 2026',
@@ -64,6 +64,8 @@ export default async function TendancesPage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+      {/* H1 server-rendered : le classement est un client component, cf. RSC / HW curl. */}
+      <h1 className="sr-only">Recherches de téléphones les plus populaires au Sénégal</h1>
       <TrendsClient suggestions={suggestions} products={products} />
     </>
   );

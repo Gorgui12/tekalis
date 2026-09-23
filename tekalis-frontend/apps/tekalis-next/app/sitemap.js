@@ -16,6 +16,7 @@ const STATIC_PAGES = [
   { url: '/garanties', priority: 0.5, changeFrequency: 'monthly' },
   { url: '/mentions-legales', priority: 0.3, changeFrequency: 'yearly' },
   { url: '/cgv', priority: 0.3, changeFrequency: 'yearly' },
+  { url: '/politique', priority: 0.3, changeFrequency: 'yearly' },
   { url: '/cookies', priority: 0.3, changeFrequency: 'yearly' },
 ];
 

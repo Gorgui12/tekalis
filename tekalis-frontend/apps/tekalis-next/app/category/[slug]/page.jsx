@@ -96,17 +96,22 @@ const CATEGORY_SEO = {
 export async function generateMetadata({ params }) {
   const { slug } = await params;
   const seo = CATEGORY_SEO[slug];
-  if (!seo) return { title: `${slug} | Tekalis` };
+  const canonical = `${SITE_URL}/category/${slug}`;
+  if (!seo) return {
+    title: `${slug} | Tekalis`,
+    description: `Produits ${slug.replace(/-/g, ' ')} disponibles à Dakar au Sénégal.`,
+    alternates: { canonical },
+  };
 
   return {
     title: seo.title,
     description: seo.description,
     keywords: seo.keywords,
-    alternates: { canonical: `${SITE_URL}/category/${slug}` },
+    alternates: { canonical },
     openGraph: {
       title: seo.title,
       description: seo.description,
-      url: `${SITE_URL}/category/${slug}`,
+      url: canonical,
       siteName: 'Tekalis Sénégal',
       locale: 'fr_SN',
     },
@@ -211,6 +216,8 @@ export default async function CategoryPage({ params }) {
       {faqSchema && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       )}
+      {/* H1 server-rendered : la liste produits est un client component, cf. RSC / HW curl. */}
+      <h1 className="sr-only">{seo.h1} à Dakar — Tekalis, livraison au Sénégal</h1>
       <CategoryClient products={products} seo={seo} slug={slug} />
     </>
   );

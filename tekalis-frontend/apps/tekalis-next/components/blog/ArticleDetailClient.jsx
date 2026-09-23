@@ -75,112 +75,11 @@ const ArticleDetails = ({ article: initialArticle, related: initialRelated }) =>
       setRelatedProducts(data.relatedProducts || []);
     } catch (error) {
       console.error("Erreur chargement article:", error);
-      setArticle(getDemoArticle());
-      setRelatedArticles(getDemoRelatedArticles());
+      setArticle(null);
     } finally {
       setLoading(false);
     }
   };
-
-  const getDemoArticle = () => ({
-    _id: "1",
-    title: "Test exclusif - Le PC portable gaming ultime de 2025",
-    slug: "test-pc-gaming-ultime-2025",
-    excerpt: "Nous avons testé pendant 2 semaines le dernier né des PC gaming avec RTX 5090.",
-    content: `
-      <h2>Introduction</h2>
-      <p>Dans un marché ultra-compétitif, les constructeurs rivalisent d'ingéniosité pour proposer THE machine ultime. Aujourd'hui, nous testons un monstre de puissance qui promet de révolutionner le gaming portable.</p>
-      
-      <h2>Design et construction</h2>
-      <p>Premier contact avec la machine : l'emballage premium annonce la couleur. Le châssis en aluminium brossé respire la qualité, avec un poids de 2.3kg qui reste raisonnable pour un 15 pouces gaming.</p>
-      
-      <p>Les finitions sont impeccables, sans aucun jeu dans l'assemblage. Le clavier RGB personnalisable offre une frappe agréable avec 1.8mm de course. Le trackpad, large et précis, supporte tous les gestes multitouch.</p>
-      
-      <h2>Performances</h2>
-      <p>C'est là que les choses deviennent intéressantes. Le processeur Intel Core i9 14900K couplé à la RTX 5090 Mobile pulvérise tous les benchmarks que nous lui avons soumis :</p>
-      
-      <ul>
-        <li><strong>Cyberpunk 2077 (Ultra, Ray Tracing):</strong> 110 FPS moyens en 1440p</li>
-        <li><strong>Baldur's Gate 3:</strong> 165 FPS constants en ultra</li>
-        <li><strong>Red Dead Redemption 2:</strong> 98 FPS en paramètres maximums</li>
-      </ul>
-      
-      <p>En production vidéo (Premiere Pro, DaVinci Resolve), le rendu 4K est fluide et les exports sont jusqu'à 40% plus rapides qu'avec la génération précédente.</p>
-      
-      <h2>Écran</h2>
-      <p>L'écran IPS 15.6" en QHD (2560x1440) avec 240Hz est une pure merveille. La colorimétrie est excellente (100% sRGB, 95% DCI-P3) et la luminosité de 500 nits permet de jouer même en extérieur.</p>
-      
-      <h2>Autonomie</h2>
-      <p>Le talon d'Achille des PC gaming ? Pas vraiment ici. La batterie 99Wh tient 6h en usage bureautique et 2h30 en gaming intense. Le mode "silence" permet de gagner encore 30% d'autonomie.</p>
-      
-      <h2>Système de refroidissement</h2>
-      <p>Le système "Vapor Chamber" à 5 caloducs et double ventilateur maintient les températures sous contrôle. En charge maximale, le CPU reste à 78°C et le GPU à 82°C, des valeurs excellentes.</p>
-      
-      <h2>Verdict</h2>
-      <p>Avec un tarif de 2 499 000 FCFA, ce PC gaming n'est pas donné. Mais pour ce prix, vous obtenez LA machine ultime capable de tout faire : gaming 1440p ultra fluide, montage vidéo 4K, développement... Un investissement durable pour 4-5 ans minimum.</p>
-      
-      <h3>Points forts</h3>
-      <ul>
-        <li>Performances exceptionnelles</li>
-        <li>Écran 240Hz sublime</li>
-        <li>Refroidissement efficace</li>
-        <li>Qualité de construction</li>
-        <li>Autonomie correcte pour un gaming laptop</li>
-      </ul>
-      
-      <h3>Points faibles</h3>
-      <ul>
-        <li>Prix élevé</li>
-        <li>Poids conséquent (2.3kg)</li>
-        <li>Chauffe en charge (normale pour la puissance)</li>
-        <li>Webcam 720p (aurait pu être 1080p)</li>
-      </ul>
-      
-      <div class="rating-box">
-        <h3>Note finale: 9/10</h3>
-        <p>Un PC gaming d'exception qui justifie pleinement son prix premium. Recommandé sans hésitation pour les gamers exigeants et créateurs de contenu.</p>
-      </div>
-    `,
-    category: "test",
-    author: { 
-      name: "Mamadou Diop", 
-      avatar: "/avatar1.jpg",
-      bio: "Expert hardware et passionné de gaming depuis 15 ans"
-    },
-    image: "/blog/gaming-pc.jpg",
-    readTime: 8,
-    viewCount: 1542,
-    publishedAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
-    tags: ["Gaming", "PC", "Hardware", "Test"],
-    relatedProductIds: ["prod1", "prod2", "prod3"]
-  });
-
-  const getDemoRelatedArticles = () => [
-    {
-      _id: "2",
-      title: "Guide : Choisir sa carte graphique en 2025",
-      slug: "guide-carte-graphique-2025",
-      image: "/blog/gpu-guide.jpg",
-      category: "guide",
-      readTime: 10
-    },
-    {
-      _id: "3",
-      title: "Les meilleurs PC gaming à moins de 1 million FCFA",
-      slug: "meilleurs-pc-gaming-budget",
-      image: "/blog/budget-gaming.jpg",
-      category: "guide",
-      readTime: 7
-    },
-    {
-      _id: "4",
-      title: "RTX 5090 vs RTX 4090 : faut-il upgrader ?",
-      slug: "rtx-5090-vs-4090",
-      image: "/blog/gpu-comparison.jpg",
-      category: "comparison",
-      readTime: 6
-    }
-  ];
 
   const shareArticle = (platform) => {
     const url = window.location.href;
@@ -259,9 +158,9 @@ const ArticleDetails = ({ article: initialArticle, related: initialRelated }) =>
               <span>{cat.icon}</span>
               {cat.label}
             </span>
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mt-4 leading-tight max-w-3xl font-display">
+            <h2 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mt-4 leading-tight max-w-3xl font-display">
               {article.title}
-            </h1>
+            </h2>
             {article.excerpt && (
               <p className="text-lg text-white/70 mt-4 max-w-2xl leading-relaxed">
                 {article.excerpt}
@@ -395,9 +294,35 @@ const ArticleDetails = ({ article: initialArticle, related: initialRelated }) =>
             <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-lg p-6 md:p-8 mt-8">
               <h2 className="text-xl font-bold text-surface-900 dark:text-white mb-6">Produits mentionnés</h2>
               <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
-                <div className="text-center text-surface-400 dark:text-surface-500 col-span-full text-sm py-6">
-                  Les produits mentionnés dans l&apos;article apparaîtront ici
-                </div>
+                {relatedProducts.map((product) => (
+                  <Link
+                    key={product._id}
+                    href={`/products/${product.slug || product._id}`}
+                    className="group flex flex-col bg-surface-50 dark:bg-surface-700/40 rounded-xl overflow-hidden border border-surface-100 dark:border-surface-700 hover:shadow-lg transition"
+                  >
+                    {product.images?.[0]?.url && (
+                      <div className="aspect-square bg-white overflow-hidden">
+                        <img
+                          src={product.images[0].url}
+                          alt={product.name}
+                          loading="lazy"
+                          onError={(e) => { e.currentTarget.style.display = "none"; }}
+                          className="w-full h-full object-contain group-hover:scale-105 transition duration-300"
+                        />
+                      </div>
+                    )}
+                    <div className="p-4">
+                      <h3 className="font-bold text-surface-900 dark:text-white group-hover:text-brand-600 transition line-clamp-2 mb-2 text-sm">
+                        {product.name}
+                      </h3>
+                      {product.price != null && (
+                        <p className="text-sm font-bold text-brand-600 dark:text-brand-400">
+                          {product.price.toLocaleString()} FCFA
+                        </p>
+                      )}
+                    </div>
+                  </Link>
+                ))}
               </div>
             </div>
           )}

@@ -81,20 +81,20 @@ const CATEGORY_SEO = {
     title: "Climatiseur Dakar — Inverter au Meilleur Prix | Sénégal",
     h1: "Climatiseurs & Climatisation",
     description: "Climatiseur split ou inverter au bon prix à Dakar, livré et installé par nos techniciens au Sénégal. Rafraîchissez votre maison avec un climatiseur adapté.",
-    descriptionLong: "Le climatiseur idéal existe pour chaque pièce : split inverter économe pour la chambre, gainable pour le salon. Nous livrons, installons et entretenons votre climatisation à Dakar, avec un prix transparent et une garantie de 12 mois.",
+    descriptionLong: "Le climatiseur idéal existe pour chaque pièce : split inverter économe pour la chambre, gainable pour le salon. Nous livrons, installons et entretenons votre climatisation à Dakar, avec un prix transparent et une garantie constructeur.",
     keywords: ["climatiseur Dakar", "climatiseur prix Sénégal"],
     faqs: [
-      { q: "Proposez-vous l'installation ?", a: "Oui, nous avons des techniciens certifiés pour l'installation à Dakar et banlieue." },
+      { q: "Proposez-vous l'installation ?", a: "Oui, nous proposons l'installation de vos climatiseurs à Dakar et banlieue par notre équipe." },
     ],
   },
   'energie-solaire': {
     title: "Énergie Solaire & Panneaux Solaires à Dakar | Tekalis Sénégal",
     h1: "Énergie Solaire",
     description: "Kits solaires, panneaux photovoltaïques et batteries pour maison au Sénégal. Solutions d'autonomie énergétique à Dakar. Installation professionnelle disponible. Prix compétitifs.",
-    descriptionLong: "Avec le fort ensoleillement du Sénégal, l'énergie solaire est la solution idéale pour réduire vos factures d'électricité. Tekalis propose des kits solaires complets pour particuliers et entreprises à Dakar : panneaux monocristallins haute performance, batteries lithium, onduleurs hybrides. Installation professionnelle et garantie 5 ans sur les panneaux.",
+    descriptionLong: "Avec le fort ensoleillement du Sénégal, l'énergie solaire est une solution pour réduire vos factures d'électricité. Tekalis propose des kits solaires pour particuliers et entreprises à Dakar : panneaux solaires, batteries et onduleurs. Installation professionnelle disponible.",
     keywords: ["panneau solaire Dakar", "kit solaire Sénégal", "énergie solaire maison Dakar", "prix panneau solaire Sénégal"],
     faqs: [
-      { q: "Quelle capacité solaire pour une maison moyenne ?", a: "Un kit 3KW suffit pour une maison de 3-4 pièces avec climatiseur. Contactez-nous pour un devis personnalisé." },
+      { q: "Quelle capacité solaire pour une maison ?", a: "La capacité dépend de vos appareils et de votre consommation. Contactez-nous pour un devis personnalisé." },
     ],
   },
   accessoires: {
@@ -241,10 +241,10 @@ const CategoryPage = ({ products: initialProducts = [], seo: initialSeo, slug: i
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
             <div>
               {/* H1 avec mots-clés — CRITIQUE pour le SEO */}
-              <h1 className="text-2xl md:text-3xl font-bold text-surface-900 dark:text-white mb-2 font-display">
+              <h2 className="text-2xl md:text-3xl font-bold text-surface-900 dark:text-white mb-2 font-display">
                 {seo.h1}
                 <span className="text-brand-600"> à Dakar</span>
-              </h1>
+              </h2>
               <p className="text-surface-600 text-sm md:text-base leading-relaxed max-w-2xl">
                 {seo.description}
               </p>
@@ -369,7 +369,7 @@ const CategoryPage = ({ products: initialProducts = [], seo: initialSeo, slug: i
           </aside>
 
           {/* ── GRILLE PRODUITS ───────────────────────────────────────── */}
-          <main className="flex-1">
+          <div className="flex-1">
 
             {/* Barre d'outils */}
             <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-card p-4 mb-4 flex items-center justify-between border border-surface-100">
@@ -437,7 +437,7 @@ const CategoryPage = ({ products: initialProducts = [], seo: initialSeo, slug: i
                 </div>
               </div>
             )}
-          </main>
+          </div>
         </div>
       </div>
     </div>
