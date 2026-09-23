@@ -67,6 +67,7 @@ const listProducts = async (req, res, { includeInactiveCategories = false } = {}
       minPrice,
       maxPrice,
       featured,
+      homepageSection,
       fields
     } = req.query;
 
@@ -83,6 +84,11 @@ const listProducts = async (req, res, { includeInactiveCategories = false } = {}
     if (brand) filter.brand = { $regex: new RegExp(escapeRegex(brand), "i") };
     if (status) filter.status = status;
     if (featured === "true") filter.isFeatured = true;
+    // "homepageSection" (new / bestseller / promo) : retourne exactement les
+    // produits choisis en admin pour cette section de la page d'accueil.
+    if (homepageSection && homepageSection !== "none") {
+      filter.homepageSection = homepageSection;
+    }
     if (minPrice || maxPrice) {
       filter.price = {};
       if (minPrice) filter.price.$gte = Number(minPrice);

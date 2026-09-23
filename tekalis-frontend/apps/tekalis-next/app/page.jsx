@@ -24,22 +24,35 @@ export const metadata = {
 export const revalidate = 300;
 
 async function getHomeData() {
-  const [productsData, articlesData] = await Promise.allSettled([
-    serverFetch('/products', { revalidate: 300 }),
+  // DFT-1 : les sections de l'accueil sont alimentées par des requêtes DÉDIÉES
+  // (homepageSection + limit=8) et non plus filtrées dans un lot de 20 produits.
+  // Le pool (limit=200) ne sert qu'au repli quand une section n'est pas
+  // renseignée en admin (vedettes / plus récents / ventes / prix barré).
+  const [poolRes, newRes, bestRes, promoRes, articlesRes] = await Promise.allSettled([
+    serverFetch('/products?limit=200', { revalidate: 300 }),
+    serverFetch('/products?homepageSection=new&limit=8', { revalidate: 300 }),
+    serverFetch('/products?homepageSection=bestseller&limit=8', { revalidate: 300 }),
+    serverFetch('/products?homepageSection=promo&limit=8', { revalidate: 300 }),
     serverFetch('/articles?limit=3'),
   ]);
 
-  const products =
-    productsData.status === 'fulfilled'
-      ? productsData.value?.data || productsData.value?.products || productsData.value || []
+  const unwrap = (res) =>
+    res.status === 'fulfilled'
+      ? res.value?.data || res.value?.products || (Array.isArray(res.value) ? res.value : [])
       : [];
 
   const articles =
-    articlesData.status === 'fulfilled'
-      ? articlesData.value?.articles || articlesData.value?.data || []
+    articlesRes.status === 'fulfilled'
+      ? articlesRes.value?.articles || articlesRes.value?.data || []
       : [];
 
-  return { products, articles };
+  return {
+    products: unwrap(poolRes),
+    newProducts: unwrap(newRes),
+    bestProducts: unwrap(bestRes),
+    promoProducts: unwrap(promoRes),
+    articles,
+  };
 }
 
 // Schema.org WebSite (boîte de recherche Google)
@@ -56,7 +69,7 @@ const websiteSchema = {
 };
 
 export default async function HomePage() {
-  const { products, articles } = await getHomeData();
+  const { products, newProducts, bestProducts, promoProducts, articles } = await getHomeData();
 
   return (
     <>
@@ -70,7 +83,13 @@ export default async function HomePage() {
         Tekalis — Boutique électronique high-tech à Dakar Fann, livraison partout au Sénégal
       </h1>
       {/* Passe les données SSR au composant client pour SEO */}
-      <HomeClient initialProducts={products} initialArticles={articles} />
+      <HomeClient
+        initialProducts={products}
+        initialNew={newProducts}
+        initialBest={bestProducts}
+        initialPromo={promoProducts}
+        initialArticles={articles}
+      />
       {/* Contenu SEO server-rendered : volume, maillage interne, NAP, FAQ */}
       <HomeSeoContent />
     </>

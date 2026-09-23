@@ -2,8 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useDispatch, useSelector } from "react-redux";
-import { fetchProducts } from "@/store/slices/productSlice";
 import DynamicHero from "@/components/home/DynamicHero";
 import {
   FaChevronLeft,
@@ -75,19 +73,19 @@ const HOME_SCHEMA = {
   ],
 };
 
-const Home = ({ initialProducts = [], initialArticles = [] }) => {
-  const dispatch = useDispatch();
-  const { allProducts: reduxProducts, loading: isLoading } = useSelector((state) => state.products);
-  
+const Home = ({
+  initialProducts = [],
+  initialNew = [],
+  initialBest = [],
+  initialPromo = [],
+  initialArticles = [],
+}) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [bestSellers, setBestSellers] = useState([]);
   const [promoProducts, setPromoProducts] = useState([]);
   const [articles, setArticles] = useState(initialArticles);
   const [loading, setLoading] = useState(false);
-  
-  // Données fraîches (Redux) dès qu'elles sont chargées, sinon les données SSR initiales
-  const products = !isLoading && reduxProducts.length > 0 ? reduxProducts : initialProducts;
    
   useEffect(() => {
     const fetchArticles = async () => {
@@ -107,44 +105,70 @@ const Home = ({ initialProducts = [], initialArticles = [] }) => {
     fetchArticles();
   }, [initialArticles]);
 
-  useEffect(() => {
-    // Charger les produits via Redux pour les interactions client
-    dispatch(fetchProducts());
-  }, [dispatch]);
+  // ── Sections accueil ────────────────────────────────────────────────────────
+  // Les produits "choisis en admin" (champ homepageSection) sont récupérés via
+  // des requêtes DÉDIÉES (limit=8) et non plus filtrés dans un lot de 20
+  // produits. Une section non renseignée en admin retombe sur un repli calculé
+  // depuis le pool complet : vedettes → plus récents / ventes+note / prix barré.
+  const extractProducts = (d) =>
+    Array.isArray(d) ? d
+    : Array.isArray(d?.data) ? d.data
+    : Array.isArray(d?.products) ? d.products
+    : [];
 
-  useEffect(() => {
-    if (products && products.length > 0) {
-      // Section "Nouveautés" : produits choisis en admin,
-      // sinon les produits en vedette, sinon les plus récents
-      let newItems = products.filter(p => p.homepageSection === "new");
-      if (newItems.length === 0) newItems = products.filter(p => p.isFeatured);
-      if (newItems.length === 0) {
-        newItems = [...products].sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        );
-      }
-      setFeaturedProducts(newItems.slice(0, 8));
+  const resolveSections = (pool, sections) => {
+    const { newItems = [], best = [], promos = [] } = sections || {};
+    const poolList = Array.isArray(pool) ? pool : [];
 
-      // Section "Meilleures ventes" : produits choisis en admin,
-      // sinon classés par ventes / note
-      let best = products.filter(p => p.homepageSection === "bestseller");
-      if (best.length === 0) {
-        best = [...products].sort((a, b) =>
-          (b.salesCount || 0) - (a.salesCount || 0) ||
-          (b.rating?.average || 0) - (a.rating?.average || 0)
-        );
-      }
-      setBestSellers(best.slice(0, 8));
-
-      // Section "Promotions" : produits choisis en admin,
-      // sinon ceux affichant un prix barré (remise)
-      let promos = products.filter(p => p.homepageSection === "promo");
-      if (promos.length === 0) {
-        promos = products.filter(p => p.comparePrice && p.comparePrice > p.price);
-      }
-      setPromoProducts(promos.slice(0, 8));
+    let newRes = newItems.length ? newItems : poolList.filter(p => p.isFeatured);
+    if (newRes.length === 0) {
+      newRes = [...poolList].sort(
+        (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+      );
     }
-  }, [products]);
+    setFeaturedProducts(newRes.slice(0, 8));
+
+    let bestRes = best.length ? best : [...poolList].sort((a, b) =>
+      (b.salesCount || 0) - (a.salesCount || 0) ||
+      (b.rating?.average || 0) - (a.rating?.average || 0)
+    );
+    setBestSellers(bestRes.slice(0, 8));
+
+    let promoRes = promos.length ? promos : poolList.filter(p => p.comparePrice && p.comparePrice > p.price);
+    setPromoProducts(promoRes.slice(0, 8));
+  };
+
+  useEffect(() => {
+    // 1) Rendu immédiat avec les données SSR…
+    resolveSections(initialProducts, {
+      newItems: initialNew,
+      best: initialBest,
+      promos: initialPromo,
+    });
+
+    // 2) …puis rafraîchissement côté client (requêtes dédiées, limit=8).
+    let cancelled = false;
+    (async () => {
+      try {
+        const [newRes, bestRes, promoRes, poolRes] = await Promise.all([
+          api.get('/products?homepageSection=new&limit=8'),
+          api.get('/products?homepageSection=bestseller&limit=8'),
+          api.get('/products?homepageSection=promo&limit=8'),
+          api.get('/products?limit=200'),
+        ]);
+        if (cancelled) return;
+        resolveSections(extractProducts(poolRes.data), {
+          newItems: extractProducts(newRes.data),
+          best: extractProducts(bestRes.data),
+          promos: extractProducts(promoRes.data),
+        });
+      } catch {
+        // API injoignable → on conserve les données SSR déjà rendues.
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [initialProducts, initialNew, initialBest, initialPromo]);
 
 
   const slides = [
@@ -259,23 +283,11 @@ const Home = ({ initialProducts = [], initialArticles = [] }) => {
           </Link>
         </div>
 
-        {isLoading ? (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="bg-white dark:bg-surface-800 rounded-2xl shadow-card p-4 animate-pulse border border-surface-100 dark:border-surface-700">
-                <div className="bg-surface-200 dark:bg-surface-700 aspect-square rounded-xl mb-4"></div>
-                <div className="bg-surface-200 dark:bg-surface-700 h-4 rounded-lg mb-2"></div>
-                <div className="bg-surface-200 dark:bg-surface-700 h-4 rounded-lg w-2/3"></div>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {featuredProducts.map((product) => (
-              <ProductCard key={product._id} product={product} />
-            ))}
-          </div>
-        )}
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          {featuredProducts.map((product) => (
+            <ProductCard key={product._id} product={product} />
+          ))}
+        </div>
       </section>
 
       {/* Best-sellers */}
