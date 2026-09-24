@@ -131,7 +131,10 @@ async function getCategoryBySlug(slug) {
     }, []);
     return flat.find((c) => c.slug === slug) || null;
   } catch {
-    return null;
+    // API indisponible (build Vercel, rate-limit 429, cold start Render) :
+    // on ne doit PAS retourner 404 ici — la page se rend avec le repli SEO
+    // et le composant client rafraîchit les produits.
+    return { apiError: true };
   }
 }
 
@@ -170,11 +173,18 @@ export default async function CategoryPage({ params }) {
   };
 
   const category = await getCategoryBySlug(slug);
-  if (!category) {
+
+  // 404 UNIQUEMENT si l'API a répondu et qu'aucune catégorie ne correspond.
+  // Si l'API est injoignable (build / rate-limit), on rend la page avec le
+  // repli SEO et le client component charge les produits.
+  const apiUnavailable = category?.apiError === true;
+  if (!category && !apiUnavailable) {
     notFound();
   }
 
-  const products = await getProductsByCategory(category._id);
+  const products = apiUnavailable
+    ? []
+    : await getProductsByCategory(category._id);
 
   const schema = {
     '@context': 'https://schema.org',
