@@ -24,6 +24,49 @@ const pickFields = (source, allowedKeys) => {
 };
 
 // ===============================================
+// Slug : unicité SANS toucher à l'URL du premier produit.
+//
+// L'ancien panel admin ajoutait `Date.now()` à chaque import, ce qui
+// produisait /products/<nom>-1790729696190 : la même fiche changeait d'URL
+// à chaque réimport et toutes les URL déjà indexées passaient en 404.
+// Ici on garde le slug tel quel s'il est libre, et on ne suffixe qu'en cas
+// de vrai conflit (-2, -3, ...), ce qui est déterministe et lisible.
+// Conséquence : réimporter le même catalogue conserve les URL.
+//
+// slugify() n'est qu'un filet de sécurité pour un produit créé SANS slug.
+// Il suit generateSlug() du panel admin : toute suite de non alphanumériques
+// (points décimaux, apostrophes, slashes) devient un seul tiret, donc
+// "3.0" -> "3-0" et "d'Air" -> "d-air". En import, le slug vient de la
+// colonne `slug` du fichier et traverse resolveUniqueSlug() intact
+// (175/179 identiques au pipeline ; les 4 écarts sont des slugs édités à la
+// main dans sources.csv, pas une règle). Ne jamais régénérer un slug
+// existant depuis le nom : cela changerait l'URL d'un produit indexé.
+// ===============================================
+const slugify = (text) =>
+
+  String(text || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)/g, "");
+
+const resolveUniqueSlug = async (baseSlug, excludeId = null) => {
+  const base = baseSlug || "produit";
+  const query = (slug) =>
+    excludeId ? Product.findOne({ slug, _id: { $ne: excludeId } }) : Product.findOne({ slug });
+
+  if (!(await query(base))) return base;
+
+  for (let i = 2; i <= 200; i++) {
+    const candidate = `${base}-${i}`;
+    if (!(await query(candidate))) return candidate;
+  }
+  // Repli : on ne bloque jamais la création sur un slug exotique.
+  return `${base}-${Date.now()}`;
+};
+
+// ===============================================
 // Utilitaire : résoudre les catégories
 // ===============================================
 const resolveCategoryIds = async (categoryInput) => {
@@ -221,15 +264,9 @@ exports.createProduct = async (req, res) => {
     };
 
     if (!productData.slug && productData.name) {
-      productData.slug = productData.name
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^a-z0-9\s-]/g, "")
-        .replace(/\s+/g, "-")
-        .replace(/-+/g, "-")
-        .trim();
+      productData.slug = slugify(productData.name);
     }
+    productData.slug = await resolveUniqueSlug(productData.slug);
 
     const product = await Product.create(productData);
 
@@ -288,14 +325,11 @@ exports.bulkCreateProducts = async (req, res) => {
         };
 
         if (!productData.slug && productData.name) {
-          productData.slug = productData.name
-            .toLowerCase()
-            .normalize("NFD")
-            .replace(/[\u0300-\u036f]/g, "")
-            .replace(/[^a-z0-9\s-]/g, "")
-            .replace(/\s+/g, "-")
-            .trim();
+          productData.slug = slugify(productData.name);
         }
+        // Ne suffixe que si le slug est vraiment pris : réimporter le
+        // catalogue conserve alors les URL d'origine.
+        productData.slug = await resolveUniqueSlug(productData.slug);
 
         const product = await Product.create(productData);
         results.success.push({ name: product.name, id: product._id });
@@ -367,6 +401,12 @@ exports.updateProduct = async (req, res) => {
     });
   } catch (error) {
     console.error("❌ Erreur updateProduct:", error);
+    if (error.code === 11000 && error.keyPattern?.slug) {
+      return res.status(409).json({
+        success: false,
+        message: `Un autre produit utilise déjà le slug : ${error.keyValue?.slug}`
+      });
+    }
     if (error.name === "ValidationError") {
       const messages = Object.values(error.errors).map(e => e.message);
       return res.status(400).json({ success: false, message: "Données invalides", details: messages });

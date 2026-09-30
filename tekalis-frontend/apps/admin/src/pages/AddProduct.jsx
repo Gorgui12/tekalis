@@ -77,14 +77,17 @@ const AddProduct = () => {
   // UTILITAIRES
   // ══════════════════════════════════════════════════════════════
 
+  // Slug lisible et stable. Pas de Date.now() : l'API backend suffixe
+  // uniquement si le slug est déjà pris (-2, -3...), donc réimporter ou
+  // corriger un produit ne change pas son URL — ce qui est vital pour ne
+  // pas casser les URL déjà indexées par Google.
   const generateSlug = (name) => {
     return name
       .toLowerCase()
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
       .replace(/[^a-z0-9]+/g, "-")
-      .replace(/(^-|-$)/g, "")
-      + "-" + Date.now(); // suffixe pour garantir l'unicité
+      .replace(/(^-|-$)/g, "");
   };
 
   // ══════════════════════════════════════════════════════════════
@@ -220,10 +223,11 @@ const AddProduct = () => {
 
     return {
       name: row.name || "",
-      // slug unique : timestamp suffix évite les doublons
-      slug: row.slug
-        ? `${row.slug}-${Date.now()}`
-        : generateSlug(row.name || "produit"),
+      // Slug propre, SANS suffixe Date.now() : l'API backend ne suffixe
+      // que si le slug est déjà pris (-2, -3...). Un timestamp ici
+      // changeait l'URL du produit à chaque réimport et faisait passer
+      // en 404 toutes les URL déjà indexées par Google.
+      slug: row.slug ? row.slug : generateSlug(row.name || "produit"),
       description: row.description || "",
       price: Number(row.price) || 0,
       comparePrice: row.comparePrice ? Number(row.comparePrice) : undefined,

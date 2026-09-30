@@ -79,7 +79,7 @@ articleSchema.index({ status: 1, publishedAt: -1 });
 
 // Générer slug
 articleSchema.pre("save", function(next) {
-  if (this.isModified("title")) {
+  if (this.isModified("title") && !this.slug) {
     this.slug = this.title
       .toLowerCase()
       .replace(/[^a-z0-9]+/g, "-")
