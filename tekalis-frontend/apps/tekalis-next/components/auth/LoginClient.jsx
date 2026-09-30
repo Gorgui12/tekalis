@@ -9,6 +9,7 @@ import {
 } from "react-icons/fa";
 import useAuth from "@/lib/hooks/useAuth";
 import { useToast } from "@/components/shared/ToastProvider";
+import GoogleButton from "@/components/auth/GoogleButton";
 
 function Login() {
   const router = useRouter();
@@ -17,7 +18,7 @@ const navigate = (path) => router.push(path);
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const toast     = useToast();
-  const { login, loading } = useAuth();
+  const { login, googleLogin, loading } = useAuth();
 
   const [formData,    setFormData]    = useState({ email: "", password: "" });
   const [showPw,      setShowPw]      = useState(false);
@@ -77,6 +78,29 @@ const navigate = (path) => router.push(path);
         toast.error(msg);
       }
       setErrors({ password: " " }); // highlight sans texte dupliqué
+    }
+  };
+
+  /* ── Connexion via Google ─────────────────────────────────────────────── */
+  const handleGoogle = async (credential) => {
+    const result = await googleLogin(credential);
+
+    if (result.success) {
+      const { user, isNewAccount } = result.data;
+      toast.success(
+        isNewAccount
+          ? `Compte créé. Bienvenue ${user?.name || ""} !`
+          : `Bienvenue ${user?.name || "utilisateur"} !`
+      );
+      setTimeout(() => {
+        navigate(user?.isAdmin ? "/admin" : from, { replace: true });
+      }, 300);
+    } else {
+      const payload = result.error;
+      const msg =
+        (typeof payload === "object" && (payload?.message || payload?.data?.message)) ||
+        "Connexion Google impossible. Réessayez.";
+      toast.error(msg);
     }
   };
 
@@ -149,6 +173,20 @@ const navigate = (path) => router.push(path);
                   S'inscrire gratuitement
                 </Link>
               </p>
+            </div>
+
+            {/* Google — chemin le plus rapide, placé au-dessus du formulaire */}
+            <GoogleButton onCredential={handleGoogle} text="Continuer avec Google" />
+
+            <div className="relative my-5">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-surface-200 dark:border-surface-700" />
+              </div>
+              <div className="relative flex justify-center">
+                <span className="px-3 bg-white dark:bg-surface-800 text-xs text-surface-400">
+                  ou avec votre email
+                </span>
+              </div>
             </div>
 
             <form onSubmit={handleSubmit} noValidate className="space-y-4">

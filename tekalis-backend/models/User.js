@@ -30,9 +30,33 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: [true, "Le mot de passe est requis"],
+      // Un compte créé via Google n'a jamais choisi de mot de passe : on
+      // lui en generates un aléatoire (voir authController.googleLogin) et
+      // on n'exige donc le champ que pour une inscription classique.
+      // Le garde `isNew` évite qu'une modification de profil d'un compte
+      // Google sans mot de passe ne fasse échouer la validation.
+      required: [
+        function () { return this.isNew && !this.googleId; },
+        "Le mot de passe est requis"
+      ],
       minlength: [6, "Le mot de passe doit contenir au moins 6 caractères"],
       select: false // Ne pas retourner le mot de passe par défaut
+    },
+    // ── Connexion via un fournisseur externe (Google) ──────────────────────
+    // googleId = identifiant opaque "sub" de l'ID token Google. C'est la
+    // clé de rattachement fiable : un email seul peut changer chez Google.
+    // Pas de `default` : un compte sans Google doit voir le champ ABSENT
+    // de son document, sinon l'index unique ci-dessous le ferait entrer en
+    // conflit avec tous les autres comptes sans Google (voir sparse).
+    googleId: {
+      type: String
+    },
+    // Méthodes de connexion actives sur ce compte : "password" et/ou
+    // "google". Permet d'afficher « connecté avec Google » côté profil.
+    authProviders: {
+      type: [String],
+      enum: ["password", "google"],
+      default: ["password"]
     },
     phone: {
       type: String,
@@ -91,5 +115,14 @@ userSchema.methods.toSafeObject = function () {
 // Index pour les recherches
 userSchema.index({ isAdmin: 1 });
 userSchema.index({ createdAt: -1 });
+// Un compte Google ne peut être rattaché qu'une seule fois.
+// Index PARTIEL et non `sparse` : `sparse` ne saute que les documents où le
+// champ est absent, pas ceux où il vaut null — avec un `default: null` tous
+// les comptes par mot de passe se seraient entrechoqué sur { googleId: null }.
+// Le filtre sur le type string rend la contrainte explicite et robuste.
+userSchema.index(
+  { googleId: 1 },
+  { unique: true, partialFilterExpression: { googleId: { $type: "string" } } }
+);
 
 module.exports = mongoose.model("User", userSchema);

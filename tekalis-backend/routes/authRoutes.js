@@ -10,6 +10,9 @@ router.post("/register", authValidation.register, authController.register);
 // POST /api/v1/auth/login
 router.post("/login", authValidation.login, authController.login);
 
+// POST /api/v1/auth/google — connexion / inscription via Google
+router.post("/google", authValidation.googleLogin, authController.googleLogin);
+
 // POST /api/v1/auth/admin/register — protégé: admin uniquement
 router.post("/admin/register", verifyToken, isAdmin, authController.registerAdmin);
 

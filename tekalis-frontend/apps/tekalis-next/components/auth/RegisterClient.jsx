@@ -4,7 +4,9 @@ import { useState } from "react";
 import Link from "next/link"; import { useRouter } from "next/navigation";
 import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaSpinner, FaCheckCircle } from "react-icons/fa";
 import api from "@/lib/api";
+import useAuth from "@/lib/hooks/useAuth";
 import { useToast } from "@/components/shared/ToastProvider";
+import GoogleButton from "@/components/auth/GoogleButton";
 
 /* ── Règles de validation mot de passe ────────────────────────────────── */
 const PASSWORD_RULES = [
@@ -18,6 +20,7 @@ function Register() {
   const toast    = useToast();
   const router = useRouter();
   const navigate = (path) => router.push(path);
+  const { googleLogin } = useAuth();
 
   const [formData, setFormData] = useState({ name: "", email: "", password: "", confirm: "" });
   const [showPw,   setShowPw]   = useState(false);
@@ -66,6 +69,31 @@ function Register() {
       const msg = err.response?.data?.message || "Erreur lors de l'inscription. Réessayez.";
       toast.error(msg);
       if (msg.toLowerCase().includes("email")) setErrors({ email: msg });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  /* ── Inscription via Google ───────────────────────────────────────────── */
+  // Contrairement à /register par mot de passe, l'inscription Google
+  // connecter immédiatement : on n'impose donc pas de repasser par /login.
+  const handleGoogle = async (credential) => {
+    setLoading(true);
+    try {
+      const result = await googleLogin(credential);
+      if (!result.success) {
+        const msg =
+          (typeof result.error === "object" &&
+            (result.error?.message || result.error?.data?.message)) ||
+          "Inscription avec Google impossible. Réessayez.";
+        toast.error(msg);
+        return;
+      }
+      const { user, isNewAccount } = result.data;
+      toast.success(
+        isNewAccount ? "Compte créé avec Google 🎉" : `Ravi de vous revoir, ${user?.name || ""} !`
+      );
+      setTimeout(() => navigate("/dashboard"), 300);
     } finally {
       setLoading(false);
     }
@@ -144,6 +172,19 @@ function Register() {
                   Se connecter
                 </Link>
               </p>
+            </div>
+
+            <GoogleButton onCredential={handleGoogle} text="S'inscrire avec Google" />
+
+            <div className="relative my-5">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-surface-200 dark:border-surface-700" />
+              </div>
+              <div className="relative flex justify-center">
+                <span className="px-3 bg-white dark:bg-surface-800 text-xs text-surface-400">
+                  ou avec votre email
+                </span>
+              </div>
             </div>
 
             <form onSubmit={handleSubmit} noValidate className="space-y-4">

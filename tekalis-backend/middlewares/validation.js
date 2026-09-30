@@ -45,6 +45,21 @@ const authValidation = {
     body("password")
       .notEmpty().withMessage("Le mot de passe est requis"),
     validate
+  ],
+  googleLogin: [
+    // Validateur unique volontairement : sur un champ opaque, une seule
+    // erreur claire vaut mieux que trois messages qui se répètent. (.bail()
+    // ne court-circuite qu'entre chaînes, pas au sein d'une même chaîne.)
+    body("idToken").custom((value) => {
+      if (typeof value !== "string") {
+        throw new Error("Jeton Google manquant ou invalide");
+      }
+      if (value.length < 20 || value.length > 4096) {
+        throw new Error("Jeton Google manquant ou invalide");
+      }
+      return true;
+    }),
+    validate
   ]
 };
 

@@ -2,7 +2,7 @@
 
 import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
-import { loginUser, registerUser, updateProfile, logout } from "@/store/slices/authSlice";
+import { loginUser, registerUser, googleLogin, updateProfile, logout } from "@/store/slices/authSlice";
 
 const useAuth = () => {
   const dispatch = useDispatch();
@@ -26,6 +26,18 @@ const useAuth = () => {
   const handleRegister = async (userData) => {
     try {
       const result = await dispatch(registerUser(userData)).unwrap();
+      return { success: true, data: result };
+    } catch (err) {
+      return { success: false, error: err };
+    }
+  };
+
+  // `credential` est l'ID token fourni par Google Identity Services.
+  // Contrairement à login(), on renvoie l'objet complet (message serveur,
+  // isNewAccount) car le front en a besoin pour adapter son message.
+  const handleGoogleLogin = async (credential) => {
+    try {
+      const result = await dispatch(googleLogin(credential)).unwrap();
       return { success: true, data: result };
     } catch (err) {
       return { success: false, error: err };
@@ -71,6 +83,7 @@ const useAuth = () => {
     error,
     login: handleLogin,
     register: handleRegister,
+    googleLogin: handleGoogleLogin,
     logout: handleLogout,
     updateProfile: handleUpdateProfile,
     isAdmin,

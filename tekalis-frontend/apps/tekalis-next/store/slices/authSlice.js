@@ -31,6 +31,21 @@ export const registerUser = createAsyncThunk("auth/register", async (userData, {
   }
 });
 
+export const googleLogin = createAsyncThunk("auth/google", async (idToken, { rejectWithValue }) => {
+  try {
+    const { data } = await api.post("/auth/google", { idToken });
+    if (typeof window !== "undefined") {
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+    }
+    return data;
+  } catch (err) {
+    console.error("Google login error:", err.response?.status, err.message);
+    const errorMessage = err.response?.data?.message || err.response?.data?.error || "Erreur de connexion avec Google";
+    return rejectWithValue({ message: errorMessage, status: err.response?.status });
+  }
+});
+
 export const updateProfile = createAsyncThunk("auth/updateProfile", async (userData, { rejectWithValue }) => {
   try {
     const { data } = await api.put("/auth/profile", userData);
@@ -79,6 +94,9 @@ const authSlice = createSlice({
       .addCase(registerUser.pending, pending)
       .addCase(registerUser.fulfilled, (state, action) => { state.loading = false; state.user = action.payload; })
       .addCase(registerUser.rejected, rejected)
+      .addCase(googleLogin.pending, pending)
+      .addCase(googleLogin.fulfilled, (state, action) => { state.loading = false; state.user = action.payload.user; })
+      .addCase(googleLogin.rejected, rejected)
       .addCase(updateProfile.pending, pending)
       .addCase(updateProfile.fulfilled, (state, action) => { state.loading = false; state.user = action.payload; })
       .addCase(updateProfile.rejected, rejected);

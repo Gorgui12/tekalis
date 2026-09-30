@@ -36,6 +36,10 @@ if (!process.env.ADMIN_EMAIL) {
   console.warn("⚠️  ADMIN_EMAIL non défini. Les notifications de commandes admin seront désactivées.");
 }
 
+if (!process.env.GOOGLE_CLIENT_ID) {
+  console.warn("⚠️  GOOGLE_CLIENT_ID non défini. La connexion avec Google sera désactivée (bouton masqué côté boutique).");
+}
+
 const connectDB = require("./config/database");
 const { notFound, errorHandler } = require("./middlewares/errorHandler");
 
@@ -139,6 +143,7 @@ const adminLimiter = createLimiter({
 app.use(API_PREFIX, apiLimiter);
 app.use(`${API_PREFIX}/auth/login`, authLimiter);
 app.use(`${API_PREFIX}/auth/register`, authLimiter);
+app.use(`${API_PREFIX}/auth/google`, authLimiter);
 app.use(`${API_PREFIX}/admin`, adminLimiter);
 
 // ─── Health Check ─────────────────────────────────────────────────────────────

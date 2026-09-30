@@ -3,6 +3,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const EmailService = require("../services/emailService");
+const GoogleAuthService = require("../services/googleAuthService");
 
 // ===============================================
 // Générer un token JWT
@@ -42,6 +43,33 @@ const clearAuthCookie = (res) => {
 };
 
 // ===============================================
+// Helpers partagés
+// ===============================================
+
+// Domaines email jetables/bloqués (optionnel, via env BLOCKED_EMAIL_DOMAINS).
+// Centralisé pour que l'inscription par mot de passe et l'inscription via
+// Google appliquent exactement la même règle.
+const isBlockedEmailDomain = (email) => {
+  if (!process.env.BLOCKED_EMAIL_DOMAINS) return false;
+  const domain = String(email).toLowerCase().split("@")[1];
+  if (!domain) return false;
+  const blocked = process.env.BLOCKED_EMAIL_DOMAINS.split(",").map(d => d.trim().toLowerCase());
+  return blocked.includes(domain);
+};
+
+// Charge utile commune à register / login / googleLogin : le front et le
+// middleware Next.js s'appuient tous les deux sur cette forme.
+const publicUser = (user) => ({
+  id: user._id,
+  name: user.name,
+  email: user.email,
+  isAdmin: user.isAdmin,
+  phone: user.phone,
+  avatar: user.avatar,
+  authProviders: user.authProviders
+});
+
+// ===============================================
 // POST /api/v1/auth/register
 // CRITIQUE 3 : Ajout de validations anti-abus
 // - Vérification du domaine email (optionnelle via env BLOCKED_EMAIL_DOMAINS)
@@ -65,12 +93,8 @@ exports.register = async (req, res) => {
     }
 
     // CRITIQUE 3 : Blocage de domaines temporaires si configuré
-    if (process.env.BLOCKED_EMAIL_DOMAINS) {
-      const blocked = process.env.BLOCKED_EMAIL_DOMAINS.split(",").map(d => d.trim().toLowerCase());
-      const domain = cleanEmail.split("@")[1];
-      if (blocked.includes(domain)) {
-        return res.status(400).json({ message: "Ce domaine email n'est pas accepté" });
-      }
+    if (isBlockedEmailDomain(cleanEmail)) {
+      return res.status(400).json({ message: "Ce domaine email n'est pas accepté" });
     }
 
     const existingUser = await User.findOne({ email: cleanEmail });
@@ -80,7 +104,12 @@ exports.register = async (req, res) => {
       return res.status(400).json({ message: "Cet email est déjà utilisé" });
     }
 
-    const user = await User.create({ name: cleanName, email: cleanEmail, password });
+    const user = await User.create({
+      name: cleanName,
+      email: cleanEmail,
+      password,
+      authProviders: ["password"]
+    });
 
     const token = generateToken(user._id, user.isAdmin);
 
@@ -97,12 +126,7 @@ exports.register = async (req, res) => {
       success: true,
       message: "Inscription réussie",
       token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        isAdmin: user.isAdmin
-      }
+      user: publicUser(user)
     });
   } catch (error) {
     console.error("❌ Erreur register:", error);
@@ -193,17 +217,161 @@ exports.login = async (req, res) => {
       success: true,
       message: "Connexion réussie",
       token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        isAdmin: user.isAdmin,
-        phone: user.phone,
-        avatar: user.avatar
-      }
+      user: publicUser(user)
     });
   } catch (error) {
     console.error("❌ Erreur login:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// ===============================================
+// POST /api/v1/auth/google
+// Connexion / inscription via Google Identity Services.
+//
+// Le client envoie l'ID token renvoyé par le popup Google. On en vérifie la
+// signature (services/googleAuthService.js) AVANT de lire quoi que ce soit
+// dedans : c'est ce qui empêche un attaquant de se créer un compte avec
+// l'email de quelqu'un d'autre.
+//
+// Trois cas :
+//   1. googleId inconnu          → création du compte
+//   2. email déjà connu          → rattachement (l'email est vérifié par
+//                                  Google, la personne en est donc la
+//                                  titulaire légitime)
+//   3. déjà connecté             → simple connexion
+// ===============================================
+exports.googleLogin = async (req, res) => {
+  try {
+    const { idToken } = req.body;
+
+    if (!idToken) {
+      return res.status(400).json({ message: "Jeton Google manquant" });
+    }
+
+    // 1) Vérifier cryptographiquement le jeton
+    let profile;
+    try {
+      profile = await GoogleAuthService.verifyIdToken(idToken);
+    } catch (err) {
+      if (err.code === "GOOGLE_NOT_CONFIGURED") {
+        console.error("❌ Google Login non configuré :", err.message);
+        return res.status(503).json({
+          message: "La connexion avec Google n'est pas encore disponible."
+        });
+      }
+      console.warn("⚠️ Jeton Google rejeté:", err.message);
+      return res.status(401).json({ message: err.message || "Connexion Google invalide" });
+    }
+
+    // 2) Sans email vérifié, on ne peut pas juger que c'est bien cette
+    //    personne → refus (et non création de compte).
+    if (!profile.emailVerified) {
+      return res.status(400).json({
+        message: "Votre adresse Google n'est pas vérifiée. Vérifiez-la avant de continuer."
+      });
+    }
+
+    if (isBlockedEmailDomain(profile.email)) {
+      return res.status(400).json({ message: "Ce domaine email n'est pas accepté" });
+    }
+
+    const existing = await User.findOne({
+      $or: [{ googleId: profile.sub }, { email: profile.email }]
+    });
+
+    let user;
+    let isNewAccount = false;
+    let isLinked = false;
+
+    if (existing) {
+      user = existing;
+
+      if (!user.isActive) {
+        return res.status(403).json({ message: "Compte désactivé. Contactez le support." });
+      }
+
+      // Compte existant trouvé par email mais jamais connecté via Google :
+      // on le rattache. Sûr, car Google a confirmé la possession de la
+      // boîte et l'email est la clé unique du compte.
+      if (!user.googleId) {
+        user.googleId = profile.sub;
+        isLinked = true;
+        console.log(`🔗 Compte ${user.email} rattaché à Google (${profile.sub})`);
+      }
+
+      if (!user.authProviders.includes("google")) {
+        user.authProviders.push("google");
+      }
+
+      // Enrichissement opportuniste, uniquement sur les champs vides.
+      if (!user.avatar && profile.picture) user.avatar = profile.picture;
+      if (profile.name && (!user.name || user.name.length < 2)) {
+        user.name = profile.name.trim().slice(0, 50);
+      }
+    } else {
+      isNewAccount = true;
+      // Mot de passe aléatoire : le compte n'a pas de secret connu, donc
+      // personne ne peut se connecter par mot de passe à sa place. Il reste
+      // modifiable plus tard via « mot de passe oublié », qui exige de
+      // prouver la possession de l'email.
+      const randomPassword = crypto.randomBytes(32).toString("hex");
+      const name = (profile.name || profile.email.split("@")[0]).trim().slice(0, 50);
+
+      try {
+        user = await User.create({
+          name,
+          email: profile.email,
+          password: randomPassword,
+          googleId: profile.sub,
+          authProviders: ["google"],
+          avatar: profile.picture || null
+        });
+      } catch (createErr) {
+        if (createErr.code === 11000) {
+          // Course entre deux inscriptions simultanées avec le même Google
+          // : on récupère le compte Rather que de renvoyer une erreur.
+          user = await User.findOne({
+            $or: [{ googleId: profile.sub }, { email: profile.email }]
+          });
+          if (!user) {
+            return res.status(400).json({ message: "Cet email est déjà utilisé" });
+          }
+          isNewAccount = false;
+        } else {
+          throw createErr;
+        }
+      }
+    }
+
+    // 3) Session
+    const token = generateToken(user._id, user.isAdmin);
+
+    user.lastLogin = new Date();
+    await user.save({ validateBeforeSave: false });
+
+    setAuthCookie(res, token);
+
+    if (isNewAccount) {
+      EmailService.sendWelcomeEmail(user)
+        .catch(err => console.error("⚠️ Email de bienvenue non envoyé:", err.message));
+    }
+
+    const message = isNewAccount
+      ? "Compte créé avec Google"
+      : isLinked
+        ? "Google rattaché à votre compte"
+        : "Connexion réussie";
+
+    res.status(isNewAccount ? 201 : 200).json({
+      success: true,
+      message,
+      isNewAccount,
+      token,
+      user: publicUser(user)
+    });
+  } catch (error) {
+    console.error("❌ Erreur googleLogin:", error);
     res.status(500).json({ message: error.message });
   }
 };
