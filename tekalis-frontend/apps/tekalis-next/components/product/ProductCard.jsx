@@ -12,6 +12,7 @@ import {
 } from "@/store/slices/wishlistSlice";
 import { useToast } from "@/components/shared/ToastProvider";
 import { trackAddToCart, trackEvent } from "@/lib/analytics";
+import { openAuthPrompt } from "@/lib/authPrompt";
 import {
   FaStar,
   FaShoppingCart,
@@ -25,6 +26,7 @@ const ProductCard = ({ product, showSpecs = false }) => {
   const toast = useToast();
   const dispatch = useDispatch();
   const wishlistItems = useSelector((state) => state.wishlist?.items || []);
+  const { user } = useSelector((state) => state.auth || {});
 
   const [imageLoaded, setImageLoaded] = useState(false);
 
@@ -83,6 +85,13 @@ const ProductCard = ({ product, showSpecs = false }) => {
         currency: "XOF",
       }, { eventId: product._id });
       toast.success("Ajouté aux favoris ❤️");
+      // Sans compte, la liste reste verrouillée sur cet appareil : on
+      // propose le bouton Google au moment exact où le visiteur vient
+      // d'exprimer ce besoin (le plafond global garantit qu'une seule
+      // invitation automatique s'affiche par session).
+      if (!user) {
+        openAuthPrompt({ reason: "wishlist", source: "wishlist-add" });
+      }
     }
   };
 

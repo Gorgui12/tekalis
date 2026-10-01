@@ -21,6 +21,7 @@ import {
 } from "react-icons/fa";
 import api from "@/lib/api";
 import ProductCard from "@/components/product/ProductCard";
+import AuthPromptCard from "@/components/auth/AuthPromptCard";
 import { SOCIAL_LINKS } from "@/lib/utils/constants";
 
 // ── Schema.org défini EN DEHORS du composant (évite recréation à chaque render) ──
@@ -447,6 +448,19 @@ const Home = ({
             >
               Contacter sur WhatsApp
             </a>
+          </div>
+
+          {/*
+            Dernier point de contact du parcours d'accueil : la commande
+            exige un compte, autant l'annoncer ici avec le bouton Google
+            plutôt que de renvoyer le visiteur vers /register par surprise.
+          */}
+          <div className="mt-8 flex justify-center relative">
+            <AuthPromptCard
+              reason="home"
+              source="home-cta"
+              className="text-left max-w-md w-full shadow-2xl"
+            />
           </div>
         </div>
       </section>

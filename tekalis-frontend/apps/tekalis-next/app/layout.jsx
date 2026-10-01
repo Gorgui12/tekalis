@@ -5,6 +5,7 @@ import AnalyticsProvider from '@/components/shared/AnalyticsProvider';
 import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import WhatsAppButton from '@/components/layout/WhatsAppButton';
+import AuthPromptHost from '@/components/auth/AuthPromptHost';
 import { SOCIAL_LINKS } from '@/lib/utils/constants';
 
 const fontDisplay = Space_Grotesk({
@@ -189,6 +190,13 @@ export default function RootLayout({ children }) {
               <main>{children}</main>
               <Footer />
               <WhatsAppButton />
+              {/*
+                Invitations automatiques à créer un compte (bouton Google).
+                Monté ici et non dans les pages : il doit pouvoir apparaître
+                au-dessus de n'importe quel écran, y compris après une
+                navigation côté client.
+              */}
+              <AuthPromptHost />
             </AnalyticsProvider>
           </div>
         </Providers>

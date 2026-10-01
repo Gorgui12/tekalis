@@ -1,12 +1,13 @@
 ﻿"use client";
 
 import { useState } from "react";
-import Link from "next/link"; import { useRouter } from "next/navigation";
+import Link from "next/link"; import { useRouter, useSearchParams } from "next/navigation";
 import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaSpinner, FaCheckCircle } from "react-icons/fa";
 import api from "@/lib/api";
 import useAuth from "@/lib/hooks/useAuth";
 import { useToast } from "@/components/shared/ToastProvider";
 import GoogleButton from "@/components/auth/GoogleButton";
+import { trackAuthSuccess } from "@/lib/authPrompt";
 
 /* ── Règles de validation mot de passe ────────────────────────────────── */
 const PASSWORD_RULES = [
@@ -20,7 +21,13 @@ function Register() {
   const toast    = useToast();
   const router = useRouter();
   const navigate = (path) => router.push(path);
+  const searchParams = useSearchParams();
   const { googleLogin } = useAuth();
+
+  // Destination d'origine quand le visiteur arrive depuis une route
+  // protégée (middleware.js pose ?redirect=) : on le ramène à son
+  // panier ou à ses commandes plutôt qu'à un tableau de bord vide.
+  const from = searchParams.get("redirect") || "/dashboard";
 
   const [formData, setFormData] = useState({ name: "", email: "", password: "", confirm: "" });
   const [showPw,   setShowPw]   = useState(false);
@@ -64,7 +71,7 @@ function Register() {
         password: formData.password,
       });
       toast.success("Compte créé avec succès ! Connectez-vous 🎉");
-      navigate("/login");
+      navigate(`/login?redirect=${encodeURIComponent(from)}`);
     } catch (err) {
       const msg = err.response?.data?.message || "Erreur lors de l'inscription. Réessayez.";
       toast.error(msg);
@@ -90,10 +97,11 @@ function Register() {
         return;
       }
       const { user, isNewAccount } = result.data;
+      trackAuthSuccess({ reason: "register", source: "register-page", isNewAccount });
       toast.success(
         isNewAccount ? "Compte créé avec Google 🎉" : `Ravi de vous revoir, ${user?.name || ""} !`
       );
-      setTimeout(() => navigate("/dashboard"), 300);
+      setTimeout(() => navigate(from), 300);
     } finally {
       setLoading(false);
     }

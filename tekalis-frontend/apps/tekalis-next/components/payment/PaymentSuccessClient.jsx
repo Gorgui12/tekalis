@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { FaCheckCircle, FaSpinner } from "react-icons/fa";
 import api from "@/lib/api";
 import { trackPurchase } from "@/lib/analytics";
+import AuthPromptCard from "@/components/auth/AuthPromptCard";
 
 const PaymentSuccess = ({ orderId }) => {
   const router = useRouter();
@@ -129,6 +130,19 @@ const PaymentSuccess = ({ orderId }) => {
           <p className="text-sm text-surface-500 mt-6">
             📧 Un email de confirmation vous a été envoyé
           </p>
+
+          {/*
+            La commande est payée : c'est l'instant où le client veut
+            savoir où en est son colis. On en profite pour rattacher la
+            commande à un compte (suivi, factures, garanties) — sinon il
+            ne pourra jamais la consulter, les commandes étant liées à un
+            utilisateur côté API.
+          */}
+          <AuthPromptCard
+            reason="order"
+            source="payment-success"
+            className="mt-6 text-left"
+          />
         </div>
       </div>
     );

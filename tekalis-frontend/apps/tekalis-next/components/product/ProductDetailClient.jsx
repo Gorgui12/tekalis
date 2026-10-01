@@ -29,6 +29,7 @@ import {
 } from "react-icons/fa";
 import { useToast } from "@/components/shared/ToastProvider";
 import { trackViewContent, trackAddToCart } from "@/lib/analytics";
+import { openAuthPrompt } from "@/lib/authPrompt";
 
 const ProductDetails = ({ product: initialProduct }) => {
   const { id } = useParams();
@@ -89,6 +90,13 @@ const ProductDetails = ({ product: initialProduct }) => {
       dispatch(addToWishlistLocal(product));
       dispatch(addToWishlist(product._id));
       toast.success("Ajouté aux favoris ❤️");
+      // Ajouter un favori est l'un des plus forts signaux d'intention sur
+      // une boutique : c'est le bon moment pour proposer un compte, sinon
+      // le visiteur ne retrouvera jamais sa liste (elle vit dans le
+      // localStorage de cet appareil tant qu'il n'a pas de compte).
+      if (!user) {
+        openAuthPrompt({ reason: "wishlist", source: "wishlist-add" });
+      }
     }
   };
 

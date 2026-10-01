@@ -10,6 +10,7 @@ import {
 import useAuth from "@/lib/hooks/useAuth";
 import { useToast } from "@/components/shared/ToastProvider";
 import GoogleButton from "@/components/auth/GoogleButton";
+import { trackAuthSuccess } from "@/lib/authPrompt";
 
 function Login() {
   const router = useRouter();
@@ -87,6 +88,11 @@ const navigate = (path) => router.push(path);
 
     if (result.success) {
       const { user, isNewAccount } = result.data;
+      trackAuthSuccess({
+        reason: "login",
+        source: "login-page",
+        isNewAccount,
+      });
       toast.success(
         isNewAccount
           ? `Compte créé. Bienvenue ${user?.name || ""} !`
@@ -110,6 +116,20 @@ const navigate = (path) => router.push(path);
     { icon: <FaShieldAlt />, text: "Garantie constructeur",   sub: "sur tous les produits" },
     { icon: <FaHeadset />,  text: "Support client 7j/7",      sub: "par WhatsApp & email" },
   ];
+
+  /* ── Contexte de rebond ──────────────────────────────────────────────────
+     Le middleware redirige vers /login?redirect=... toute tentative
+     d'accéder à une route protégée (/checkout, /wishlist, /dashboard).
+     Dire au visiteur ce qu'il va obtenir une fois connecté évite la
+     impression de detour inutile — c'est le moment le plus fort pour
+     une inscription.                                            */
+  const REDIRECT_COPY = {
+    "/checkout": "Connectez-vous pour finaliser votre commande",
+    "/wishlist": "Connectez-vous pour retrouver vos favoris sur tous vos appareils",
+    "/dashboard": "Connectez-vous pour accéder à votre espace",
+  };
+  const redirectKey = from.split("/").filter(Boolean).slice(0, 1)[0];
+  const redirectHint = REDIRECT_COPY[`/${redirectKey}`] || null;
 
   return (
     <div className="min-h-screen flex bg-surface-50 dark:bg-surface-950">
@@ -161,6 +181,22 @@ const navigate = (path) => router.push(path);
             </span>
           </Link>
 
+          {/* Rappel du contexte lorsqu'on arrive d'une route protégée */}
+          {redirectHint && (
+            <div className="mb-4 flex items-start gap-3 bg-brand-50 dark:bg-brand-900/20 border border-brand-200 dark:border-brand-800 text-brand-800 dark:text-brand-200 rounded-2xl px-4 py-3 text-sm">
+              <FaShieldAlt className="mt-0.5 flex-shrink-0" />
+              <p>
+                {redirectHint}.{" "}
+                <Link
+                  href={`/register?redirect=${encodeURIComponent(from)}`}
+                  className="font-semibold underline"
+                >
+                  Créer un compte en 1 clic
+                </Link>
+              </p>
+            </div>
+          )}
+
           <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-card border border-surface-100 dark:border-surface-700 p-8">
 
             <div className="mb-7">
@@ -169,8 +205,11 @@ const navigate = (path) => router.push(path);
               </h1>
               <p className="text-sm text-surface-500 dark:text-surface-400">
                 Pas encore de compte ?{" "}
-                <Link href="/register" className="text-brand-600 dark:text-brand-400 hover:underline font-semibold">
-                  S'inscrire gratuitement
+                <Link
+                  href={`/register${from !== "/dashboard" ? `?redirect=${encodeURIComponent(from)}` : ""}`}
+                  className="text-brand-600 dark:text-brand-400 hover:underline font-semibold"
+                >
+                  S&apos;inscrire gratuitement
                 </Link>
               </p>
             </div>
