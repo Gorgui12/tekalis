@@ -5,6 +5,35 @@ const RMA = require("../models/RMA");
 const Order = require("../models/Order");
 // ✅ APRÈS
 const Notification = require("../models/notification");
+const EmailService = require("../services/emailService");
+
+// Envoie l'email SAV et marque la notification in-app correspondante.
+//
+// Volontairement NON attendu par l'appelant, comme les autres emails du projet
+// (orderController, paymentController) : le timeout socket SMTP est de 15 s et
+// faire attendre le client pour un email est un mauvais échange. Les erreurs
+// sont donc consommées ici plutôt que remontées, sinon un rejet non géré tuerait
+// le process (handler unhandledRejection dans server.js).
+const notifyRMA = ({ user, rma, notification, type }) => {
+  Promise.resolve()
+    .then(async () => {
+      let emailed = false;
+
+      if (user && user.email) {
+        const result = await EmailService.sendRMANotification(user, rma, type);
+        emailed = !!result.success;
+        if (!emailed) {
+          console.error(`⚠️ Email SAV non envoyé (${rma.rmaNumber}):`, result.error);
+        }
+      }
+
+      if (notification) {
+        notification.emailSent = emailed;
+        await notification.save();
+      }
+    })
+    .catch((err) => console.error("⚠️ Notification SAV non mise à jour:", err.message));
+};
 
 // Créer une demande SAV
 const createRMA = async (req, res) => {
@@ -55,7 +84,7 @@ const createRMA = async (req, res) => {
     });
     
     // Créer une notification
-    await Notification.create({
+    const notification = await Notification.create({
       user: req.user._id,
       type: "rma_created",
       title: "Demande SAV créée",
@@ -63,8 +92,9 @@ const createRMA = async (req, res) => {
       link: `/rma/${rma._id}`,
       data: { rmaId: rma._id }
     });
-    
-    // TODO: Envoyer email de confirmation
+
+    // Email de confirmation au client (non bloquant — voir notifyRMA)
+    notifyRMA({ user: req.user, rma, notification, type: "created" });
     
     res.status(201).json({
       success: true,
@@ -173,6 +203,11 @@ const updateRMAStatus = async (req, res) => {
       note
     });
     
+    // On fige le client avant rma.save() : save() sur un document peuplé est
+    // correct, mais s'appuyer sur rma.user après coup ferait dépendre l'email
+    // d'un détail d'implémentation Mongoose.
+    const client = rma.user;
+
     rma.status = status;
     if (trackingNumber) rma.trackingNumber = trackingNumber;
     if (resolution) rma.resolution = resolution;
@@ -181,16 +216,18 @@ const updateRMAStatus = async (req, res) => {
     await rma.save();
     
     // Créer une notification pour le client
-    await Notification.create({
-      user: rma.user._id,
+    const notification = await Notification.create({
+      user: client._id,
       type: "rma_updated",
       title: "Mise à jour de votre demande SAV",
       message: `Votre demande ${rma.rmaNumber} a été mise à jour: ${status}`,
       link: `/rma/${rma._id}`,
       data: { rmaId: rma._id }
     });
-    
-    // TODO: Envoyer email
+
+    // Email au client : il vient d'apprendre la mauvaise nouvelle, il doit la
+    // recevoir par email et pas seulement dans l'application.
+    notifyRMA({ user: client, rma, notification, type: "updated" });
     
     res.status(200).json({
       success: true,

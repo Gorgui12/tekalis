@@ -20,10 +20,35 @@ router.post("/admin/register", verifyToken, isAdmin, authController.registerAdmi
 router.get("/me", verifyToken, authController.getMe);
 
 // POST /api/v1/auth/forgot-password
-router.post("/forgot-password", authController.forgotPassword);
+// Le rate-limit est monté dans server.js sur cette route précise.
+router.post(
+  "/forgot-password",
+  authValidation.forgotPassword,
+  authController.forgotPassword
+);
 
 // POST /api/v1/auth/reset-password/:token
-router.post("/reset-password/:token", authController.resetPassword);
+router.post(
+  "/reset-password/:token",
+  authValidation.resetPassword,
+  authController.resetPassword
+);
+
+// POST /api/v1/auth/verify-email
+// Consomme le jeton du lien reçu par email (page front /verify-email).
+router.post(
+  "/verify-email",
+  authValidation.verifyEmail,
+  authController.verifyEmail
+);
+
+// POST /api/v1/auth/resend-verification
+// Le rate-limit est monté dans server.js sur cette route précise.
+router.post(
+  "/resend-verification",
+  authValidation.forgotPassword,
+  authController.resendVerification
+);
 
 // POST /api/v1/auth/logout — efface le cookie httpOnly côté serveur
 router.post("/logout", authController.logout);

@@ -1,42 +1,15 @@
 ﻿"use client";
 
 import Link from "next/link";
-import { useState } from "react";
-import { 
+import {
   FaFacebook, FaInstagram, FaLinkedin, FaTwitter,
   FaEnvelope, FaPhone, FaMapMarkerAlt, FaClock,
   FaArrowUp, FaHeart, FaShieldAlt, FaTruck
 } from "react-icons/fa";
-import { useToast } from "@/components/shared/ToastProvider";
-import { validateEmail } from "@/lib/utils/validators";
 import { SOCIAL_LINKS } from "@/lib/utils/constants";
-import Button from "../shared/Button";
+import NewsletterForm from "../shared/NewsletterForm";
 
 const Footer = () => {
-  const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
-  const toast = useToast();
-
-  const handleNewsletterSubmit = async (e) => {
-    e.preventDefault();
-    const emailValidation = validateEmail(email);
-    if (!emailValidation.isValid) {
-      toast.error(emailValidation.errors[0]);
-      return;
-    }
-    setLoading(true);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      toast.success("Merci ! Vous êtes inscrit à notre newsletter", 4000, {
-        title: "Inscription réussie"
-      });
-      setEmail("");
-    } catch (error) {
-      toast.error("Erreur lors de l'inscription. Réessayez plus tard.");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -153,7 +126,7 @@ const Footer = () => {
           </div>
 
           {/* Colonne 4 : Newsletter & Réseaux */}
-          <div>
+          <div id="newsletter">
             <h4 className="text-lg font-bold font-display mb-4 flex items-center gap-2">
               <span className="w-1 h-6 bg-brand-500 rounded-full"></span>
               Newsletter
@@ -162,30 +135,13 @@ const Footer = () => {
               Inscrivez-vous pour recevoir nos offres exclusives et nouveautés !
             </p>
 
-            {/* Formulaire newsletter */}
-            <form onSubmit={handleNewsletterSubmit} className="mb-6">
-              <div className="flex flex-col gap-2">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Votre email"
-                  aria-label="Adresse email pour la newsletter"
-                  autoComplete="email"
-                  className="w-full px-4 py-3 bg-white/5 border border-white/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-white placeholder-surface-500 transition"
-                  required
-                />
-                <Button
-                  type="submit"
-                  variant="primary"
-                  fullWidth
-                  isLoading={loading}
-                  icon={<FaEnvelope />}
-                >
-                  S'inscrire
-                </Button>
-              </div>
-            </form>
+            {/* Formulaire newsletter — inscription réelle (double opt-in) */}
+            <NewsletterForm
+              source="footer"
+              dark
+              className="mb-6"
+              buttonClassName="w-full flex items-center justify-center px-6 py-3 rounded-xl font-bold transition bg-brand-500 text-white hover:bg-brand-600 disabled:opacity-60"
+            />
 
             {/* Réseaux sociaux */}
             <div>

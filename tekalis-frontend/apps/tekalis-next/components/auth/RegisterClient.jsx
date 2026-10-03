@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link"; import { useRouter, useSearchParams } from "next/navigation";
-import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaSpinner, FaCheckCircle } from "react-icons/fa";
+import { FaUser, FaEnvelope, FaLock, FaEye, FaEyeSlash, FaSpinner, FaCheckCircle, FaEnvelopeOpenText } from "react-icons/fa";
 import api from "@/lib/api";
 import useAuth from "@/lib/hooks/useAuth";
 import { useToast } from "@/components/shared/ToastProvider";
@@ -34,6 +34,24 @@ function Register() {
   const [showCpw,  setShowCpw]  = useState(false);
   const [loading,  setLoading]  = useState(false);
   const [errors,   setErrors]   = useState({});
+  // Adresse du compte créé en attente de vérification (null = formulaire
+  // affiché). Bascule l'écran en « vérifiez votre boîte mail ».
+  const [registered, setRegistered] = useState(null);
+  const [resendSent, setResendSent] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+
+  /* ── Renvoi du lien de vérification ──────────────────────────────────── */
+  const handleResend = async () => {
+    setResendLoading(true);
+    try {
+      await api.post("/auth/resend-verification", { email: registered });
+      setResendSent(true);
+    } catch {
+      toast.error("Envoi impossible. Réessayez dans quelques minutes.");
+    } finally {
+      setResendLoading(false);
+    }
+  };
 
   /* ── Helpers ─────────────────────────────────────────────────────────── */
   const set = (field) => (e) => {
@@ -60,16 +78,27 @@ function Register() {
   };
 
   /* ── Soumission ──────────────────────────────────────────────────────── */
+  // Le backend n'ouvre PAS de session à l'inscription : le compte est créé
+  // mais reste inactif tant que le lien de vérification n'a pas été cliqué.
+  // `registered` déclenche l'écran « vérifiez vos emails » avec l'adresse en
+  // mémoire, ce qui évite d'obliger à retaper le mot de passe si le client
+  // décide de tenter une connexion tout de suite.
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);
     try {
-      await api.post("/auth/register", {
+      const { data } = await api.post("/auth/register", {
         name:     formData.name.trim(),
         email:    formData.email.trim().toLowerCase(),
         password: formData.password,
       });
+
+      if (data?.requiresEmailVerification) {
+        setRegistered(formData.email.trim().toLowerCase());
+        return;
+      }
+
       toast.success("Compte créé avec succès ! Connectez-vous 🎉");
       navigate(`/login?redirect=${encodeURIComponent(from)}`);
     } catch (err) {
@@ -168,6 +197,61 @@ function Register() {
             </span>
           </Link>
 
+          {registered ? (
+            /* ── Compte créé — activation en attente ──────────────────────
+               Le compte existe mais aucune session n'est ouverte : l'accès
+               reste bloqué tant que l'adresse n'a pas été confirmée depuis
+               l'email. D'où cet écran plutôt qu'une redirection vers
+               /dashboard. */
+            <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-card border border-surface-100 dark:border-surface-700 p-8 text-center">
+              <div className="flex justify-center mb-5">
+                <FaEnvelopeOpenText className="text-brand-500" size={52} />
+              </div>
+
+              <h1 className="text-2xl font-bold font-display text-surface-900 dark:text-white mb-3">
+                Vérifiez votre boîte mail
+              </h1>
+
+              <p className="text-sm text-surface-600 dark:text-surface-400 leading-relaxed mb-2">
+                Un lien de confirmation vient d&apos;être envoyé à
+              </p>
+              <p className="text-sm font-bold text-surface-900 dark:text-white mb-5 break-all">
+                {registered}
+              </p>
+              <p className="text-xs text-surface-500 dark:text-surface-400 leading-relaxed mb-6">
+                Cliquez sur ce lien pour activer votre compte. Il reste valable
+                24 heures. Sans confirmation, la connexion par mot de passe
+                restera bloquée.
+              </p>
+
+              {resendSent ? (
+                <p className="text-sm text-green-600 mb-4">
+                  Si un compte non vérifié existe à cette adresse, un nouvel
+                  email vient d&apos;être envoyé.
+                </p>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleResend}
+                  disabled={resendLoading}
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-bold text-white bg-brand-500 hover:bg-brand-600 disabled:opacity-60 disabled:cursor-not-allowed shadow-md transition-all duration-200"
+                >
+                  {resendLoading ? (
+                    <><FaSpinner className="animate-spin" /> Envoi en cours...</>
+                  ) : (
+                    "Renvoyer le lien"
+                  )}
+                </button>
+              )}
+
+              <Link
+                href="/login"
+                className="block mt-5 text-sm text-surface-500 hover:text-brand-600 dark:text-surface-400 dark:hover:text-brand-400 transition"
+              >
+                Déjà vérifié ? Se connecter
+              </Link>
+            </div>
+          ) : (
           <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-card border border-surface-100 dark:border-surface-700 p-8">
 
             <div className="mb-7">
@@ -352,6 +436,7 @@ function Register() {
               </button>
             </form>
           </div>
+          )}
         </div>
       </div>
     </div>

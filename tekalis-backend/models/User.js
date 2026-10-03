@@ -78,6 +78,26 @@ const userSchema = new mongoose.Schema(
     // Réinitialisation mot de passe
     resetPasswordToken: String,
     resetPasswordExpires: Date,
+    // ── Vérification de l'adresse email ─────────────────────────────────────
+    // Sans cela, s'inscrire avec l'adresse d'une victime suffit pour recevoir
+    // ses confirmations de commande et s'attribuer ses demandes SAV. Tant que
+    // ce drapeau est faux, la connexion par mot de passe est refusée.
+    //
+    // Google passe par la même case : Google a déjà authentifié la boîte
+    // (voir authController.googleLogin), il n'y a donc rien à redemander.
+    emailVerified: {
+      type: Boolean,
+      default: false
+    },
+    emailVerifiedAt: Date,
+    // `select: false` : ces champs ne doivent jamais sortir du modèle par
+    // défaut, sinon une réponse d'API les exposerait. Un sélecteur explicite
+    // est posé dans authController quand le contrôleur en a besoin.
+    emailVerificationToken: {
+      type: String,
+      select: false
+    },
+    emailVerificationExpires: Date,
     // Date de dernière connexion
     lastLogin: Date
   },
@@ -109,6 +129,8 @@ userSchema.methods.toSafeObject = function () {
   delete obj.password;
   delete obj.resetPasswordToken;
   delete obj.resetPasswordExpires;
+  delete obj.emailVerificationToken;
+  delete obj.emailVerificationExpires;
   return obj;
 };
 

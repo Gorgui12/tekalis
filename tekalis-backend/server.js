@@ -36,11 +36,23 @@ if (!process.env.ADMIN_EMAIL) {
   console.warn("⚠️  ADMIN_EMAIL non défini. Les notifications de commandes admin seront désactivées.");
 }
 
+// FRONTEND_URL et BACKEND_URL composent TOUTES les URL des emails (liens de
+// commande, reset de mot de passe, confirmation/désabonnement newsletter).
+// Sans FRONTEND_URL, un client qui clique sur "Suivre ma commande" atterrit sur
+// localhost. Mieux vaut le signaler au boot que le découvrir en production.
+if (!process.env.FRONTEND_URL || !process.env.BACKEND_URL) {
+  const missing = [!process.env.FRONTEND_URL && "FRONTEND_URL", !process.env.BACKEND_URL && "BACKEND_URL"]
+    .filter(Boolean)
+    .join(", ");
+  console.warn(`⚠️  ${missing} non défini(s) — les liens dans les emails seront invalides.`);
+}
+
 if (!process.env.GOOGLE_CLIENT_ID) {
   console.warn("⚠️  GOOGLE_CLIENT_ID non défini. La connexion avec Google sera désactivée (bouton masqué côté boutique).");
 }
 
 const connectDB = require("./config/database");
+const emailQueue = require("./services/emailQueue");
 const { notFound, errorHandler } = require("./middlewares/errorHandler");
 
 const app = express();
@@ -112,14 +124,31 @@ if (isDev) {
 }
 
 // ─── Rate Limiting ────────────────────────────────────────────────────────────
+// RATE_LIMIT_DISABLED=true désactive tout (tests de charge, debug local
+// ponctuel). En dehors de ça, les limiters de SÉCURITÉ — auth, mot de passe —
+// restent actifs même en dev : c'est précisément le réglage qui laissait
+// /forgot-password sans protection en local, et le comportement de dev doit
+// ressembler à celui de prod sur ce point. Seuls les limiters de confort
+// (API globale) cèdent devant isDev, pour ne pas bloquer une session de
+// développement normale.
+const rateLimitDisabled = process.env.RATE_LIMIT_DISABLED === "true";
+
 const createLimiter = (options) => {
-  if (isDev) {
+  if (rateLimitDisabled) {
+    console.warn("⚠️  Rate limiting désactivé (RATE_LIMIT_DISABLED=true)");
     return (req, res, next) => next();
   }
   return rateLimit(options);
 };
 
-const apiLimiter = createLimiter({
+const createSoftLimiter = (options) => {
+  if (isDev || rateLimitDisabled) {
+    return (req, res, next) => next();
+  }
+  return rateLimit(options);
+};
+
+const apiLimiter = createSoftLimiter({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
   max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
   message: { success: false, message: "Trop de requêtes, veuillez réessayer plus tard" },
@@ -134,16 +163,48 @@ const authLimiter = createLimiter({
   message: { success: false, message: "Trop de tentatives de connexion, réessayez dans 15 minutes" }
 });
 
+// Réinitialisation de mot de passe : chaque appel déclenche un email, donc le
+// plafond est bas et les succès sont COMPTÉS (skipSuccessfulRequests reste
+// faux). Sans cela, la route sert de relais : un attaquant y injecte une
+// adresse tierce et inonde sa boîte, ou la nôtre via le support.
+const passwordResetLimiter = createLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: parseInt(process.env.RATE_LIMIT_RESET_PASSWORD_MAX) || 5,
+  message: {
+    success: false,
+    message: "Trop de demandes de réinitialisation. Réessayez dans quelques minutes."
+  },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
 const adminLimiter = createLimiter({
   windowMs: 15 * 60 * 1000,
   max: 200,
   message: { success: false, message: "Trop de requêtes admin" }
 });
 
+const newsletterLimiter = createLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: parseInt(process.env.RATE_LIMIT_NEWSLETTER_MAX) || 10,
+  message: {
+    success: false,
+    message: "Trop de demandes d'inscription. Réessayez dans quelques minutes."
+  },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
 app.use(API_PREFIX, apiLimiter);
 app.use(`${API_PREFIX}/auth/login`, authLimiter);
 app.use(`${API_PREFIX}/auth/register`, authLimiter);
 app.use(`${API_PREFIX}/auth/google`, authLimiter);
+app.use(`${API_PREFIX}/auth/forgot-password`, passwordResetLimiter);
+app.use(`${API_PREFIX}/auth/reset-password`, passwordResetLimiter);
+// Même limiteur que le reset : cet endpoint envoie aussi un email à une
+// adresse fournie par l'appelant.
+app.use(`${API_PREFIX}/auth/resend-verification`, passwordResetLimiter);
+app.use(`${API_PREFIX}/newsletter`, newsletterLimiter);
 app.use(`${API_PREFIX}/admin`, adminLimiter);
 
 // ─── Health Check ─────────────────────────────────────────────────────────────
@@ -176,6 +237,7 @@ const loadRoute = (path, file) => {
 };
 
 loadRoute(`${API_PREFIX}/auth`, "./routes/authRoutes");
+loadRoute(`${API_PREFIX}/newsletter`, "./routes/newsletterRoutes");
 loadRoute(`${API_PREFIX}/products`, "./routes/productRoutes");
 loadRoute(`${API_PREFIX}/categories`, "./routes/categoryRoutes");
 loadRoute(`${API_PREFIX}/articles`, "./routes/articleRoutes");
@@ -195,6 +257,12 @@ loadRoute(`${API_PREFIX}/whatsapp`, "./routes/whatsappRoutes");
 
 console.log("✅ Routes chargées\n");
 
+// ─── File d'attente email ─────────────────────────────────────────────────────
+// Les emails sont envoyés APRÈS la réponse HTTP : une panne SMTP ne doit pas
+// coûter une confirmation de commande. Le balayeur reprend ce qui a échoué,
+// y compris après un redémarrage (c'est tout l'intérêt de la persistance).
+emailQueue.start();
+
 // ─── 404 ──────────────────────────────────────────────────────────────────────
 app.use(notFound);
 
@@ -210,7 +278,11 @@ const server = app.listen(PORT, () => {
 ║  Port:          ${PORT.toString().padEnd(27)} ║
 ║  Environnement: ${(process.env.NODE_ENV || "development").padEnd(27)} ║
 ║  URL:           http://localhost:${PORT}${API_PREFIX.padEnd(10)} ║
-║  Rate limiting: ${(isDev ? "DÉSACTIVÉ (dev)" : "ACTIF").padEnd(27)} ║
+║  Rate limiting: ${(rateLimitDisabled
+      ? "DÉSACTIVÉ (RATE_LIMIT_DISABLED)"
+      : isDev
+        ? "PARTIEL (API globale off en dev)"
+        : "ACTIF").padEnd(27)} ║
 ╚════════════════════════════════════════════╝
   `);
 });
@@ -222,6 +294,7 @@ process.on("unhandledRejection", (err) => {
 
 process.on("SIGTERM", () => {
   console.log("🛑 SIGTERM reçu — arrêt propre du serveur");
+  emailQueue.stop();
   server.close(() => process.exit(0));
 });
 

@@ -5,8 +5,9 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
   FaEnvelope, FaLock, FaEye, FaEyeSlash, FaSpinner,
-  FaShieldAlt, FaTruck, FaHeadset
+  FaShieldAlt, FaTruck, FaHeadset, FaEnvelopeOpenText
 } from "react-icons/fa";
+import api from "@/lib/api";
 import useAuth from "@/lib/hooks/useAuth";
 import { useToast } from "@/components/shared/ToastProvider";
 import GoogleButton from "@/components/auth/GoogleButton";
@@ -25,6 +26,12 @@ const navigate = (path) => router.push(path);
   const [showPw,      setShowPw]      = useState(false);
   const [rememberMe,  setRememberMe]  = useState(false);
   const [errors,      setErrors]      = useState({});
+  // Adresse non confirmée : le backend refuse la session avec un 403
+  // `requiresEmailVerification`. On propose alors le renvoi du lien au lieu de
+  // laisser l'utilisateur devant un simple échec.
+  const [needsVerification, setNeedsVerification] = useState(false);
+  const [resendSent,          setResendSent]          = useState(false);
+  const [resendLoading,       setResendLoading]       = useState(false);
 
   // Lit le ?redirect=... posé par middleware.js quand on arrive ici après
   // avoir été refoulé d'une route protégée. Avant : "/dashboard" || "/"
@@ -67,14 +74,37 @@ const navigate = (path) => router.push(path);
         navigate(user?.isAdmin ? "/admin" : from, { replace: true });
       }, 300);
     } else {
-      const errorObj = typeof result.error === 'object' ? result.error : { message: result.error };
-      const msg = errorObj.message || "Identifiants incorrects";
-      const status = errorObj.status;
+      // Axios rejette avec une Error « Request failed with status code 401 »
+      // : le message utile est dans response.data. Lire `error.message` seul
+      // affichait donc un message technique à l'utilisateur sur chaque échec
+      // de connexion.
+      const err = typeof result.error === "object" ? result.error : {};
+      const data = err.response?.data || {};
+      const status = err.response?.status;
+      const msg = data.message || "Identifiants incorrects";
 
       if (status === 500) {
         toast.error("Erreur serveur. Veuillez réessayer plus tard.");
       } else if (status === 429) {
         toast.error("Trop de tentatives. Attendez quelques minutes.");
+      } else if (data.requiresEmailVerification) {
+        // Mot de passe correct mais adresse jamais confirmée : ce n'est pas une
+        // erreur de saisie. On le dit explicitement et on propose le renvoi,
+        // sinon l'utilisateur va croire à un mot de passe oublié.
+        toast.error(msg, { duration: 8000 });
+        setNeedsVerification(true);
+        setResendLoading(true);
+        try {
+          await api.post("/auth/resend-verification", {
+            email: formData.email.trim().toLowerCase(),
+          });
+          setResendSent(true);
+        } catch {
+          setResendSent(false);
+        } finally {
+          setResendLoading(false);
+        }
+        return;
       } else {
         toast.error(msg);
       }
@@ -229,6 +259,27 @@ const navigate = (path) => router.push(path);
             </div>
 
             <form onSubmit={handleSubmit} noValidate className="space-y-4">
+
+              {/* Adresse non confirmée — le mot de passe est bon, c'est la
+                  boîte mail qui ne l'a pas encore confirmé. Message dédié pour
+                  ne pas laisser croire à un mot de passe erroné. */}
+              {needsVerification && (
+                <div className="rounded-xl border border-amber-300 dark:border-amber-700 bg-amber-50 dark:bg-amber-900/20 p-4">
+                  <div className="flex items-start gap-3">
+                    <FaEnvelopeOpenText className="text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" size={20} />
+                    <div>
+                      <p className="text-sm font-semibold text-amber-900 dark:text-amber-200">
+                        Adresse email non vérifiée
+                      </p>
+                      <p className="text-xs text-amber-800 dark:text-amber-300 mt-1 leading-relaxed">
+                        {resendSent
+                          ? "Si un compte non vérifié existe pour cette adresse, un nouveau lien vient d'être envoyé."
+                          : "Ouvrez le lien de confirmation reçu à l'inscription pour activer la connexion."}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Email */}
               <div>

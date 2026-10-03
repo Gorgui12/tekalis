@@ -3,7 +3,13 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const EmailService = require("../services/emailService");
+const emailCooldown = require("../services/emailCooldown");
 const GoogleAuthService = require("../services/googleAuthService");
+
+// Réponse unique de /forgot-password : elle ne doit jamais varier selon que
+// l'adresse existe, est en cooldown, ou provoke une erreur SMTP.
+const GENERIC_RESET_MESSAGE =
+  "Si cet email existe, un lien de réinitialisation a été envoyé";
 
 // ===============================================
 // Générer un token JWT
@@ -66,8 +72,36 @@ const publicUser = (user) => ({
   isAdmin: user.isAdmin,
   phone: user.phone,
   avatar: user.avatar,
-  authProviders: user.authProviders
+  authProviders: user.authProviders,
+  emailVerified: !!user.emailVerified
 });
+
+// Réponse unique de /resend-verification : elle ne doit jamais révéler si
+// l'adresse existe, comme pour /forgot-password.
+const GENERIC_VERIFICATION_MESSAGE =
+  "Si un compte non vérifié existe pour cette adresse, un email vient d'être envoyé";
+
+// ── Vérification de l'adresse email ───────────────────────────────────────────
+// Génère un jeton, n'en stocke que l'empreinte SHA-256 et renvoie le jeton en
+// clair. Stocker le jeton en clair allowrait à quiconque ayant accès à la base
+// (ou à un log) de vérifier une adresse au lieu du titulaire. Même schéma que
+// la réinitialisation de mot de passe, appliqué au même endroit.
+const issueVerificationToken = async (user) => {
+  const token = crypto.randomBytes(32).toString("hex");
+  user.emailVerificationToken = crypto
+    .createHash("sha256")
+    .update(token)
+    .digest("hex");
+  user.emailVerificationExpires = new Date(Date.now() + EmailService.EMAIL_VERIFICATION_TTL_MS);
+  await user.save({ validateBeforeSave: false });
+  return token;
+};
+
+// Nettoie le jeton après usage : un lien de vérification est à usage unique.
+const clearVerificationToken = (user) => {
+  user.emailVerificationToken = undefined;
+  user.emailVerificationExpires = undefined;
+};
 
 // ===============================================
 // POST /api/v1/auth/register
@@ -108,24 +142,25 @@ exports.register = async (req, res) => {
       name: cleanName,
       email: cleanEmail,
       password,
-      authProviders: ["password"]
+      authProviders: ["password"],
+      // Compte créé mais non vérifié : aucune session n'est ouverte tant que
+      // le lien n'a pas été cliqué.
+      emailVerified: false
     });
 
-    const token = generateToken(user._id, user.isAdmin);
+    // Email de vérification AVANT toute ouverture de session : c'est la seule
+    // preuve que l'adresse appartient au demandeur.
+    const verificationToken = await issueVerificationToken(user);
+    EmailService.sendEmailVerification(user, verificationToken)
+      .catch(err => console.error("⚠️ Email de vérification non envoyé:", err.message));
 
-    user.lastLogin = new Date();
-    await user.save({ validateBeforeSave: false });
-
-    setAuthCookie(res, token);
-
-    // Email de bienvenue (non bloquant)
-    EmailService.sendWelcomeEmail(user)
-      .catch(err => console.error("⚠️ Email de bienvenue non envoyé:", err.message));
-
+    // Note : ni token JWT ni cookie ici, contrairement aux autres réponses
+    // d'authentification de ce contrôleur. Le front doit d'abord afficher
+    // « vérifiez votre boîte mail » au lieu de rediriger vers /dashboard.
     res.status(201).json({
       success: true,
-      message: "Inscription réussie",
-      token,
+      requiresEmailVerification: true,
+      message: `Compte créé. Vérifiez votre boîte mail à ${cleanEmail} pour activer la connexion.`,
       user: publicUser(user)
     });
   } catch (error) {
@@ -204,6 +239,18 @@ exports.login = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({ message: "Identifiants invalides" });
+    }
+
+    // Mot de passe correct mais adresse non vérifiée : on refuse d'ouvrir une
+    // session. Le mot de passe ayant été communiqué, révéler ici que le compte
+    // existe n'apporte rien à l'attaquant ; on en profite pour proposer un
+    // renvoi du lien.
+    if (!user.emailVerified) {
+      return res.status(403).json({
+        message:
+          "Votre adresse email n'est pas vérifiée. Consultez votre boîte mail et cliquez sur le lien de confirmation pour vous connecter.",
+        requiresEmailVerification: true
+      });
     }
 
     const token = generateToken(user._id, user.isAdmin);
@@ -300,6 +347,16 @@ exports.googleLogin = async (req, res) => {
         console.log(`🔗 Compte ${user.email} rattaché à Google (${profile.sub})`);
       }
 
+      // Google a authentifié la boîte (profile.emailVerified a été exigé plus
+      // haut) : il n'y a donc rien à redemander. Cette étape est aussi ce qui
+      // débloque un compte mot de passe resté non vérifié, puisqu'il vient de
+      // prouver la possession de la même adresse.
+      if (!user.emailVerified) {
+        user.emailVerified = true;
+        user.emailVerifiedAt = new Date();
+        clearVerificationToken(user);
+      }
+
       if (!user.authProviders.includes("google")) {
         user.authProviders.push("google");
       }
@@ -325,7 +382,11 @@ exports.googleLogin = async (req, res) => {
           password: randomPassword,
           googleId: profile.sub,
           authProviders: ["google"],
-          avatar: profile.picture || null
+          avatar: profile.picture || null,
+          // Google a déjà vérifié la boîte : le compte est utilisable
+          // immédiatement, sans email de confirmation à renvoyer.
+          emailVerified: true,
+          emailVerifiedAt: new Date()
         });
       } catch (createErr) {
         if (createErr.code === 11000) {
@@ -356,7 +417,6 @@ exports.googleLogin = async (req, res) => {
       EmailService.sendWelcomeEmail(user)
         .catch(err => console.error("⚠️ Email de bienvenue non envoyé:", err.message));
     }
-
     const message = isNewAccount
       ? "Compte créé avec Google"
       : isLinked
@@ -393,34 +453,54 @@ exports.getMe = async (req, res) => {
 
 // ===============================================
 // POST /api/v1/auth/forgot-password
+// ───────────────────────────────────────────────
+// Trois protections, car cet endpoint envoie un email à une adresse fournie
+// par l'appelant :
+//   1. rate-limit par IP        → server.js (passwordResetLimiter)
+//   2. cooldown par adresse    → services/emailCooldown.js
+//   3. validation de l'email    → middlewares/validation.js
+// Les trois sont nécessaires : le rate-limit seul peut être contourné par
+// distribution d'IP, et le cooldown seul est trivial à contourner.
 // ===============================================
 exports.forgotPassword = async (req, res) => {
   try {
-    const { email } = req.body;
+    const email = String(req.body.email || "").toLowerCase();
 
-    const user = await User.findOne({ email: email.toLowerCase() });
+    // Refroidissement : on répond 200 sans rien envoyer. Le message reste
+    // identique dans tous les cas pour ne pas révéler si l'email existe.
+    if (emailCooldown.isBlocked(email)) {
+      return res.status(200).json({
+        success: true,
+        message: GENERIC_RESET_MESSAGE
+      });
+    }
+
+    const user = await User.findOne({ email });
 
     // Toujours répondre 200 pour ne pas révéler si l'email existe
     if (!user) {
       return res.status(200).json({
         success: true,
-        message: "Si cet email existe, un lien de réinitialisation a été envoyé"
+        message: GENERIC_RESET_MESSAGE
       });
     }
 
     const resetToken = crypto.randomBytes(32).toString("hex");
     user.resetPasswordToken = crypto.createHash("sha256").update(resetToken).digest("hex");
-    user.resetPasswordExpires = Date.now() + 10 * 60 * 1000;
+    user.resetPasswordExpires = Date.now() + EmailService.RESET_TOKEN_TTL_MS;
     await user.save({ validateBeforeSave: false });
 
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
-
-    // Envoyer l'email de réinitialisation (via le service consolidé)
-    await EmailService.sendPasswordReset(user, resetToken);
+    // Envoyer l'email de réinitialisation (via le service consolidé).
+    // markSent() seulement en cas de succès : sinon une panne SMTP ferait
+    // perdre une demande légitime pendant une minute entière.
+    const result = await EmailService.sendPasswordReset(user, resetToken);
+    if (result.success) {
+      emailCooldown.markSent(email);
+    }
 
     res.status(200).json({
       success: true,
-      message: "Si cet email existe, un lien de réinitialisation a été envoyé"
+      message: GENERIC_RESET_MESSAGE
     });
   } catch (error) {
     console.error("❌ Erreur forgotPassword:", error);
@@ -467,6 +547,103 @@ exports.resetPassword = async (req, res) => {
   } catch (error) {
     console.error("❌ Erreur resetPassword:", error);
     res.status(500).json({ message: error.message });
+  }
+};
+
+// ===============================================
+// POST /api/v1/auth/verify-email
+// ───────────────────────────────────────────────
+// Consomme le jeton émis à l'inscription.
+//
+// Le jeton est comparé via sa forme hachée : une collision sur SHA-256 est
+// hors de portée, et le champ est `select: false` dans le modèle, il faut donc
+// le demander explicitement.
+//
+// Consumé = invalidé. Un lien ne sert qu'une fois : s'il fuite après usage
+// (historique de navigateur, proxy), il ne permet plus de revalider le compte.
+// ===============================================
+exports.verifyEmail = async (req, res) => {
+  try {
+    const token = String(req.body.token || "");
+    if (!token) {
+      return res.status(400).json({ success: false, message: "Jeton manquant" });
+    }
+
+    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+
+    const user = await User.findOne({
+      emailVerificationToken: hashedToken,
+      emailVerificationExpires: { $gt: new Date() }
+    }).select("+emailVerificationToken");
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "Ce lien est invalide ou a expiré. Demandez-en un nouveau.",
+        invalidToken: true
+      });
+    }
+
+    user.emailVerified = true;
+    user.emailVerifiedAt = new Date();
+    clearVerificationToken(user);
+    await user.save({ validateBeforeSave: false });
+
+    // Bienvenue envoyée ici plutôt qu'à l'inscription : on ne veut pas
+    // congratuler quelqu'un dont l'adresse n'est pas encore prouvée.
+    EmailService.sendWelcomeEmail(user)
+      .catch(err => console.error("⚠️ Email de bienvenue non envoyé:", err.message));
+
+    res.status(200).json({
+      success: true,
+      message: "Adresse email vérifiée. Vous pouvez vous connecter.",
+      user: publicUser(user)
+    });
+  } catch (error) {
+    console.error("❌ Erreur verifyEmail:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// ===============================================
+// POST /api/v1/auth/resend-verification
+// ───────────────────────────────────────────────
+// Renvoie le lien de vérification.
+//
+// Mêmes trois protections que /forgot-password, car l'endpoint envoie un email
+// à une adresse fournie par l'appelant :
+//   1. rate-limit par IP        → server.js (passwordResetLimiter)
+//   2. cooldown par adresse    → services/emailCooldown.js
+//   3. validation de l'email    → middlewares/validation.js
+//
+// La réponse est volontairement identique que le compte existe ou non, sinon
+// cet endpoint devient un oracle d'existence d'adresse.
+// ===============================================
+exports.resendVerification = async (req, res) => {
+  try {
+    const email = String(req.body.email || "").toLowerCase();
+
+    if (emailCooldown.isBlocked(email)) {
+      return res.status(200).json({ success: true, message: GENERIC_VERIFICATION_MESSAGE });
+    }
+
+    const user = await User.findOne({ email });
+
+    // Rien à faire si le compte n'existe pas, est déjà vérifié ou inactif.
+    if (!user || user.emailVerified || !user.isActive) {
+      return res.status(200).json({ success: true, message: GENERIC_VERIFICATION_MESSAGE });
+    }
+
+    const token = await issueVerificationToken(user);
+    const result = await EmailService.sendEmailVerification(user, token);
+    if (result.success || result.queued) {
+      emailCooldown.markSent(email);
+    }
+
+    res.status(200).json({ success: true, message: GENERIC_VERIFICATION_MESSAGE });
+  } catch (error) {
+    console.error("❌ Erreur resendVerification:", error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };
 

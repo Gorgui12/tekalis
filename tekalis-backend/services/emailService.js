@@ -3,85 +3,85 @@
 // MAJEUR 5 : Fichier unique consolidé
 //   → emailSeervice.js (typo) doit être supprimé
 //   → Ce fichier est la seule source de vérité
+//
+// Le transporteur SMTP vit désormais dans services/mailer.js : il est partagé
+// avec services/emailQueue.js (reprise sur échec). L'import se fait par
+// propriété, `mailer.xxx()`, et non par destructuration — ainsi le module
+// reste substituable, ce qui permet de tester ce que reçoit réellement le SMTP
+// sans envoyer de message.
 // ===============================================
-const nodemailer = require("nodemailer");
+const mailer = require("./mailer");
+const emailQueue = require("./emailQueue");
 const emailTemplates = require("../utils/emailTemplates");
-
-// ── Vérification de la configuration ─────────────────────────────────────────
-const isEmailConfigured = () =>
-  !!(process.env.EMAIL_HOST && process.env.EMAIL_USER && process.env.EMAIL_PASS);
-
-// ── Configuration du transporteur ────────────────────────────────────────────
-// Port 465 → secure: true (SSL)
-// Port 587 → secure: false (STARTTLS)
-// Le .env de Tekalis utilise le port 465 avec mail.tekalis.com
-const createTransporter = () => {
-  const port = Number(process.env.EMAIL_PORT) || 465;
-  return nodemailer.createTransport({
-    host: process.env.EMAIL_HOST,
-    port,
-    secure: port === 465,
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS
-    },
-    // Timeout pour éviter de bloquer le thread Node en prod
-    connectionTimeout: 10000,
-    greetingTimeout: 5000,
-    socketTimeout: 15000
-  });
-};
-
-// Singleton transporter (créé une seule fois au démarrage)
-let _transporter = null;
-
-const getTransporter = () => {
-  if (!_transporter) {
-    _transporter = createTransporter();
-  }
-  return _transporter;
-};
-
-// Vérification au démarrage (non bloquant)
-if (isEmailConfigured()) {
-  getTransporter().verify()
-    .then(() => console.log("✅ Serveur email prêt"))
-    .catch((err) => {
-      console.error("❌ Erreur configuration email:", err.message);
-      _transporter = null; // Reset pour retry au prochain envoi
-    });
-} else {
-  console.warn("⚠️  Email non configuré (EMAIL_HOST/USER/PASS manquants) — envois désactivés");
-}
 
 // ── Classe EmailService ───────────────────────────────────────────────────────
 class EmailService {
 
+  // Durée de validité d'un lien de réinitialisation. Source unique de vérité :
+  // le contrôleur la met dans resetPasswordExpires, le template l'affiche.
+  // Avant, "10 minutes" était écrit en dur des deux côtés.
+  static RESET_TOKEN_TTL_MINUTES = 10;
+  static RESET_TOKEN_TTL_MS = EmailService.RESET_TOKEN_TTL_MINUTES * 60 * 1000;
+
+  // Durée de validité du lien de vérification d'email. Volontairement plus
+  // longue que celle du reset : un client qui ne voit pas l'email tout de suite
+  // doit pouvoir en demander un nouveau sans être bloqué.
+  static EMAIL_VERIFICATION_TTL_HOURS = 24;
+  static EMAIL_VERIFICATION_TTL_MS = EmailService.EMAIL_VERIFICATION_TTL_HOURS * 60 * 60 * 1000;
+
   // ── Envoi générique ─────────────────────────────────────────────────────────
-  static async sendEmail(to, subject, html, attachments = []) {
-    if (!isEmailConfigured()) {
+  // options : { attachments, headers, text }
+  //
+  // `headers` sert notamment à poser List-Unsubscribe sur les emails marketing
+  // (obligatoire pour la délivrabilité Gmail/Yahoo des campagnes).
+  //
+  // Deux garanties ajoutées ici :
+  //  1. une partie text/plain dérivée du HTML — sans elle, Gmail classe le
+  //     message en spam et les clients texte seul affichent le HTML brut ;
+  //  2. un repli en file d'attente si l'envoi immédiat échoue, pour qu'une
+  //     coupure SMTP ne coûte pas une confirmation de commande.
+  static async sendEmail(to, subject, html, options = {}) {
+    if (!mailer.isEmailConfigured()) {
       console.log(`📧 Email ignoré (non configuré) → ${to} : ${subject}`);
       return { success: false, error: "Email non configuré" };
     }
 
+    const { attachments = [], headers = {} } = options;
+
+    const mail = {
+      from: `"${process.env.SITE_NAME || "Tekalis"}" <${process.env.EMAIL_USER}>`,
+      to,
+      subject,
+      html,
+      text: options.text || emailTemplates.htmlToText(html),
+      // Sans Reply-To explicite, une réponse du client part vers la boîte
+      // technique du site et disparaît. On expose une adresse de support.
+      replyTo: process.env.EMAIL_REPLY_TO || process.env.CONTACT_EMAIL || process.env.EMAIL_USER,
+      attachments,
+      headers
+    };
+
     try {
-      const info = await getTransporter().sendMail({
-        from: `"${process.env.SITE_NAME || "Tekalis"}" <${process.env.EMAIL_USER}>`,
-        to,
-        subject,
-        html,
-        attachments
-      });
+      const info = await mailer.getTransporter().sendMail(mail);
 
       console.log(`📧 Email envoyé: ${info.messageId} → ${to}`);
       return { success: true, messageId: info.messageId };
     } catch (error) {
       console.error(`❌ Erreur envoi email → ${to}:`, error.message);
-      // Reset transporter en cas d'erreur de connexion pour forcer reconnexion
+
       if (error.code === "ECONNECTION" || error.code === "ETIMEDOUT") {
-        _transporter = null;
+        mailer.resetTransporter();
       }
-      return { success: false, error: error.message };
+
+      // Repli : on conserve le message en base et le balayeur le rejouera.
+      // Les erreurs permanentes ne sont pas empilées — le client devra
+      // déclencher un nouvel envoi.
+      if (!mailer.isPermanentError(error)) {
+        const queued = await emailQueue.enqueue(mail);
+        return { success: false, queued: queued.success, error: error.message };
+      }
+
+      return { success: false, queued: false, error: error.message };
     }
   }
 
@@ -113,13 +113,62 @@ class EmailService {
 
   // ── Reset password ─────────────────────────────────────────────────────────
   static async sendPasswordReset(user, resetToken) {
-    const resetUrl = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
-    const html = emailTemplates.passwordReset(user, resetUrl);
+    // .replace sur la barre oblique finale : sans cela, une URL configurée avec
+    // un slash terminal produirait un lien "//reset-password/...".
+    const frontendUrl = (process.env.FRONTEND_URL || "").replace(/\/+$/, "");
+    const resetUrl = `${frontendUrl}/reset-password/${resetToken}`;
+    const html = emailTemplates.passwordReset(
+      user,
+      resetUrl,
+      EmailService.RESET_TOKEN_TTL_MINUTES
+    );
     return this.sendEmail(
       user.email,
       "🔑 Réinitialisation de votre mot de passe — Tekalis",
       html
     );
+  }
+
+  // ── Vérification de l'adresse email ────────────────────────────────────────
+  // Le lien pointe vers le front (/verify-email?token=…), pas vers l'API : le
+  // client vient de s'inscrire et doit ensuite pouvoir se connecter depuis une
+  // vraie page du site.
+  static async sendEmailVerification(user, token) {
+    const frontendUrl = (process.env.FRONTEND_URL || "").replace(/\/+$/, "");
+    const verifyUrl = `${frontendUrl}/verify-email?token=${encodeURIComponent(token)}`;
+    const html = emailTemplates.emailVerification(
+      user,
+      verifyUrl,
+      EmailService.EMAIL_VERIFICATION_TTL_HOURS
+    );
+
+    return this.sendEmail(
+      user.email,
+      "✅ Vérifiez votre adresse email — Tekalis",
+      html
+    );
+  }
+
+  // ── Newsletter : confirmation d'inscription (double opt-in) ─────────────────
+  static async sendNewsletterConfirmation(subscriber, confirmUrl, unsubscribeUrl) {
+    const html = emailTemplates.newsletterConfirmation(confirmUrl, unsubscribeUrl);
+    return this.sendEmail(
+      subscriber.email,
+      `📬 Confirmez votre inscription à la newsletter ${process.env.SITE_NAME || "Tekalis"}`,
+      html,
+      { headers: EmailService.buildUnsubscribeHeaders(unsubscribeUrl) }
+    );
+  }
+
+  // ── En-têtes List-Unsubscribe (One-Click) ───────────────────────────────────
+  // Requis par Gmail et Yahoo pour les emails marketing : sans eux, les
+  // campagnes partent en spam. Doit pointer vers une URL qui traite le
+  // désabonnement sans session ni clic supplémentaire.
+  static buildUnsubscribeHeaders(unsubscribeUrl) {
+    return {
+      "List-Unsubscribe": `<${unsubscribeUrl}>`,
+      "List-Unsubscribe-Post": "List-Unsubscribe=One-Click"
+    };
   }
 
   // ── Demande d'avis ─────────────────────────────────────────────────────────

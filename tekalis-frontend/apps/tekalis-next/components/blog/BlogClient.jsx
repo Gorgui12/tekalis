@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { FaSearch, FaFilter, FaClock, FaEye, FaTimes } from "react-icons/fa";
 import api from "@/lib/api";
+import NewsletterForm from "@/components/shared/NewsletterForm";
 
 const Blog = ({ initialArticles = [] }) => {
   const [articles, setArticles] = useState(initialArticles || []);
@@ -413,16 +414,12 @@ const Blog = ({ initialArticles = [] }) => {
           <p className="text-xl mb-6 text-purple-100">
             Recevez nos derniers articles et guides directement dans votre boîte mail
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-            <input
-              type="email"
-              placeholder="Votre email"
-              aria-label="Votre email pour la newsletter du blog"
-              className="flex-1 px-4 py-3 rounded-xl text-surface-900 focus:outline-none focus:ring-2 focus:ring-white"
+          <div className="max-w-md mx-auto">
+            <NewsletterForm
+              source="blog"
+              buttonLabel="S'abonner"
+              successLabel="Vérifiez votre boîte mail pour confirmer votre abonnement."
             />
-            <button className="bg-white text-purple-600 px-6 py-3 rounded-xl font-bold hover:bg-surface-100 transition">
-              S'abonner
-            </button>
           </div>
         </div>
       </div>

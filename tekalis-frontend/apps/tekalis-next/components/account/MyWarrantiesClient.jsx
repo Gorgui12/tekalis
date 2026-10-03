@@ -371,7 +371,14 @@ const MyWarranties = () => {
             <div>
               <p className="font-semibold mb-2">Besoin d'aide ?</p>
               <p className="text-amber-100">
-                Contactez-nous au +221 33 823 45 67 ou via WhatsApp.
+                Contactez-nous au{" "}
+                <a
+                  href="tel:+221786346946"
+                  className="underline hover:text-amber-200 transition"
+                >
+                  +221 78 634 69 46
+                </a>{" "}
+                ou via WhatsApp.
               </p>
             </div>
           </div>

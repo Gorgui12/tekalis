@@ -343,14 +343,14 @@ const OrderDetails = () => {
               </p>
               <div className="space-y-3 text-sm">
                 <a 
-                  href="tel:+221338234567"
+                  href="tel:+221786346946"
                   className="flex items-center gap-2 hover:text-amber-200 transition"
                 >
                   <FaPhone />
-                  +221 33 823 45 67
+                  +221 78 634 69 46
                 </a>
                 <a 
-                  href="https://wa.me/221776543210"
+                  href="https://wa.me/221786346946"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 hover:text-amber-200 transition"

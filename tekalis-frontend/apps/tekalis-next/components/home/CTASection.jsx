@@ -133,7 +133,9 @@ export const PresetCTAs = {
     description: "Inscrivez-vous à notre newsletter et bénéficiez de 10% de réduction sur votre première commande",
     primaryButton: {
       text: "S'inscrire maintenant",
-      link: "/newsletter"
+      // Ancre sur le formulaire réel du footer : la page /newsletter
+      // n'a jamais existé, ce lien menait à un 404.
+      link: "/#newsletter"
     },
     gradient: "from-purple-600 to-pink-600",
     icon: "📧"

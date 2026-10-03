@@ -8,6 +8,7 @@ const Order = require("../models/Order");
 const Cart = require("../models/Cart");
 const crypto = require("crypto");
 const MetaCapi = require("../services/metaCapiService");
+const EmailService = require("../services/emailService");
 
 // Configuration PayDunya
 const setup = new paydunya.Setup({
@@ -22,7 +23,7 @@ const setup = new paydunya.Setup({
 const store = new paydunya.Store({
   name: process.env.STORE_NAME || "Tekalis",
   tagline: process.env.STORE_TAGLINE || "Vente en ligne",
-  phoneNumber: process.env.STORE_PHONE || "221771234567",
+  phoneNumber: process.env.STORE_PHONE || "221786346946",
   postalAddress: process.env.STORE_ADDRESS || "Dakar, Sénégal",
   websiteURL: process.env.STORE_WEBSITE || process.env.FRONTEND_URL,
   logoURL: process.env.STORE_LOGO || `${process.env.FRONTEND_URL}/logo.png`,
@@ -287,13 +288,30 @@ const paydunyaCallback = async (req, res) => {
       order.paymentMethod = invoice?.payment_method || "online";
       order.transactionId = invoice?.token || paymentData.token;
 
+      let statusChanged = false;
+
       if (order.status === "pending") {
         order.status = "processing";
+        statusChanged = true;
       }
 
       await order.save();
 
       console.log(`✅ Paiement confirmé (double vérification) — commande ${order.orderNumber}`);
+
+      // Email au client. Le paiement fait passer la commande en « processing »
+      // sans passer par orderController.updateOrderStatus, donc aucun email
+      // n'était déclenché. On ne l'envoie que si le statut a RÉELLEMENT changé :
+      // orderStatusUpdate annonce « votre commande a changé », ce serait faux
+      // sinon. (PaymentSuccessClient n'annonce qu'une confirmation, déjà
+      // envoyée à la création de la commande.)
+      if (statusChanged && order.user && order.user.email) {
+        EmailService.sendOrderStatusUpdate(order, order.user, order.status)
+          .then((r) => {
+            if (!r.success) console.error("⚠️ Email paiement non envoyé:", r.error);
+          })
+          .catch((err) => console.error("⚠️ Email paiement non envoyé:", err.message));
+      }
 
       // ── Meta CAPI : Purchase serveur→serveur (non bloquant) ────────────
       // L'event_id = orderId permet la déduplication avec l'événement
@@ -338,6 +356,11 @@ const confirmPayment = async (req, res) => {
     await invoice.confirm(order.paymentToken);
 
     if (invoice.status === "completed") {
+      // Le webhook et cette route peuvent tous deux voir la factureCompleted.
+      // On ne déclenche l'email qu'une fois, en capturant l'état AVANT écriture.
+      const alreadyPaid = order.paymentStatus === "paid";
+      let statusChanged = false;
+
       order.paymentStatus = "paid";
       order.isPaid = true;
       order.paidAt = new Date();
@@ -352,9 +375,21 @@ const confirmPayment = async (req, res) => {
 
       if (order.status === "pending") {
         order.status = "processing";
+        statusChanged = true;
       }
 
       await order.save();
+
+      // Voir le commentaire équivalent dans paydunyaCallback : on n'écrit que
+      // si le statut a changé, sinon l'email annoncerait une transition qui
+      // n'a pas eu lieu.
+      if (!alreadyPaid && statusChanged && req.user && req.user.email) {
+        EmailService.sendOrderStatusUpdate(order, req.user, order.status)
+          .then((r) => {
+            if (!r.success) console.error("⚠️ Email paiement non envoyé:", r.error);
+          })
+          .catch((err) => console.error("⚠️ Email paiement non envoyé:", err.message));
+      }
 
       // ── Meta CAPI : Purchase (chemin alternatif au webhook, non bloquant)
       MetaCapi.trackPurchase({

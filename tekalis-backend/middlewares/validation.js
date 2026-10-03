@@ -46,6 +46,33 @@ const authValidation = {
       .notEmpty().withMessage("Le mot de passe est requis"),
     validate
   ],
+  forgotPassword: [
+    body("email")
+      .trim()
+      .notEmpty().withMessage("L'email est requis")
+      .isEmail().withMessage("Email invalide")
+      .normalizeEmail(),
+    validate
+  ],
+  // Jeton de vérification d'email : hex de 64 caractères
+  // (crypto.randomBytes(32)). Même bornage que pour le reset de mot de passe.
+  verifyEmail: [
+    body("token")
+      .notEmpty().withMessage("Le jeton est requis")
+      .isLength({ min: 32, max: 128 }).withMessage("Jeton invalide"),
+    validate
+  ],
+  resetPassword: [
+    // Le jeton est un hex de 64 caractères (crypto.randomBytes(32)).
+    // On borne la longueur pour ne pas interroger la base avec n'importe
+    // quoi, tout en gardant la porte ouverte si la taille change un jour.
+    param("token")
+      .isLength({ min: 32, max: 128 }).withMessage("Jeton invalide"),
+    body("password")
+      .notEmpty().withMessage("Le mot de passe est requis")
+      .isLength({ min: 6 }).withMessage("Le mot de passe doit contenir au moins 6 caractères"),
+    validate
+  ],
   googleLogin: [
     // Validateur unique volontairement : sur un champ opaque, une seule
     // erreur claire vaut mieux que trois messages qui se répètent. (.bail()
@@ -134,11 +161,29 @@ const cartValidation = {
   ]
 };
 
+// ===============================================
+// Validations pour la newsletter
+// ===============================================
+const newsletterValidation = {
+  subscribe: [
+    body("email")
+      .trim()
+      .notEmpty().withMessage("L'email est requis")
+      .isEmail().withMessage("Email invalide")
+      .normalizeEmail(),
+    body("source")
+      .optional()
+      .isIn(["footer", "blog", "cta", "api"]).withMessage("Source invalide"),
+    validate
+  ]
+};
+
 module.exports = {
   validate,
   authValidation,
   productValidation,
   orderValidation,
   reviewValidation,
-  cartValidation
+  cartValidation,
+  newsletterValidation
 };
