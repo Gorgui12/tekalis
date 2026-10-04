@@ -14,6 +14,27 @@ const connectDB = async () => {
       serverSelectionTimeoutMS: 10000, // Timeout après 10 secondes
       socketTimeoutMS: 45000, // Timeout socket après 45 secondes
       connectTimeoutMS: 10000, // Timeout de connexion après 10 secondes
+
+      // ── Dimensionnement du pool ──────────────────────────────────────────────
+      // Le défaut Mongoose (100 connexions) est dimensionné pour un cluster
+      // entier : sur une instance unique il ouvre des sockets vers Atlas en
+      // continu, pour rien. 20 couvre largement le pic d'une boutique et reste
+      // sous les quotas d'Atlas.
+      maxPoolSize: 20,
+      minPoolSize: 2,
+
+      // Reconnexion avant qu'Atlas coupe un socket idle (connexion gratuite
+      // inactivée) : le symptôme était une latence de plusieurs secondes
+      // suivie d'une erreur sur la première requête après une pause.
+      maxIdleTimeMS: 30000,
+      heartbeatFrequencyMS: 10000,
+
+      // Le point le plus important. Par défaut, une requête qui ne trouve pas
+      // de connexion libre reste EN ATTENTE INDÉFINIMENT : la requête HTTP
+      // promise donc des heures, le navigateur abandonne, et l'API passe pour
+      // morte alors que le process tourne. Avec ce délai, elle échoue
+      // explicitement en 10 s et l'erreur remonte au client au lieu de disparaitre.
+      waitQueueTimeoutMS: 10000,
     };
 
     // Connexion à MongoDB
@@ -35,12 +56,9 @@ const connectDB = async () => {
       console.log("⚠️ Mongoose disconnected from DB");
     });
 
-    // Fermeture propre de la connexion lors de l'arrêt de l'application
-    process.on("SIGINT", async () => {
-      await mongoose.connection.close();
-      console.log("🔒 Mongoose connection closed due to app termination");
-      process.exit(0);
-    });
+    // La fermeture propre est gérée dans server.js (shutdown()), qui possède
+    // déjà la référence au serveur HTTP et au file d'emails. Un handler
+    // SIGINT ici appelerait process.exit(0) en court-circuitant ces étapes.
 
   } catch (error) {
     console.error("❌ MongoDB Connection Error:");

@@ -59,6 +59,16 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const API_PREFIX = "/api/v1";
 
+// ─── Trust proxy (INDISPENSABLE) ──────────────────────────────────────────────
+// L'API tourne derrière le reverse proxy de Render. Sans cette ligne, req.ip
+// vaut l'IP INTERNE du proxy — identique pour tous les visiteurs — et les
+// rate-limiters keyed par IP se retrouvent à compter TOUTE la boutique dans un
+// seul seau. Symptôme observé : la boutique répond, puis plus rien pendant 15
+// minutes (le temps que la fenêtre glisse). Le nombre de sauts pour Render est
+// 1 ; `true` serait laxiste (un client pourrait usurper l'en-tête pour
+// contourner le rate-limiting). D'où le 1 : on ne fait confiance qu'à Render.
+app.set("trust proxy", 1);
+
 const sitemapRouter = require("./routes/sitemap");
 app.use("/api/v1", sitemapRouter);
 
@@ -148,12 +158,59 @@ const createSoftLimiter = (options) => {
   return rateLimit(options);
 };
 
+// ── Lectures publiques : hors budget du limiteur global ───────────────────────
+// Les pages catalogue sont lues par les crawlers (SEO), par le rendu serveur de
+// Vercel (ISR) et par les visiteurs. Les facturer sur le quota global revient à
+// laisser un robot réveiller le quota que le visiteur suivant doit payer —
+// c'est-à-dire recréer le bug de coupure globale, plus lentement et de façon
+// incompréhensible.
+//
+// Chemins RELATIFS à /api/v1 : c'est ce que vaut req.path dans un app.use
+// monté sur API_PREFIX (req.url y est déjà amputé du préfixe). Écrire
+// "/api/v1/products" ici ne matchait jamais — l'exemption était morte.
+const PUBLIC_READ_PATHS = [
+  "/products",
+  "/categories",
+  "/articles",
+  "/hero",
+  "/trends",
+  "/settings/public",
+];
+
+// Liste seulement : /products/:id incrémente viewCount et écrit en base, ce
+// n'est pas une lecture. isPublicRead ne retient que le GET, donc un POST
+// admin sur /products reste soumis au quota global.
+const isPublicRead = (req) =>
+  req.method === "GET" && PUBLIC_READ_PATHS.includes(req.path);
+
+// AloneLimiter borne quand même ces endpoints par IP, plus bas que l'ancien
+// plafond global — un 429 reste un vrai 429, on ne perd pas de page SEO.
+const aloneLimiter = createLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: parseInt(process.env.RATE_LIMIT_PUBLIC_READ_MAX) || 300,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: "Trop de requêtes, veuillez réessayer plus tard" },
+});
+
+app.use(API_PREFIX, (req, res, next) =>
+  isPublicRead(req) ? aloneLimiter(req, res, next) : next()
+);
+
+// 600 et non 100 : avec `trust proxy` actif chaque visiteur a son propre seau,
+// mais les appels serveur de Vercel (ISR, sitemap) sortent d'un petit pool d'IP
+// de sortie partagées. Une session de navigation réelle plafonne autour de 40
+// appels par quart d'heure — 100 la tuait, 600 laisse dix fois de marge.
 const apiLimiter = createSoftLimiter({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
+  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 600,
   message: { success: false, message: "Trop de requêtes, veuillez réessayer plus tard" },
   standardHeaders: true,
-  legacyHeaders: false
+  legacyHeaders: false,
+  // Indispensable : aloneLimiter appelle next() en cas de succès, et l'appel
+  // retombait donc sur ce limiteur. Sans ce skip, une lecture publique
+  // consommerait les DEUX seaux — l'exemption serait sans effet.
+  skip: (req) => isPublicRead(req)
 });
 
 const authLimiter = createLimiter({
@@ -288,15 +345,55 @@ const server = app.listen(PORT, () => {
   `);
 });
 
-process.on("unhandledRejection", (err) => {
-  console.error("❌ Unhandled Rejection:", err.message);
-  server.close(() => process.exit(1));
+// ─── Arrêt du process ─────────────────────────────────────────────────────────
+// server.close() cesse d'écouter immédiatement (les nouvelles connexions sont
+// refusées) mais son callback ne part qu'une fois TOUTES les connexions
+// terminées. Sans le filet de sécurité ci-dessous, une seule connexion qui
+// traîne — requête Mongo sans réponse, socket client jamais fermé — laissait un
+// process VIVANT mais sourd : le port ne répondait plus, `process.exit` n'était
+// jamais atteint, donc aucun redémarrage. C'était le second mode de panne,
+// celui qui ne se résorbait pas tout seul.
+let _shuttingDown = false;
+
+const shutdown = (reason, code) => {
+  if (_shuttingDown) return;
+  _shuttingDown = true;
+  console.log(`🛑 Arrêt du serveur (${reason})`);
+
+  try {
+    emailQueue.stop();
+  } catch (e) {
+    console.error("emailQueue.stop():", e.message);
+  }
+
+  // Les sockets Mongo tiennent la boucle d'événements ouverte : sans cette
+  // fermeture, la sortie peut être repoussée de plusieurs secondes.
+  require("mongoose").connection.close().catch(() => {});
+
+  server.close(() => process.exit(code));
+
+  // D'abord les connexions inactives (aucune requête en vol), puis les
+  // restantes : closeAllConnections ne doit pas tomber comme une brique sur
+  // une requête légitime en cours de traitement.
+  server.closeIdleConnections?.();
+  setTimeout(() => server.closeAllConnections?.(), 3000);
+
+  // Filet ultime : on sort quoi qu'il arrive, pour que Render redémarre le
+  // service. unref() évite de maintenir la boucle en vie pour ce seul timer.
+  setTimeout(() => process.exit(code), 8000).unref();
+};
+
+process.on("unhandledRejection", (reason) => {
+  console.error("❌ Unhandled Rejection:", reason?.stack || reason);
+  shutdown("unhandledRejection", 1);
 });
 
-process.on("SIGTERM", () => {
-  console.log("🛑 SIGTERM reçu — arrêt propre du serveur");
-  emailQueue.stop();
-  server.close(() => process.exit(0));
+process.on("uncaughtException", (err) => {
+  console.error("❌ Uncaught Exception:", err?.stack || err);
+  shutdown("uncaughtException", 1);
 });
+
+process.on("SIGTERM", () => shutdown("SIGTERM", 0));
+process.on("SIGINT", () => shutdown("SIGINT", 0));
 
 module.exports = app;

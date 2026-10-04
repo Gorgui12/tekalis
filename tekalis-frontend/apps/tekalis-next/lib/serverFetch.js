@@ -17,6 +17,13 @@ const BASE = rawBase.replace(/\/+$/, "").replace(/\/api\/v1$/, "") + "/api/v1";
  */
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
+// Un 429 signifie « quota déjà épuisé » : réessayer ne fait qu'allonger la
+// fenêtre. Insister sur un seau plein le repousse encore plus loin (chaque
+// tentative est elle-même comptée), ce qui transformait un pic de trafic
+// passager en coupure de tout le site. 5xx et erreurs réseau en revanche
+// méritent de l'insistance : ils se résorbent seuls.
+const MAX_429_RETRIES = 1;
+
 export async function serverFetch(path, options = {}) {
   const { revalidate = 3600, timeout = 15000, maxRetries = 3, ...rest } = options;
 
@@ -48,11 +55,21 @@ export async function serverFetch(path, options = {}) {
     }
     clearTimeout(t);
 
-    // 429 = rate-limit, 5xx = surcharge : on retente avec backoff
-    if (res.status === 429 || res.status >= 500) {
+    // Quota épuisé : une seule reprise, courte. Au-delà on aggrave la situation.
+    if (res.status === 429) {
+      lastErr = new Error(`API 429 (rate-limit): ${path}`);
+      if (attempt < Math.min(maxRetries, MAX_429_RETRIES)) {
+        await sleep(2000);
+        continue;
+      }
+      throw lastErr;
+    }
+
+    // 5xx = surcharge ou cold start : on retente avec backoff
+    if (res.status >= 500) {
       lastErr = new Error(`API ${res.status}: ${path}`);
       if (attempt < maxRetries) {
-        await sleep((res.status === 429 ? 1500 : 800) * (attempt + 1));
+        await sleep(800 * (attempt + 1));
         continue;
       }
       throw lastErr;
