@@ -71,8 +71,8 @@ const ReviewForm = ({ productId, onSuccess }) => {
     setLoading(true);
     try {
       const { data } = await api.post(
-        `/products/${productId}/reviews`,
-        { rating, title: title.trim(), comment: comment.trim() },
+        "/reviews",
+        { productId, rating, title: title.trim(), comment: comment.trim() },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setSubmitted(true);

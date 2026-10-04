@@ -43,10 +43,31 @@ const Addresses = () => {
     fetchAddresses();
   }, [user, navigate]);
 
+  // Mapping API <-> formulaire : l'API stocke `fullAddress`/`city`
+  // alors que l'UI manipule `address`/`region`/`fullName`.
+  const addressToView = (a) => ({
+    _id: a._id,
+    label: a.label || "",
+    fullName: user?.name || "",
+    phone: a.phone || "",
+    address: a.fullAddress || "",
+    city: a.city || "",
+    region: a.city || "",
+    isDefault: !!a.isDefault
+  });
+
+  const formToApi = (f) => ({
+    label: f.label,
+    fullAddress: f.address,
+    city: f.city,
+    phone: f.phone,
+    isDefault: f.isDefault
+  });
+
   const fetchAddresses = async () => {
     try {
-      const { data } = await api.get("/addresses");
-      setAddresses(data.addresses || []);
+      const { data } = await api.get("/users/me");
+      setAddresses((data.user?.addresses || []).map(addressToView));
     } catch (error) {
       if (error.response?.status === 404) {
         setAddresses([]);
@@ -101,11 +122,11 @@ const Addresses = () => {
     try {
       if (editingAddress) {
         // Modifier
-        await api.put(`/addresses/${editingAddress._id}`, formData);
+        await api.put(`/users/me/addresses/${editingAddress._id}`, formToApi(formData));
         toast.success("Adresse modifiée avec succès !");
       } else {
         // Ajouter
-        await api.post("/addresses", formData);
+        await api.post("/users/me/addresses", formToApi(formData));
         toast.success("Adresse ajoutée avec succès !");
       }
       
@@ -123,7 +144,7 @@ const Addresses = () => {
     }
 
     try {
-      await api.delete(`/addresses/${id}`);
+      await api.delete(`/users/me/addresses/${id}`);
       toast.success("Adresse supprimée avec succès !");
       fetchAddresses();
     } catch (error) {
@@ -134,7 +155,7 @@ const Addresses = () => {
   // Définir comme adresse par défaut
   const setDefaultAddress = async (id) => {
     try {
-      await api.put(`/addresses/${id}/set-default`);
+      await api.put(`/users/me/addresses/${id}/set-default`);
       fetchAddresses();
     } catch (error) {
       toast.error("Erreur lors de la mise à jour de l'adresse par défaut");

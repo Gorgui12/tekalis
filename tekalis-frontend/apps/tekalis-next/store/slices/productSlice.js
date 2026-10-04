@@ -24,7 +24,7 @@ export const fetchProducts = createAsyncThunk("products/fetchAll", async (params
 
 export const fetchProductBySlug = createAsyncThunk("products/fetchBySlug", async (slug, { rejectWithValue }) => {
   try {
-    const { data } = await api.get(`/products/slug/${slug}`);
+    const { data } = await api.get(`/products/${slug}`);
     return data;
   } catch (err) {
     return rejectWithValue(err.response?.data?.message || "Produit introuvable");

@@ -29,6 +29,9 @@ router.post("/", orderValidation.create, orderController.createOrder);
 // GET /api/v1/orders/my-orders (AVANT /:id)
 router.get("/my-orders", orderController.getMyOrders);
 
+// PUT /api/v1/orders/:id/cancel — Annuler sa commande (client)
+router.put("/:id/cancel", orderController.cancelOrder);
+
 // GET /api/v1/orders/:id
 router.get("/:id", orderController.getOrderById);
 

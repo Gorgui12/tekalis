@@ -13,6 +13,7 @@ import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useRouter } from "next/navigation";
 import { clearCart } from "@/store/slices/cartSlice";
+import { computePromoDiscount } from "@/lib/utils/promo";
 import { useToast } from "@/components/shared/ToastProvider";
 import api from "@/lib/api";
 import {
@@ -32,7 +33,7 @@ const CheckoutForm = () => {
   const navigate = (path) => router.push(path);
   const toast       = useToast();
 
-  const { items, totalAmount } = useSelector((state) => state.cart);
+  const { items, totalAmount, promo } = useSelector((state) => state.cart);
   const { user }               = useSelector((state) => state.auth);
 
   const [step,           setStep]           = useState(2);
@@ -98,6 +99,9 @@ const CheckoutForm = () => {
         // Totaux — le backend utilise "totalPrice"
         totalPrice: totalWithDelivery,
 
+        // Code promo — revalidé et recalculé côté serveur
+        ...(promo?.code ? { promoCode: promo.code } : {}),
+
         // Paiement
         paymentMethod: "cash",
         paymentStatus: "pending",
@@ -141,8 +145,10 @@ const CheckoutForm = () => {
     }
   };
 
-  const deliveryFee       = deliveryData?.deliveryMode?.price ?? 0;
-  const totalWithDelivery = totalAmount + deliveryFee;
+  const deliveryFee         = deliveryData?.deliveryMode?.price ?? 0;
+  const totalWithDelivery   = totalAmount + deliveryFee;
+  const promoDiscountAmount = computePromoDiscount(promo, totalAmount);
+  const payableTotal        = Math.max(0, totalWithDelivery - promoDiscountAmount);
 
   return (
     <div className="space-y-8">
@@ -199,7 +205,7 @@ const CheckoutForm = () => {
 
               <PaymentMethods
                 onPay={handlePay}
-                totalAmount={totalWithDelivery}
+                totalAmount={payableTotal}
                 loading={paymentLoading}
               />
             </div>
@@ -208,7 +214,7 @@ const CheckoutForm = () => {
 
         {/* Récapitulatif */}
         <div className="lg:col-span-1">
-          <OrderSummary deliveryFee={deliveryFee} />
+          <OrderSummary deliveryFee={deliveryFee} promo={promo} />
         </div>
       </div>
     </div>

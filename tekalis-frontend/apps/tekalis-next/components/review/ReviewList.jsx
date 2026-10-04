@@ -44,7 +44,7 @@ const ReviewList = ({ productId, rating = {}, showForm = true }) => {
 
       const { data } = await api.get(`/reviews/${productId}?${params}`);
       setReviews(data.reviews || []);
-      setTotalPages(data.totalPages || 1);
+      setTotalPages(data.pagination?.pages || data.totalPages || 1);
     } catch (err) {
       console.error("Erreur chargement avis", err);
     } finally {
@@ -59,7 +59,7 @@ const ReviewList = ({ productId, rating = {}, showForm = true }) => {
   // ─── Vote utile ───────────────────────────────────────────────────────────
   const handleHelpful = async (reviewId, helpful) => {
     try {
-      await api.post(`/reviews/${reviewId}/helpful`, { helpful });
+      await api.put(`/reviews/${reviewId}/helpful`, { helpful });
     } catch (err) {
       console.error(err);
     }

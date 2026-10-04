@@ -48,7 +48,7 @@ export const googleLogin = createAsyncThunk("auth/google", async (idToken, { rej
 
 export const updateProfile = createAsyncThunk("auth/updateProfile", async (userData, { rejectWithValue }) => {
   try {
-    const { data } = await api.put("/auth/profile", userData);
+    const { data } = await api.put("/users/me", userData);
     return data.user;
   } catch (err) {
     return rejectWithValue(err.response?.data?.message || "Erreur de mise a jour");

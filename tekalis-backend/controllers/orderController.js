@@ -264,6 +264,62 @@ exports.getOrderById = async (req, res) => {
 };
 
 // ===============================================
+// PUT /api/v1/orders/:id/cancel — Annuler sa commande (client)
+// ===============================================
+exports.cancelOrder = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ message: "Commande introuvable" });
+    }
+
+    // Seul le propriétaire (ou un admin) peut annuler
+    if (
+      order.user.toString() !== req.user._id.toString() &&
+      !req.user.isAdmin
+    ) {
+      return res.status(403).json({ message: "Accès refusé" });
+    }
+
+    if (order.status === "cancelled") {
+      return res.status(400).json({ message: "Cette commande est déjà annulée" });
+    }
+
+    // Une commande expédiée ou livrée ne peut plus être annulée par le client
+    if (["shipped", "delivered"].includes(order.status) && !req.user.isAdmin) {
+      return res.status(400).json({
+        message: "Cette commande ne peut plus être annulée. Contactez le service client."
+      });
+    }
+
+    order.status = "cancelled";
+    await order.save();
+
+    // Remettre le stock (création de commande l'avait décrémenté)
+    const bulkOps = order.products.map(item => ({
+      updateOne: {
+        filter: { _id: item.product },
+        update: { $inc: { stock: item.quantity, salesCount: -item.quantity } }
+      }
+    }));
+    if (bulkOps.length > 0) await Product.bulkWrite(bulkOps);
+
+    res.status(200).json({ success: true, message: "Commande annulée", order });
+
+    // Email de mise à jour de statut au client (non bloquant)
+    const populated = await Order.findById(order._id).populate("user", "name email");
+    if (populated?.user?.email) {
+      EmailService.sendOrderStatusUpdate(populated, populated.user, "cancelled")
+        .catch(err => console.error("⚠️ Email annulation non envoyé:", err.message));
+    }
+  } catch (error) {
+    console.error("❌ Erreur cancelOrder:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// ===============================================
 // PUT /api/v1/orders/:id/status — Modifier statut (Admin)
 // ===============================================
 exports.updateOrderStatus = async (req, res) => {

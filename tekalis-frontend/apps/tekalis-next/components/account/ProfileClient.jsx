@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { 
   FaUser, FaEnvelope, FaPhone, FaMapMarkerAlt, FaEdit, FaSave, FaTimes, 
   FaSignOutAlt, FaShieldAlt, FaBell
@@ -49,12 +50,13 @@ const Profile = () => {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      setUserData(res.data);
+      const profile = res.data?.user || res.data || {};
+      setUserData(profile);
       setFormData({
-        name: res.data.name || "",
-        email: res.data.email || "",
-        phone: res.data.phone || "",
-        address: res.data.address || ""
+        name: profile.name || "",
+        email: profile.email || "",
+        phone: profile.phone || "",
+        address: profile.address || ""
       });
     } catch (error) {
       console.error("Erreur:", error);
@@ -115,12 +117,11 @@ const Profile = () => {
       return;
     }
 
-    // ✅ Sanitization
+    // ✅ Sanitization — seuls name et phone sont modifiables côté API
+    //    (email verrouillé, l'adresse se gère dans /dashboard/addresses)
     const sanitizedData = {
       name: sanitizeInput(formData.name),
-      email: sanitizeInput(formData.email),
-      phone: sanitizeInput(formData.phone),
-      address: sanitizeInput(formData.address)
+      phone: sanitizeInput(formData.phone)
     };
 
     const result = await updateProfile(sanitizedData);
@@ -166,7 +167,7 @@ const Profile = () => {
     }
 
     try {
-      await api.put("/users/change-password", passwordData);
+      await api.put("/users/me/password", passwordData);
       toast.success("Mot de passe modifié avec succès !"); // ✅ Pas d'emoji
       setPasswordData({
         currentPassword: "", 
@@ -328,17 +329,12 @@ const Profile = () => {
                   <input
                     type="email"
                     value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    disabled={!editMode}
+                    disabled
                     className={inputClasses('email')}
-                    aria-invalid={!!formErrors.email}
                   />
-                  {/* ✅ AJOUTÉ */}
-                  {formErrors.email && (
-                    <p className="mt-1 text-sm text-red-600" role="alert">
-                      {formErrors.email}
-                    </p>
-                  )}
+                  <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
+                    L'email ne peut pas être modifié. Contactez le support si nécessaire.
+                  </p>
                 </div>
 
                 <div>
@@ -371,23 +367,14 @@ const Profile = () => {
                 <div>
                   <label className="block text-sm font-semibold text-surface-700 dark:text-surface-300 mb-2">
                     <FaMapMarkerAlt className="inline mr-2 text-surface-400" />
-                    Adresse
+                    Adresses de livraison
                   </label>
-                  <textarea
-                    value={formData.address}
-                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                    disabled={!editMode}
-                    rows={3}
-                    placeholder="Votre adresse complète..."
-                    className={`${inputClasses('address')} resize-none`}
-                    aria-invalid={!!formErrors.address}
-                  />
-                  {/* ✅ AJOUTÉ */}
-                  {formErrors.address && (
-                    <p className="mt-1 text-sm text-red-600" role="alert">
-                      {formErrors.address}
-                    </p>
-                  )}
+                  <Link
+                    href="/dashboard/addresses"
+                    className="block w-full px-4 py-3 border-2 border-surface-200 dark:border-surface-700 rounded-xl text-brand-600 dark:text-brand-400 font-semibold hover:border-brand-500 transition"
+                  >
+                    Gérer mes adresses →
+                  </Link>
                 </div>
               </div>
             </div>

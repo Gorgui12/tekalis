@@ -19,8 +19,9 @@ import {
 } from "react-icons/fa";
 import api from "@/lib/api";
 import { useToast } from '@/components/shared/ToastProvider';
-const OrderDetails = () => {
-  const { id } = useParams();
+const OrderDetails = ({ orderId }) => {
+  const params = useParams();
+  const id = orderId || params?.id;
   const router = useRouter();
   const navigate = (path) => router.push(path);
   const { user } = useSelector((state) => state.auth);
@@ -38,11 +39,11 @@ const OrderDetails = () => {
     const fetchOrderDetails = async () => {
       try {
         const { data } = await api.get(`/orders/${id}`);
-        setOrder(data);
+        setOrder(data?.order || data);
       } catch (error) {
         console.error("Erreur chargement commande:", error);
         toast.error("Commande introuvable");
-        navigate("/orders");
+        navigate("/dashboard/orders");
       } finally {
         setLoading(false);
       }
@@ -64,7 +65,7 @@ const OrderDetails = () => {
       <div className="min-h-screen flex items-center justify-center mt-20">
         <div className="text-center">
           <p className="text-xl text-surface-600 dark:text-surface-400 mb-4">Commande introuvable</p>
-          <Link href="/orders" className="text-brand-600 hover:text-brand-700 dark:text-brand-400 font-semibold">
+          <Link href="/dashboard/orders" className="text-brand-600 hover:text-brand-700 dark:text-brand-400 font-semibold">
             ← Retour aux commandes
           </Link>
         </div>
@@ -188,9 +189,17 @@ const OrderDetails = () => {
                 {order.products?.map((item, idx) => (
                   <div key={idx} className="flex gap-4 pb-4 border-b border-surface-200 dark:border-surface-700 last:border-0">
                     <img
-                      src={item.product?.image || "/placeholder.png"}
+                      src={
+                        (Array.isArray(item.product?.images) && item.product.images.find((img) => img?.isPrimary)?.url) ||
+                        (Array.isArray(item.product?.images) && item.product.images[0]?.url) ||
+                        item.product?.image ||
+                        "/placeholder.png"
+                      }
                       alt={item.product?.name}
                       className="w-24 h-24 object-contain rounded border border-surface-200 dark:border-surface-700"
+                      onError={(e) => {
+                        e.target.src = "/placeholder.png";
+                      }}
                     />
                     <div className="flex-1">
                       <Link href={`/products/${item.product?.slug || item.product?._id}`}

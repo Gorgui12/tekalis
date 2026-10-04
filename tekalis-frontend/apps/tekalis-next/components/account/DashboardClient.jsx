@@ -25,20 +25,21 @@ const ClientDashboard = () => {
   // re-render / rehydration redux-persist.
   const userId = useSelector((state) => state.auth?.user?._id);
   const userName = useSelector((state) => state.auth?.user?.name);
+  const wishlistCount = useSelector((state) => state.wishlist?.items?.length || 0);
   const [isChecking, setIsChecking] = useState(true);
 
   // ✅ Fetch #1 : stats dashboard — fonction stable (useCallback), un seul appel
   const fetchDashboardStats = useCallback(async (signal) => {
-    const { data } = await api.get("/users/dashboard", { signal });
-    const d = data?.dashboard || data || {};
+    const { data } = await api.get("/users/me/stats", { signal });
+    const d = data?.stats || data?.dashboard || data || {};
     return {
       stats: {
-        orders: d.stats?.totalOrders ?? 0,
-        wishlist: d.stats?.wishlistCount ?? 0,
-        warranties: d.stats?.activeWarranties ?? 0,
-        rma: d.stats?.openRMA ?? 0,
-        totalSpent: d.stats?.totalSpent ?? 0,
-        loyaltyPoints: d.stats?.loyaltyPoints ?? 0,
+        orders: d.ordersCount ?? 0,
+        wishlist: d.wishlistCount ?? 0,
+        warranties: d.activeWarranties ?? 0,
+        rma: d.openRMA ?? 0,
+        totalSpent: d.totalSpent ?? 0,
+        loyaltyPoints: d.loyaltyPoints ?? 0,
       },
       lastOrder: d.lastOrder || null,
     };
@@ -89,14 +90,16 @@ const ClientDashboard = () => {
     );
   }
 
-  // ✅ Extraire stats et lastOrder du résultat, avec valeurs par défaut
-  const stats = dashboardData?.stats || {
+  // ✅ Extraire stats et lastOrder du résultat, avec valeurs par défaut.
+  //    `wishlist` vient du store Redux (favoris locaux), pas du backend.
+  const stats = {
     orders: 0,
-    wishlist: 0,
     warranties: 0,
     rma: 0,
     totalSpent: 0,
     loyaltyPoints: 0,
+    ...dashboardData?.stats,
+    wishlist: wishlistCount,
   };
   const lastOrder = dashboardData?.lastOrder || null;
 

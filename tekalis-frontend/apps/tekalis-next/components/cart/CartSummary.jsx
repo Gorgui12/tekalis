@@ -1,11 +1,12 @@
 ﻿"use client";
 
-import { useState } from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import Link from "next/link";
 import { FaTag, FaArrowRight, FaLock, FaTruck, FaShieldAlt } from "react-icons/fa";
 import Button from "../shared/Button";
 import PromoCodeInput from "./PromoCodeInput";
+import { applyPromo, removePromo } from "@/store/slices/cartSlice";
+import { computePromoDiscount } from "@/lib/utils/promo";
 
 /**
  * CartSummary — Récapitulatif et total du panier
@@ -13,23 +14,20 @@ import PromoCodeInput from "./PromoCodeInput";
  *   onCheckout: () => void
  */
 const CartSummary = ({ onCheckout }) => {
-  const { items, totalAmount } = useSelector(state => state.cart);
-
-  const [promoDiscount, setPromoDiscount] = useState(0);
-  const [promoCode, setPromoCode] = useState("");
+  const dispatch = useDispatch();
+  const { items, totalAmount, promo } = useSelector(state => state.cart);
 
   const subtotal = items.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
-  const discountAmount = promoDiscount > 0 ? Math.round(subtotal * (promoDiscount / 100)) : 0;
+  const discountAmount = computePromoDiscount(promo, subtotal);
   const total = subtotal - discountAmount;
+  const promoCode = promo?.code || "";
 
-  const handlePromoApplied = ({ code, discount }) => {
-    setPromoCode(code);
-    setPromoDiscount(discount);
+  const handlePromoApplied = (applied) => {
+    dispatch(applyPromo(applied));
   };
 
   const handlePromoRemoved = () => {
-    setPromoCode("");
-    setPromoDiscount(0);
+    dispatch(removePromo());
   };
 
   if (items.length === 0) return null;
@@ -91,6 +89,7 @@ const CartSummary = ({ onCheckout }) => {
         onApplied={handlePromoApplied}
         onRemoved={handlePromoRemoved}
         appliedCode={promoCode}
+        subtotal={subtotal}
       />
 
       {/* Bouton commander */}

@@ -42,10 +42,11 @@ const PaymentSuccess = ({ orderId }) => {
     try {
       // Vérifier le statut du paiement via votre backend
       const { data } = await api.get(`/orders/${orderId}`);
-      
-      if (data.paymentStatus === "paid") {
+      const order = data?.order || data;
+
+      if (order?.paymentStatus === "paid" || order?.isPaid) {
         setStatus("success");
-        setOrderDetails(data);
+        setOrderDetails(order);
       } else {
         // Attendre quelques secondes puis revérifier (webhook peut prendre du temps)
         setTimeout(() => {

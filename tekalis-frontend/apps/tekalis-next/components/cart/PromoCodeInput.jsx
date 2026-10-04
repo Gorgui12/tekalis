@@ -11,7 +11,7 @@ import api from "@/lib/api";
  *   onRemoved: () => void
  *   appliedCode: string
  */
-const PromoCodeInput = ({ onApplied, onRemoved, appliedCode = "" }) => {
+const PromoCodeInput = ({ onApplied, onRemoved, appliedCode = "", subtotal = 0 }) => {
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -25,8 +25,16 @@ const PromoCodeInput = ({ onApplied, onRemoved, appliedCode = "" }) => {
     setError("");
 
     try {
-      const { data } = await api.post("/promo/validate", { code: code.trim().toUpperCase() });
-      onApplied({ code: data.code, discount: data.discount });
+      const { data } = await api.post("/promo/validate", {
+        code: code.trim().toUpperCase(),
+        subtotal,
+      });
+      onApplied({
+        code: data.code,
+        type: data.type,
+        discount: data.discount,
+        discountAmount: data.discountAmount,
+      });
       setCode("");
     } catch (err) {
       const msg = err.response?.data?.message || "Code promo invalide ou expiré";

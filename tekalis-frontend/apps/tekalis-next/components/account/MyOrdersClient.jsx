@@ -234,9 +234,17 @@ const MyOrders = () => {
                     {order.products?.slice(0, 2).map((item, idx) => (
                       <div key={idx} className="flex gap-3">
                         <img
-                          src={item.product?.image || "/placeholder.png"}
+                          src={
+                            (Array.isArray(item.product?.images) && item.product.images.find((img) => img?.isPrimary)?.url) ||
+                            (Array.isArray(item.product?.images) && item.product.images[0]?.url) ||
+                            item.product?.image ||
+                            "/placeholder.png"
+                          }
                           alt={item.product?.name}
                           className="w-16 h-16 object-contain rounded border border-surface-200 dark:border-surface-700"
+                          onError={(e) => {
+                            e.target.src = "/placeholder.png";
+                          }}
                         />
                         <div className="flex-1">
                           <p className="font-medium text-surface-900 dark:text-white line-clamp-1">
@@ -257,7 +265,7 @@ const MyOrders = () => {
 
                   {/* Actions */}
                   <div className="flex flex-wrap gap-2">
-                    <Link href={`/orders/${order._id}`}
+                    <Link href={`/dashboard/orders/${order._id}`}
                       className="flex-1 sm:flex-none bg-brand-500 hover:bg-brand-600 text-white px-4 py-2 rounded-xl font-semibold text-center flex items-center justify-center gap-2 transition"
                     >
                       <FaEye />

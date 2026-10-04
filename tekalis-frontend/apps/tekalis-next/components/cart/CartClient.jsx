@@ -58,10 +58,13 @@ const Cart = () => {
         <div className="lg:col-span-2 space-y-4">
           {items.map((item) => {
             const price = item.price || 0;
+            const product = item.product || item;
+            const images = product?.images || item?.images || [];
             const imageUrl =
-              item.images?.find((img) => img.isPrimary)?.url ||
-              item.images?.[0]?.url ||
-              item.image ||
+              (Array.isArray(images) ? images.find((img) => img?.isPrimary)?.url : null) ||
+              (Array.isArray(images) && images.length > 0 ? images[0]?.url : null) ||
+              product?.image ||
+              item?.image ||
               "/images/no-image.webp";
 
             return (
@@ -73,7 +76,7 @@ const Cart = () => {
                 <div className="flex-shrink-0 w-full sm:w-28 h-28 bg-surface-50 dark:bg-surface-900 rounded-xl overflow-hidden flex items-center justify-center">
                   <img
                     src={imageUrl}
-                    alt={item.name}
+                    alt={product?.name || item.name}
                     className="w-full h-full object-contain p-2"
                     onError={(e) => {
                       e.target.src = "/images/no-image.webp";
@@ -84,13 +87,13 @@ const Cart = () => {
                 {/* Détails */}
                 <div className="flex-1 flex flex-col justify-between">
                   <div>
-                    {item.brand && (
+                    {(product?.brand || item.brand) && (
                       <p className="text-xs text-surface-400 dark:text-surface-400 uppercase font-semibold mb-0.5 tracking-wide">
-                        {item.brand}
+                        {product?.brand || item.brand}
                       </p>
                     )}
                     <h3 className="font-semibold font-display text-surface-900 dark:text-white mb-1 line-clamp-2">
-                      {item.name}
+                      {product?.name || item.name}
                     </h3>
                     <p className="text-brand-600 dark:text-brand-400 font-bold text-xl">
                       {price.toLocaleString()} FCFA

@@ -8,6 +8,8 @@ const express = require("express");
 const router = express.Router();
 const User = require("../models/User");
 const Order = require("../models/Order");
+const Warranty = require("../models/Warranty");
+const RMA = require("../models/RMA");
 const { verifyToken } = require("../middlewares/authMiddleware");
 const bcrypt = require("bcryptjs");
 
@@ -133,7 +135,7 @@ router.get("/me/stats", async (req, res) => {
   try {
     const userId = req.user._id;
 
-    const [ordersCount, totalSpentData, lastOrder, ordersByStatus] = await Promise.all([
+    const [ordersCount, totalSpentData, lastOrder, ordersByStatus, activeWarranties, openRMA] = await Promise.all([
       Order.countDocuments({ user: userId }),
       Order.aggregate([
         { $match: { user: userId, isPaid: true } },
@@ -143,14 +145,25 @@ router.get("/me/stats", async (req, res) => {
       Order.aggregate([
         { $match: { user: userId } },
         { $group: { _id: "$status", count: { $sum: 1 } } }
-      ])
+      ]),
+      Warranty.countDocuments({ user: userId, status: "active" }),
+      RMA.countDocuments({
+        user: userId,
+        status: { $nin: ["resolved", "rejected", "cancelled"] }
+      })
     ]);
+
+    const totalSpent = totalSpentData[0]?.total || 0;
 
     res.status(200).json({
       success: true,
       stats: {
         ordersCount,
-        totalSpent: totalSpentData[0]?.total || 0,
+        totalSpent,
+        // 1 point de fidélité par tranche de 1 000 FCFA dépensés
+        loyaltyPoints: Math.floor(totalSpent / 1000),
+        activeWarranties,
+        openRMA,
         lastOrder,
         ordersByStatus: ordersByStatus.reduce((acc, item) => {
           acc[item._id] = item.count;
@@ -199,6 +212,74 @@ router.post("/me/addresses", async (req, res) => {
     res.status(200).json({ success: true, message: "Adresse ajoutée", addresses: user.addresses });
   } catch (error) {
     console.error("❌ Erreur add address:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// ===============================================
+// PUT /api/v1/users/me/addresses/:addressId
+// ===============================================
+router.put("/me/addresses/:addressId", async (req, res) => {
+  try {
+    const { label, fullAddress, city, postalCode, country, phone, isDefault } = req.body;
+
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "Utilisateur non trouvé" });
+    }
+
+    const address = user.addresses.id(req.params.addressId);
+    if (!address) {
+      return res.status(404).json({ success: false, message: "Adresse non trouvée" });
+    }
+
+    if (label !== undefined) address.label = label;
+    if (fullAddress !== undefined) address.fullAddress = fullAddress;
+    if (city !== undefined) address.city = city;
+    if (postalCode !== undefined) address.postalCode = postalCode;
+    if (country !== undefined) address.country = country;
+    if (phone !== undefined) address.phone = phone;
+
+    if (isDefault) {
+      user.addresses.forEach(addr => {
+        if (addr._id.toString() !== address._id.toString()) addr.isDefault = false;
+      });
+      address.isDefault = true;
+    }
+
+    await user.save();
+
+    res.status(200).json({ success: true, message: "Adresse mise à jour", addresses: user.addresses });
+  } catch (error) {
+    console.error("❌ Erreur update address:", error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// ===============================================
+// PUT /api/v1/users/me/addresses/:addressId/set-default
+// ===============================================
+router.put("/me/addresses/:addressId/set-default", async (req, res) => {
+  try {
+    const user = await User.findById(req.user._id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: "Utilisateur non trouvé" });
+    }
+
+    const address = user.addresses.id(req.params.addressId);
+    if (!address) {
+      return res.status(404).json({ success: false, message: "Adresse non trouvée" });
+    }
+
+    user.addresses.forEach(addr => {
+      addr.isDefault = addr._id.toString() === address._id.toString();
+    });
+
+    await user.save();
+
+    res.status(200).json({ success: true, message: "Adresse par défaut mise à jour", addresses: user.addresses });
+  } catch (error) {
+    console.error("❌ Erreur set default address:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 });

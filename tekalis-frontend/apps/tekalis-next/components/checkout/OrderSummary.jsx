@@ -3,19 +3,20 @@
 import { useSelector } from "react-redux";
 import Link from "next/link";
 import { FaShoppingCart, FaEdit, FaTag } from "react-icons/fa";
+import { computePromoDiscount } from "@/lib/utils/promo";
 
 /**
  * OrderSummary — Récapitulatif de commande pour le checkout
  * Props:
  *   deliveryFee: number (0 = gratuit)
- *   promoDiscount: number
- *   promoCode: string
+ *   promo: objet retourné par POST /promo/validate | null
  */
-const OrderSummary = ({ deliveryFee = 0, promoDiscount = 0, promoCode = "" }) => {
+const OrderSummary = ({ deliveryFee = 0, promo = null }) => {
   const { items, totalAmount } = useSelector(state => state.cart);
 
   const subtotal = items.reduce((sum, item) => sum + item.price * (item.quantity || 1), 0);
-  const discountAmount = promoDiscount > 0 ? Math.round(subtotal * (promoDiscount / 100)) : 0;
+  const discountAmount = computePromoDiscount(promo, subtotal);
+  const promoCode = promo?.code || "";
   const total = subtotal - discountAmount + deliveryFee;
 
   return (
@@ -41,16 +42,27 @@ const OrderSummary = ({ deliveryFee = 0, promoDiscount = 0, promoCode = "" }) =>
             {/* Image */}
             <div className="w-12 h-12 bg-surface-100 dark:bg-surface-700 rounded-lg flex-shrink-0 overflow-hidden">
               <img
-                src={item.image || "/images/no-image.webp"}
-                alt={item.name}
+                src={
+                  (Array.isArray(item?.images) && item.images.find((img) => img?.isPrimary)?.url) ||
+                  (Array.isArray(item?.images) && item.images[0]?.url) ||
+                  (Array.isArray(item?.product?.images) && item.product.images.find((img) => img?.isPrimary)?.url) ||
+                  (Array.isArray(item?.product?.images) && item.product.images[0]?.url) ||
+                  item?.image ||
+                  item?.product?.image ||
+                  "/images/no-image.webp"
+                }
+                alt={item.name || item.product?.name}
                 className="w-full h-full object-contain p-1"
+                onError={(e) => {
+                  e.target.src = "/images/no-image.webp";
+                }}
               />
             </div>
 
             {/* Infos */}
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-surface-900 dark:text-white line-clamp-1">
-                {item.name}
+                {item.name || item.product?.name}
               </p>
               <p className="text-xs text-surface-500 dark:text-surface-400">
                 Qté : {item.quantity || 1}

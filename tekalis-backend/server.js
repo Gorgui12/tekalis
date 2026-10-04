@@ -244,6 +244,7 @@ loadRoute(`${API_PREFIX}/articles`, "./routes/articleRoutes");
 loadRoute(`${API_PREFIX}/hero`, "./routes/heroRoutes");
 loadRoute(`${API_PREFIX}/users`, "./routes/userRoutes");
 loadRoute(`${API_PREFIX}/cart`, "./routes/cartRoutes");
+loadRoute(`${API_PREFIX}/promo`, "./routes/promoRoutes");
 loadRoute(`${API_PREFIX}/orders`, "./routes/orderRoutes");
 loadRoute(`${API_PREFIX}/reviews`, "./routes/reviewRoutes");
 loadRoute(`${API_PREFIX}/warranties`, "./routes/warrantyRoutes");
