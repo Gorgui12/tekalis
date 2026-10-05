@@ -1,4 +1,5 @@
 import { PRIX_GUIDES } from '@/lib/utils/prixGuides';
+import { KNOWN_CATEGORY_SLUGS, categoryPath, productPath, articlePath } from '@/lib/seo/config';
 
 const SITE_URL = 'https://tekalis.com';
 
@@ -80,17 +81,20 @@ export default async function sitemap() {
     categoryEntries = categories
       .filter((c) => c.isActive !== false)
       .map((c) => ({
-        url: `${SITE_URL}/category/${c.slug}`,
+        url: `${SITE_URL}${categoryPath(c.slug)}`,
         lastModified: new Date(c.updatedAt || c.createdAt || Date.now()),
         changeFrequency: 'daily',
         priority: 0.9,
       }));
   } catch (err) {
     console.error('[sitemap] Categories fetch failed, using fallback:', err.message);
-    const FALLBACK_SLUGS = [
-      'smartphones', 'ordinateurs', 'gaming', 'tv',
-      'electromenager', 'climatiseurs', 'energie-solaire', 'accessoires', 'audio',
-    ];
+    /*
+     * Repli : on n'invente pas de slugs, on reutilise la liste des categories
+     * reelles (lib/seo/config.js). Le'ancien repli contenait `climatiseurs`,
+     * qui n'existe pas dans l'API (le vrai slug est `climatisation`) : cela
+     * declarait dans le sitemap une URL qui repondait 404.
+     */
+    const FALLBACK_SLUGS = KNOWN_CATEGORY_SLUGS;
     categoryEntries = FALLBACK_SLUGS.map((slug) => ({
       url: `${SITE_URL}/category/${slug}`,
       lastModified: new Date(),
@@ -103,7 +107,7 @@ export default async function sitemap() {
   try {
     const products = await fetchAllProducts();
     productEntries = products.map((p) => ({
-      url: `${SITE_URL}/products/${p.slug || p._id}`,
+      url: `${SITE_URL}${productPath(p.slug || p._id)}`,
       lastModified: new Date(p.updatedAt || Date.now()),
       changeFrequency: 'weekly',
       priority: 0.8,
@@ -116,7 +120,7 @@ export default async function sitemap() {
   try {
     const articles = await fetchAllArticles();
     articleEntries = articles.map((a) => ({
-      url: `${SITE_URL}/blog/${a.slug}`,
+      url: `${SITE_URL}${articlePath(a.slug)}`,
       lastModified: new Date(a.updatedAt || Date.now()),
       changeFrequency: 'monthly',
       priority: 0.6,

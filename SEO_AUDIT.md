@@ -191,8 +191,8 @@ Les commentaires du code confirment que ce choix est|delibere (« H1 server-rend
 
 | Element | Etat | Emplacement |
 |---|---|---|
-| `robots.txt` | ✅ present, **bloque `/login`, `/register`, `/cart`, `/checkout`, `/dashboard`, `/profile`, `/wishlist`, `/admin`, `/api/`** | `app/robots.js` |
-| `sitemap.xml` | ✅ dynamique (produits, categories, articles, 7 guides de prix, 15 pages statiques) | `app/sitemap.js` |
+| `robots.txt` | ✅ present, **ne bloque plus que `/admin`, `/api/`, `/payment/`** ; `/login`, `/register`, `/cart` etc. restent crawlables pour que leur `noindex` soit lu (corrige phase 5) | `app/robots.js` |
+| `sitemap.xml` | ✅ dynamique (produits, categories, articles, 7 guides de prix, 15 pages statiques) ; **239 URL servies, 0 URL invalide** (corrige phase 5) | `app/sitemap.js` |
 | canonical | ✅ sur accueil, `/products`, categories, blog, prix, contact, apropos, faq, livraison, garanties, retours, cgv, mentions, politique, cookies, tendances, fiches produit. ❌ sur login/register/cart/checkout/profile/wishlist/dashboard |.pages |
 | JSON-LD | ✅ `LocalBusiness` (layout), `WebSite`+`SearchAction` (accueil), `CollectionPage` (`/products`, categories, `/prix`), `Product`+`BreadcrumbList` (fiche), `Article`+`Person`+`BreadcrumbList` (blog), `Blog`, `ItemList` (`/tendances`, `/prix/[slug]`), `FAQPage` (accueil, categories, fiche, `/faq`) | voir section 5 |
 | `metadataBase` | ✅ | `app/layout.jsx:26` |
@@ -202,7 +202,7 @@ Les commentaires du code confirment que ce choix est|delibere (« H1 server-rend
 
 1. **`FAQPage` est en tension avec les directives de Google.** Google n'affiche plus les resultats enrichis FAQ que pour quelques sites institutionnels de premier plan, et **une balise `FAQPage` sans contenu visible equivalent est une violation des directives**. Ici le cas est inverse (« visible mais pas de schema ») pour `ProductSeoContent`, mais `/faq`, l'accueil et les categories injectent du `FAQPage`. A arbitrer.
 2. **`aggregateRating` / `review`** : `app/products/[id]/page.jsx:178-187` n'injecte `aggregateRating` que si `product.rating.count > 0` et `review` que si `/reviews/:id` repond. **Aucune donnee fabriquee** — conforme. A verifier que `rating.count` est bien alimente en base (les 180 produits affiches n'exposent pas `rating` dans le listing).
-3. `app/robots.js` **interdit `/login` et `/register`** : Google ne peut alors pas lire la meta `noindex` que la mission veut poser. Conflit a resoudre (Phase 5).
+3. `app/robots.js` **interdisait `/login` et `/register`** : Google ne pouvait alors pas lire la meta `noindex` que la mission veut poser. **Corrige en phase 5** : ces pages ne sont plus bloquees, et `robots.txt` ne bloque plus que `/admin`, `/api/` et `/payment/`. Le groupe `Googlebot` separe a aussi ete supprime : Google n'applique qu'un seul groupe, le plus specifique, donc un groupe `Googlebot: allow: /` neutralisait completement les `disallow` du groupe `*`.
 4. **Hote canonique = `https://tekalis.com` (sans `www`)**, utilise a peu pres partout (layout, robots, sitemap, prixGuides, Footer, backend). `NEXT_PUBLIC_SITE_URL=https://tekalis.com` dans `.env.local`. **Aucune redirection www <-> non-www n'existe en code.**
 
 ---
@@ -358,8 +358,44 @@ Les deux affirmations ne peuvent pas etre vraies. **Les pages `/prix/*` doivent 
 
 `app/sitemap.js:91-99` liste en repli `climatiseurs`, qui **n'existe pas** (le vrai slug est `climatisation`), et **oublie** `ventilation`, `divertissement`, `mobilite`, `reseau`, `informatique`, `tablettes`, `laptops`.
 
+**Corrige (phase 5)** : le repli utilise desormais `KNOWN_CATEGORY_SLUGS` (`lib/seo/config.js`), la seule source de verite deja utilisee ailleurs. Les chemins du sitemap sont construits via `categoryPath()`, `productPath()` et `articlePath()` au lieu de concatener des chaines en dur.
+
 Slugs reellement servis par l'API (16, tous actifs, **aucun sous-enfant**) :
 `accessoires` · `audio` · `climatisation` · `divertissement` · `electromenager` · `energie-solaire` · `gaming` · `informatique` · `laptops` · `mobilite` · `ordinateurs` · `reseau` · `smartphones` · `tablettes` · `tv` · `ventilation`
+
+### 11.5 Status HTTP reels : 404 et redirections qui ne sortaient jamais (corrige en phase 5)
+
+Ce point a ete decouvert en testant les URL **sur HTTP**, et non dans le code.
+Les appels a `notFound()` et `permanentRedirect()` etaient corrects dans
+`app/products/[id]/page.jsx` et `app/category/[slug]/page.jsx`, mais le serveur
+repondait quand meme `HTTP 200` a tout.
+
+| URL | Attendu | Obtenu avant correction |
+|---|---|---|
+| `/products/6abc5e1695d41614d578733b` | 308 → slug propre | **200** (page vide, aucun H1) |
+| `/products/inexistant` | 404 | **200** + titre de l'accueil |
+| `/category/une-categorie-inexistante` | 404 | **200** + titre construit depuis le slug |
+| `/blog/article-inexistant` | 404 | **200** |
+| `/prix/inexistant` | 404 | **200** |
+
+**Cause** : `app/loading.jsx` a la racine cree une frontiere `Suspense`
+implicite autour de toutes les pages. Next.js envoie alors le shell (donc le
+statut HTTP) **avant** d'avoir rendu la page. Un `notFound()` ou un
+`permanentRedirect()` declenche apres cet envoi ne peut plus modifier le statut :
+le router affiche bien la page 404 ou la redirection, mais l'entete reste `200`.
+
+C'est le pire cas pour le SEO : des **soft 404**. Google voit des URL distinctes
+renvoyant `200` avec le titre de l'accueil, et les interprète comme des pages
+dupliquées a faible valeur, au lieu de les voir disparaître de l'index.
+
+**Corrige** : suppression de `app/loading.jsx`. Consequences assumees :
+
+- plus de spinner global pendant la navigation vers une page qui attend l'API ;
+- le statut HTTP redevient exact, ce qui est non negociable pour le SEO.
+
+Note : `permanentRedirect()` produit un **308** et non un 301 (comportement de
+l'App Router). Les deux sont des redirections permanentes et equivalents pour
+Google ; aucune action n'est necessaire.
 
 ### 11.4 Divergence contrat API / hooks front
 
@@ -409,12 +445,13 @@ Diagnostic par type : fiches smartphones **~67 % des impressions, position moyen
 | # | Cause | Gravite | Phases |
 |---|---|---|---|
 | 0 | **`<body>` vide sur tout le site : `PersistGate` bloquait le rendu serveur (corrige)** | 🔴 Critique | 3 |
-| 1 | **Les URL indexees (slugs a suffixe numerique) sont toutes 404 → 301 vers `/products`** | 🔴 Critique | 5 |
+| 0b | **`loading.jsx` racine gelait le statut HTTP : 404 et redirections sortaient en `200` (soft 404, corrige)** | 🔴 Critique | 5 |
+| 1 | **Les URL indexees (slugs a suffixe numerique) sont toutes 404 → 308 vers le slug propre** | 🔴 Critique | 5 |
 | 2 | **La production sert l'app Vite, pas l'app Next.js** | 🔴 Critique | 10 |
 | 3 | Fiches smartphones a ~67 % des impressions bloquees en position 5-8 : titres sans prix, donc peu distinctifs a l'ecran | 🟠 Fort | 2, 3 |
 | 4 | Aucun `aggregateRating` exploite (3 impressions « Extraits de produits ») ; `FAQPage` en surplus | 🟠 Fort | 4 |
 | 5 | `/configurator` en 404 alors qu'elle a des impressions | 🟡 Moyen | 5 |
-| 6 | `robots.txt` bloque `/login` + `/register` : la meta `noindex` est inatteignable | 🟡 Moyen | 5 |
+| 6 | `robots.txt` bloquait `/login` + `/register` : la meta `noindex` etait inatteignable (corrige) | 🟡 Moyen | 5 |
 | 7 | `/cart`, `/login`, `/register` sans `robots` ni canonical | 🟡 Moyen | 2 |
 | 8 | Pas de redirection www <-> non-www en code | 🟡 Moyen | 5 |
 | 9 | Contradiction « tout est neuf » vs 15 produits `-venant` | 🟠 Fort | 10 (arbitrage proprietaire) |
