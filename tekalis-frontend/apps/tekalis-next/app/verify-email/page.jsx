@@ -1,3 +1,4 @@
+import { Suspense } from 'react';
 import VerifyEmailClient from "@/components/auth/VerifyEmailClient";
 import { buildPrivateMetadata } from '@/lib/seo/metadata';
 
@@ -8,6 +9,12 @@ export const metadata = buildPrivateMetadata(
   'Confirmez votre adresse email pour activer votre compte Tekalis.'
 );
 
+// Suspense requis : VerifyEmailClient utilise useSearchParams() pour lire le
+// jeton de confirmation présent dans l'URL.
 export default function VerifyEmailPage() {
-  return <VerifyEmailClient />;
+  return (
+    <Suspense fallback={null}>
+      <VerifyEmailClient />
+    </Suspense>
+  );
 }

@@ -17,7 +17,6 @@ export async function generateMetadata({ params }) {
     return {
       title: `${article.title} | Blog Tekalis`,
       description: article.excerpt || article.title,
-      keywords: [...(article.tags || []), 'blog tech Sénégal', 'guide achat Dakar'],
       alternates: { canonical: `${SITE_URL}/blog/${article.slug}` },
       openGraph: {
         type: 'article',

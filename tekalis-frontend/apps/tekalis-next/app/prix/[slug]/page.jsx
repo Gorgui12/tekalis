@@ -15,7 +15,6 @@ export async function generateMetadata({ params }) {
   return {
     title: guide.title,
     description: guide.metaDescription,
-    keywords: guide.keywords,
     alternates: { canonical: `${SITE_URL}/prix/${guide.slug}` },
     openGraph: {
       type: 'website',

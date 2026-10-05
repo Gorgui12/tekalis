@@ -6,11 +6,7 @@ export const metadata = {
   title: 'Tekalis — Boutique Électronique Dakar Fann | Livraison Sénégal',
   description:
     'Boutique électronique en ligne au Sénégal : smartphones, laptops, TV et électroménager à Dakar Fann. Achetez sur Tekalis avec livraison rapide.',
-  keywords: [
-    'boutique électronique Dakar', 'magasin high-tech Dakar', 'acheter électronique en ligne Sénégal',
-    'site e-commerce électronique Sénégal', 'Tekalis', 'smartphones Dakar', 'ordinateurs Sénégal', 'TV électroménager Dakar'
-  ],
-  alternates: { canonical: 'https://tekalis.com/' },
+alternates: { canonical: 'https://tekalis.com/' },
   openGraph: {
     title: 'Tekalis — Boutique Électronique Dakar Fann',
     description: 'Boutique électronique en ligne au Sénégal. Smartphones, laptops, TV et électroménager à Dakar Fann, livraison rapide.',

@@ -130,7 +130,6 @@ export function buildMetadata({
   modifiedTime,
   authors,
   noindex = false,
-  extraKeywords,
 } = {}) {
   const canonical = path ? absoluteUrl(path) : undefined;
   const finalTitle = title || SITE_NAME;
@@ -169,7 +168,6 @@ export function buildMetadata({
       images: ogImages.map((img) => img.url),
     },
     ...(noindex ? { robots: NOINDEX_ROBOTS } : {}),
-    ...(extraKeywords && extraKeywords.length > 0 ? { keywords: extraKeywords } : {}),
   };
 
   return metadata;

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   FaSearch,
@@ -278,4 +278,25 @@ const Products = ({ initialProducts = [] }) => {
   );
 };
 
-export default Products;
+/**
+ * `useSearchParams()` (ligne 30) sans <Suspense> provoque un
+ * BAILOUT_TO_CLIENT_SIDE_RENDERING : React abandonnait le rendu serveur de
+ * /products et le HTML servi ne contenait qu'un spinner, donc aucun H1 ni
+ * aucun nom de produit pour les crawlers.
+ *
+ * L'encapsulation dans <Suspense> rend le HTML sur le serveur ; le spinner
+ * ci-dessous ne s'affiche plus que le temps de l'hydratation.
+ */
+export default function ProductsWithSuspense(props) {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-4 border-blue-600" />
+        </div>
+      }
+    >
+      <Products {...props} />
+    </Suspense>
+  );
+}

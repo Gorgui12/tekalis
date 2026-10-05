@@ -408,6 +408,7 @@ Diagnostic par type : fiches smartphones **~67 % des impressions, position moyen
 
 | # | Cause | Gravite | Phases |
 |---|---|---|---|
+| 0 | **`<body>` vide sur tout le site : `PersistGate` bloquait le rendu serveur (corrige)** | 🔴 Critique | 3 |
 | 1 | **Les URL indexees (slugs a suffixe numerique) sont toutes 404 → 301 vers `/products`** | 🔴 Critique | 5 |
 | 2 | **La production sert l'app Vite, pas l'app Next.js** | 🔴 Critique | 10 |
 | 3 | Fiches smartphones a ~67 % des impressions bloquees en position 5-8 : titres sans prix, donc peu distinctifs a l'ecran | 🟠 Fort | 2, 3 |
@@ -416,7 +417,72 @@ Diagnostic par type : fiches smartphones **~67 % des impressions, position moyen
 | 6 | `robots.txt` bloque `/login` + `/register` : la meta `noindex` est inatteignable | 🟡 Moyen | 5 |
 | 7 | `/cart`, `/login`, `/register` sans `robots` ni canonical | 🟡 Moyen | 2 |
 | 8 | Pas de redirection www <-> non-www en code | 🟡 Moyen | 5 |
-| 9 | Contradiction « tout est neuf » vs 14 produits `-venant` | 🟠 Fort | 10 (arbitrage proprietaire) |
+| 9 | Contradiction « tout est neuf » vs 15 produits `-venant` | 🟠 Fort | 10 (arbitrage proprietaire) |
 | 10 | Tri de listing casse (`sortBy` vs `sort`, `sold` vs `salesCount`) | 🟢 Bas | hors perimetre |
 | 11 | Guides de prix S24 Ultra / A55 sans produit correspondant dans le catalogue | 🟡 Moyen | 10 |
 | 12 | 200 produits envoyes dans le HTML du listing | 🟢 Bas | 8 |
+
+---
+
+## 15. Cause racine du rendu serveur vide (corrigee en phase 3)
+
+Ce point a ete decouvert en executant la phase 6, et il est plus grave que les
+autres : **avant correction, le HTML servi par le site ne contenait aucun contenu
+sur aucune page.**
+
+### Symptome
+
+Sur `/category/smartphones`, le HTML brut faisait 72 436 octets mais seulement
+**155 octets visibles** dans `<body>` :
+
+```html
+<body><div hidden=""><!--$--><!--/$--></div></body>
+```
+
+Aucun `<h1>`, aucun `<h2>`, aucun nom de produit, aucun texte. Le payload RSC
+(contenu envoye au navigateur) etait complet : le serveur avait bien rendu les
+donnees, mais **le DOM n'etait pas ecrit dans le HTML**.
+
+### Cause 1 — `PersistGate` attend un persistor inexistant cote serveur
+
+`store/index.js:37` ne cree le persistor que dans le navigateur :
+
+```js
+if (typeof window !== 'undefined') {
+  store.__persistor = persistStore(store);
+}
+```
+
+Or `components/shared/Providers.jsx` passait `persistor={store.__persistor}`
+a `<PersistGate loading={null}>`. Cote serveur, `store.__persistor` vaut donc
+`undefined` : la gate attend la rehydratation qui ne peut jamais avoir lieu et
+rend `null`. **Comme `Providers` enveloppe toute l'application dans le layout
+racine, le `<body>` etait vide sur les 58 pages du site.**
+
+Correctif : rendre les enfants directement tant que la rehydratation n'a pas
+commence, avec un indicateur `hydrated` pose au montage pour garantir que le
+premier rendu client est identique a celui du serveur.
+
+### Cause 2 — `useSearchParams()` hors `<Suspense>`
+
+Sur `/products`, `useSearchParams()` etait appele sans frontiere `<Suspense>`,
+ce qui produit un `BAILOUT_TO_CLIENT_SIDE_RENDERING` : React abandonnait le rendu
+de la page entiere et ne renvoyait qu'un spinner. Correctif : encapsulation du
+composant dans `<Suspense>`. Meme correction appliquee a `/register` et
+`/verify-email`.
+
+### Effet mesure apres correction
+
+| Page | Avant (visible) | Apres (visible) | `<h1>` |
+|---|---|---|---|
+| `/` | 155 | 75 780 | 1 |
+| `/products` | 155 | 36 686 | 1 |
+| `/category/smartphones` | 155 | 187 091 | 1 |
+| `/blog` | 155 | 92 414 | 1 |
+
+Les 16 categories ont ete verifiees : un seul `<h1>` chacune, plus de
+`meta keywords`, JSON-LD `ItemList` + `BreadcrumbList` presents.
+
+**A retenir : tout controle SEO fait sur le HTML brut etait fausse avant cette
+correction.** C'est la raison pour laquelle les phases suivantes doivent
+verifier le HTML servi, et pas seulement le code.

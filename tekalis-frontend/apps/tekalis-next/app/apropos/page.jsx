@@ -4,7 +4,6 @@ import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaClock, FaCheckCircle, FaShieldAl
 export const metadata = {
   title: "À propos de Tekalis | Boutique Électronique Dakar Fann",
   description: "Boutique en ligne fiable du Sénégal, Tekalis livre vos produits électroniques à Dakar Fann. Payez à la livraison ou par Wave : garantie et livraison rapide.",
-  keywords: ['à propos tekalis', 'boutique en ligne fiable Sénégal', 'acheter en ligne payer à la livraison Sénégal', 'paiement Wave Dakar'],
   alternates: { canonical: 'https://tekalis.com/apropos' },
   openGraph: {
     title: 'À propos de Tekalis | Boutique Électronique Dakar',

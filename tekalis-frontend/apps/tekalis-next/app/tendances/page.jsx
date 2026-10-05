@@ -6,12 +6,7 @@ export const metadata = {
   title: 'Tendances des recherches de téléphones au Sénégal — Tekalis',
   description:
     "Les recherches de téléphones les plus populaires au Sénégal en ce moment : prix iPhone, Samsung Galaxy, téléphones pas chers en FCFA. Comparez les prix avant d'acheter chez Tekalis.",
-  keywords: [
-    'tendance recherche téléphone senegal', 'phone le plus recherché dakar',
-    'prix téléphone en fcfa', 'smartphone tendance senegal 2026',
-    'iphone tendance dakar', 'samsung le plus demandé senegal',
-  ],
-  alternates: { canonical: `${SITE_URL}/tendances` },
+alternates: { canonical: `${SITE_URL}/tendances` },
   openGraph: {
     type: 'website',
     title: 'Tendances des recherches de téléphones au Sénégal — Tekalis',

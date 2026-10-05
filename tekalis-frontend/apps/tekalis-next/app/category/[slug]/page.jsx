@@ -1,124 +1,63 @@
 import { notFound } from 'next/navigation';
 import { serverFetch } from '@/lib/serverFetch';
 import CategoryClient from '@/components/product/CategoryClient';
+import Breadcrumb from '@/components/seo/Breadcrumb';
+import JsonLd from '@/components/seo/JsonLd';
+import { absoluteUrl, categoryPath, productPath } from '@/lib/seo/config';
+import { buildItemListSchema, buildBreadcrumbSchema } from '@/lib/seo/jsonld';
+import { categoryBreadcrumb } from '@/lib/seo/breadcrumbs';
+import {
+  CATEGORY_CONTENT,
+  buildFallbackCategoryContent,
+} from '@/lib/seo/categoryContent';
 
-const SITE_URL = 'https://tekalis.com';
+export const revalidate = 3600;
 
-const CATEGORY_SEO = {
-  smartphones: {
-    title: 'Acheter un Smartphone Pas Cher à Dakar | Livraison Sénégal',
-    description: 'Achetez votre smartphone en ligne à Dakar, livré au Sénégal. Téléphones Android neufs sous garantie pour trouver le meilleur smartphone 2026 au bon prix.',
-    descriptionLong: 'Des téléphones Android aux modèles les plus récents, notre catalogue couvre tous les budgets avec des appareils neufs et garantis. Commandez en ligne, payez à la livraison ou via Wave, et recevez votre smartphone sous 24 à 48h à Dakar.',
-    h1: 'Smartphones & Téléphones',
-    keywords: ['smartphone Dakar', 'acheter smartphone en ligne Sénégal', 'téléphone pas cher Dakar', 'smartphone pas cher Sénégal', 'téléphone Android Dakar', 'meilleur smartphone 2026 Sénégal'],
-    faqs: [
-      { q: 'Quelle est la garantie sur les smartphones ?', a: 'Tous nos smartphones sont garantis 12 mois minimum par le constructeur.' },
-      { q: 'Puis-je payer à la livraison ?', a: 'Oui, nous acceptons le paiement à la livraison, Wave, Orange Money et Free Money.' },
-      { q: 'Livrez-vous en dehors de Dakar ?', a: 'Oui, nous livrons partout au Sénégal. Délai de 3-5 jours ouvrés pour les régions.' },
-    ],
-  },
-  ordinateurs: {
-    title: 'Ordinateurs Portables Dakar — PC Portable Pas Cher | Sénégal',
-    description: 'Achetez un ordinateur portable au meilleur prix à Dakar, en ligne avec livraison au Sénégal. PC gamer, bureautique ou ultrabook au bon prix.',
-    descriptionLong: 'Du PC portable pas cher pour les études aux laptops plus puissants pour le travail, nous avons un ordinateur pour chaque usage et chaque budget. Chaque machine est neuve, sous garantie, avec facture officielle et livraison rapide à Dakar.',
-    h1: 'Laptops & Ordinateurs Portables',
-    keywords: ['ordinateur portable Dakar', 'PC portable pas cher Sénégal', 'ordinateur portable prix Sénégal', 'PC gamer Dakar', 'ordinateur bureautique Sénégal', 'acheter ordinateur en ligne Dakar'],
-    faqs: [
-      { q: 'Les laptops sont-ils neufs ou reconditionnés ?', a: 'Tous nos laptops sont neufs, sous emballage d\'origine avec facture officielle.' },
-      { q: 'Proposez-vous des PC gaming ?', a: 'Oui, nous avons une large sélection de laptops gaming MSI, Asus ROG, Lenovo Legion.' },
-    ],
-  },
-  gaming: {
-    title: 'Gaming à Dakar — PC, Manettes & Accessoires | Tekalis',
-    description: 'PC gaming, manettes de jeux vidéo et accessoires gaming à Dakar : consoles et setup complet pour gamers, livrés rapidement au Sénégal.',
-    descriptionLong: 'Le setup de vos rêves démarre ici : PC gaming performant, manettes pour tous les styles de jeu et accessoires gaming de qualité. Nos conseillers vous aident à composer votre configuration, avec livraison rapide dans toute la région de Dakar.',
-    h1: 'Gaming & Jeux Vidéo',
-    keywords: ['PC gaming Dakar', 'manette jeux vidéo Dakar', 'accessoires gaming Dakar'],
-    faqs: [
-      { q: 'La PS5 est-elle disponible en stock ?', a: 'Consultez notre stock en temps réel. Nous réapprovisionnons régulièrement.' },
-    ],
-  },
-  tv: {
-    title: 'Smart TV Dakar — Téléviseurs 4K Pas Chers | Sénégal',
-    description: 'Télévisions pas chères et Smart TV 4K à Dakar, avec livraison rapide et installation au Sénégal. Le home cinéma maison devient simple.',
-    descriptionLong: 'De la petite Smart TV de chambre au grand écran du salon, chaque téléviseur est neuf, vérifié et livré avec soin à Dakar. Un large choix de tailles, du 32 au 85 pouces, au prix le plus juste du marché sénégalais.',
-    h1: 'Téléviseurs & TV',
-    keywords: ['Smart TV Dakar', 'TV 4K prix Sénégal', 'télévision pas cher Dakar', 'home cinéma Dakar'],
-    faqs: [
-      { q: 'Livrez-vous les grandes TV ?', a: 'Oui, nous livrons tous les formats. Des équipes spécialisées s\'occupent des très grandes dalles.' },
-    ],
-  },
-  electromenager: {
-    title: 'Électroménager Dakar — Réfrigérateurs & Machines à Laver',
-    description: 'Réfrigérateurs pas chers, machines à laver et électroménager de cuisine à Dakar. Gros et petit électroménager livrés et installés au Sénégal.',
-    descriptionLong: 'Équipez toute la maison sans vous déplacer : réfrigérateurs, machines à laver, fours et petit électroménager au meilleur prix à Dakar. Nous livrons et installons vos appareils dans toute la région, garantie incluse.',
-    h1: 'Électroménager',
-    keywords: ['électroménager Dakar', 'réfrigérateur pas cher Dakar', 'machine à laver Dakar'],
-    faqs: [],
-  },
-  climatiseurs: {
-    title: 'Climatiseur Dakar — Inverter au Meilleur Prix | Sénégal',
-    description: 'Climatiseur split ou inverter au bon prix à Dakar, livré et installé par nos techniciens au Sénégal. Rafraîchissez votre maison avec un climatiseur adapté.',
-    descriptionLong: 'Le climatiseur idéal existe pour chaque pièce : split inverter économe pour la chambre, gainable pour le salon. Nous livrons, installons et entretenons votre climatisation à Dakar, avec un prix transparent et une garantie de 12 mois.',
-    h1: 'Climatiseurs & Climatisation',
-    keywords: ['climatiseur Dakar', 'climatiseur prix Sénégal'],
-    faqs: [
-      { q: 'Proposez-vous l\'installation ?', a: 'Oui, nous avons des techniciens certifiés pour l\'installation à Dakar et banlieue.' },
-    ],
-  },
-  'energie-solaire': {
-    title: 'Panneaux Solaires Dakar — Kits Énergie Solaire | Tekalis',
-    description: 'Kits solaires, panneaux photovoltaïques et batteries pour maison au Sénégal. Installation professionnelle à Dakar. Énergie renouvelable, économies d\'électricité.',
-    h1: 'Énergie Solaire',
-    keywords: ['panneau solaire Dakar Fann', 'kit solaire Sénégal', 'énergie solaire Dakar', 'onduleur solaire Dakar', 'batterie solaire Sénégal'],
-    faqs: [
-      { q: 'Quelle capacité solaire pour une maison moyenne ?', a: 'Un kit 3KW suffit pour une maison de 3-4 pièces avec climatiseur. Contactez-nous pour un devis personnalisé.' },
-    ],
-  },
-  accessoires: {
-    title: 'Accessoires Téléphone Dakar — Chargeurs, Power Banks',
-    description: 'Coques, chargeurs rapides, power banks et montres connectées pour votre téléphone à Dakar. Tous les accessoires tech, livrés rapidement au Sénégal.',
-    descriptionLong: 'De la power bank de secours au chargeur rapide pour recharger en plein trajet, en passant par la montre connectée et les coques de protection, tout est disponible dans notre boutique en ligne. Livraison sous 24-48h à Dakar et paiement à la livraison.',
-    h1: 'Accessoires & Périphériques',
-    keywords: ['accessoires téléphone Dakar', 'chargeur rapide Dakar', 'power bank Dakar', 'montre connectée Dakar'],
-    faqs: [],
-  },
-  audio: {
-    title: 'Casques & Écouteurs Audio Dakar — Bluetooth | Tekalis',
-    description: 'Écouteurs sans fil, casques Bluetooth et enceintes Bluetooth à Dakar pour un son de qualité au meilleur prix. Essai avant achat, garantie incluse.',
-    descriptionLong: 'Des écouteurs sans fil discrets aux casques confortables, en passant par les enceintes portables, nous avons le son qu\'il vous faut. Équipements neufs, garantis et livrés rapidement à Dakar.',
-    h1: 'Audio — Casques & Enceintes',
-    keywords: ['écouteurs sans fil Dakar', 'casque Bluetooth Dakar', 'enceinte Bluetooth Dakar'],
-    faqs: [],
-  },
-};
-
+/**
+ * Metadata de categorie.
+ *
+ * Le contenu editorial vient de `lib/seo/categoryContent.js` (un titre et une
+ * description par categorie, valides par `scripts/check-seo-content.mjs`).
+ * L'objectif est la pertinence de la page sur les requetes de categorie a
+ * Dakar, donc un prix en FCFA dans le titre et une description qui reprend le
+ * lieu et la disponibilite locale.
+ */
 export async function generateMetadata({ params }) {
   const { slug } = await params;
-  const seo = CATEGORY_SEO[slug];
-  const canonical = `${SITE_URL}/category/${slug}`;
-  if (!seo) return {
-    title: `${slug} | Tekalis`,
-    description: `Produits ${slug.replace(/-/g, ' ')} disponibles à Dakar au Sénégal.`,
-    alternates: { canonical },
-  };
+  const category = await getCategoryBySlug(slug);
+
+  if (!category || category.apiError) {
+    // API indisponible : on rend quand meme une page avec un repli, on ne
+    // renvoie pas de noindex (une erreur de fetch ne doit pas deindexer).
+    const fallback = buildFallbackCategoryContent({ name: slug.replace(/-/g, ' ') });
+    return buildCategoryMetadata(fallback, slug);
+  }
+
+  const content = CATEGORY_CONTENT[slug] ?? buildFallbackCategoryContent(category);
+  return buildCategoryMetadata(content, slug);
+}
+
+function buildCategoryMetadata(content, slug) {
+  const canonical = absoluteUrl(categoryPath(slug));
 
   return {
-    title: seo.title,
-    description: seo.description,
-    keywords: seo.keywords,
+    title: content.title,
+    description: content.description,
     alternates: { canonical },
     openGraph: {
-      title: seo.title,
-      description: seo.description,
+      type: 'website',
+      title: content.title,
+      description: content.description,
       url: canonical,
-      siteName: 'Tekalis Sénégal',
       locale: 'fr_SN',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: content.title,
+      description: content.description,
     },
   };
 }
-
-export const revalidate = 3600;
 
 async function getCategoryBySlug(slug) {
   try {
@@ -158,19 +97,12 @@ export async function generateStaticParams() {
     }, []);
     return flat.filter((c) => c.isActive !== false).map((c) => ({ slug: c.slug }));
   } catch {
-    return Object.keys(CATEGORY_SEO).map((slug) => ({ slug }));
+    return Object.keys(CATEGORY_CONTENT).map((slug) => ({ slug }));
   }
 }
 
 export default async function CategoryPage({ params }) {
   const { slug } = await params;
-  const seo = CATEGORY_SEO[slug] || {
-    title: slug.replace(/-/g, ' '),
-    h1: slug.replace(/-/g, ' '),
-    description: `Produits ${slug.replace(/-/g, ' ')} disponibles à Dakar au Sénégal.`,
-    keywords: [`${slug} Dakar`],
-    faqs: [],
-  };
 
   const category = await getCategoryBySlug(slug);
 
@@ -186,49 +118,122 @@ export default async function CategoryPage({ params }) {
     ? []
     : await getProductsByCategory(category._id);
 
-  const schema = {
-    '@context': 'https://schema.org',
-    '@type': 'CollectionPage',
-    name: seo.h1,
-    description: seo.description,
-    url: `${SITE_URL}/category/${slug}`,
-    numberOfItems: products.length,
-    ...(products.length > 0 ? {
-      hasPart: products.slice(0, 50).map((p) => ({
-        '@type': 'ItemList',
-        name: p.name,
-        url: `${SITE_URL}/products/${p.slug || p._id}`,
-      })),
-    } : {}),
-    breadcrumb: {
-      '@type': 'BreadcrumbList',
-      itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Accueil', item: SITE_URL },
-        { '@type': 'ListItem', position: 2, name: 'Produits', item: `${SITE_URL}/products` },
-        { '@type': 'ListItem', position: 3, name: seo.h1, item: `${SITE_URL}/category/${slug}` },
-      ],
-    },
-  };
+  const content =
+    CATEGORY_CONTENT[slug] ?? buildFallbackCategoryContent(category ?? undefined);
 
-  const faqSchema = seo.faqs && seo.faqs.length > 0 ? {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: seo.faqs.map((faq) => ({
-      '@type': 'Question',
-      name: faq.q,
-      acceptedAnswer: { '@type': 'Answer', text: faq.a },
-    })),
-  } : null;
+  const canonical = absoluteUrl(categoryPath(slug));
+  const breadcrumbItems = categoryBreadcrumb(content.h1, slug);
+
+  // ItemList : la liste des produits reellement en base, pour que Google
+  // puisse associer la page de categorie a ses produits.
+  const itemList = buildItemListSchema(content.h1, products, {
+    url: canonical,
+    startPosition: 1,
+  });
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
-      {faqSchema && (
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      <JsonLd id="category-itemlist" data={itemList} />
+      <JsonLd id="category-breadcrumb" data={buildBreadcrumbSchema(breadcrumbItems)} />
+
+      <div className="container mx-auto px-4 pt-4">
+        <Breadcrumb items={breadcrumbItems} />
+      </div>
+
+      {/* H1 et introduction rendus serveur : presents dans le HTML brut, donc
+          exploitables par les crawlers sans execution de JavaScript. */}
+      <div className="container mx-auto px-4 pt-4 pb-2">
+        <h1 className="text-3xl md:text-4xl font-bold font-display text-surface-900 dark:text-white mb-4">
+          {content.h1} à Dakar
+        </h1>
+        {content.intro && (
+          <div className="max-w-3xl text-surface-600 dark:text-surface-300 leading-relaxed space-y-3">
+            {content.intro.split('\n\n').map((paragraph, index) => (
+              <p key={index}>{paragraph}</p>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <CategoryClient products={products} slug={slug} />
+
+      {/*
+        FAQ rendered server-side : le texte des questions et des reponses est
+        dans le HTML. Google n'affiche plus les FAQ enrichies dans ses
+        resultats depuis 2023, mais le contenu reste utile au lecteur et
+        coherent avec le JSON-LD.
+      */}
+      {content.faqs?.length > 0 && (
+        <section className="container mx-auto px-4 py-12" aria-labelledby="faq-cat">
+          <h2
+            id="faq-cat"
+            className="text-2xl font-bold font-display text-surface-900 dark:text-white mb-6"
+          >
+            Questions fréquentes — {content.h1}
+          </h2>
+          <div className="max-w-3xl space-y-4">
+            {content.faqs.map((faq, index) => (
+              <details
+                key={index}
+                className="bg-white dark:bg-surface-800 rounded-xl border border-surface-200 dark:border-surface-700 p-4"
+              >
+                <summary className="font-semibold text-surface-900 dark:text-white cursor-pointer">
+                  {faq.q}
+                </summary>
+                <p className="mt-2 text-surface-600 dark:text-surface-300 leading-relaxed">
+                  {faq.a}
+                </p>
+              </details>
+            ))}
+          </div>
+        </section>
       )}
-      {/* H1 server-rendered : la liste produits est un client component, cf. RSC / HW curl. */}
-      <h1 className="sr-only">{seo.h1} à Dakar — Tekalis, livraison au Sénégal</h1>
-      <CategoryClient products={products} seo={seo} slug={slug} />
+
+      {/* Maillage interne : renvoie vers les autres categories reelles. */}
+      <RelatedCategories currentSlug={slug} />
     </>
+  );
+}
+
+/**
+ * Liens vers les autres categories. Sert au maillage entre pages de
+ * catégories : chaque categorie point vers les autres sans passer par le
+ * header, ce qui rend la hierarchie du site lisible par les crawlers.
+ */
+function RelatedCategories({ currentSlug }) {
+  const others = Object.entries(CATEGORY_CONTENT)
+    .filter(([slug]) => slug !== currentSlug)
+    .map(([slug, content]) => ({ slug, h1: content.h1, description: content.description }));
+
+  if (others.length === 0) return null;
+
+  return (
+    <section
+      className="container mx-auto px-4 pb-16"
+      aria-labelledby="nav-categories"
+    >
+      <h2
+        id="nav-categories"
+        className="text-2xl font-bold font-display text-surface-900 dark:text-white mb-6"
+      >
+        Nos autres rayons
+      </h2>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        {others.map((other) => (
+          <a
+            key={other.slug}
+            href={categoryPath(other.slug)}
+            className="block p-4 rounded-xl border border-surface-200 dark:border-surface-700 hover:border-brand-400 hover:bg-brand-50 dark:hover:bg-brand-900/10 transition"
+          >
+            <span className="font-semibold text-surface-900 dark:text-white block mb-1">
+              {other.h1}
+            </span>
+            <span className="text-sm text-surface-600 dark:text-surface-300 line-clamp-2">
+              {other.description}
+            </span>
+          </a>
+        ))}
+      </div>
+    </section>
   );
 }

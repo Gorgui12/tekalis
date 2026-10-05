@@ -42,11 +42,10 @@ export function productBreadcrumb(product, category) {
   return items;
 }
 
-/** Accueil > Categorie. */
+/** Accueil > Produits > Categorie. */
 export function categoryBreadcrumb(categoryName, categorySlug) {
   return [
-    { name: 'Accueil', path: '/' },
-    { name: 'Produits', path: '/products' },
+    ...baseBreadcrumb(),
     { name: categoryName || 'Catégorie', path: `/category/${categorySlug}` },
   ];
 }

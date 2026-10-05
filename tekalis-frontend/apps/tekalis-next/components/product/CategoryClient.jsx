@@ -239,15 +239,13 @@ const CategoryPage = ({ products: initialProducts = [], seo: initialSeo, slug: i
         {/* ── HERO SEO (visible + indexable) ───────────────────────────── */}
         <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-card p-6 md:p-8 mb-8 border border-surface-100">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-            <div>
-              {/* H1 avec mots-clés — CRITIQUE pour le SEO */}
-              <h2 className="text-2xl md:text-3xl font-bold text-surface-900 dark:text-white mb-2 font-display">
-                {seo.h1}
-                <span className="text-brand-600"> à Dakar</span>
-              </h2>
-              <p className="text-surface-600 text-sm md:text-base leading-relaxed max-w-2xl">
-                {seo.description}
-              </p>
+<div>
+              {/*
+                Pas de titre ici : le H1 « <categorie> à Dakar » et
+                l'introduction sont rendus serveur dans app/category/[slug]/page.jsx,
+                donc presents dans le HTML brut. Ce bloc ne conserve que le
+                compteur de produits, qui depend des filtres client.
+              */}
             </div>
             <div className="flex items-center gap-2 bg-brand-50 px-4 py-2 rounded-xl shrink-0">
               <span className="text-2xl font-bold text-brand-600">{filteredProducts.length}</span>
@@ -411,32 +409,12 @@ const CategoryPage = ({ products: initialProducts = [], seo: initialSeo, slug: i
               </div>
             )}
 
-            {/* ── CONTENU TEXTUEL SEO (bas de page, indexable) ─────────── */}
-            {seo.descriptionLong && (
-              <div className="mt-8 bg-white dark:bg-surface-800 rounded-2xl shadow-card p-6 border border-surface-100">
-                <h2 className="text-lg font-bold text-surface-900 dark:text-white mb-3">
-                  {seo.h1} au Sénégal — Pourquoi choisir Tekalis ?
-                </h2>
-                <p className="text-surface-600 text-sm leading-relaxed">
-                  {seo.descriptionLong}
-                </p>
-              </div>
-            )}
-
-            {/* ── FAQ SEO ───────────────────────────────────────────────── */}
-            {seo.faqs && seo.faqs.length > 0 && (
-              <div className="mt-6 bg-white dark:bg-surface-800 rounded-2xl shadow-card p-6 border border-surface-100">
-                <h2 className="text-lg font-bold text-surface-900 dark:text-white mb-4">Questions fréquentes</h2>
-                <div className="space-y-4">
-                  {seo.faqs.map((faq, index) => (
-                    <div key={index} className="border-b border-surface-100 pb-4 last:border-0 last:pb-0">
-                      <h3 className="text-sm font-semibold text-surface-900 dark:text-white mb-1">{faq.q}</h3>
-                      <p className="text-sm text-surface-600">{faq.a}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+            {/*
+              L'introduction, les FAQ et le maillage interne sont desormais
+              rendus serveur dans app/category/[slug]/page.jsx : ils sont donc
+              presents dans le HTML brut. On ne les duplique pas ici, ce qui
+              evite deux H1 et deux blocs FAQ sur la meme page.
+            */}
           </div>
         </div>
       </div>

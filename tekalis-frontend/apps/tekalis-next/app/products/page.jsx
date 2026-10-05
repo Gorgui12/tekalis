@@ -7,10 +7,6 @@ export const metadata = {
   title: 'Tous les Produits — Électronique Dakar Fann | Tekalis Sénégal',
   description:
     'Découvrez tous nos produits électroniques à Dakar Fann : smartphones iPhone Samsung, ordinateurs portables HP Dell Lenovo, TV 4K, électroménager. Livraison rapide dans toute la région de Dakar. Garantie constructeur incluse.',
-  keywords: [
-    'électronique Dakar Fann', 'smartphones Dakar', 'laptops Sénégal', 'TV Dakar',
-    'électroménager Dakar', 'gaming Dakar', 'accessoires tech Sénégal', 'Tekalis'
-  ],
   alternates: { canonical: 'https://tekalis.com/products' },
   openGraph: {
     title: 'Tous les Produits — Électronique Dakar Fann | Tekalis',

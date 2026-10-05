@@ -24,7 +24,7 @@ import { SHIPPING_CLAIM, PAYMENT_CLAIM, RETURNS_CLAIM, WARRANTY_CLAIM } from './
 
 export const CATEGORY_CONTENT = {
   smartphones: {
-    title: 'Smartphones et iPhone au Sénégal - Prix en FCFA | Tekalis',
+    title: 'Smartphones et iPhone au Sénégal - Prix en FCFA',
     description:
       'iPhone et Samsung Galaxy au prix en FCFA à Dakar. Models neufs et appareils « Venant », prix affiché en FCFA, livraison 24-48h au Sénégal.',
     h1: 'Smartphones et iPhone',
@@ -50,7 +50,7 @@ Le catalogue couvre notamment les iPhone 8, 8 Plus, X, XR, XS Max, 11, 12, 12 Mi
   },
 
   ordinateurs: {
-    title: 'Ordinateurs portables HP - Prix en FCFA à Dakar | Tekalis',
+    title: 'Ordinateurs portables HP - Prix en FCFA à Dakar',
     description:
       'Ordinateurs portables HP EliteBook au prix en FCFA à Dakar. Configurations Core i5 et Core i7, 16 Go RAM, livraison 24-48h au Sénégal.',
     h1: 'Ordinateurs portables HP',
@@ -72,7 +72,7 @@ La fiche de chaque modèle indique le prix en FCFA, le stock et les caractérist
   },
 
   laptops: {
-    title: 'Laptops et PC portables - Prix en FCFA à Dakar | Tekalis',
+    title: 'Laptops et PC portables - Prix en FCFA à Dakar',
     description:
       'MacBook Air, Asus ZenBook, HP Envy, Dell et Lenovo au prix en FCFA à Dakar. PC portables 16 Go RAM et 512 Go SSD, livraison 24-48h.',
     h1: 'Laptops et PC portables',
@@ -93,7 +93,7 @@ Chaque fiche affiche la génération du processeur, la mémoire vive, le stockag
     ],
   },
 audio: {
-    title: 'Audio - Casques, enceintes et barres de son | Tekalis',
+    title: 'Audio - Casques, enceintes et barres de son',
     description:
       'Casques, écouteurs, enceintes et barres de son au prix en FCFA à Dakar. JBL, Sony, LG, Lenovo : livraison 24 à 48 h au Sénégal.',
     h1: 'Audio : casques, enceintes et barres de son',
@@ -115,7 +115,7 @@ Chaque fiche indique la puissance en watts quand elle existe, l'autonomie de la 
   },
 
   tv: {
-    title: 'Smart TV et télévisions - Prix en FCFA à Dakar | Tekalis',
+    title: 'Smart TV et télévisions - Prix en FCFA à Dakar',
     description:
       'Smart TV Hisense, Samsung, LG et TCL de 43 à 50 pouces au prix en FCFA à Dakar. Écrans 4K UHD, livraison 24 à 48 h au Sénégal.',
     h1: 'Télévisions et Smart TV',
@@ -137,7 +137,7 @@ La fiche précise la diagonale, la définition et les fonctions, le prix est aff
   },
 
   ventilation: {
-    title: 'Ventilateurs et rafraîchisseurs d\'air | Tekalis',
+    title: 'Ventilateurs et rafraîchisseurs d\'air',
     description:
       'Ventilateurs et rafraîchisseurs d\'air au prix en FCFA à Dakar. Binatone, Midea, Westpool, Sayona : livraison 24 à 48 h au Sénégal.',
     h1: 'Ventilateurs et rafraîchisseurs d\'air',
@@ -158,7 +158,7 @@ Les fiches indiquent la puissance, la capacité en litres pour les rafraîchisse
     ],
   },
 climatisation: {
-    title: 'Climatiseurs split et inverter - Prix en FCFA | Tekalis',
+    title: 'Climatiseurs split et inverter - Prix en FCFA',
     description:
       'Climatiseurs split Hisense, LG, Samsung, TCL et Midea au prix en FCFA à Dakar. 12000 BTU inverter, livraison 24 à 48 h au Sénégal.',
     h1: 'Climatiseurs et climatisation',
@@ -180,7 +180,7 @@ Chaque fiche indique la puissance en BTU, la technologie et le fluide. Le prix e
   },
 
   electromenager: {
-    title: 'Électroménager - Réfrigérateurs et machines | Tekalis',
+    title: 'Électroménager - Réfrigérateurs et machines',
     description:
       'Réfrigérateurs, machines à laver, micro-ondes et air fryer au prix en FCFA à Dakar. Samsung, LG, Roch, Westpool, Moulinex : livraison 24-48h.',
     h1: 'Électroménager',
@@ -223,7 +223,7 @@ Le prix est affiché en FCFA. ${SHIPPING_CLAIM}.`,
     ],
   },
 gaming: {
-    title: 'Gaming - PC gamers, manettes et écrans | Tekalis',
+    title: 'Gaming - PC gamers, manettes et écrans',
     description:
       'PC portable gamer, manettes PS5 et écrans 144 Hz au prix en FCFA à Dakar. HP Victus, Samsung Odyssey, Redragon : livraison 24-48h.',
     h1: 'Gaming',
@@ -245,7 +245,7 @@ Le taux de rafraîchissement de 144 Hz de l'Odyssey et le 144 Hz de la mention d
   },
 
   informatique: {
-    title: 'Informatique - Écrans, stockage et imprimantes | Tekalis',
+    title: 'Informatique - Écrans, stockage et imprimantes',
     description:
       'Écrans PC, SSD externes, onduleurs et imprimantes au prix en FCFA à Dakar. HP, SanDisk, Logitech, Epson, APC : livraison 24-48h au Sénégal.',
     h1: 'Informatique',
@@ -267,7 +267,7 @@ La fiche indique la taille, la résolution, la capacité ou la puissance, selon 
   },
 
   reseau: {
-    title: 'Réseau - Routeurs, Wi-Fi mesh et switchs | Tekalis',
+    title: 'Réseau - Routeurs, Wi-Fi mesh et switchs',
     description:
       'Routeurs Wi-Fi 6, kits mesh et switchs TP-Link au prix en FCFA à Dakar. Réseau et connectivité, livraison 24 à 48 h au Sénégal.',
     h1: 'Réseau et connectivité',
@@ -288,7 +288,7 @@ Les prix sont en FCFA et la livraison à Dakar se fait en 24 à 48 h.`,
     ],
   },
 accessoires: {
-    title: 'Accessoires téléphone et informatique | Tekalis',
+    title: 'Accessoires téléphone et informatique',
     description:
       'Chargeurs, power banks, câbles USB-C et clés USB au prix en FCFA à Dakar. Apple, Samsung, HP, Anker, SanDisk : livraison 24-48h.',
     h1: 'Accessoires et périphériques',
@@ -310,7 +310,7 @@ La fiche indique la puissance, la capacité ou la connectique. Les prix sont en 
   },
 
   divertissement: {
-    title: 'Streaming et vidéoprojecteurs - Prix en FCFA | Tekalis',
+    title: 'Streaming et vidéoprojecteurs - Prix en FCFA',
     description:
       'Boîtiers de streaming, vidéoprojecteurs et casques VR au prix en FCFA à Dakar. Apple TV, Chromecast, Fire TV, Xiaomi, Wanbo : livraison 24-48h.',
     h1: 'Divertissement et streaming',
@@ -330,7 +330,7 @@ Pour la source de contenu, on trouve le boîtier TV streaming Apple TV 4K 64 Go,
   },
 
   mobilite: {
-    title: 'Trottinettes et vélos électriques | Tekalis',
+    title: 'Trottinettes et vélos électriques',
     description:
       'Trottinettes électriques Segway et Xiaomi, vélos électriques et casques au prix en FCFA à Dakar. Ninebot, Fiido : livraison 24-48h au Sénégal.',
     h1: 'Mobilité électrique',
@@ -352,7 +352,7 @@ S'y ajoutent les accessoires associés : casque de protection urbain LED, sac à
   },
 
   tablettes: {
-    title: 'Tablettes - iPad, Galaxy Tab et Lenovo | Tekalis',
+    title: 'Tablettes - iPad, Galaxy Tab et Lenovo',
     description:
       'Tablettes Apple iPad, Samsung Galaxy Tab, Lenovo et Xiaomi au prix en FCFA à Dakar. De 7 à 11 pouces, livraison 24-48h au Sénégal.',
     h1: 'Tablettes',

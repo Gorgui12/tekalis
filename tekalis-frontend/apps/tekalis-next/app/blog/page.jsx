@@ -5,7 +5,6 @@ export const metadata = {
   title: 'Blog Tech Sénégal — Tests, Guides & Actualités | Tekalis',
   description:
     'Tests exclusifs, guides d\'achat et actualités tech au Sénégal. Trouvez le meilleur smartphone, laptop ou TV adapté à votre budget à Dakar.',
-  keywords: ['blog tech Sénégal', 'guide achat Dakar', 'test smartphone Dakar', 'blog tekalis'],
   alternates: { canonical: 'https://tekalis.com/blog' },
   openGraph: {
     title: 'Blog Tech Sénégal — Tekalis',

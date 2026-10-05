@@ -5,11 +5,7 @@ export const metadata = {
   title: 'Guides des prix des téléphones au Sénégal — FCFA | Tekalis',
   description:
     'Les prix des iPhone et Samsung au Sénégal et à Dakar, mis à jour avec les modèles en stock. iPhone 12, 13, Galaxy S24 Ultra, A25, A55, S23 FE : prix en FCFA, garantie, livraison 24-48h.',
-  keywords: [
-    'prix téléphone dakar', 'prix téléphone sénégal', 'prix iphone dakar en fcfa',
-    'prix samsung en fcfa', 'guide prix téléphone sénégal', 'téléphone prix fcfa dakar',
-  ],
-  alternates: { canonical: `${SITE_URL}/prix` },
+alternates: { canonical: `${SITE_URL}/prix` },
   openGraph: {
     type: 'website',
     title: 'Guides des prix des téléphones au Sénégal — FCFA | Tekalis',
