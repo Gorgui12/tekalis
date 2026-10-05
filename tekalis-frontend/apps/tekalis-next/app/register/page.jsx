@@ -1,3 +1,14 @@
 ﻿import RegisterClient from "@/components/auth/RegisterClient";
-export const metadata = { title: "Creer un compte | Tekalis" };
-export default function RegisterPage() { return <RegisterClient />; }
+import { buildPrivateMetadata } from '@/lib/seo/metadata';
+
+// Page privee : noindex, nofollow porte par le HTML (et non par robots.txt,
+// qui doit rester lisible par Google pour que le noindex soit applique).
+export const metadata = buildPrivateMetadata(
+  '/register',
+  'Créer un compte Tekalis',
+  'Créez votre compte Tekalis : suivez vos commandes, vos garanties et vos factures.'
+);
+
+export default function RegisterPage() {
+  return <RegisterClient />;
+}

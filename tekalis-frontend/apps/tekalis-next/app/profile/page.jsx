@@ -1,6 +1,12 @@
 import ProfileClient from "@/components/account/ProfileClient";
+import { buildPrivateMetadata } from '@/lib/seo/metadata';
 
-export const metadata = { title: "Mon Profil | Tekalis", robots: { index: false } };
+// Profil : donnees personnelles -> noindex, nofollow.
+export const metadata = buildPrivateMetadata(
+  '/profile',
+  'Mon profil',
+  'Gérez vos informations personnelles et vos adresses de livraison sur Tekalis.'
+);
 
 export default function ProfilePage() {
   return <ProfileClient />;
