@@ -2,9 +2,11 @@ import Link from 'next/link';
 import { PRIX_GUIDES, SITE_URL } from '@/lib/utils/prixGuides';
 
 export const metadata = {
-  title: 'Guides des prix des téléphones au Sénégal — FCFA | Tekalis',
+  title: {
+    absolute: 'Prix des téléphones au Sénégal — iPhone, Samsung en FCFA',
+  },
   description:
-    'Les prix des iPhone et Samsung au Sénégal et à Dakar, mis à jour avec les modèles en stock. iPhone 12, 13, Galaxy S24 Ultra, A25, A55, S23 FE : prix en FCFA, garantie, livraison 24-48h.',
+    'Prix des iPhone et Samsung au Sénégal et à Dakar, mis à jour selon les modèles en stock : prix en FCFA, garantie et livraison 24-48 h.',
 alternates: { canonical: `${SITE_URL}/prix` },
   openGraph: {
     type: 'website',

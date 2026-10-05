@@ -31,7 +31,7 @@ const steps = [
 export const metadata = {
   title: "Garanties & SAV | Tekalis",
   description:
-    "Garantie constructeur sur tous les produits tekalis.com : durée, couverture, procédure SAV simple depuis votre espace client. Réparation, échange ou remboursement.",
+    "Garantie constructeur sur tous les produits : durée, couverture et procédure SAV depuis votre espace client. Réparation, échange ou remboursement.",
   alternates: { canonical: "https://tekalis.com/garanties" },
   openGraph: {
     title: "Garanties & SAV | Tekalis",

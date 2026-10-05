@@ -15,8 +15,12 @@ export const metadata = buildPrivateMetadata(
 // le rendu serveur de toute la page.
 export default function RegisterPage() {
   return (
-    <Suspense fallback={null}>
-      <RegisterClient />
-    </Suspense>
+    <>
+      {/* Page sans <h1> : la hierarchie de titres est incomplete, meme en noindex. */}
+      <h1 className="sr-only">Créer un compte Tekalis</h1>
+      <Suspense fallback={null}>
+        <RegisterClient />
+      </Suspense>
+    </>
   );
 }

@@ -4,9 +4,12 @@ import ProductsClient from '@/components/product/ProductsClient';
 import { PRIX_GUIDES } from '@/lib/utils/prixGuides';
 
 export const metadata = {
-  title: 'Tous les Produits — Électronique Dakar Fann | Tekalis Sénégal',
+  // Deja suffixe par la marque : `absolute` evite le doublon du template du layout.
+  title: {
+    absolute: 'Tous les Produits — Électronique Dakar Fann | Tekalis Sénégal',
+  },
   description:
-    'Découvrez tous nos produits électroniques à Dakar Fann : smartphones iPhone Samsung, ordinateurs portables HP Dell Lenovo, TV 4K, électroménager. Livraison rapide dans toute la région de Dakar. Garantie constructeur incluse.',
+    'Nos produits électroniques à Dakar Fann : smartphones, ordinateurs portables, TV 4K, électroménager. Livraison dans la région de Dakar, garantie incluse.',
   alternates: { canonical: 'https://tekalis.com/products' },
   openGraph: {
     title: 'Tous les Produits — Électronique Dakar Fann | Tekalis',

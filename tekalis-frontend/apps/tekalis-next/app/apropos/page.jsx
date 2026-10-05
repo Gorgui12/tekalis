@@ -2,8 +2,11 @@
 import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaClock, FaCheckCircle, FaShieldAlt, FaTruck, FaMoneyBillWave } from "react-icons/fa";
 
 export const metadata = {
-  title: "À propos de Tekalis | Boutique Électronique Dakar Fann",
-  description: "Boutique en ligne fiable du Sénégal, Tekalis livre vos produits électroniques à Dakar Fann. Payez à la livraison ou par Wave : garantie et livraison rapide.",
+  title: {
+    absolute: 'À propos de Tekalis — Boutique électronique à Dakar',
+  },
+  description:
+    'Boutique en ligne du Sénégal : Tekalis livre vos produits électroniques à Dakar Fann. Paiement à la livraison ou par Wave, garantie incluse.',
   alternates: { canonical: 'https://tekalis.com/apropos' },
   openGraph: {
     title: 'À propos de Tekalis | Boutique Électronique Dakar',

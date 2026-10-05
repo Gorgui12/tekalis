@@ -2,9 +2,11 @@
 import BlogClient from '@/components/blog/BlogClient';
 
 export const metadata = {
-  title: 'Blog Tech Sénégal — Tests, Guides & Actualités | Tekalis',
+  title: {
+    absolute: 'Blog tech Sénégal — Tests, guides et actualités',
+  },
   description:
-    'Tests exclusifs, guides d\'achat et actualités tech au Sénégal. Trouvez le meilleur smartphone, laptop ou TV adapté à votre budget à Dakar.',
+    'Tests, guides d\'achat et actualités tech au Sénégal. Trouvez le meilleur smartphone, laptop ou TV adapté à votre budget à Dakar.',
   alternates: { canonical: 'https://tekalis.com/blog' },
   openGraph: {
     title: 'Blog Tech Sénégal — Tekalis',

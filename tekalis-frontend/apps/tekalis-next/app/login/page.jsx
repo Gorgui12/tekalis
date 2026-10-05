@@ -16,8 +16,12 @@ export const metadata = buildPrivateMetadata(
 // d'échec du build statique.
 export default function LoginPage() {
   return (
-    <Suspense fallback={null}>
-      <LoginClient />
-    </Suspense>
+    <>
+      {/* Page sans <h1> : la hierarchie de titres est incomplete, meme en noindex. */}
+      <h1 className="sr-only">Connexion a votre compte Tekalis</h1>
+      <Suspense fallback={null}>
+        <LoginClient />
+      </Suspense>
+    </>
   );
 }

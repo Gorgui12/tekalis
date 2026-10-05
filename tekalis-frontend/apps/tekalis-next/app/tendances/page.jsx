@@ -3,9 +3,12 @@ import TrendsClient from '@/components/trends/TrendsClient';
 import { SITE_URL } from '@/lib/utils/prixGuides';
 
 export const metadata = {
-  title: 'Tendances des recherches de téléphones au Sénégal — Tekalis',
+  // 70 caracteres maximum servait a 77 : le template du layout ajoutait la marque.
+  title: {
+    absolute: 'Téléphones les plus recherchés au Sénégal — Tekalis',
+  },
   description:
-    "Les recherches de téléphones les plus populaires au Sénégal en ce moment : prix iPhone, Samsung Galaxy, téléphones pas chers en FCFA. Comparez les prix avant d'acheter chez Tekalis.",
+    'Les téléphones les plus recherchés au Sénégal : prix iPhone et Samsung Galaxy en FCFA, modèles abordables. Comparez les prix avant d’acheter.',
 alternates: { canonical: `${SITE_URL}/tendances` },
   openGraph: {
     type: 'website',

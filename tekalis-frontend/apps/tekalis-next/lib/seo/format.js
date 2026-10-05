@@ -40,6 +40,25 @@ export function truncate(input, maxLength = 155) {
   return `${base.replace(/[\s,;:.\-–—]+$/, '')}…`;
 }
 
+/**
+ * Coupe a une frontiere de mot et termine par `...`, en respectant `maxLength`
+ * *final* (points de suspension compris).
+ *
+ * `truncate` termine par un point et coupe parfois au milieu d'un mot : c'est
+ * acceptable pour une description, pas pour un titre, ou une coupure en milieu
+ * de mot gaspille la place la plus precieuse du resultat Google.
+ */
+export function truncateAtWord(input, maxLength = 65) {
+  if (!input) return '';
+  const text = String(input).replace(/\s+/g, ' ').trim();
+  if (text.length <= maxLength) return text;
+  const room = maxLength - 3;
+  const cut = text.slice(0, room);
+  const lastSpace = cut.lastIndexOf(' ');
+  const base = lastSpace > room * 0.5 ? cut.slice(0, lastSpace) : cut;
+  return `${base.replace(/[\s,;:.\-–—]+$/, '')}...`;
+}
+
 /** Retire les balises HTML et decode les entities les plus courantes. */
 export function stripHtml(input) {
   if (!input) return '';

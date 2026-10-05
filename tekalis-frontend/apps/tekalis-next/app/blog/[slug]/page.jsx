@@ -2,8 +2,13 @@ import { notFound } from 'next/navigation';
 import { serverFetch } from '@/lib/serverFetch';
 import ArticleDetailClient from '@/components/blog/ArticleDetailClient';
 import { SOCIAL_LINKS } from '@/lib/utils/constants';
+import { truncateAtWord } from '@/lib/seo/format';
+import { MAX_DESCRIPTION } from '@/lib/seo/metadata';
 
 const SITE_URL = 'https://tekalis.com';
+
+/* Reserve au template du layout la place du suffixe ` | Tekalis Senegal`. */
+const BLOG_TITLE_MAX = 65 - ' | Tekalis Senegal'.length;
 
 export async function generateMetadata({ params }) {
   try {
@@ -14,9 +19,18 @@ export async function generateMetadata({ params }) {
 
     const ogImage = article.coverImage?.url || article.image || '';
 
+    /*
+     * Le titre de l'article est deja long (81 a 114 caracteres servis). Il
+     * portait en plus `| Blog Tekalis`, puis le template du layout ajoutait
+     * `| Tekalis Senegal` : deux marques pour un titre que Google tronque de
+     * toute facon. On reserve la place au mot-cle et on laisse le template
+     * poser l'unique suffixe de marque.
+     */
+    const title = truncateAtWord(article.title || '', BLOG_TITLE_MAX);
+
     return {
-      title: `${article.title} | Blog Tekalis`,
-      description: article.excerpt || article.title,
+      title,
+      description: truncateAtWord(article.excerpt || article.title || '', MAX_DESCRIPTION),
       alternates: { canonical: `${SITE_URL}/blog/${article.slug}` },
       openGraph: {
         type: 'article',

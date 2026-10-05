@@ -9,5 +9,11 @@ export const metadata = buildPrivateMetadata(
 );
 
 export default function CartPage() {
-  return <CartClient />;
+  return (
+    <>
+      {/* Page sans <h1> : la hierarchie de titres est incomplete, meme en noindex. */}
+      <h1 className="sr-only">Mon panier</h1>
+      <CartClient />
+    </>
+  );
 }

@@ -106,7 +106,7 @@ const faqCategories = [
 export const metadata = {
   title: "FAQ — Questions fréquentes | Tekalis",
   description:
-    "Réponses aux questions fréquentes sur tekalis.com : paiement à la livraison, Wave et Orange Money, délais de livraison à Dakar, retours sous 7 jours et garanties.",
+    "Questions fréquentes sur tekalis.com : paiement à la livraison, Wave et Orange Money, délais à Dakar, retours sous 7 jours et garanties.",
   alternates: { canonical: "https://tekalis.com/faq" },
   openGraph: {
     title: "FAQ — Questions fréquentes | Tekalis",

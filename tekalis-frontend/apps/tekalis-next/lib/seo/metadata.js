@@ -27,7 +27,7 @@ import {
   SHIPPING_CLAIM,
   absoluteUrl,
 } from './config';
-import { formatFcfa, stripHtml, truncate } from './format';
+import { formatFcfa, stripHtml, truncate, truncateAtWord } from './format';
 
 // Google tronque le title vers 60 caracteres sur mobile, ~70 au total.
 export const MAX_TITLE = 65;
@@ -66,7 +66,7 @@ export function buildProductTitle(name, price) {
         `${cleanName} ${BRAND_SUFFIX}`,
       ];
 
-  const fallback = truncate(`${cleanName} ${BRAND_SUFFIX}`, MAX_TITLE);
+  const fallback = `${truncateAtWord(cleanName, MAX_TITLE - BRAND_SUFFIX.length)} ${BRAND_SUFFIX}`;
   return firstWithinLimit(candidates, MAX_TITLE, fallback);
 }
 
@@ -146,7 +146,16 @@ export function buildMetadata({
   ];
 
   const metadata = {
-    title: finalTitle,
+    /*
+     * Le layout racine applique le template `%s | ${SITE_NAME}`. Les builders
+     * qui construisent deja un titre complet (fiche produit : nom + prix +
+     * marque) verraient donc la marque apparaitre deux fois :
+     *   "Onduleur X - 377 000 FCFA | Tekalis | Tekalis Senegal"
+     * On passe en `absolute` des que le titre contient deja la marque.
+     */
+    title: finalTitle.includes(SITE_NAME)
+      ? { absolute: finalTitle }
+      : finalTitle,
     description: finalDescription,
     ...(canonical ? { alternates: { canonical } } : {}),
     openGraph: {
