@@ -83,6 +83,8 @@ export function resolveItemCondition(product) {
   if (condition === 'used') return 'https://schema.org/UsedCondition';
   if (condition === 'new') {
     const signal = `${product?.slug || ''} ${product?.name || ''}`.toLowerCase();
+    // 15 produits « Venant » dans le catalogue : on omet itemCondition jusqu'a
+    // validation proprietaire de leur etat reel.
     if (signal.includes('venant')) return undefined;
     return 'https://schema.org/NewCondition';
   }
