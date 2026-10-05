@@ -6,7 +6,21 @@ import Navbar from '@/components/layout/Navbar';
 import Footer from '@/components/layout/Footer';
 import WhatsAppButton from '@/components/layout/WhatsAppButton';
 import AuthPromptHost from '@/components/auth/AuthPromptHost';
-import { SOCIAL_LINKS } from '@/lib/utils/constants';
+import JsonLd from '@/components/seo/JsonLd';
+import {
+  SITE_URL,
+  SITE_NAME,
+  SITE_LOCALE,
+  SITE_LANG,
+  CONTACT,
+  DEFAULT_OG_IMAGE,
+  DEFAULT_OG_IMAGE_WIDTH,
+  DEFAULT_OG_IMAGE_HEIGHT,
+  LOGO_URL,
+  SAME_AS,
+  absoluteUrl,
+} from '@/lib/seo/config';
+import { buildOrganizationSchema, buildWebSiteSchema } from '@/lib/seo/jsonld';
 
 const fontDisplay = Space_Grotesk({
   subsets: ['latin'],
@@ -23,79 +37,103 @@ const fontBody = DM_Sans({
 });
 
 export const metadata = {
-  metadataBase: new URL('https://tekalis.com'),
+  metadataBase: new URL(SITE_URL),
   title: {
-    default: 'Tekalis — Boutique Électronique & High-Tech au Sénégal | Dakar',
+    default: 'Tekalis - Boutique Electronique & High-Tech au Senegal | Dakar',
     template: '%s | Tekalis Sénégal',
   },
   description:
-    'Votre boutique électronique et magasin high-tech à Dakar. Ordinateurs, smartphones, TV, électroménager. Livraison rapide au Sénégal, garantie incluse.',
-  keywords: [
-    'boutique électronique Dakar', 'magasin high-tech Dakar', 'acheter électronique en ligne Sénégal', 'site e-commerce électronique Sénégal', 'Tekalis',
-  ],
-  authors: [{ name: 'Tekalis' }],
-  creator: 'Tekalis',
+    'Boutique électronique et high-tech à Dakar : smartphones, ordinateurs portables, TV, électroménager, énergie solaire. Livraison 24-48h au Sénégal.',
+  applicationName: SITE_NAME,
+  authors: [{ name: SITE_NAME }],
+  creator: SITE_NAME,
+  publisher: SITE_NAME,
+  formatDetection: { telephone: false },
+  alternates: { canonical: `${SITE_URL}/` },
   openGraph: {
     type: 'website',
-    locale: 'fr_SN',
-    url: 'https://tekalis.com',
-    siteName: 'Tekalis',
-    title: 'Tekalis — Électronique & High-Tech au Sénégal',
-    description: 'Smartphones, laptops, TV, électroménager à Dakar. Livraison rapide, garantie incluse.',
-    images: [{ url: '/og-image.png', width: 1200, height: 630 }],
+    locale: SITE_LOCALE,
+    url: absoluteUrl('/'),
+    siteName: SITE_NAME,
+    title: 'Tekalis - Électronique & High-Tech au Sénégal',
+    description:
+      'Smartphones, ordinateurs portables, TV, électroménager et énergie solaire à Dakar. Livraison 24-48h, paiement à la livraison.',
+    images: [
+      {
+        url: absoluteUrl(DEFAULT_OG_IMAGE),
+        width: DEFAULT_OG_IMAGE_WIDTH,
+        height: DEFAULT_OG_IMAGE_HEIGHT,
+        alt: 'Tekalis - boutique électronique à Dakar',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     site: '@tekalis',
-    title: 'Tekalis — Électronique & High-Tech Sénégal',
-    description: 'Ordinateurs, smartphones, TV et accessoires tech à Dakar.',
-    images: ['/og-image.png'],
+    title: 'Tekalis - Électronique & High-Tech Sénégal',
+    description:
+      'Ordinateurs, smartphones, TV et électroménager à Dakar. Livraison 24-48h au Sénégal.',
+    images: [absoluteUrl(DEFAULT_OG_IMAGE)],
   },
   robots: {
     index: true,
     follow: true,
-    googleBot: { index: true, follow: true, 'max-image-preview': 'large' },
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
   verification: {
     google: 'google3f11c8471493d46b',
   },
 };
 
-// Schema.org LocalBusiness - Optimisé Géo-SEO Dakar/Fann
+// Organization : rattache le nom "Tekalis" (requete en position 3 dans la
+// baseline) a l'entite locale, avec NAP et sameAs reels.
+const organizationSchema = buildOrganizationSchema();
+
+const webSiteSchema = buildWebSiteSchema();
+
+// LocalBusiness conserve horaires, zone desservie et catalogue.
+// TODO(owner): remplacer LOGO_URL par un vrai logo 60x60+ des que disponible
+// (public/ ne contient a ce jour que og-image.png).
 const localBusinessSchema = {
   '@context': 'https://schema.org',
   '@type': 'LocalBusiness',
-  name: 'Tekalis - Boutique Électronique Dakar',
+  '@id': `${SITE_URL}/#localbusiness`,
+  name: 'Tekalis - Boutique Electronique Dakar',
   alternateName: 'Tekalis Sénégal',
-  description: 'Boutique spécialisée en électronique et high-tech à Dakar, Sénégal. Ordinateurs, smartphones, TV, électroménager. Livraison rapide dans toute la région de Dakar.',
-  url: 'https://tekalis.com',
-  logo: 'https://tekalis.com/og-image.png',
-  image: 'https://tekalis.com/og-image.png',
-  telephone: '+221786346946',
-  email: 'contact@tekalis.com',
+  description: organizationSchema.description,
+  url: `${SITE_URL}/`,
+  logo: absoluteUrl(LOGO_URL),
+  image: absoluteUrl(DEFAULT_OG_IMAGE),
+  telephone: CONTACT.telephone,
+  email: CONTACT.email,
   priceRange: '$$',
   currenciesAccepted: 'XOF',
   paymentAccepted: 'Cash, Mobile Money, Wave, Orange Money, Free Money, Carte bancaire',
   address: {
     '@type': 'PostalAddress',
-    streetAddress: 'Fann, Rue 14',
-    addressLocality: 'Dakar',
-    addressRegion: 'Dakar',
-    postalCode: 'BP 12345',
-    addressCountry: 'SN',
+    streetAddress: CONTACT.streetAddress,
+    addressLocality: CONTACT.addressLocality,
+    addressRegion: CONTACT.addressRegion,
+    postalCode: CONTACT.postalCode,
+    addressCountry: CONTACT.addressCountry,
   },
   geo: {
     '@type': 'GeoCoordinates',
-    latitude: '14.6928',
-    longitude: '-17.4467',
+    latitude: String(CONTACT.latitude),
+    longitude: String(CONTACT.longitude),
   },
   areaServed: [
     {
       '@type': 'GeoCircle',
       geoMidpoint: {
         '@type': 'GeoCoordinates',
-        latitude: '14.6928',
-        longitude: '-17.4467',
+        latitude: String(CONTACT.latitude),
+        longitude: String(CONTACT.longitude),
       },
       geoRadius: '50000',
     },
@@ -130,21 +168,16 @@ const localBusinessSchema = {
       { '@type': 'OfferCatalog', name: 'Ordinateurs portables' },
       { '@type': 'OfferCatalog', name: 'Téléviseurs' },
       { '@type': 'OfferCatalog', name: 'Électroménager' },
+      { '@type': 'OfferCatalog', name: 'Énergie solaire' },
       { '@type': 'OfferCatalog', name: 'Accessoires tech' },
     ],
   },
-  sameAs: [
-    SOCIAL_LINKS.facebook,
-    SOCIAL_LINKS.instagram,
-    SOCIAL_LINKS.twitter,
-    SOCIAL_LINKS.linkedin,
-    SOCIAL_LINKS.youtube,
-  ],
+  ...(SAME_AS.length > 0 ? { sameAs: SAME_AS } : {}),
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="fr" suppressHydrationWarning data-scroll-behavior="smooth" className={`${fontDisplay.variable} ${fontBody.variable}`}>
+    <html lang={SITE_LANG} suppressHydrationWarning data-scroll-behavior="smooth" className={`${fontDisplay.variable} ${fontBody.variable}`}>
       <head>
         <link rel="preconnect" href="https://images.unsplash.com" />
         <link rel="dns-prefetch" href="//tekalis.onrender.com" />
@@ -174,15 +207,17 @@ export default function RootLayout({ children }) {
       </head>
       <body className="bg-white dark:bg-surface-950 text-surface-900 dark:text-surface-50 font-body antialiased">
         {/*
-          Schema.org LocalBusiness — rendu serveur (présent dans le HTML brut).
-          Un JSON-LD injecté en next/script (afterInteractive) n'apparaît pas
-          dans le HTML source et n'est pas vu par les crawlers.
+          Données structurées du site — rendues serveur, donc présentes dans le
+          HTML brut. Un JSON-LD injecté en next/script (afterInteractive)
+          n'apparaît pas dans le HTML source et n'est pas vu par les crawlers.
+
+          - Organization : entité locale "Tekalis" + NAP (nom de marque en position 3).
+          - WebSite : SearchAction, la recherche par URL existe (/products?search=).
+          - LocalBusiness : horaires, zone desservie, catalogue.
         */}
-        <script
-          id="local-business-schema"
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema) }}
-        />
+        <JsonLd id="organization-schema" data={organizationSchema} />
+        <JsonLd id="website-schema" data={webSiteSchema} />
+        <JsonLd id="local-business-schema" data={localBusinessSchema} />
         <Providers>
           <div className="pt-[100px]">
             <AnalyticsProvider>
