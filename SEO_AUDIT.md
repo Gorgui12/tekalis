@@ -268,7 +268,7 @@ Les slugs de production **n'ont plus de suffixe numerique**, alors que le brief 
 
 Le suffixe `1786915894592` est un `Date.now()` ajoute par `resolveUniqueSlug` (`productController.js:54-67`) quand le slug de base etait deja pris. Les slugs ont ete regeneres proprement entre-temps — **sans redirection**. Consequence : **la page la plus vue de la baseline (A14, 312 impressions) et la plupart des pages smartphones renvoie 301 vers `/products`** (`fetchProduct` renvoie `"not-found"` → `permanentRedirect('/products')`, ligne 61-63).
 
-**C'est la source #1 de perte de visibilite, devant le CTR.** Correctif Phase 5.
+**C'est la source #1 de perte de visibilite.** Ces 404 prevent le classement : sans URL servie, aucune optimisation de titre ou de contenu ne peut produire de gain de position. Correctif Phase 5.
 
 ---
 
@@ -396,9 +396,11 @@ Points faibles reels :
 | Ordinateur | CTR 3,1 % |
 | Extraits de produits | 3 impressions |
 
-Diagnostic par type : fiches smartphones **~67 % des impressions pour ~1,0 % de CTR** (positions 5-8) ; hors produit 2,7 % ; autres produits 3,5 % ; solaire 3,7 % ; ordinateurs 2,8 %.
+Diagnostic par type : fiches smartphones **~67 % des impressions, position moyenne ~6,5** ; hors produit 2,7 % de CTR ; autres produits 3,5 % ; solaire 3,7 % ; ordinateurs 2,8 %.
 
-**A re-exporter a +4 et +8 semaines pour comparer** (cf. `SEO_POST_DEPLOY.md`).
+**Le CTR des fiches smartphones (~1,0 % a position ~6,5) est dans la norme.** Benchmarks recents (Advanced Web Ranking, juillet 2026) : position 1 = 20 %, position 2 = 10,4 %, position 3 = 3,9 %, position 4 = 1,7 %, position 5 = 1,1 %, positions 6 a 10 = 0,5 a 0,7 %. Un CTR de 1,0 % autour de la position 6,5 est donc attendu. **Le levier n'est pas le CTR mais le passage des positions 5-8 au top 3.**
+
+**A re-exporter a +4 et +8 semaines pour comparer** (cf. `SEO_POST_DEPLOY.md`). La comparaison porte sur la **position moyenne** et la **part des impressions en top 3** ; le CTR se juge par rapport a la position, pas en valeur absolue.
 
 ---
 
@@ -408,7 +410,7 @@ Diagnostic par type : fiches smartphones **~67 % des impressions pour ~1,0 % de 
 |---|---|---|---|
 | 1 | **Les URL indexees (slugs a suffixe numerique) sont toutes 404 → 301 vers `/products`** | 🔴 Critique | 5 |
 | 2 | **La production sert l'app Vite, pas l'app Next.js** | 🔴 Critique | 10 |
-| 3 | Fiches smartphones en position 5-8 avec 1 % de CTR : titre/prix pas assez « cliquables » | 🟠 Fort | 2, 3 |
+| 3 | Fiches smartphones a ~67 % des impressions bloquees en position 5-8 : titres sans prix, donc peu distinctifs a l'ecran | 🟠 Fort | 2, 3 |
 | 4 | Aucun `aggregateRating` exploite (3 impressions « Extraits de produits ») ; `FAQPage` en surplus | 🟠 Fort | 4 |
 | 5 | `/configurator` en 404 alors qu'elle a des impressions | 🟡 Moyen | 5 |
 | 6 | `robots.txt` bloque `/login` + `/register` : la meta `noindex` est inatteignable | 🟡 Moyen | 5 |

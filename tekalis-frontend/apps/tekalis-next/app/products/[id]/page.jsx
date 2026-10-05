@@ -14,9 +14,11 @@ const BLOCKED_STATUSES = new Set(['discontinued']);
 /**
  * Metadata de fiche produit.
  *
- * Titre priorise « Prix » + montant + « FCFA » dans les ~60 premiers caracteres :
- * c'est ce que tapent les researched senegalais (« prix senegal », « prix en fcfa »)
- * et c'est le principal levier de CTR, a 1,0 % sur ces pages dans la baseline.
+ * Titre priorise « Prix » + montant + « FCFA » dans les ~60 premiers caracteres.
+ * Raison : ces fiches portent ~67 % des impressions et sont bloquees en position
+ * 5-8. Leur CTR est dans la norme de cette tranche, donc l'objectif est le gain
+ * de position ; un titre specifique et un prix dans le titre numerotent comme
+ * signaux de pertinence, ce qui aide au classement autant qu'au clic.
  *
  * Le canonical pointe toujours sur le slug, meme si la page est atteinte par
  * ObjectId (ancienne URL Vite) ou par un ancien slug a suffixe numerique.

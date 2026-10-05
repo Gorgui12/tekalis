@@ -3,11 +3,16 @@
  *
  * Constructeurs de title / description / metadata Next.js.
  *
- * Objectif CTR : les chiffres de la baseline (fiches smartphones a ~1,0 % de CTR
- * en position 5-8) montrent que le titre actuel ne donne pas assez envie de
- * cliquer. Les researched Senegalais tapent "prix senegal" / "prix en fcfa" :
- * on fait donc apparaitre "Prix" + le montant + "FCFA" dans les 60 premiers
- * caracteres du titre, et le prix dans les 120 premiers de la description.
+ * Objectif : gain de positions. Les fiches smartphones sont bloquees en
+ * position 5-8 (~67 % des impressions). Leur CTR (~1,0 % a position ~6,5) est
+ * dans la norme de sa tranche : le levier est donc le classement, pas le CTR.
+ *
+ * Concretement, le titre actuel est generique et identique sur plusieurs
+ * fiches, donc peu distinctif. Les recherchesTyped par les visiteurs senegalais
+ * portent sur le prix ("prix senegal", "prix en fcfa") : on fait apparaitre
+ * "Prix" + le montant + "FCFA" dans les 60 premiers caracteres du titre, et le
+ * prix dans les 120 premiers de la description. Un titre specifique ameliore
+ * aussi la pertinence perçue et le taux de clic a position egale.
  */
 
 import {
