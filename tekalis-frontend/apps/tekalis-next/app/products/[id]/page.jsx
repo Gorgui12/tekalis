@@ -1,51 +1,34 @@
-import { permanentRedirect } from "next/navigation";
-import { serverFetch } from "@/lib/serverFetch";
+import { notFound, permanentRedirect } from 'next/navigation';
 import ProductDetailClient from '@/components/product/ProductDetailClient';
 import ProductSeoContent from '@/components/product/ProductSeoContent';
-
-const SITE_URL = 'https://tekalis.com';
+import Breadcrumb from '@/components/seo/Breadcrumb';
+import JsonLd from '@/components/seo/JsonLd';
+import { buildProductMetadata } from '@/lib/seo/metadata';
+import { absoluteUrl } from '@/lib/seo/config';
+import { attachSpecs, buildBreadcrumbSchema, buildProductSchema, productImages } from '@/lib/seo/jsonld';
+import { productBreadcrumb } from '@/lib/seo/breadcrumbs';
+import { getProductReviews, getRelatedProducts, resolveProductRequest } from '@/lib/seo/products';
 
 const BLOCKED_STATUSES = new Set(['discontinued']);
 
+/**
+ * Metadata de fiche produit.
+ *
+ * Titre priorise « Prix » + montant + « FCFA » dans les ~60 premiers caracteres :
+ * c'est ce que tapent les researched senegalais (« prix senegal », « prix en fcfa »)
+ * et c'est le principal levier de CTR, a 1,0 % sur ces pages dans la baseline.
+ *
+ * Le canonical pointe toujours sur le slug, meme si la page est atteinte par
+ * ObjectId (ancienne URL Vite) ou par un ancien slug a suffixe numerique.
+ */
 export async function generateMetadata({ params }) {
   try {
     const { id } = await params;
-    const product = await fetchProduct(id);
+    const { product, canonicalSlug } = await resolveProductRequest(id);
 
-    if (!product || product === "not-found") return {};
+    if (!product || !canonicalSlug) return {};
 
-    const path = product.slug || id;
-    const productUrl = `${SITE_URL}/products/${path}`;
-    const primaryImage = product.images?.[0]?.url || product.image || '';
-    const priceStr = product.price?.toLocaleString('fr-FR');
-
-    return {
-      title: `Prix ${product.name} à Dakar — ${priceStr} FCFA | Tekalis Sénégal`,
-      description:
-        product.metaDescription ||
-        `En stock à Dakar : ${product.name} au prix de ${priceStr} FCFA. ` +
-        `Livraison rapide au Sénégal, garantie incluse. ` +
-        `Paiement à la livraison, Wave, Orange Money. Commandez en ligne.`,
-      keywords: [
-        `${product.name} Dakar`,
-        `${product.name} Sénégal`,
-        `prix ${product.name} fcfa`,
-        `${product.name} prix`,
-        `acheter ${product.name} Dakar`,
-        product.brand ? `${product.brand} Dakar` : null,
-        product.brand ? `${product.brand} Sénégal` : null,
-      ].filter(Boolean),
-      alternates: { canonical: productUrl },
-      openGraph: {
-        type: 'website',
-        title: `Prix ${product.name} à Dakar — ${priceStr} FCFA | Tekalis`,
-        description: product.metaDescription || product.description?.substring(0, 160) || '',
-        url: productUrl,
-        siteName: 'Tekalis Sénégal',
-        locale: 'fr_SN',
-        images: primaryImage ? [{ url: primaryImage, width: 800, height: 800, alt: product.name }] : [],
-      },
-    };
+    return buildProductMetadata(product, canonicalSlug);
   } catch {
     return {};
   }
@@ -56,19 +39,35 @@ export const revalidate = 3600;
 export default async function ProductPage({ params }) {
   const { id } = await params;
 
-  const product = await fetchProduct(id);
+  const { product, canonicalSlug, notFound: missing, shouldRedirect, apiUnavailable } =
+    await resolveProductRequest(id);
 
-  if (product === "not-found") {
-    permanentRedirect('/products');
+  // 301 vers le slug canonique : couvre /products/<ObjectId> (URL de l'ancienne
+  // app Vite) et /products/<slug>-<13 chiffres> (ancien format de slug, encore
+  // indexe par Google, aujourd'hui en 404).
+  if (shouldRedirect && canonicalSlug) {
+    permanentRedirect(`/products/${canonicalSlug}`);
+  }
+
+  // 404 reel si l'API a repondu et qu'aucun produit ne correspond.
+  // `notFound()` renvoie un vrai statut HTTP 404 (pas de soft-404).
+  if (missing) {
+    notFound();
   }
 
   if (!product) {
+    // API injoignable (cold start Render, rate-limit) : on rend une page
+    // degradee indexable=false plutot qu'un 404, et le client recharge.
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Erreur de chargement</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            Produit momentanément indisponible
+          </h1>
           <p className="text-gray-600 mb-6">
-            Une erreur est survenue lors du chargement du produit. Veuillez réessayer.
+            {apiUnavailable
+              ? 'Le catalogue se recharge. Réessayez dans un instant ou parcourez nos catégories.'
+              : 'Une erreur est survenue lors du chargement du produit.'}
           </p>
           <a href="/products" className="text-blue-600 hover:underline">
             Voir tous les produits
@@ -82,173 +81,85 @@ export default async function ProductPage({ params }) {
     permanentRedirect('/products');
   }
 
-  if (product.slug && product.slug !== id) {
-    permanentRedirect(`/products/${product.slug}`);
+  const category = product.category?.[0];
+  const productUrl = absoluteUrl(`/products/${canonicalSlug}`);
+  const images = productImages(product);
+
+  // Avis reels uniquement : aucune note synthetique.
+  const reviews = await getProductReviews(product._id);
+  const rating = product.rating && Number(product.rating.count) > 0 ? product.rating : null;
+
+  // Produits lies, rendus serveur pour le maillage interne (phase 7).
+  const related = await getRelatedProducts(product, 6);
+
+  // ---- Donnees structurees (Product / Offer) ----
+  const productSchema = attachSpecs(
+    buildProductSchema(product, {
+      productUrl,
+      categoryName: category?.name,
+    }),
+    product
+  );
+
+  // aggregateRating / review : uniquement si la base contient de vrais avis.
+  if (productSchema && rating && Number(rating.average) > 0) {
+    productSchema.aggregateRating = {
+      '@type': 'AggregateRating',
+      ratingValue: Number(rating.average),
+      bestRating: Number(rating.max) || 5,
+      ...(rating.min !== undefined ? { worstRating: Number(rating.min) } : {}),
+      reviewCount: Number(rating.count),
+    };
   }
-
-  const productPath = product.slug || product._id;
-  const productUrl = `${SITE_URL}/products/${productPath}`;
-  const primaryImage = product.images?.[0]?.url || product.image || '';
-  const allImages = (product.images || []).map((img) => img.url || img).filter(Boolean);
-
-  // Avis approuvés (utilisés pour les champs review + aggregateRating requis par Google)
-  const reviewsData = await fetchReviews(product._id);
-  const reviewItems = (reviewsData?.reviews || [])
-    .slice(0, 5)
-    .map((rev) => ({
+  if (productSchema && reviews.length > 0) {
+    productSchema.review = reviews.slice(0, 5).map((review) => ({
       '@type': 'Review',
-      ...(rev.title ? { name: rev.title } : {}),
+      ...(review.title ? { name: stripReviewHtml(review.title) } : {}),
       reviewRating: {
         '@type': 'Rating',
-        ratingValue: rev.rating,
+        ratingValue: Number(review.rating),
         bestRating: 5,
         worstRating: 1,
       },
-      author: {
-        '@type': 'Person',
-        name: rev.user?.name || (rev.isVerified ? 'Acheteur vérifié' : 'Client Tekalis'),
-      },
-      ...(rev.createdAt
-        ? { datePublished: new Date(rev.createdAt).toISOString().split('T')[0] }
+      ...(review.user?.name || review.isVerified
+        ? {
+            author: {
+              '@type': 'Person',
+              name: review.user?.name || 'Acheteur vérifié',
+            },
+          }
         : {}),
-      ...(rev.comment ? { reviewBody: rev.comment } : {}),
+      ...(review.createdAt
+        ? { datePublished: new Date(review.createdAt).toISOString().slice(0, 10) }
+        : {}),
+      ...(review.comment ? { reviewBody: stripReviewHtml(review.comment) } : {}),
     }));
+  }
 
-  // Produits de la même catégorie — rendus côté serveur pour le maillage interne
-  const related = await fetchRelated(product.category?.[0]?._id);
-
-  const productSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: product.name,
-    image: allImages.length > 0 ? allImages : primaryImage ? [primaryImage] : undefined,
-    description: product.description || product.metaDescription || '',
-    sku: product._id,
-    mpn: product.mpn || product._id,
-    ...(product.gtin ? { gtin: product.gtin } : {}),
-    ...(product.specs && Object.keys(product.specs).length > 0 ? {
-      additionalProperty: Object.entries(product.specs)
-        .map(([key, value]) => ({
-          '@type': 'PropertyValue',
-          name: key,
-          value: String(value),
-        })),
-    } : {}),
-    brand: { '@type': 'Brand', name: product.brand || 'Tekalis' },
-    offers: {
-      '@type': 'Offer',
-      url: productUrl,
-      priceCurrency: 'XOF',
-      price: product.price,
-      itemCondition: 'https://schema.org/NewCondition',
-      availability: product.stock > 0
-        ? 'https://schema.org/InStock'
-        : 'https://schema.org/OutOfStock',
-      seller: {
-        '@type': 'Organization',
-        name: 'Tekalis',
-        url: SITE_URL,
-      },
-      hasMerchantReturnPolicy: {
-        '@type': 'MerchantReturnPolicy',
-        applicableCountry: 'SN',
-        returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
-        merchantReturnDays: 7,
-        returnMethod: 'https://schema.org/ReturnByMail',
-        returnFees: 'https://schema.org/FreeReturn',
-      },
-      shippingDetails: {
-        '@type': 'OfferShippingDetails',
-        shippingRate: {
-          '@type': 'MonetaryAmount',
-          value: product.price >= 50000 ? 0 : 2500,
-          currency: 'XOF',
-        },
-        shippingDestination: {
-          '@type': 'DefinedRegion',
-          addressCountry: 'SN',
-        },
-        deliveryTime: {
-          '@type': 'ShippingDeliveryTime',
-          handlingTime: { '@type': 'QuantitativeValue', minValue: 0, maxValue: 1, unitCode: 'DAY' },
-          transitTime: { '@type': 'QuantitativeValue', minValue: 1, maxValue: 2, unitCode: 'DAY' },
-        },
-      },
-    },
-    ...(product.rating && product.rating.count > 0 ? {
-      aggregateRating: {
-        '@type': 'AggregateRating',
-        ratingValue: product.rating.average,
-        bestRating: 5,
-        worstRating: 1,
-        reviewCount: product.rating.count,
-      },
-    } : {}),
-    ...(reviewItems.length > 0 ? { review: reviewItems } : {}),
-    category: product.category?.[0]?.name || product.category?.[0] || '',
-  };
-
-  const breadcrumbSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'BreadcrumbList',
-    itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Accueil', item: SITE_URL },
-      { '@type': 'ListItem', position: 2, name: 'Produits', item: `${SITE_URL}/products` },
-      ...(product.category?.[0] ? [{
-        '@type': 'ListItem',
-        position: 3,
-        name: product.category[0].name || product.category[0],
-        item: `${SITE_URL}/category/${product.category[0].slug || ''}`,
-      }] : []),
-      {
-        '@type': 'ListItem',
-        position: product.category?.[0] ? 4 : 3,
-        name: product.name,
-        item: productUrl,
-      },
-    ],
-  };
+  const breadcrumbItems = productBreadcrumb(product, category);
+  const breadcrumbSchema = buildBreadcrumbSchema(breadcrumbItems);
 
   return (
     <>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
-      {/* H1 server-rendered : la fiche produit est un client component, cf. RSC / HW curl. */}
-      <h1 className="sr-only">{product.name}</h1>
+      <JsonLd id="product-schema" data={productSchema} />
+      <JsonLd id="breadcrumb-schema" data={breadcrumbSchema} />
+
+      <div className="container mx-auto px-4 pt-4">
+        <Breadcrumb items={breadcrumbItems} />
+      </div>
+
+      {/* H1 + prix + disponibilite + tableau des caracterisations : rendus
+          serveur dans ProductSeoContent, donc presents dans le HTML brut.
+          ProductDetailClient fournit la galerie, le prix cliquable et le panier. */}
       <ProductDetailClient product={product} />
-      <ProductSeoContent product={product} related={related} />
+      <ProductSeoContent product={product} related={related} category={category} />
     </>
   );
 }
 
-async function fetchRelated(categoryId) {
-  if (!categoryId) return [];
-  try {
-    const res = await serverFetch(`/products?category=${categoryId}&limit=8`);
-    const list = res?.data || res?.products || res || [];
-    return Array.isArray(list) ? list : [];
-  } catch {
-    return [];
-  }
-}
-
-async function fetchProduct(id) {
-  try {
-    const res = await serverFetch(`/products/${id}`);
-    return res?.data || res || null;
-  } catch (err) {
-    const msg = err?.message || "";
-    const m = msg.match(/^API (\d+):/);
-    if (m && Number(m[1]) === 404) return "not-found";
-    return null;
-  }
-}
-
-async function fetchReviews(productId) {
-  try {
-    const res = await serverFetch(`/reviews/${productId}?limit=5`);
-    return res || null;
-  } catch {
-    return null;
-  }
+function stripReviewHtml(value) {
+  return String(value || '')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
 }

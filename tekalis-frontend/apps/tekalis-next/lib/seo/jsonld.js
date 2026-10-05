@@ -170,16 +170,6 @@ export function buildBreadcrumbSchema(items) {
   };
 }
 
-/** Fil d'Ariane standard d'une fiche produit. */
-export function productBreadcrumbItems(product, category) {
-  const items = [{ name: 'Accueil', path: '/' }, { name: 'Produits', path: '/products' }];
-  if (category?.slug) {
-    items.push({ name: category.name, path: `/category/${category.slug}` });
-  }
-  items.push({ name: stripHtml(product?.name), path: `/products/${product?.slug || product?._id}` });
-  return items;
-}
-
 /** Organization : ce que Google doit associer au nom "Tekalis". */
 export function buildOrganizationSchema() {
   return {

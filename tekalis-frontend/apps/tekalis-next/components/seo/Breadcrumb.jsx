@@ -1,40 +1,48 @@
-﻿import Link from "next/link";
-import { FaHome, FaChevronRight } from 'react-icons/fa';
+﻿import Link from 'next/link';
+import { breadcrumbItems } from '@/lib/seo/breadcrumbs';
 
 /**
- * Breadcrumb (fil d'Ariane) pour SEO et UX
- * Usage: <Breadcrumb items={[{name: "Produits", path: "/products"}, ...]} />
+ * Fil d'Ariane visible, rendu serveur.
+ *
+ * Google s'en sert pour comprendre la hierarchie et, combine au BreadcrumbList
+ * JSON-LD, pour afficher le chemin dans le resultat. Le dernier element n'est
+ * pas un lien : c'est la page courante.
  */
-export const Breadcrumb = ({ items = [] }) => {
+export default function Breadcrumb({ items = [], className = '' }) {
+  const list = breadcrumbItems(items);
+  if (list.length === 0) return null;
+
   return (
-    <nav aria-label="Fil d'Ariane" className="py-3 px-4">
-      <ol className="flex items-center gap-2 text-sm flex-wrap">
-        <li>
-          <Link href="/"
-            className="flex items-center gap-1 text-surface-600 dark:text-surface-400 hover:text-brand-600 dark:hover:text-brand-400 transition"
-          >
-            <FaHome />
-            <span>Accueil</span>
-          </Link>
-        </li>
-        
-        {items.map((item, index) => (
-          <li key={index} className="flex items-center gap-2">
-            <FaChevronRight className="text-surface-400 dark:text-surface-500 text-xs" />
-            {index === items.length - 1 ? (
-              <span className="text-surface-900 dark:text-white font-semibold">
-                {item.name}
-              </span>
-            ) : (
-              <Link href={item.path}
-                className="text-surface-600 dark:text-surface-400 hover:text-brand-600 dark:hover:text-brand-400 transition"
-              >
-                {item.name}
-              </Link>
-            )}
-          </li>
-        ))}
+    <nav aria-label="Fil d'Ariane" className={`text-sm ${className}`}>
+      <ol className="flex flex-wrap items-center gap-x-2 gap-y-1 text-surface-500 dark:text-surface-400">
+        {list.map((item, index) => {
+          const isLast = index === list.length - 1;
+          return (
+            <li key={`${item.name}-${index}`} className="flex items-center gap-2">
+              {index > 0 && (
+                <span aria-hidden="true" className="text-surface-300 dark:text-surface-600">
+                  /
+                </span>
+              )}
+              {isLast ? (
+                <span
+                  aria-current="page"
+                  className="font-semibold text-surface-900 dark:text-surface-100"
+                >
+                  {item.name}
+                </span>
+              ) : (
+                <Link
+                  href={item.path || '/'}
+                  className="hover:underline hover:text-brand-600 dark:hover:text-brand-400"
+                >
+                  {item.name}
+                </Link>
+              )}
+            </li>
+          );
+        })}
       </ol>
     </nav>
   );
-};
+}

@@ -1,246 +1,350 @@
-import Link from "next/link";
-import { FaTruck, FaShieldAlt, FaMoneyBillWave, FaUndo, FaCheckCircle } from "react-icons/fa";
-
-const SITE_URL = 'https://tekalis.com';
+import Link from 'next/link';
+import { FaTruck, FaShieldAlt, FaMoneyBillWave, FaUndo } from 'react-icons/fa';
+import { availabilityLabel } from '@/lib/seo/jsonld';
+import { formatFcfa, productAnchor } from '@/lib/seo/format';
+import {
+  PAYMENT_CLAIM,
+  RETURNS_CLAIM,
+  SHIPPING_CLAIM,
+  WARRANTY_CLAIM,
+} from '@/lib/seo/config';
+import { buildProductIntro } from '@/lib/seo/productContent';
 
 const SPEC_LABELS = {
-  processor: "Processeur",
-  ram: "Mémoire RAM",
-  storage: "Stockage",
-  storageType: "Type de stockage",
-  display: "Écran",
-  battery: "Batterie",
-  weight: "Poids",
-  dimensions: "Dimensions",
-  color: "Couleur",
-  os: "Système d'exploitation",
-  gpu: "Carte graphique",
-  camera: "Caméra",
-  connectivity: "Connectivité",
+  processor: 'Processeur',
+  processorBrand: 'Marque du processeur',
+  processorGeneration: 'Génération du processeur',
+  ram: 'Mémoire RAM',
+  ramType: 'Type de RAM',
+  storage: 'Stockage',
+  storageType: 'Type de stockage',
+  display: 'Écran',
+  screen: 'Taille d\'écran',
+  screenTech: 'Technologie d\'écran',
+  refreshRate: 'Taux de rafraîchissement',
+  gpu: 'Carte graphique',
+  graphics: 'Carte graphique',
+  graphicsMemory: 'Mémoire graphique',
+  connectivity: 'Connectivité',
+  ports: 'Ports',
+  os: 'Système d\'exploitation',
+  battery: 'Batterie',
+  batteryCapacity: 'Capacité de la batterie',
+  weight: 'Poids',
+  dimensions: 'Dimensions',
+  color: 'Couleur',
+  camera: 'Caméra arrière',
+  frontCamera: 'Caméra avant',
+  rgb: 'Éclairage RGB',
+  coolingSystem: 'Système de refroidissement',
 };
 
-const KEY_SPECS = [
-  "processor",
-  "ram",
-  "storage",
-  "storageType",
-  "display",
-  "gpu",
-  "battery",
-  "camera",
-  "connectivity",
-  "os",
+// Ordre d'affichage : on montre d'abord ce que l'internaute compare.
+const SPEC_ORDER = [
+  'storage',
+  'ram',
+  'display',
+  'screen',
+  'screenTech',
+  'refreshRate',
+  'processor',
+  'processorBrand',
+  'processorGeneration',
+  'ramType',
+  'storageType',
+  'gpu',
+  'graphics',
+  'graphicsMemory',
+  'battery',
+  'batteryCapacity',
+  'camera',
+  'frontCamera',
+  'os',
+  'connectivity',
+  'ports',
+  'color',
+  'weight',
+  'dimensions',
+  'rgb',
+  'coolingSystem',
 ];
 
-export default function ProductSeoContent({ product, related = [] }) {
+function formatSpecValue(value) {
+  if (Array.isArray(value)) return value.filter(Boolean).join(', ');
+  if (typeof value === 'boolean') return value ? 'Oui' : 'Non';
+  return String(value);
+}
+
+/** Toutes les caracteristiques reelles du produit, dans un ordre lisible. */
+function collectSpecs(specs) {
+  if (!specs || typeof specs !== 'object') return [];
+  return SPEC_ORDER.filter((key) => {
+    const value = specs[key];
+    return value !== null && value !== undefined && value !== '' &&
+      !(Array.isArray(value) && value.filter(Boolean).length === 0);
+  }).map((key) => [SPEC_LABELS[key] || key, formatSpecValue(specs[key])]);
+}
+
+/**
+ * Contenu editorial de la fiche produit, rendu côté serveur.
+ *
+ * Tout ce que Google voit sans executer de JavaScript : H1, prix, disponibilite,
+ * tableau des caracteristiques, arguments d'achat et FAQ.
+ *
+ * Regle : les seules affirmations employee's sont celles de lib/seo/config.js,
+ * qui ne reprend que des formules deja publiees sur /livraison, /retours et
+ * /garanties. Aucun schema FAQPage ici : Google n'affiche plus ce type de
+ * resultat enrichi pour un site marchand, et le balisage visible est deja
+ * present dans le HTML.
+ */
+export default function ProductSeoContent({ product, related = [], category }) {
   if (!product) return null;
 
-  const productPath = product.slug || product._id;
-  const productUrl = `${SITE_URL}/products/${productPath}`;
-  const category = product.category?.[0];
+  const categoryRef = category || product.category?.[0];
+  const price = formatFcfa(product.price);
+  const comparePrice = formatFcfa(product.comparePrice);
+  const hasDiscount = Number(product.comparePrice) > Number(product.price);
+  const availability = availabilityLabel(product);
+  const inStock = availability === 'En stock';
+  const specs = collectSpecs(product.specs);
+  const intro = buildProductIntro(product, { price, availability });
 
-  const inStock = product.stock > 0;
-  const price = (product.price || 0).toLocaleString('fr-FR');
-
-  const specEntries = Object.entries(product.specs || {})
-    .filter(([key, value]) => KEY_SPECS.includes(key) && value)
-    .map(([key, value]) => [SPEC_LABELS[key] || key, value])
-    .slice(0, 6);
-
-  const relatedItems = (related || [])
-    .filter((item) => (item._id || item.id) !== (product._id || product.id))
+  const relatedItems = (Array.isArray(related) ? related : [])
+    .filter((item) => item && (item.slug || item._id))
+    .filter((item) => item._id !== product._id)
     .slice(0, 4);
 
   const productName = product.name;
 
+  // FAQ : uniquement des faits deja publies sur le site.
   const faqItems = [
     {
-      question: `Quel est le prix de ${productName} ?`,
-      answer:
-        `Le prix affiché de ${productName} est de ${price} FCFA (prix en vigueur au Sénégal). ` +
-        `Avant d'acheter, consultez nos guides de prix pour comparer les modèles disponibles.`,
+      question: `Quel est le prix du ${productName} au Sénégal ?`,
+      answer: price
+        ? `Le ${productName} est affiché à ${price} FCFA sur tekalis.com. Le stock en ligne reflète la disponibilité réelle du produit.`
+        : `Le prix du ${productName} est affiché en direct sur cette page, en FCFA.`,
     },
     {
-      question: `Où acheter ${productName} à Dakar ?`,
-      answer:
-        `Tekalis, boutique high-tech basée à Dakar Fann (Fann, Rue 14), vend ${productName}. ` +
-        `Commandez en ligne sur tekalis.com : la livraison est assurée en 24 à 48 heures à Dakar et dans sa banlieue, ` +
-        `et en 2 à 5 jours dans les autres régions du Sénégal.`,
+      question: `Livrez-vous le ${productName} à Dakar ?`,
+      answer: `Oui. Tekalis est situé ${'Fann, Rue 14 à Dakar'}. ${SHIPPING_CLAIM}.`,
     },
     {
-      question: "Quels moyens de paiement acceptez-vous ?",
-      answer:
-        "Nous acceptons le paiement à la livraison (espèces), Wave, Orange Money, Free Money et la carte bancaire (Visa, Mastercard).",
+      question: 'Quels moyens de paiement acceptez-vous ?',
+      answer: `${PAYMENT_CLAIM}.`,
     },
     {
-      question: "Le produit est-il garanti ?",
-      answer:
-        "Chaque produit vendu par Tekalis bénéficie de la garantie du constructeur. La durée de garantie dépend du produit : consultez notre page garanties pour les modalités.",
+      question: 'Le produit est-il garanti et retourneable ?',
+      answer: `${WARRANTY_CLAIM}. ${RETURNS_CLAIM}.`,
     },
   ];
 
-  const faqSchema = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: faqItems.map((item) => ({
-      '@type': 'Question',
-      name: item.question,
-      acceptedAnswer: { '@type': 'Answer', text: item.answer },
-    })),
-  };
-
   return (
-    <>
-      <div className="container mx-auto px-4 mb-12">
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* En bref — faits clés (2/3) */}
-          <div className="rounded-2xl border border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-800 p-6">
+    <div className="container mx-auto px-4 mt-10 mb-12">
+      {/* H1 unique de la page + resume factuel. Rendus serveur : c'est ce que
+          Googlebot indexe, la SPA/Vite ne le fournissait pas. */}
+      <header className="max-w-3xl">
+        <h1 className="text-3xl md:text-4xl font-extrabold font-display text-surface-900 dark:text-white">
+          {productName}
+        </h1>
+        <p className="mt-3 text-base text-surface-600 dark:text-surface-300 leading-relaxed">
+          {intro}
+        </p>
+      </header>
+
+      {/* Prix / disponibilite : le bloc que les researched DakarWant voir avant de cliquer. */}
+      <div className="mt-6 rounded-2xl border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-800 p-5">
+        <h2 className="text-xl font-bold font-display text-surface-900 dark:text-white">
+          Prix du {productName} au Sénégal
+        </h2>
+        <p className="mt-2 text-2xl font-extrabold text-brand-600 dark:text-brand-400">
+          {price ? `${price} FCFA` : 'Prix sur demande'}
+          {hasDiscount && comparePrice && (
+            <span className="ml-3 text-base font-medium text-surface-400 line-through">
+              {comparePrice} FCFA
+            </span>
+          )}
+        </p>
+        <p
+          className={`mt-1 text-sm font-semibold ${
+            inStock ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
+          }`}
+        >
+          {availability}
+          {inStock && Number(product.stock) > 1 ? ` (${product.stock} en stock)` : ''}
+        </p>
+        <ul className="mt-4 grid gap-2 text-sm text-surface-700 dark:text-surface-300 sm:grid-cols-2">
+          {product.brand && (
+            <li>
+              <strong className="font-semibold">Marque :</strong> {product.brand}
+            </li>
+          )}
+          {categoryRef?.name && (
+            <li>
+              <strong className="font-semibold">Catégorie :</strong>{' '}
+              <Link
+                href={`/category/${categoryRef.slug}`}
+                className="text-brand-600 dark:text-brand-400 hover:underline"
+              >
+                {categoryRef.name}
+              </Link>
+            </li>
+          )}
+          {SHIPPING_CLAIM && (
+            <li>
+              <strong className="font-semibold">Livraison :</strong> {SHIPPING_CLAIM}
+            </li>
+          )}
+          {WARRANTY_CLAIM && (
+            <li>
+              <strong className="font-semibold">Garantie :</strong> {WARRANTY_CLAIM}
+            </li>
+          )}
+        </ul>
+      </div>
+
+      <div className="mt-8 grid gap-8 lg:grid-cols-2">
+        {/* Caracteristiques reelles du produit */}
+        {specs.length > 0 && (
+          <section className="rounded-2xl border border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-800 p-6">
             <h2 className="text-xl font-bold font-display text-surface-900 dark:text-white mb-4">
-              {productName} en bref
+              Caractéristiques du {productName}
             </h2>
-            <dl className="space-y-2 text-sm">
-              {product.brand && (
-                <div className="flex items-center gap-2">
-                  <dt className="w-40 font-semibold text-surface-700 dark:text-surface-300">Marque</dt>
-                  <dd className="text-surface-900 dark:text-white">{product.brand}</dd>
-                </div>
-              )}
-              {category?.name && (
-                <div className="flex items-center gap-2">
-                  <dt className="w-40 font-semibold text-surface-700 dark:text-surface-300">Catégorie</dt>
-                  <dd className="text-surface-900 dark:text-white">
-                    <Link
-                      href={`/category/${category.slug || ''}`}
-                      className="text-brand-600 dark:text-brand-400 hover:underline"
-                    >
-                      {category.name}
-                    </Link>
-                  </dd>
-                </div>
-              )}
-              <div className="flex items-center gap-2">
-                <dt className="w-40 font-semibold text-surface-700 dark:text-surface-300">Prix</dt>
-                <dd className="text-surface-900 dark:text-white">{price} FCFA</dd>
-              </div>
-              <div className="flex items-center gap-2">
-                <dt className="w-40 font-semibold text-surface-700 dark:text-surface-300">Disponibilité</dt>
-                <dd className={inStock ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}>
-                  {inStock ? "En stock" : "Rupture de stock"}
-                </dd>
-              </div>
-              {specEntries.map(([label, value]) => (
-                <div key={label} className="flex items-center gap-2">
-                  <dt className="w-40 font-semibold text-surface-700 dark:text-surface-300">{label}</dt>
+            <dl className="divide-y divide-surface-100 dark:divide-surface-700 text-sm">
+              {specs.map(([label, value]) => (
+                <div key={label} className="flex items-start gap-3 py-2">
+                  <dt className="w-44 shrink-0 font-semibold text-surface-600 dark:text-surface-400">
+                    {label}
+                  </dt>
                   <dd className="text-surface-900 dark:text-white">{value}</dd>
                 </div>
               ))}
             </dl>
-          </div>
-
-          {/* Acheter en ligne en confiance — faits boutique */}
-          <div className="rounded-2xl border border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-800 p-6">
-            <h2 className="text-xl font-bold font-display text-surface-900 dark:text-white mb-4">
-              Commandez {productName} en ligne — Tekalis Dakar
-            </h2>
-            <ul className="space-y-3 text-sm text-surface-700 dark:text-surface-300">
-              <li className="flex items-start gap-3">
-                <FaTruck className="text-brand-600 dark:text-brand-400 mt-0.5 flex-shrink-0" />
-                <span>
-                  <strong>Livraison :</strong> 24 à 48h à Dakar et sa banlieue, 2 à 5 jours dans le reste du Sénégal, offerte dès 50 000 FCFA.{" "}
-                  <Link href="/livraison" className="text-brand-600 dark:text-brand-400 hover:underline">Voir les zones et délais</Link>.
-                </span>
-              </li>
-              <li className="flex items-start gap-3">
-                <FaShieldAlt className="text-brand-600 dark:text-brand-400 mt-0.5 flex-shrink-0" />
-                <span>
-                  <strong>Garantie :</strong> couverture assurée selon le produit, avec SAV réactif.{" "}
-                  <Link href="/garanties" className="text-brand-600 dark:text-brand-400 hover:underline">Consulter la page garanties</Link>.
-                </span>
-              </li>
-              <li className="flex items-start gap-3">
-                <FaUndo className="text-brand-600 dark:text-brand-400 mt-0.5 flex-shrink-0" />
-                <span>
-                  <strong>Retours :</strong> 7 jours pour retourner un produit non utilisé.{" "}
-                  <Link href="/retours" className="text-brand-600 dark:text-brand-400 hover:underline">Lire les conditions</Link>.
-                </span>
-              </li>
-              <li className="flex items-start gap-3">
-                <FaMoneyBillWave className="text-brand-600 dark:text-brand-400 mt-0.5 flex-shrink-0" />
-                <span>
-                  <strong>Paiement :</strong> à la livraison (espèces), Wave, Orange Money, Free Money ou carte bancaire.
-                </span>
-              </li>
-              <li className="flex items-start gap-3">
-                <FaCheckCircle className="text-brand-600 dark:text-brand-400 mt-0.5 flex-shrink-0" />
-                <span>
-                  <strong>Avis clients :</strong> note et avis vérifiés visibles sur cette fiche, déposés après achat.
-                </span>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        {/* Produits de la même catégorie — liens internes server-rendered */}
-        {relatedItems.length > 0 && (
-          <div className="mt-8 rounded-2xl border border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-800 p-6">
-            <h2 className="text-xl font-bold font-display text-surface-900 dark:text-white mb-4">
-              {category?.name ? `Autres produits de la catégorie ${category.name}` : "Produits similaires"}
-            </h2>
-            <ul className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              {relatedItems.map((item) => (
-                <li key={item._id || item.id}>
-                  <Link
-                    href={`/products/${item.slug || item._id || item.id}`}
-                    className="group flex flex-col h-full rounded-xl border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-900/40 p-4 hover:shadow-card transition"
-                  >
-                    <span className="text-sm font-semibold text-surface-900 dark:text-white group-hover:text-brand-600 dark:group-hover:text-brand-400 mb-2 line-clamp-2">
-                      {item.name}
-                    </span>
-                    {item.price != null && (
-                      <span className="mt-auto text-sm font-bold text-brand-600 dark:text-brand-400">
-                        {(item.price || 0).toLocaleString('fr-FR')} FCFA
-                      </span>
-                    )}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-            <p className="mt-4 text-sm text-surface-600 dark:text-surface-400">
-              Retrouvez tout notre catalogue sur la page{" "}
-              <Link href="/products" className="text-brand-600 dark:text-brand-400 hover:underline">produits</Link>
-              {category?.slug ? (
-                <> et la catégorie{" "}
-                <Link href={`/category/${category.slug}`} className="text-brand-600 dark:text-brand-400 hover:underline">{category.name}</Link></>
-              ) : null}.
-            </p>
-          </div>
+          </section>
         )}
 
-        {/* FAQ produit — contenu visible + schéma */}
-        <div className="mt-8 rounded-2xl border border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-800 p-6">
+        {/* Arguments d'achat : faits boutique, tous deja publies ailleurs sur le site */}
+        <section className="rounded-2xl border border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-800 p-6">
           <h2 className="text-xl font-bold font-display text-surface-900 dark:text-white mb-4">
-            Questions fréquentes sur {productName}
+            Acheter le {productName} en ligne
           </h2>
-          <div className="space-y-3">
-            {faqItems.map((item) => (
-              <details key={item.question} className="group rounded-xl border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-900/40 px-4 py-3">
-                <summary className="cursor-pointer font-semibold text-surface-900 dark:text-white text-sm list-none flex items-center justify-between gap-3">
-                  {item.question}
-                  <span aria-hidden="true" className="text-brand-500 group-open:rotate-180 transition-transform">▾</span>
-                </summary>
-                <p className="mt-2 text-sm text-surface-600 dark:text-surface-400 leading-relaxed">
-                  {item.answer}
-                </p>
-              </details>
-            ))}
-          </div>
-        </div>
+          <ul className="space-y-3 text-sm text-surface-700 dark:text-surface-300">
+            <li className="flex items-start gap-3">
+              <FaTruck className="text-brand-600 dark:text-brand-400 mt-0.5 flex-shrink-0" />
+              <span>
+                <strong>Livraison :</strong> 24 à 48h à Dakar, 2 à 5 jours dans les régions, offerte dès 50 000 FCFA.{' '}
+                <Link href="/livraison" className="text-brand-600 dark:text-brand-400 hover:underline">
+                  Zones et délais
+                </Link>
+                .
+              </span>
+            </li>
+            <li className="flex items-start gap-3">
+              <FaShieldAlt className="text-brand-600 dark:text-brand-400 mt-0.5 flex-shrink-0" />
+              <span>
+                <strong>Garantie :</strong> garantie constructeur incluse.{' '}
+                <Link href="/garanties" className="text-brand-600 dark:text-brand-400 hover:underline">
+                  Modalités
+                </Link>
+                .
+              </span>
+            </li>
+            <li className="flex items-start gap-3">
+              <FaUndo className="text-brand-600 dark:text-brand-400 mt-0.5 flex-shrink-0" />
+              <span>
+                <strong>Retours :</strong> 7 jours après réception.{' '}
+                <Link href="/retours" className="text-brand-600 dark:text-brand-400 hover:underline">
+                  Conditions
+                </Link>
+                .
+              </span>
+            </li>
+            <li className="flex items-start gap-3">
+              <FaMoneyBillWave className="text-brand-600 dark:text-brand-400 mt-0.5 flex-shrink-0" />
+              <span>
+                <strong>Paiement :</strong> à la livraison, Wave, Orange Money ou Free Money. Commandez en ligne,
+                payez à réception.
+              </span>
+            </li>
+          </ul>
+        </section>
       </div>
 
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-      />
-    </>
+      {/* Maillage interne : ancres descriptives, jamais « cliquez ici » */}
+      {relatedItems.length > 0 && (
+        <section className="mt-8 rounded-2xl border border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-800 p-6">
+          <h2 className="text-xl font-bold font-display text-surface-900 dark:text-white mb-4">
+            {categoryRef?.name
+              ? `Autres ${categoryRef.name.toLowerCase()} au même prix`
+              : 'Produits similaires'}
+          </h2>
+          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {relatedItems.map((item) => (
+              <li key={item._id}>
+                <Link
+                  href={`/products/${item.slug || item._id}`}
+                  className="group flex h-full flex-col rounded-xl border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-900/40 p-4 transition hover:shadow-card"
+                >
+                  <span className="mb-2 line-clamp-2 text-sm font-semibold text-surface-900 group-hover:text-brand-600 dark:text-white dark:group-hover:text-brand-400">
+                    {productAnchor(item.name, item.price)}
+                  </span>
+                  {item.price != null && (
+                    <span className="mt-auto text-sm font-bold text-brand-600 dark:text-brand-400">
+                      {formatFcfa(item.price)} FCFA
+                    </span>
+                  )}
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-4 text-sm text-surface-600 dark:text-surface-400">
+            Voir tout le catalogue sur la page{' '}
+            <Link href="/products" className="text-brand-600 dark:text-brand-400 hover:underline">
+              produits
+            </Link>
+            {categoryRef?.slug && (
+              <>
+                {' '}et la catégorie{' '}
+                <Link
+                  href={`/category/${categoryRef.slug}`}
+                  className="text-brand-600 dark:text-brand-400 hover:underline"
+                >
+                  {categoryRef.name}
+                </Link>
+              </>
+            )}
+            .
+          </p>
+        </section>
+      )}
+
+      {/* FAQ visible, SANS schema FAQPage (resultat enrichi non affiche pour
+          un site marchand ; le contenu reste utile aux visiteurs). */}
+      <section className="mt-8 rounded-2xl border border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-800 p-6">
+        <h2 className="text-xl font-bold font-display text-surface-900 dark:text-white mb-4">
+          Questions fréquentes sur le {productName}
+        </h2>
+        <div className="space-y-3">
+          {faqItems.map((item) => (
+            <details
+              key={item.question}
+              className="group rounded-xl border border-surface-200 dark:border-surface-700 bg-surface-50 dark:bg-surface-900/40 px-4 py-3"
+            >
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-surface-900 dark:text-white">
+                {item.question}
+                <span
+                  aria-hidden="true"
+                  className="text-brand-500 transition-transform group-open:rotate-180"
+                >
+                  ▾
+                </span>
+              </summary>
+              <p className="mt-2 text-sm leading-relaxed text-surface-600 dark:text-surface-400">
+                {item.answer}
+              </p>
+            </details>
+          ))}
+        </div>
+      </section>
+    </div>
   );
 }

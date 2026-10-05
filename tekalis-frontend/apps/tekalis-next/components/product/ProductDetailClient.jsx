@@ -16,7 +16,6 @@ import ProductCard from "@/components/product/ProductCard";
 import ProductGallery from "@/components/product/ProductGallery";
 import ProductSpecs from "@/components/product/ProductSpecs";
 import ReviewList from "@/components/review/ReviewList";
-import { Breadcrumb } from "@/components/seo/Breadcrumb";
 import {
   FaShieldAlt,
   FaTruck,
@@ -143,14 +142,6 @@ const ProductDetails = ({ product: initialProduct }) => {
   return (
     <div className="container mx-auto px-4 py-8 mt-4 md:mt-8">
 
-      {/* ── Fil d'Ariane SEO ─────────────────────────────────────────────── */}
-      <Breadcrumb
-        items={[
-          { name: "Produits", path: "/products" },
-          { name: product.name, path: `/products/${productPath}` },
-        ]}
-      />
-
       {/* ── Section Principale ───────────────────────────────────────────── */}
       <div className="grid md:grid-cols-2 gap-8 mb-12 mt-4">
 
@@ -166,10 +157,12 @@ const ProductDetails = ({ product: initialProduct }) => {
             </p>
           )}
 
-          {/* H1 produit — serveur dans app/products/[id]/page.jsx ; ici H2 pour la hiérarchie */}
-          <h2 className="text-3xl font-bold font-display text-surface-900 dark:text-white mb-4">
-            {product.name}
-          </h2>
+          {/*
+            Pas de titre ici : le H1 (nom du produit) et le bloc
+            « Prix du ... au Sénégal » sont rendus serveur dans
+            ProductSeoContent, donc presents dans le HTML brut.
+            Ce bloc ne duplique ni le H1 ni le prix, il porte l'action d'achat.
+          */}
 
           {/* Note */}
           {product.rating?.average > 0 && (
