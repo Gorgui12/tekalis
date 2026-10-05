@@ -46,3 +46,9 @@ export default function Breadcrumb({ items = [], className = '' }) {
     </nav>
   );
 }
+
+/**
+ * Export nomme conserve pour les composants existants (PrixGuide, TrendsClient,
+ * CategoryClient) qui font `import { Breadcrumb }`.
+ */
+export { Breadcrumb };
