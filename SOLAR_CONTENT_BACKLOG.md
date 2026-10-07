@@ -1,0 +1,11 @@
+﻿# SOLAR_CONTENT_BACKLOG.md
+- kit solaire senegal (intent: transactionnel/info)
+- kit solaire dakar
+- prix kit solaire senegal
+- panneau solaire dakar
+- batterie solaire prix senegal
+- onduleur solaire dakar
+- calculateur panneau solaire
+- kit solaire maison
+- kit solaire 1000w prix
+- solution coupure courant senelec
