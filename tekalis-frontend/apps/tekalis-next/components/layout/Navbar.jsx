@@ -137,6 +137,10 @@ const Navbar = () => {
 
                 {categoriesOpen && (
                   <div className="absolute top-full left-0 mt-2 w-72 bg-white dark:bg-surface-800 rounded-2xl shadow-elevated border border-surface-200 dark:border-surface-700 py-2 z-50">
+                    <Link href="/configurateur-solaire" className="flex items-center gap-3 px-4 py-2.5 text-sm text-surface-700 dark:text-surface-300 hover:bg-yellow-50 dark:hover:bg-surface-700 font-semibold transition rounded-lg mx-2" onClick={() => setCategoriesOpen(false)}>
+                      <span className="text-yellow-500"><FaSun size={13}/></span>
+                      Calculer mon kit solaire
+                    </Link>
                     <Link href="/products" className="flex items-center gap-3 px-4 py-2.5 text-sm text-surface-700 dark:text-surface-300 hover:bg-brand-50 dark:hover:bg-surface-700 font-semibold transition rounded-lg mx-2" onClick={() => setCategoriesOpen(false)}>
                       <FaTag className="text-brand-500" size={13} /> Tous les produits
                     </Link>
