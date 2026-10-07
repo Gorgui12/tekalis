@@ -1,8 +1,8 @@
-﻿import dynamic from 'next/dynamic';
+import dynamic from 'next/dynamic';
 import { Suspense } from 'react';
 import JsonLd from '@/components/seo/JsonLd';
 
-const SolarConfigurator = dynamic(() => import('@/components/solar/SolarConfigurator'), { ssr: false });
+const SolarConfigurator = dynamic(() => import('@/components/solar/SolarConfigurator'));
 
 export const metadata = {
   title: 'Configurateur de kit solaire - Tekalis',
