@@ -31,6 +31,25 @@ export const VOLTAGE_RULE = {
   threshold24: 3000,
 };
 
+/**
+ * PSH (heures de plein soleil equivalent) par ville.
+ * Source : PVGIS (Commission europeenne), annee 2020, base SARAH3,
+ * collecte le 2026-10-07 - detail dans SOLAR_AUDIT.md section 7.
+ * Valeurs a faire valider par un technicien (SOLAR_DECISIONS.md).
+ * `prudent` (5.0) reste la valeur de conception par defaut : le rayonnement
+ * journalier moyen n'est pas une garantie de jours de pluie/orage.
+ */
+export const PSH_BY_REGION = {
+  prudent: { label: 'Prudence (5,0 h) - conseillé', psf: 5.0 },
+  dakar: { label: 'Dakar', psf: 6.16 },
+  thies: { label: 'Thiès', psf: 6.3 },
+  'saint-louis': { label: 'Saint-Louis', psf: 6.47 },
+  kaolack: { label: 'Kaolack', psf: 6.4 },
+  diourbel: { label: 'Diourbel / Touba', psf: 6.44 },
+  tambacounda: { label: 'Tambacounda', psf: 6.29 },
+  ziguinchor: { label: 'Ziguinchor', psf: 5.98 },
+};
+
 export const WARNINGS = {
   indicative: 'Estimation indicative, à faire valider par un technicien avant achat ou installation.',
   resistive: 'Appareil très gourmand en énergie (résistif). Vérifier la faisabilité.',
