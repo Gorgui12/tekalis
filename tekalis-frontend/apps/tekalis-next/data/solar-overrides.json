@@ -1,4 +1,77 @@
-﻿{
-  "_comment": "Overrides côté front (fallback) pour les annotations solar. Indexé par slug produit. Tous champs optionnels. Ne pas éditer manuellement sans validation.",
-  "overrides": {}
+{
+  "_comment": "Overrides cote front (couche de donnees solaire). Indexe par slug produit. Alimente par scripts/solar-apply.mjs a partir du CSV SOLAR_DATA_TO_FILL.csv valide. Valeurs techniques a faire valider par un technicien (SOLAR_DECISIONS.md).",
+  "overrides": {
+    "projecteur-solaire-450-watt-en-promo": {
+      "role": "accessory"
+    },
+    "camera-solaire-classique-4g-camera-solaire-vc-21": {
+      "role": "accessory"
+    },
+    "camera-triple-objectif-wifi-camera-solaire-wi-fi": {
+      "role": "accessory"
+    },
+    "lampe-solaire-ip67": {
+      "role": "accessory"
+    },
+    "onduleur-hybride-solaire-5kw-48v-mppt": {
+      "role": "inverter",
+      "powerW": 5000,
+      "inverterContinuousW": 5000,
+      "systemVoltageV": 48,
+      "inverterType": "hybrid"
+    },
+    "batterie-solaire-gel-12v-200ah-c10": {
+      "role": "battery",
+      "voltageV": 12,
+      "capacityAh": 200,
+      "chemistry": "gel"
+    },
+    "onduleur-hybride-solaire-3kw-24v-mppt": {
+      "role": "inverter",
+      "powerW": 3000,
+      "inverterContinuousW": 3000,
+      "systemVoltageV": 24,
+      "inverterType": "hybrid"
+    },
+    "panneau-solaire-monocristallin-450w-perc": {
+      "role": "panel",
+      "powerW": 450
+    },
+    "batterie-solaire-gel-12v-100ah": {
+      "role": "battery",
+      "voltageV": 12,
+      "capacityAh": 100,
+      "chemistry": "gel"
+    },
+    "panneau-solaire-monocristallin-100w-18v": {
+      "role": "panel",
+      "powerW": 100,
+      "voltageV": 18
+    },
+    "convertisseur-onduleur-1000w-12v-vers-220v": {
+      "role": "inverter",
+      "powerW": 1000,
+      "inverterContinuousW": 1000,
+      "inverterType": "converter"
+    },
+    "kit-eclairage-solaire-familial-3-ampoules-avec-port-usb": {
+      "role": "kit"
+    },
+    "projecteur-solaire-led-100w-ip67-avec-telecommande": {
+      "role": "accessory"
+    },
+    "regulateur-de-charge-solaire-pwm-30a-12v-24v": {
+      "role": "controller",
+      "systemVoltageV": 24,
+      "mpptMaxA": 30
+    },
+    "camera-solaire-ip-double-objectif-exterieure-ptz-8mp-4g": {
+      "role": "accessory"
+    },
+    "ventilateur-rechargeable-solaire-16-pouces-avec-panneau": {
+      "role": "panel"
+    }
+  },
+  "source": "SOLAR_DATA_TO_FILL.csv",
+  "importedAt": "2026-10-07T12:37:12.334Z"
 }

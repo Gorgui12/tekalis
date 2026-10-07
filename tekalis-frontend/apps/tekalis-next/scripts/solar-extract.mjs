@@ -25,8 +25,9 @@ import { writeFileSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
+// scripts/ -> tekalis-next -> apps -> tekalis-frontend -> racine du repo
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const REPO_ROOT = join(__dirname, "..", "..", "..");
+const REPO_ROOT = join(__dirname, "..", "..", "..", "..");
 const OUT_FILE = join(REPO_ROOT, "SOLAR_DATA_TO_FILL.csv");
 
 const argBase = process.argv.slice(2).find((a) => !a.startsWith('-'));
