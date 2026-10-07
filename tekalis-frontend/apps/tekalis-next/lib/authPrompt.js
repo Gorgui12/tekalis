@@ -42,6 +42,12 @@ const AUTO_COOLDOWN_DAYS = 7;
 /** Délai avant l'invitation « engagement » sur une page produit (ms). */
 export const ENGAGEMENT_DELAY_MS = 45000;
 
+/**
+ * Délai avant l'apparition du bandeau bas d'écran « Continue avec Google »
+ * après l'arrivée d'un visiteur sur le site (ms).
+ */
+export const LANDING_DELAY_MS = 6000;
+
 // ── Raisons et argumentaires ─────────────────────────────────
 // `icon` référence une icône mappée dans AuthPromptCard/AuthPromptModal.
 // Les textes sont volontairement orientés bénéfice, pas technique.
@@ -108,6 +114,17 @@ export const PROMPT_REASONS = {
     bullets: [
       { icon: "bolt",   text: "Coordonnées enregistrées pour la prochaine commande" },
       { icon: "shield", text: "Garanties et SAV suivis depuis votre espace" },
+    ],
+  },
+  landing: {
+    icon: "user",
+    title: "Un compte Tekalis, c'est gratuit",
+    subtitle:
+      "Connectez-vous avec Google et vos articles, prix et garanties restent enregistrés.",
+    bullets: [
+      { icon: "bolt",   text: "Aucun mot de passe à retenir" },
+      { icon: "truck",  text: "Commande en 2 clics et suivi de livraison" },
+      { icon: "shield", text: "Garanties et SAV centralisés dans votre espace" },
     ],
   },
 };
@@ -268,10 +285,11 @@ export function isAuthenticated() {
 // l'ait demandée. Elles restent plafonnées (une par session au maximum).
 //   "auto"        : exit intent / engagement, avec en plus un délai de
 //                   sept jours entre deux invites.
+//   "landing"     : bandeau bas d'écran affiché peu après l'arrivée.
 //   "wishlist-add": le visiteur vient d'ajouter un favori — signal
 //                   d'intention explicite, pas besoin d'une semaine de
 //                   délai, mais une seule fois par session suffit.
-const AUTOMATIC_SOURCES = ["auto", "wishlist-add"];
+const AUTOMATIC_SOURCES = ["auto", "landing", "wishlist-add"];
 
 export function canPrompt({ source = "auto", requireIntent = false } = {}) {
   if (typeof window === "undefined") return false;
@@ -293,7 +311,7 @@ export function canPrompt({ source = "auto", requireIntent = false } = {}) {
   if (source === "auto" && requireIntent && !hasSignupIntent()) return false;
   if (readSession(KEY_SESSION_SHOWN) === "1") return false;
 
-  if (source === "auto") {
+  if (source === "auto" || source === "landing") {
     const last = Number(readLocal(KEY_LAST_SHOWN)) || 0;
     if (last && Date.now() - last < AUTO_COOLDOWN_DAYS * MS_PER_DAY) return false;
   }
@@ -304,7 +322,7 @@ export function canPrompt({ source = "auto", requireIntent = false } = {}) {
 /** À appeler quand une invitation est effectivement affichée. */
 export function notePromptShown(source = "auto") {
   writeSession(KEY_SESSION_SHOWN, "1");
-  if (source === "auto") writeLocal(KEY_LAST_SHOWN, String(Date.now()));
+  if (source === "auto" || source === "landing") writeLocal(KEY_LAST_SHOWN, String(Date.now()));
 }
 
 // ── Tracking ─────────────────────────────────────────────────

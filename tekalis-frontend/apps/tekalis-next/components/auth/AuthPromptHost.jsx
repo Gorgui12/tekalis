@@ -22,8 +22,10 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { useSelector } from "react-redux";
 import AuthPromptModal from "@/components/auth/AuthPromptModal";
+import AuthPromptBanner from "@/components/auth/AuthPromptBanner";
 import {
   ENGAGEMENT_DELAY_MS,
+  LANDING_DELAY_MS,
   canPrompt,
   markEngagement,
   notePromptShown,
@@ -86,7 +88,36 @@ export default function AuthPromptHost() {
     return () => clearTimeout(timer);
   }, [pathname, user, prompt]);
 
+  // ── Bandeau bas d'écran à l'arrivée sur le site ──────────────
+  // Quelques secondes après le premier rendu, le bandeau « Continue
+  // avec Google » apparaît en bas de l'écran. Il passe par le même bus
+  // que la modale : les plafonds (une fois par session) et exclusions
+  // sont donc appliqués dans canPrompt.
+  useEffect(() => {
+    if (user || prompt) return;
+    const timer = setTimeout(() => {
+      openAuthPrompt({ reason: "landing", source: "landing" });
+    }, LANDING_DELAY_MS);
+    return () => clearTimeout(timer);
+  }, [pathname, user, prompt]);
+
   if (!prompt) return null;
+
+  if (prompt.source === "landing") {
+    return (
+      <AuthPromptBanner
+        isOpen
+        title={prompt.title}
+        subtitle={prompt.subtitle}
+        reason={prompt.reason}
+        source={prompt.source}
+        onClose={() => {
+          trackPromptDismissed({ reason: prompt.reason, source: prompt.source });
+          setPrompt(null);
+        }}
+      />
+    );
+  }
 
   return (
     <AuthPromptModal
