@@ -75,6 +75,44 @@ const productSchemaEnhanced = new mongoose.Schema({
     rgb: Boolean,
     coolingSystem: String
   },
+
+  // 🆕 Sous-objet SOLAIRE (additif, 100% optionnel)
+  // Alimenté par le configurateur de kit solaire (SOLAR_AUDIT.md / SOLAR_DECISIONS.md).
+  // Chaque clé est optionnelle : un produit peut être partiellement décrit. Aucune
+  // valeur n'est écrite automatiquement en base : elle passe par la validation
+  // humaine d'un CSV (voir scripts/solar-apply.mjs).
+  solar: {
+    role: {
+      type: String,
+      enum: [
+        "panel",      // panneau photovoltaïque
+        "battery",    // batterie (gel / AGM / lithium)
+        "inverter",   // onduleur / convertisseur
+        "controller", // régulateur de charge (MPPT / PWM)
+        "kit",        // kit solaire complet
+        "accessory"   // câbles, supports, protections…
+      ]
+    },
+    powerW: Number,          // puissance nominale panneau (Wc) ou kit
+    voltageV: Number,        // tension nominale (ex. 12, 24, 48) batterie/panneau
+    capacityAh: Number,      // capacité batterie (Ah)
+    chemistry: {             // technologie batterie
+      type: String,
+      enum: ["gel", "agm", "lithium", "lead-acid"]
+    },
+    inverterContinuousW: Number, // puissance continue onduleur (W)
+    inverterPeakW: Number,       // puissance crête onduleur (W)
+    systemVoltageV: Number,      // tension système de l'onduleur (12/24/48 V)
+    inverterType: {              // type d'onduleur
+      type: String,
+      enum: ["hybrid", "off-grid", "grid-tie", "converter"]
+    },
+    mpptMaxVocV: Number,     // tension max d'entrée solaire du MPPT (V)
+    mpptMaxA: Number,        // courant max d'entrée solaire du MPPT (A)
+    panelVocV: Number,       // tension circuit ouvert du panneau (V)
+    panelVmpV: Number,       // tension max power point du panneau (V)
+    cycles: Number           // cycles de vie de la batterie (durée de vie)
+  },
   
   // 🆕 Système de notation
   rating: {

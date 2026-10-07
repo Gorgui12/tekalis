@@ -10,7 +10,7 @@ const { getInactiveCategoryIds, isProductInInactiveCategory, applyActiveCategory
 // ===============================================
 const PRODUCT_FIELDS = [
   "name", "slug", "description", "price", "comparePrice", "stock",
-  "images", "category", "brand", "specs", "warranty", "tags",
+  "images", "category", "brand", "specs", "solar", "warranty", "tags",
   "status", "isFeatured", "homepageSection", "metaTitle", "metaDescription",
   "gtin", "mpn", "weight", "condition"
 ];
