@@ -1,0 +1,4 @@
+﻿{
+  "_comment": "Overrides côté front (fallback) pour les annotations solar. Indexé par slug produit. Tous champs optionnels. Ne pas éditer manuellement sans validation.",
+  "overrides": {}
+}
