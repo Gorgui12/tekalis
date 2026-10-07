@@ -15,6 +15,7 @@ import { buildNeed, tierNeed, findMatchingKits } from '@/lib/solar/matching';
 import { formatFcfa } from '@/lib/seo/format';
 import { SOCIAL_LINKS } from '@/lib/utils/constants';
 import useCart from '@/lib/hooks/useCart';
+import { SOLAR_EVENTS, trackSolarEvent } from '@/lib/solar/tracking';
 
 const APPLIANCE_BY_ID = Object.fromEntries(APPLIANCES.map((a) => [a.id, a]));
 
@@ -85,6 +86,43 @@ export default function SolarConfigurator({ products = [] }) {
   const [copied, setCopied] = useState(false);
   const [hydrated, setHydrated] = useState(false);
 
+  // Suivi des etapes : un evenement solar_step_complete par avancement,
+  // solar_complete la premiere fois que le devis (etape 4) est atteint.
+  const goStep = (n) => {
+    if (n > step) {
+      trackSolarEvent(SOLAR_EVENTS.STEP_COMPLETE, {
+        step: n,
+        step_name: STEPS[n - 1],
+        mode,
+        items_count: items.length,
+      });
+      if (n === 4) {
+        trackSolarEvent(SOLAR_EVENTS.COMPLETE, {
+          tier,
+          profile: profileId,
+          mode,
+          total: activeProfile?.total || 0,
+          currency: 'XOF',
+        });
+      }
+    }
+    setStep(n);
+  };
+
+  const selectTier = (id) => {
+    if (id !== tier) {
+      trackSolarEvent(SOLAR_EVENTS.TIER_SELECT, { tier: id, profile: profileId, mode });
+    }
+    setTier(id);
+  };
+
+  const selectProfile = (id) => {
+    if (id !== profileId) {
+      trackSolarEvent(SOLAR_EVENTS.TIER_SELECT, { tier, profile: id, mode });
+    }
+    setProfileId(id);
+  };
+
   // Hydratation : URL d'abord (partage), puis brouillon localStorage.
   useEffect(() => {
     const urlItems = parseItemsParam(searchParams.get('a'));
@@ -109,9 +147,15 @@ export default function SolarConfigurator({ products = [] }) {
       setAutonomy(st.autonomy || 1);
       setRegion(PSH_BY_REGION[st.region] ? st.region : 'prudent');
       setBudget(st.budget || '');
-      setStep(2);
+      goStep(2);
     }
     setHydrated(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Evenement d'entree : une fois par montage du configurateur.
+  useEffect(() => {
+    trackSolarEvent(SOLAR_EVENTS.START, { mode, source: 'configurateur' });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -146,7 +190,7 @@ export default function SolarConfigurator({ products = [] }) {
 
   const applyPreset = (preset) => {
     setItems(preset.items.map(([id, qty, hours]) => ({ id, qty, hours })));
-    setStep(2);
+    goStep(2);
   };
 
   // Besoin -> niveaux -> kits (memo : le catalogue ne change pas pendant la session).
@@ -207,6 +251,13 @@ export default function SolarConfigurator({ products = [] }) {
     for (const line of activeProfile.lines) {
       addItem(line.product, line.units);
     }
+    trackSolarEvent(SOLAR_EVENTS.ADD_TO_CART, {
+      tier,
+      profile: profileId,
+      value: activeProfile.total,
+      currency: 'XOF',
+      num_items: activeProfile.lines.reduce((s, l) => s + l.units, 0),
+    });
     setCartFeedback('Kit ajouté au panier.');
     setTimeout(() => setCartFeedback(''), 4000);
   };
@@ -236,7 +287,7 @@ export default function SolarConfigurator({ products = [] }) {
             <li key={label}>
               <button
                 type="button"
-                onClick={() => n < step && setStep(n)}
+                onClick={() => n < step && goStep(n)}
                 disabled={n > step}
                 className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${
                   state === 'current'
@@ -330,7 +381,7 @@ export default function SolarConfigurator({ products = [] }) {
             <button
               type="button"
               disabled={!items.length}
-              onClick={() => setStep(2)}
+              onClick={() => goStep(2)}
               className="px-5 py-2.5 rounded-lg bg-blue-600 text-white font-semibold disabled:opacity-40"
             >
               Continuer →
@@ -425,10 +476,10 @@ export default function SolarConfigurator({ products = [] }) {
           </div>
 
           <div className="flex justify-between">
-            <button type="button" onClick={() => setStep(1)} className="px-5 py-2.5 rounded-lg border border-gray-300 font-semibold">
+            <button type="button" onClick={() => goStep(1)} className="px-5 py-2.5 rounded-lg border border-gray-300 font-semibold">
               ← Retour
             </button>
-            <button type="button" onClick={() => setStep(3)} className="px-5 py-2.5 rounded-lg bg-blue-600 text-white font-semibold">
+            <button type="button" onClick={() => goStep(3)} className="px-5 py-2.5 rounded-lg bg-blue-600 text-white font-semibold">
               Voir les kits →
             </button>
           </div>
@@ -452,7 +503,7 @@ export default function SolarConfigurator({ products = [] }) {
                 <button
                   key={t.id}
                   type="button"
-                  onClick={() => setTier(t.id)}
+                  onClick={() => selectTier(t.id)}
                   className={`text-left border rounded-lg p-3 ${isActive ? 'border-blue-500 bg-blue-50' : 'border-gray-200 bg-white'}`}
                 >
                   <span className="font-bold block">{t.label}</span>
@@ -476,7 +527,7 @@ export default function SolarConfigurator({ products = [] }) {
               <button
                 key={p.id}
                 type="button"
-                onClick={() => setProfileId(p.id)}
+                onClick={() => selectProfile(p.id)}
                 className={`px-4 py-1.5 rounded-full text-xs font-semibold border ${profileId === p.id ? 'bg-gray-900 text-white border-gray-900' : 'bg-white text-gray-700 border-gray-300'}`}
               >
                 {p.label}
@@ -540,10 +591,10 @@ export default function SolarConfigurator({ products = [] }) {
           )}
 
           <div className="flex flex-wrap gap-3">
-            <button type="button" onClick={() => setStep(2)} className="px-5 py-2.5 rounded-lg border border-gray-300 font-semibold">
+            <button type="button" onClick={() => goStep(2)} className="px-5 py-2.5 rounded-lg border border-gray-300 font-semibold">
               ← Retour
             </button>
-            <button type="button" onClick={() => setStep(4)} className="px-5 py-2.5 rounded-lg bg-blue-600 text-white font-semibold">
+            <button type="button" onClick={() => goStep(4)} className="px-5 py-2.5 rounded-lg bg-blue-600 text-white font-semibold">
               Obtenir le devis →
             </button>
           </div>
@@ -564,6 +615,15 @@ export default function SolarConfigurator({ products = [] }) {
               href={buildWhatsAppMessage()}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={() =>
+                trackSolarEvent(SOLAR_EVENTS.QUOTE_WHATSAPP, {
+                  tier,
+                  profile: profileId,
+                  mode,
+                  value: activeProfile?.total || 0,
+                  currency: 'XOF',
+                })
+              }
               className="flex-1 px-5 py-3 rounded-lg bg-green-600 text-white font-semibold text-center hover:bg-green-700"
             >
               Envoyer ma demande sur WhatsApp
@@ -621,14 +681,14 @@ export default function SolarConfigurator({ products = [] }) {
           </div>
 
           <div className="mt-5 flex justify-between">
-            <button type="button" onClick={() => setStep(3)} className="px-5 py-2.5 rounded-lg border border-gray-300 font-semibold">
+            <button type="button" onClick={() => goStep(3)} className="px-5 py-2.5 rounded-lg border border-gray-300 font-semibold">
               ← Résultats
             </button>
             <button
               type="button"
               onClick={() => {
                 setItems([]);
-                setStep(1);
+                goStep(1);
               }}
               className="px-5 py-2.5 rounded-lg border border-gray-300 font-semibold"
             >
