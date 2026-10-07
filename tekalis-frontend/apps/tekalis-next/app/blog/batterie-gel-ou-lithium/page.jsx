@@ -3,9 +3,9 @@ import JsonLd from '@/components/seo/JsonLd';
 import Breadcrumb from '@/components/seo/Breadcrumb';
 
 export const metadata = {
-  title: 'Batterie solaire gel ou lithium au Sénégal : laquelle choisir ?',
+  title: 'Gel ou lithium : quelle batterie solaire ?',
   description:
-    'Comparatif batterie gel AGM vs lithium pour kit solaire au Sénégal : DoD, durée de vie, prix, entretien. Guide pour bien choisir.',
+    'Comparatif batterie gel AGM vs lithium pour kit solaire : DoD, durée de vie, prix, entretien au Sénégal.',
   alternates: { canonical: '/blog/batterie-gel-ou-lithium' },
   openGraph: {
     title: 'Batterie solaire gel ou lithium ?',

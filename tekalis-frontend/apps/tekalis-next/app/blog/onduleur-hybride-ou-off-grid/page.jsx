@@ -3,9 +3,9 @@ import JsonLd from '@/components/seo/JsonLd';
 import Breadcrumb from '@/components/seo/Breadcrumb';
 
 export const metadata = {
-  title: 'Onduleur hybride ou off-grid ? Comparatif au Sénégal',
+  title: 'Onduleur hybride ou off-grid ?',
   description:
-    "Onduleur hybride solaire vs convertisseur off-grid : différences, MPPT intégré, tension batterie, quand choisir quoi. Guide Tekalis Sénégal.",
+    'Onduleur hybride solaire vs convertisseur off-grid : différences, MPPT intégré, tension batterie.',
   alternates: { canonical: '/blog/onduleur-hybride-ou-off-grid' },
   openGraph: {
     title: 'Onduleur hybride ou off-grid ?',

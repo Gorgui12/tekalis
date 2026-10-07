@@ -3,9 +3,9 @@ import JsonLd from '@/components/seo/JsonLd';
 import Breadcrumb from '@/components/seo/Breadcrumb';
 
 export const metadata = {
-  title: 'Comment dimensionner son kit solaire au Sénégal (2026)',
+  title: 'Dimensionner son kit solaire au Sénégal',
   description:
-    "Méthode de calcul d'un kit solaire : énergie journalière, tension 12/24/48V, capacité batterie et puissance panneaux. Exemples chiffrés pour Dakar et le Sénégal.",
+    "Méthode de calcul d'un kit solaire : énergie journalière, tension 12/24/48V, batteries et panneaux, avec exemples chiffrés.",
   alternates: { canonical: '/blog/dimensionner-kit-solaire-senegal' },
   openGraph: {
     title: 'Comment dimensionner son kit solaire au Sénégal',

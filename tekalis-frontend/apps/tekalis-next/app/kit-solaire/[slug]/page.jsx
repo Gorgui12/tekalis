@@ -24,7 +24,9 @@ export async function generateMetadata({ params }) {
   if (!preset) return { title: 'Kit solaire - Tekalis' };
 
   const title = preset.title.length > 60 ? `${preset.title.slice(0, 57)}...` : preset.title;
-  const description = `${preset.intro} Prix indicatifs en FCFA, à faire valider par un technicien.`;
+  // Limite a 160 caracteres au total (intro tronquee proprement + mention).
+  const intro = preset.intro.length > 88 ? `${preset.intro.slice(0, 85).trimEnd()}...` : preset.intro;
+  const description = `${intro} Prix indicatifs en FCFA, à faire valider par un technicien.`;
   const canonical = `/kit-solaire/${preset.slug}`;
   const ogImage = `/api/og?title=${encodeURIComponent(preset.title.slice(0, 60))}&subtitle=${encodeURIComponent('Estimation indicative, à faire valider par un technicien')}`;
 
