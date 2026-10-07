@@ -17,7 +17,8 @@ import {
   FaGamepad,
   FaTv,
   FaBlender,
-  FaKeyboard
+  FaKeyboard,
+  FaSolarPanel
 } from "react-icons/fa";
 import api from "@/lib/api";
 import ProductCard from "@/components/product/ProductCard";
@@ -264,6 +265,18 @@ const Home = ({
               <div>
                 <h2 className="font-bold font-display text-surface-900 dark:text-white text-lg">Labo Tech</h2>
                 <p className="text-sm text-surface-500">Tests & guides d'achat</p>
+              </div>
+            </div>
+          </Link>
+
+          <Link href="/configurateur-solaire" className="bg-white dark:bg-surface-800 rounded-2xl shadow-card hover:shadow-card-hover p-6 transition-all duration-300 group border border-surface-100 dark:border-surface-700 hover:-translate-y-1">
+            <div className="flex items-center gap-4">
+              <div className="bg-emerald-100 dark:bg-emerald-900/30 rounded-2xl p-4 group-hover:bg-emerald-200 dark:group-hover:bg-emerald-900/50 transition">
+                <FaSolarPanel className="text-emerald-600 dark:text-emerald-400 text-2xl animate-float" style={{ animationDelay: "1.2s" }} />
+              </div>
+              <div>
+                <h2 className="font-bold font-display text-surface-900 dark:text-white text-lg">Kit solaire sur mesure</h2>
+                <p className="text-sm text-surface-500">Dimensionnez en 4 étapes</p>
               </div>
             </div>
           </Link>

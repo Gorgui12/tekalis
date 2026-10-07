@@ -106,6 +106,14 @@ export default function HomeSeoContent() {
           <Link href="/apropos" className="text-brand-600 dark:text-brand-400 hover:underline">En savoir plus sur Tekalis</Link>.
         </p>
 
+        <p className="text-sm text-surface-600 dark:text-surface-400 leading-relaxed mb-8">
+          Coupures d&apos;électricité ? Dimensionnez votre{" "}
+          <Link href="/configurateur-solaire" className="text-brand-600 dark:text-brand-400 hover:underline">kit solaire</Link>{" "}
+          en 4 étapes, ou essayez nos{" "}
+          <Link href="/outils/calculateur-consommation-electrique" className="text-brand-600 dark:text-brand-400 hover:underline">calculateurs gratuits</Link>{" "}
+          (consommation, batterie, panneaux).
+        </p>
+
         {/* FAQ */}
         <h3 className="text-xl font-bold font-display text-surface-900 dark:text-white mb-3">
           Questions fréquentes

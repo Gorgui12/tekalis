@@ -104,6 +104,17 @@ const nextConfig = {
         destination: '/products/:id',
         permanent: true,
       },
+      // Ancienne URL du configurateur solaire (constatée en analytics)
+      {
+        source: '/configurator',
+        destination: '/configurateur-solaire',
+        permanent: true,
+      },
+      {
+        source: '/configurator/',
+        destination: '/configurateur-solaire',
+        permanent: true,
+      },
     ];
   },
 

@@ -1,5 +1,6 @@
 import { PRIX_GUIDES } from '@/lib/utils/prixGuides';
 import { KNOWN_CATEGORY_SLUGS, categoryPath, productPath, articlePath } from '@/lib/seo/config';
+import { kitPresetSlugs } from '@/lib/solar/presets';
 
 const SITE_URL = 'https://tekalis.com';
 
@@ -9,6 +10,13 @@ const STATIC_PAGES = [
   { url: '/prix', priority: 0.8, changeFrequency: 'weekly' },
   { url: '/tendances', priority: 0.7, changeFrequency: 'weekly' },
   { url: '/blog', priority: 0.8, changeFrequency: 'weekly' },
+  { url: '/configurateur-solaire', priority: 1.0, changeFrequency: 'daily' },
+  { url: '/outils/calculateur-consommation-electrique', priority: 0.7, changeFrequency: 'monthly' },
+  { url: '/outils/calculateur-batterie-solaire', priority: 0.7, changeFrequency: 'monthly' },
+  { url: '/outils/calculateur-panneaux-solaires', priority: 0.7, changeFrequency: 'monthly' },
+  { url: '/blog/dimensionner-kit-solaire-senegal', priority: 0.7, changeFrequency: 'monthly' },
+  { url: '/blog/batterie-gel-ou-lithium', priority: 0.7, changeFrequency: 'monthly' },
+  { url: '/blog/onduleur-hybride-ou-off-grid', priority: 0.7, changeFrequency: 'monthly' },
   { url: '/apropos', priority: 0.6, changeFrequency: 'monthly' },
   { url: '/contact', priority: 0.6, changeFrequency: 'monthly' },
   { url: '/faq', priority: 0.6, changeFrequency: 'monthly' },
@@ -137,5 +145,20 @@ export default async function sitemap() {
     priority: 0.8,
   }));
 
-  return [...staticEntries, ...categoryEntries, ...productEntries, ...prixEntries, ...articleEntries];
+  // Pages besoin /kit-solaire/[slug] (presets statiques, lib/solar/presets.js)
+  const solarEntries = kitPresetSlugs().map((slug) => ({
+    url: `${SITE_URL}/kit-solaire/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'weekly',
+    priority: 0.9,
+  }));
+
+  return [
+    ...staticEntries,
+    ...categoryEntries,
+    ...productEntries,
+    ...prixEntries,
+    ...articleEntries,
+    ...solarEntries,
+  ];
 }
