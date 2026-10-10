@@ -10,6 +10,7 @@ import {
   FaCheck
 } from "react-icons/fa";
 import api from "@shared/api/api";
+import { generateInvoicePdf } from "../utils/invoice";
 
 const AdminOrders = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -19,10 +20,18 @@ const AdminOrders = () => {
   const [statusFilter, setStatusFilter] = useState(searchParams.get("status") || "all");
   const [showFilters, setShowFilters] = useState(false);
   const [selectedOrders, setSelectedOrders] = useState([]);
+  const [settings, setSettings] = useState({});
 
   useEffect(() => {
     fetchOrders();
   }, [statusFilter]);
+
+  useEffect(() => {
+    api
+      .get("/admin/settings")
+      .then(({ data }) => setSettings(data.settings || {}))
+      .catch(() => setSettings({}));
+  }, []);
 
   const fetchOrders = async () => {
     try {
@@ -65,6 +74,25 @@ const AdminOrders = () => {
       alert("Statut mis à jour avec succès");
     } catch (error) {
       alert("Erreur lors de la mise à jour");
+    }
+  };
+
+  // Télécharger la facture
+  const downloadInvoice = async (order) => {
+    try {
+      let invoiceOrder = order;
+      // Le endpoint liste ne renvoie pas toujours les infos client complètes :
+      // on récupère le détail complet pour une facture exacte.
+      try {
+        const { data } = await api.get(`/admin/orders/${order._id}`);
+        if (data?.order) invoiceOrder = data.order;
+      } catch {
+        // On retombe sur la commande déjà chargée en cas d'échec
+      }
+      generateInvoicePdf(invoiceOrder, settings);
+    } catch (error) {
+      console.error("Erreur génération facture:", error);
+      alert("Erreur lors de la génération de la facture");
     }
   };
 
@@ -302,7 +330,7 @@ const AdminOrders = () => {
                             <FaEye />
                           </Link>
                           <button
-                            onClick={() => alert("Fonctionnalité à implémenter")}
+                            onClick={() => downloadInvoice(order)}
                             className="text-green-600 hover:text-green-700 p-2"
                             title="Télécharger facture"
                           >

@@ -9,9 +9,11 @@ import {
   FaCreditCard,
   FaBox,
   FaPrint,
+  FaDownload,
   FaTrash
 } from "react-icons/fa";
 import api from "@shared/api/api";
+import { generateInvoicePdf } from "../utils/invoice";
 import { useToast } from '@shared/context/ToastContext';
 
 const AdminOrderDetails = () => {
@@ -21,9 +23,14 @@ const AdminOrderDetails = () => {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [updating, setUpdating] = useState(false);
+  const [settings, setSettings] = useState({});
 
   useEffect(() => {
     fetchOrderDetails();
+    api
+      .get("/admin/settings")
+      .then(({ data }) => setSettings(data.settings || {}))
+      .catch(() => setSettings({}));
   }, [id]);
 
   const fetchOrderDetails = async () => {
@@ -62,6 +69,15 @@ const AdminOrderDetails = () => {
       navigate("/orders");
     } catch (error) {
       toast.error("Erreur lors de la suppression de la commande");
+    }
+  };
+
+  const downloadInvoice = () => {
+    try {
+      generateInvoicePdf(order, settings);
+    } catch (error) {
+      console.error("Erreur génération facture:", error);
+      toast.error("Erreur lors de la génération de la facture");
     }
   };
 
@@ -143,6 +159,12 @@ const AdminOrderDetails = () => {
             </div>
 
             <div className="flex gap-3">
+              <button
+                onClick={downloadInvoice}
+                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2"
+              >
+                <FaDownload /> Télécharger la facture
+              </button>
               <button
                 onClick={() => window.print()}
                 className="bg-white hover:bg-gray-50 text-gray-700 px-4 py-2 rounded-lg font-semibold border shadow-sm flex items-center gap-2"
