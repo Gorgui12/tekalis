@@ -6,7 +6,13 @@ const DARK = [31, 41, 55]; // gray-800
 const MUTED = [107, 114, 128]; // gray-500
 const LIGHT = [243, 244, 246]; // gray-100
 
-const money = (value) => `${Number(value || 0).toLocaleString("fr-FR")} FCFA`;
+// Les polices standard de jsPDF ne gèrent pas les espaces fines insécables
+// (U+202F) produites par toLocaleString("fr-FR") — elles s'affichent "/".
+// On les remplace par une espace normale.
+const money = (value) =>
+  `${Number(value || 0)
+    .toLocaleString("fr-FR")
+    .replace(/\s/g, " ")} FCFA`;
 
 const formatDate = (date, withTime = false) => {
   if (!date) return "—";
