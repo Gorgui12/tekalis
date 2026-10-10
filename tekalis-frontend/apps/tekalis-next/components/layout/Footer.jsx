@@ -7,6 +7,7 @@ import {
   FaArrowUp, FaHeart, FaShieldAlt, FaTruck
 } from "react-icons/fa";
 import { SOCIAL_LINKS } from "@/lib/utils/constants";
+import { openConsentBanner } from "@/lib/analytics";
 import NewsletterForm from "../shared/NewsletterForm";
 
 const Footer = () => {
@@ -234,6 +235,14 @@ const Footer = () => {
             >
               Cookies
             </Link>
+            <span className="text-surface-700">•</span>
+            <button
+              type="button"
+              onClick={openConsentBanner}
+              className="hover:text-brand-400 transition"
+            >
+              Gérer mes cookies
+            </button>
           </div>
         </div>
       </div>

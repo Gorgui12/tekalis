@@ -9,6 +9,7 @@ import {
   trackPageView,
   trackPageVisit,
   CONSENT,
+  OPEN_CONSENT_EVENT,
 } from "@/lib/analytics";
 
 /**
@@ -21,6 +22,13 @@ const ConsentBanner = () => {
 
   useEffect(() => {
     if (getConsent() === CONSENT.PENDING) setOpen(true);
+  }, []);
+
+  // Réouverture demandée depuis un autre composant (lien « Gérer mes cookies »).
+  useEffect(() => {
+    const onOpen = () => setOpen(true);
+    window.addEventListener(OPEN_CONSENT_EVENT, onOpen);
+    return () => window.removeEventListener(OPEN_CONSENT_EVENT, onOpen);
   }, []);
 
   if (!open) return null;

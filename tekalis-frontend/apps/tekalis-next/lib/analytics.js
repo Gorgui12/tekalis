@@ -33,6 +33,9 @@ export const CONSENT = {
   REJECTED: "rejected",
 };
 
+// Événement écouté par ConsentBanner pour se rouvrir (lien « Cookies »).
+export const OPEN_CONSENT_EVENT = "tekalis:open-consent";
+
 // Événements standard Meta (track) — les autres passent en trackCustom
 const META_STANDARD_EVENTS = new Set([
   "ViewContent",
@@ -158,6 +161,20 @@ function gtagConsentRevoke() {
   });
 }
 
+// Enregistre auprès de GA4 l'état de consentement courant puis configure la
+// propriété. Appelable AVANT le chargement de gtag.js : le bootstrap du <head>
+// définit déjà window.gtag comme file d'attente (dataLayer), donc les commandes
+// sont bufferisées puis rejouées dès l'arrivée du script.
+function primeGtag() {
+  if (typeof window === "undefined" || !window.gtag) return false;
+  const gaId = getGaId();
+  if (!gaId) return false;
+  if (isConsentGranted()) gtagConsentUpdate();
+  else gtagConsentRevoke();
+  window.gtag("config", gaId, { send_page_view: false });
+  return true;
+}
+
 // ── Chargement des scripts —─────────────────────────────────
 function loadScript(src, id, onLoad) {
   if (typeof document === "undefined") return;
@@ -177,13 +194,9 @@ function loadGtag() {
   const gaId = getGaId();
   if (!gaId) return;
   loadScript(`https://www.googletagmanager.com/gtag/js?id=${gaId}`, "tekalis-ga-script", () => {
-    if (window.gtag) {
-      gtagConsentUpdate();
-      window.gtag("config", gaId, { send_page_view: false });
-      // La page vue est émise ici et par AnalyticsProvider : trackPageView
-      // déduplique par URL pour éviter les doubles comptages.
-      trackPageView();
-    }
+    // Le consentement + la config sont posés par primeGtag() (avant/à
+    // l'init). Ici on émet la page vue GA4 éventuelle.
+    trackPageView();
   });
 }
 
@@ -248,8 +261,8 @@ function relayEvent(eventName, eventId, customData) {
 // ── API publique ────────────────────────────────────────────
 export async function grantConsent() {
   setConsent(CONSENT.ACCEPTED);
-  gtagConsentUpdate();
   await ensureConfig();
+  primeGtag();
   loadGtag();
   ensureFbq();
   loadMetaPixel();
@@ -265,6 +278,18 @@ export function revokeConsent() {
   notifyConsentChanged();
 }
 
+// Rouvre la bannière de consentement (lien « Gérer mes cookies » du footer).
+// Indispensable depuis l'ajout du gating : sans cela, un visiteur ayant
+// refusé ne pouvait plus jamais changer d'avis.
+export function openConsentBanner() {
+  if (typeof window === "undefined") return;
+  try {
+    window.dispatchEvent(new CustomEvent(OPEN_CONSENT_EVENT));
+  } catch {
+    /* no-op */
+  }
+}
+
 // Événement custom — permet aux composants React (AnalyticsProvider, etc.)
 // de réagir au changement de consentement sans polling localStorage.
 function notifyConsentChanged() {
@@ -278,14 +303,17 @@ function notifyConsentChanged() {
   }
 }
 
-// Appelé au montage : charge la config puis charge les scripts si un
-// consentement a déjà été accordé lors d'une visite précédente.
+// Appelé au montage : charge la config puis prépare/charge les scripts.
+// GA4 est chargé systématiquement (Consent Mode v2) — le script démarre en
+// "denied" et émet des pings anonymes, puis bascule en "granted" dès que
+// l'utilisateur accepte. Le Pixel Meta reste conditionné au consentement.
 export async function initAnalytics() {
   if (typeof window === "undefined") return;
   await ensureConfig();
+  primeGtag();
+  loadGtag();
   if (getConsent() === CONSENT.ACCEPTED) {
     ensureFbq();
-    loadGtag();
     loadMetaPixel();
   }
 }
@@ -293,13 +321,14 @@ export async function initAnalytics() {
 // Événement générique, propagé vers GA4 + Meta + relais CAPI.
 export function trackEvent(eventName, params = {}, options = {}) {
   if (typeof window === "undefined") return;
-  if (!isConsentGranted()) return;
 
   // event_id unique systématique → déduplication browser/CAPI et GA4.
   const { eventId } = options;
   const resolvedId = eventId != null ? String(eventId) : newEventId();
 
   try {
+    // GA4 : toujours émis. En Consent Mode v2, un consentement "denied"
+    // anonymise l'événement (cookieless) au lieu de le bloquer.
     const gaId = getGaId();
     if (window.gtag && gaId) {
       window.gtag("event", eventName, {
@@ -308,18 +337,22 @@ export function trackEvent(eventName, params = {}, options = {}) {
       });
     }
 
-    const fbq = ensureFbq();
-    if (fbq) {
-      const metaParams = { ...params };
-      const opts = { eventID: resolvedId };
-      if (META_STANDARD_EVENTS.has(eventName)) {
-        fbq("track", eventName, metaParams, opts);
-      } else {
-        fbq("trackCustom", eventName, metaParams, opts);
+    // Meta (Pixel + relais CAPI) : uniquement après consentement explicite,
+    // car ces signaux sont publicitaires.
+    if (isConsentGranted()) {
+      const fbq = ensureFbq();
+      if (fbq) {
+        const metaParams = { ...params };
+        const opts = { eventID: resolvedId };
+        if (META_STANDARD_EVENTS.has(eventName)) {
+          fbq("track", eventName, metaParams, opts);
+        } else {
+          fbq("trackCustom", eventName, metaParams, opts);
+        }
       }
-    }
 
-    relayEvent(eventName, resolvedId, params);
+      relayEvent(eventName, resolvedId, params);
+    }
   } catch {
     /* le tracking ne doit jamais casser l'UI */
   }
@@ -333,18 +366,24 @@ let lastFbqUrl = "";
 
 export function trackPageView() {
   if (typeof window === "undefined") return;
-  if (!isConsentGranted()) return;
   const url = window.location.href;
   try {
+    // GA4 : émis dans tous les cas. En Consent Mode v2, un consentement
+    // "denied" transforme l'événement en ping anonyme (sans cookie) : Google
+    // reçoit donc des données même sans acceptation, et les données complètes
+    // dès que l'utilisateur accepte.
     const gaId = getGaId();
     if (window.gtag && gaId && url !== lastGtagUrl) {
       lastGtagUrl = url;
       window.gtag("event", "page_view", { page_location: url });
     }
-    const fbq = ensureFbq();
-    if (fbq && url !== lastFbqUrl) {
-      lastFbqUrl = url;
-      fbq("track", "PageView");
+    // Meta : uniquement après consentement explicite.
+    if (isConsentGranted()) {
+      const fbq = ensureFbq();
+      if (fbq && url !== lastFbqUrl) {
+        lastFbqUrl = url;
+        fbq("track", "PageView");
+      }
     }
   } catch {
     /* no-op */
