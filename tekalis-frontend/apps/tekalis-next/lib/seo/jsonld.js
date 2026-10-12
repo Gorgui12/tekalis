@@ -147,6 +147,8 @@ function buildShippingDetails(numericPrice) {
  * Politique reelle de la page /retours : retour sous 7 jours apres reception.
  * `returnFees` est volontairement omis : le site ne precise pas si le retour
  * standard est gratuit ou a la charge du client, on ne l'invente donc pas.
+ * `refundType` vient de /retours : « vous êtes remboursé sous 7 jours ouvrables
+ * via votre moyen de paiement initial » -> remboursement integral.
  */
 function buildReturnPolicy() {
   return {
@@ -156,7 +158,27 @@ function buildReturnPolicy() {
     merchantReturnDays: RETURN_POLICY.days,
     merchantReturnLink: RETURN_POLICY.link,
     returnMethod: 'https://schema.org/ReturnByMail',
+    refundType: 'https://schema.org/FullRefund',
   };
+}
+
+/**
+ * Politique de retour autonome, pour la page /retours.
+ * Donne au reviewer Google / au GMC la meme politique que celle des fiches,
+ * sur la page publique officielle (et non sur /dashboard/rma, protegee).
+ */
+export function buildReturnPolicySchema() {
+  return { '@context': SCHEMA_CONTEXT, ...buildReturnPolicy() };
+}
+
+/**
+ * Politique de livraison autonome, pour la page /livraison.
+ * Miroir de `shippingDetails` des fiches (offre standard) : tarif 2 500 FCFA,
+ * destination Senegal, delais 24-48h a Dakar. « Offerte des 50 000 FCFA » et
+ * les autres tarifs par zone restent affiches sur la page elle-meme.
+ */
+export function buildShippingPolicySchema() {
+  return { '@context': SCHEMA_CONTEXT, ...buildShippingDetails(undefined) };
 }
 
 /**

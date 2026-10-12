@@ -1,4 +1,6 @@
 import Link from "next/link";
+import JsonLd from '@/components/seo/JsonLd';
+import { buildShippingPolicySchema } from '@/lib/seo/jsonld';
 import { FaTruck, FaMapMarkerAlt, FaClock, FaMoneyBillWave, FaBoxOpen, FaPhoneAlt } from "react-icons/fa";
 
 const zones = [
@@ -44,6 +46,9 @@ export const metadata = {
 export default function LivraisonPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-12">
+      {/* Politique de livraison structuree = source de verite pour GMC / crawlers. */}
+      <JsonLd id="shipping-policy-schema" data={buildShippingPolicySchema()} />
+
       <div className="container mx-auto px-4 max-w-5xl">
         {/* Header */}
         <div className="text-center mb-12">

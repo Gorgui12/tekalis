@@ -81,6 +81,15 @@ Verifie en local sur `next start` : `/products/iphone-15` (420 000 FCFA, compare
 
 Rappel post-deploy : revalider dans le test de resultats enrichis de Google (merchant listing) puis dans Search Console > "Résultats enrichis" / "Merchant listings".
 
+## Politique retour GMC alignee (cause racine du blocage merchant listing)
+Le merchant listing restait sans image/prix malgre le balisage : la "Return policy review" de Google Merchant Center pointait vers `www.tekalis.com/dashboard/rma`, page **privee** (`noindex,nofollow` via `buildPrivateMetadata`, protegee par `middleware.js` — Google ne peut pas la lire). Correction :
+- **GMC (cote compte)** : Policy URL -> `https://tekalis.com/retours`, methode -> « Par courrier » (seul mode accepte), condition produit -> « Neuf » uniquement, fenetre 7 jours, sans frais. Statut passe a **Verified**. Shipping policy GMC a verifier de meme avec URL -> `https://tekalis.com/livraison`.
+- `lib/seo/jsonld.js` : export `buildReturnPolicySchema()` / `buildShippingPolicySchema()` (nœuds autonomes `MerchantReturnPolicy` / `OfferShippingDetails` reutilisant `RETURN_POLICY` / `SHIPPING_POLICY` existants) ; ajout `refundType: FullRefund` au `MerchantReturnPolicy` des fiches ("rembourse sous 7 jours ouvrables via le moyen de paiement initial", page `/retours`).
+- `app/retours/page.jsx` : `<JsonLd id="return-policy-schema">`. `app/livraison/page.jsx` : `<JsonLd id="shipping-policy-schema">`. Les politiques publiees deviennent lisibles par les crawlers et les reviewers GMC.
+- `returnFees` toujours omis (frais non precises sur le site) ; aucune donnee inventee (regle projet).
+
+Verifie en local sur `next start` (port 3999, apres arret du precedent serveur stale) : `/retours` sert le `MerchantReturnPolicy` autonome, `/livraison` l'`OfferShippingDetails`, et `/products/iphone-15` son `hasMerchantReturnPolicy` avec `refundType`. Build OK. A noter : verifier qu'aucun ancien processus `next start` ne retient le port (PID 11048 retrouve a l'antenne avec un code perime au premier test).
+
 ## Points d'attention
 - `permanentRedirect()` produit un **308** (App Router) au lieu d'un 301. Equivalent pour Google, aucun impact negatif.
 - Suppression de `app/loading.jsx` globale : navigation vers pages attend l'API sans spinner global (compromis accepte pour avoir des statuts HTTP exacts).

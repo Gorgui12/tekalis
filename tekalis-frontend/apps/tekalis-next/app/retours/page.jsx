@@ -1,4 +1,6 @@
 import Link from "next/link";
+import JsonLd from '@/components/seo/JsonLd';
+import { buildReturnPolicySchema } from '@/lib/seo/jsonld';
 import { FaUndoAlt, FaCheckCircle, FaTimesCircle, FaClipboardList, FaMoneyBillWave, FaHeadset } from "react-icons/fa";
 
 const conditions = [
@@ -49,6 +51,9 @@ export const metadata = {
 export default function RetoursPage() {
   return (
     <div className="min-h-screen bg-gray-50 py-12">
+      {/* Politique publiee = source de verite (voir GMC : « Standard for Senegal »). */}
+      <JsonLd id="return-policy-schema" data={buildReturnPolicySchema()} />
+
       <div className="container mx-auto px-4 max-w-5xl">
         {/* Header */}
         <div className="text-center mb-12">
