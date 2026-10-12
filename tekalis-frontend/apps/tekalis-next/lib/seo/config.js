@@ -73,6 +73,28 @@ export const SHIPPING_CLAIM = `Livraison à Dakar sous 24 à 48 h, offerte dès 
 // app/retours/page.jsx : « Produit retourné dans un délai de 7 jours après réception »
 export const RETURNS_CLAIM = 'Retour possible sous 7 jours après réception';
 
+// Politiques de livraison / retour pour le balisage `shippingDetails` et
+// `hasMerchantReturnPolicy` des fiches produit. Mêmes sources que SHIPPING_CLAIM
+// et RETURNS_CLAIM : rien n'est inventé ici.
+//  - frais : 2 500 FCFA standard (SHIPPING.STANDARD_SHIPPING_COST), OFFERTS dès
+//    50 000 FCFA (SHIPPING.FREE_SHIPPING_THRESHOLD, voir app/livraison) ;
+//  - délais : « 24 - 48h à Dakar » (SHIPPING.DELIVERY_TIME.DAKAR), préparation
+//    « sous 2 à 4 heures » (app/livraison, étapes) ;
+//  - retour : « Produit retourné dans un délai de 7 jours après réception »
+//    (app/retours). `returnFees` est omis dans le JSON-LD : le site ne précise
+//    pas si le retour standard est gratuit ou à la charge du client.
+export const SHIPPING_POLICY = {
+  freeShippingThreshold: SHIPPING.FREE_SHIPPING_THRESHOLD,
+  standardCost: SHIPPING.STANDARD_SHIPPING_COST,
+  handlingDays: { min: 0, max: 1 },
+  transitDays: { min: 1, max: 2 },
+};
+
+export const RETURN_POLICY = {
+  days: 7,
+  link: absoluteUrl('/retours'),
+};
+
 // app/garanties/page.jsx : « Garantie constructeur sur tous les produits »,
 // models/Product.js : warranty.duration = 12 mois.
 export const WARRANTY_CLAIM = 'Garantie constructeur incluse';

@@ -68,6 +68,19 @@ Verification sur serveur Next.js de production locale :
 
 16 categories pre-rendues : 1 H1 chacune, contenu serveur substantiel, aucune `meta keywords`. Sitemap : 239 URLs, 0 invalide. `seo:check` OK, `seo:content` OK.
 
+## Merchant listing (image + prix dans Google Search)
+Ajoute au JSON-LD `Product`/`Offer` des fiches produit les donnees qui rendent la fiche **eligible au "merchant listing"** — c'est ce qui affiche l'image, le prix et la promo directement dans la SERP (le site y apparaissait en position 5-8 mais sans image ni prix, d'ou un CTR bas).
+- `tekalis-frontend/apps/tekalis-next/lib/seo/config.js` : `SHIPPING_POLICY` et `RETURN_POLICY`, derives des pages publiees `/livraison`, `/retours` et des constantes `SHIPPING` (offerte des 50 000 FCFA, sinon 2 500 FCFA ; delais 24-48h ; retour sous 7 jours). Rien d'invente.
+- `tekalis-frontend/apps/tekalis-next/lib/seo/jsonld.js` :
+  - `shippingDetails` (`OfferShippingDetails`) sur l'`Offer` : tarif reel (0 si >= 50 000 FCFA, sinon 2 500), destination SN, delais 0-1 j preparation / 1-2 j transit.
+  - `hasMerchantReturnPolicy` (`MerchantReturnPolicy`) : `merchantReturnDays: 7`, lien `/retours`, `ReturnByMail`. `returnFees` volontairement omis (non precise sur le site).
+  - Prix barre (`priceSpecification` `StrikethroughPrice` = `comparePrice`) quand `comparePrice > price` : Google affiche alors la promo, sans date de fin inventee.
+  - Nettoyage `attachSpecs` : plus de `PropertyValue` vides (`value: ""`, `value: "false"`).
+
+Verifie en local sur `next start` : `/products/iphone-15` (420 000 FCFA, compare 483 000) -> shipping offert + barré 483 000 ; `/products/verre-trempe-...` (4 500 FCFA) -> livraison 2 500 FCFA. Build OK.
+
+Rappel post-deploy : revalider dans le test de resultats enrichis de Google (merchant listing) puis dans Search Console > "Résultats enrichis" / "Merchant listings".
+
 ## Points d'attention
 - `permanentRedirect()` produit un **308** (App Router) au lieu d'un 301. Equivalent pour Google, aucun impact negatif.
 - Suppression de `app/loading.jsx` globale : navigation vers pages attend l'API sans spinner global (compromis accepte pour avoir des statuts HTTP exacts).

@@ -14,11 +14,14 @@ import {
   SITE_URL,
   SITE_NAME,
   SITE_LOCALE,
+  SITE_COUNTRY,
   CURRENCY,
   CONTACT,
   DEFAULT_OG_IMAGE,
   LOGO_URL,
   SAME_AS,
+  SHIPPING_POLICY,
+  RETURN_POLICY,
   absoluteUrl,
 } from './config';
 import { stripHtml } from './format';
@@ -100,6 +103,82 @@ export function availabilityLabel(product) {
 }
 
 /**
+ * shippingDetails (OfferShippingDetails).
+ *
+ * Fournit au merchant listing (Google) le tarif et le delai de livraison reels :
+ *  - offerte des 50 000 FCFA (sinon 2 500 FCFA standard, cf. SHIPPING_POLICY) ;
+ *  - « 24-48h a Dakar », preparation le jour meme (0-1 jour).
+ * Valeurs issues de lib/seo/config.js, elles-memes derivees des pages publiees.
+ */
+function buildShippingDetails(numericPrice) {
+  const free = Number.isFinite(numericPrice) && numericPrice >= SHIPPING_POLICY.freeShippingThreshold;
+  return {
+    '@type': 'OfferShippingDetails',
+    shippingRate: {
+      '@type': 'MonetaryAmount',
+      value: free ? 0 : SHIPPING_POLICY.standardCost,
+      currency: CURRENCY,
+    },
+    shippingDestination: {
+      '@type': 'DefinedRegion',
+      addressCountry: SITE_COUNTRY,
+    },
+    deliveryTime: {
+      '@type': 'ShippingDeliveryTime',
+      handlingTime: {
+        '@type': 'QuantitativeValue',
+        minValue: SHIPPING_POLICY.handlingDays.min,
+        maxValue: SHIPPING_POLICY.handlingDays.max,
+        unitCode: 'DAY',
+      },
+      transitTime: {
+        '@type': 'QuantitativeValue',
+        minValue: SHIPPING_POLICY.transitDays.min,
+        maxValue: SHIPPING_POLICY.transitDays.max,
+        unitCode: 'DAY',
+      },
+    },
+  };
+}
+
+/**
+ * hasMerchantReturnPolicy (MerchantReturnPolicy).
+ *
+ * Politique reelle de la page /retours : retour sous 7 jours apres reception.
+ * `returnFees` est volontairement omis : le site ne precise pas si le retour
+ * standard est gratuit ou a la charge du client, on ne l'invente donc pas.
+ */
+function buildReturnPolicy() {
+  return {
+    '@type': 'MerchantReturnPolicy',
+    applicableCountry: SITE_COUNTRY,
+    returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+    merchantReturnDays: RETURN_POLICY.days,
+    merchantReturnLink: RETURN_POLICY.link,
+    returnMethod: 'https://schema.org/ReturnByMail',
+  };
+}
+
+/**
+ * Prix barre lisible par Google (StrikethroughPrice).
+ * `comparePrice` est le prix barre affiche sur la fiche. S'il est strictement
+ * superieur au prix de vente, le produit est en promo : on le declare pour que
+ * Google l'affiche barre. Aucune date de fin n'est inventee (pas de prix barré
+ * temporaire declare sur le site).
+ */
+function buildStrikethroughPrice(product, numericPrice) {
+  const compare = Number(product?.comparePrice);
+  if (numericPrice === undefined) return undefined;
+  if (!Number.isFinite(compare) || compare <= numericPrice) return undefined;
+  return {
+    '@type': 'UnitPriceSpecification',
+    priceType: 'https://schema.org/StrikethroughPrice',
+    price: compare,
+    priceCurrency: CURRENCY,
+  };
+}
+
+/**
  * Product + Offer.
  * `categorySlug` alimente le fil d'Ariane ; `breadcrumb` evite de le re-calculer.
  */
@@ -114,6 +193,7 @@ export function buildProductSchema(product, options = {}) {
   const itemCondition = resolveItemCondition(product);
   const price = Number(product.price);
   const numericPrice = Number.isFinite(price) && price > 0 ? price : undefined;
+  const strikethroughPrice = buildStrikethroughPrice(product, numericPrice);
 
   const seller = {
     '@type': 'Organization',
@@ -138,9 +218,15 @@ export function buildProductSchema(product, options = {}) {
       url,
       priceCurrency: CURRENCY,
       ...(numericPrice !== undefined ? { price: numericPrice } : {}),
+      // Prix barre reel (comparePrice) : montre la promo, sans fake date de fin.
+      ...(strikethroughPrice ? { priceSpecification: strikethroughPrice } : {}),
       availability,
       ...(itemCondition ? { itemCondition } : {}),
       seller,
+      // Livraison + retour réels : requis pour afficher le merchant listing
+      // (prix, image, frais et délais) dans Google Search.
+      ...(numericPrice !== undefined ? { shippingDetails: buildShippingDetails(numericPrice) } : {}),
+      hasMerchantReturnPolicy: buildReturnPolicy(),
     },
   };
 }
@@ -307,7 +393,14 @@ export function attachSpecs(schema, product, maxEntries = 25) {
   if (!specs || typeof specs !== 'object') return schema;
 
   const additionalProperty = Object.entries(specs)
-    .filter(([, value]) => value !== null && value !== undefined && value !== '')
+    .filter(([, value]) => {
+      // On ne balise que de vraies valeurs : pas de null, de chaîne vide,
+      // de booléen `false` inutile (ex. `rgb`) ni de tableau vide.
+      if (value === null || value === undefined || value === '') return false;
+      if (typeof value === 'boolean' && !value) return false;
+      if (Array.isArray(value) && value.filter(Boolean).length === 0) return false;
+      return true;
+    })
     .map(([name, value]) => ({
       '@type': 'PropertyValue',
       name,
