@@ -48,43 +48,42 @@ export default function AuthPromptBanner({
     <div
       role="dialog"
       aria-label={title}
-      className="fixed bottom-0 inset-x-0 z-40 animate-slide-up"
+      className="fixed z-[70] left-0 right-0 bottom-[var(--consent-banner-h,0px)] px-3 pb-3 lg:left-auto lg:right-4 lg:top-28 lg:bottom-auto lg:w-[360px] lg:px-0 lg:pb-0 animate-slide-up"
     >
-      <div className="bg-white dark:bg-surface-800 border-t border-surface-200 dark:border-surface-700 shadow-elevated">
-        <div className="max-w-6xl mx-auto pl-4 pr-20 sm:pl-6 sm:pr-28 py-3 sm:py-4 flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4">
-          <p className="flex-1 min-w-0 text-sm sm:text-base font-semibold text-surface-900 dark:text-white leading-snug">
-            {title}
-            {subtitle && (
-              <span className="block font-normal text-xs sm:text-sm text-surface-500 dark:text-surface-400 mt-0.5">
-                {subtitle}
-              </span>
-            )}
-          </p>
+      <div className="relative bg-white dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-2xl shadow-elevated p-4 sm:p-5">
+        <button
+          type="button"
+          onClick={() => {
+            trackPromptDismissed({ reason, source });
+            onClose();
+          }}
+          aria-label="Fermer"
+          className="absolute top-2.5 right-2.5 p-1.5 rounded-full text-surface-400 dark:text-surface-500 hover:text-surface-600 dark:hover:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-700 transition"
+        >
+          <FaTimes size={16} />
+        </button>
 
-          <div className="flex items-center justify-center gap-2">
-            <div className="min-w-0 max-w-[280px] sm:max-w-[340px]">
-              <GoogleButton
-                onCredential={handleCredential}
-                text="Continuer avec Google"
-              />
-            </div>
-            <button
-              type="button"
-              onClick={() => {
-                trackPromptDismissed({ reason, source });
-                onClose();
-              }}
-              aria-label="Fermer"
-              className="flex-shrink-0 p-2 rounded-full text-surface-400 dark:text-surface-500 hover:text-surface-600 dark:hover:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-700 transition"
-            >
-              <FaTimes size={18} />
-            </button>
-          </div>
-
-          {busy && (
-            <p className="text-center text-xs text-surface-400">Connexion en cours…</p>
+        <p className="pr-8 text-sm sm:text-base font-semibold text-surface-900 dark:text-white leading-snug">
+          {title}
+          {subtitle && (
+            <span className="block font-normal text-xs sm:text-sm text-surface-500 dark:text-surface-400 mt-0.5">
+              {subtitle}
+            </span>
           )}
+        </p>
+
+        <div className="mt-3 flex justify-center">
+          <div className="w-full min-w-0 max-w-[320px]">
+            <GoogleButton
+              onCredential={handleCredential}
+              text="Continuer avec Google"
+            />
+          </div>
         </div>
+
+        {busy && (
+          <p className="mt-2 text-center text-xs text-surface-400">Connexion en cours…</p>
+        )}
       </div>
     </div>
   );

@@ -4,15 +4,7 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { Analytics } from "@vercel/analytics/next";
 import ConsentBanner from "./ConsentBanner";
-import {
-  initAnalytics,
-  trackPageView,
-  trackPageVisit,
-  getConsent,
-  CONSENT,
-} from "@/lib/analytics";
-
-const CONSENT_EVENT = "tekalis:consent-changed";
+import { initAnalytics, trackPageView, trackPageVisit } from "@/lib/analytics";
 
 /**
  * AnalyticsProvider — charge les trackers admissibles au montage
@@ -25,19 +17,16 @@ const CONSENT_EVENT = "tekalis:consent-changed";
  *      seule page_view pour la route initiale ;
  *   2. à chaque changement de route : trackPageView() + trackPageVisit()
  *      (comptage des sessions pour l'admin analytics) ;
- *   3. Vercel Analytics (<Analytics/>) n'est monté qu'après acceptation.
+ *   3. Vercel Analytics (<Analytics/>) est monté SANS condition : il est
+ *      cookieless et n'utilise aucun identifiant persistant, donc aucun
+ *      consentement n'est requis. Le monter derrière le consentement
+ *      biaisait le taux de rebond : Vercel ne mesurait que les visiteurs
+ *      ayant accepté, et faisait démarrer leur « session » à l'acceptation
+ *      (=> surpondération des sessions à une seule page).
  */
 const AnalyticsProvider = ({ children }) => {
   const pathname = usePathname();
   const [ready, setReady] = useState(false);
-  const [consent, setConsent] = useState(CONSENT.PENDING);
-
-  useEffect(() => {
-    setConsent(getConsent());
-    const onConsent = () => setConsent(getConsent());
-    window.addEventListener(CONSENT_EVENT, onConsent);
-    return () => window.removeEventListener(CONSENT_EVENT, onConsent);
-  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -60,11 +49,9 @@ const AnalyticsProvider = ({ children }) => {
     trackPageVisit();
   }, [pathname, ready]);
 
-  const analyticsGranted = consent === CONSENT.ACCEPTED;
-
   return (
     <>
-      {analyticsGranted && <Analytics />}
+      <Analytics />
       {children}
       <ConsentBanner />
     </>
