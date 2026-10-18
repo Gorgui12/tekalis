@@ -35,6 +35,20 @@ const xmlEscape = (str) =>
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&apos;");
 
+const imageUrl = (img) => (typeof img === "string" ? img : img?.url) || "";
+
+// Google rejette un <item> sans <g:image_link>. `images: [{ url: "" }]` a une
+// longueur non nulle mais aucune URL exploitable : on teste l'URL reelle.
+const firstImage = (p) => {
+  const primary = p.images?.find((img) => img?.isPrimary && img?.url);
+  if (primary?.url) return primary.url;
+  for (const img of p.images || []) {
+    const url = typeof img === "string" ? img : img?.url;
+    if (url && String(url).trim()) return url;
+  }
+  return "";
+};
+
 // Champs obligatoires conditionnels : seul <g:mpn> (ou <g:gtin>) est requis
 // avec <g:brand>. Google exige identifier_exists=false si ni gtin ni mpn.
 const itemBlock = (p) => {
@@ -43,8 +57,7 @@ const itemBlock = (p) => {
     (p.metaDescription || p.description || "").slice(0, 5000)
   );
   const link = `${SITE_URL}/products/${p.slug || p._id}`;
-  const primaryImage =
-    (p.images?.find((img) => img.isPrimary)?.url || p.images?.[0]?.url) || "";
+  const primaryImage = firstImage(p);
   const price = Number(p.price) || 0;
   const comparePrice = Number(p.comparePrice) || 0;
   // 🔧 Prix : si comparePrice (prix barré) > price, le produit est en promo.
@@ -99,7 +112,7 @@ router.get("/merchant/products.xml", async (req, res) => {
       .populate("category", "name")
       .lean();
 
-    const items = products.filter((p) => p.images?.length).map(itemBlock);
+    const items = products.filter((p) => firstImage(p)).map(itemBlock);
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:g="http://base.google.com/ns/1.0">

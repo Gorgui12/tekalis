@@ -106,6 +106,25 @@ Verifie sur `next start -p 3117` (entetes `Host` spoofees via `curl.exe`) :
 - `Host: tekalis.com` et `localhost` -> 200, aucun entete de garde.
 `seo:check` : **OK**. `seo:content` : 18 ecarts **pre-existants** (derive de donnees, hors perimetre de cette correction : categorie API `climatiseurs` absente de `categoryContent.js`, marques/modeles au-dela de la page API de 200 produits).
 
+## Doublons de slug : fin du suffixe `Date.now()` (GSC : doublons / 404 sur anciennes URL)
+`resolveUniqueSlug()` (`tekalis-backend/controllers/productController.js`) suffixait un conflit exotique (`> 200`) avec `Date.now()`, produisant des URL instables type `/<nom>-1790729696190` a chaque reimport.
+- Repli remplace par un suffixe **incremental deterministe** `-2 … -9999`, et **erreur explicite** si aucun n'est libre (plus de doublon silencieux). Le comportement nominal (`-2, -3, …`) est inchange.
+- Script de diagnostic `tekalis-backend/scripts/diagnostic-slugs-doublons.mjs` (dry-run par defaut, aucune ecriture) : regroupe par slug, signale les suffixes `-\d{13}$`, signale les noms en double, compte les commandes.
+- Frontend deja en place : `resolveProductRequest` absorbe les anciens slugs a suffixe (`permanentRedirect` 308).
+
+Verifie : aucun slug a suffixe 13 chiffres en base, aucun doublon exact par slug. Build OK, `seo:check` OK.
+
+## Merchant listings : offres completes + plus de `Product` sans image (GSC : « elements non valides »)
+Deux causes de balisage marchand invalide : des `Offer` sans livraison/retour et des `Product` sans `image`.
+- `lib/seo/jsonld.js` :
+  - `buildProductSchema()` renvoie `null` si le produit n'a **aucune image** (un produit sans image n'est pas eligible au merchant listing) ; `attachSpecs` devient tolerant au `null`.
+  - `buildShippingDetails` / `buildReturnPolicy` exportes (reutilisation sur les listes).
+- `app/prix/[slug]/page.jsx` : chaque `Offer` de l'`ItemList` porte `url`, `shippingDetails` et `hasMerchantReturnPolicy` ; offre seulement si `price > 0`.
+- `app/configurateur-solaire/page.jsx` : suppression de `offers` (`price: 0`) du `WebApplication` (outil gratuit, pas un produit).
+- `tekalis-backend/routes/productFeed.js` : flux `merchant/products.xml` filtre sur une **URL d'image reelle** (`firstImage()`), plus sur `images.length` (`[{ url: "" }]` passait mais donnait un `<g:image_link>` vide).
+
+Verifie sur `next start -p 3117` : `/products/airpods-pro-originale` (sans image) -> 0 bloc `Product`, page 200 ; `/products/iphone-15` -> 1 bloc avec `image` ; `/prix/iphone-12-prix-dakar` -> 12 offres avec `shippingDetails`+`hasMerchantReturnPolicy` ; `/configurateur-solaire` -> 0 `offers`. Build OK, `seo:check` OK.
+
 ## Points d'attention
 - `permanentRedirect()` produit un **308** (App Router) au lieu d'un 301. Equivalent pour Google, aucun impact negatif.
 - Suppression de `app/loading.jsx` globale : navigation vers pages attend l'API sans spinner global (compromis accepte pour avoir des statuts HTTP exacts).

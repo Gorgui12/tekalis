@@ -110,7 +110,7 @@ export function availabilityLabel(product) {
  *  - « 24-48h a Dakar », preparation le jour meme (0-1 jour).
  * Valeurs issues de lib/seo/config.js, elles-memes derivees des pages publiees.
  */
-function buildShippingDetails(numericPrice) {
+export function buildShippingDetails(numericPrice) {
   const free = Number.isFinite(numericPrice) && numericPrice >= SHIPPING_POLICY.freeShippingThreshold;
   return {
     '@type': 'OfferShippingDetails',
@@ -150,7 +150,7 @@ function buildShippingDetails(numericPrice) {
  * `refundType` vient de /retours : « vous êtes remboursé sous 7 jours ouvrables
  * via votre moyen de paiement initial » -> remboursement integral.
  */
-function buildReturnPolicy() {
+export function buildReturnPolicy() {
   return {
     '@type': 'MerchantReturnPolicy',
     applicableCountry: SITE_COUNTRY,
@@ -210,6 +210,10 @@ export function buildProductSchema(product, options = {}) {
 
   const url = productUrl || absoluteUrl(`/products/${product.slug || product._id}`);
   const images = productImages(product);
+  // Une fiche sans image n'est pas eligible au merchant listing : Google la
+  // compte alors comme un « élément non valide ». On n'emet donc pas de
+  // `Product` sans `image` plutot que de publier un balisage incomplet.
+  if (images.length === 0) return null;
   const description = stripHtml(product.metaDescription || product.description || '');
   const availability = resolveAvailability(product);
   const itemCondition = resolveItemCondition(product);
@@ -228,7 +232,7 @@ export function buildProductSchema(product, options = {}) {
     '@type': 'Product',
     name: stripHtml(product.name),
     ...(description ? { description } : {}),
-    ...(images.length > 0 ? { image: images } : {}),
+    image: images,
     ...(product._id ? { sku: product._id } : {}),
     ...(product.mpn ? { mpn: product.mpn } : {}),
     ...(product.gtin ? { gtin: product.gtin } : {}),
@@ -411,6 +415,7 @@ export function buildArticleSchema(article) {
  * Toutes les paires sont des donnees produit, aucune n'est inventee.
  */
 export function attachSpecs(schema, product, maxEntries = 25) {
+  if (!schema) return schema;
   const specs = product?.specs;
   if (!specs || typeof specs !== 'object') return schema;
 

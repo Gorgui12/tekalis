@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { serverFetch } from '@/lib/serverFetch';
 import PrixGuide from '@/components/product/PrixGuide';
+import { buildShippingDetails, buildReturnPolicy } from '@/lib/seo/jsonld';
 import { PRIX_GUIDES, SITE_URL, getPrixGuide } from '@/lib/utils/prixGuides';
 
 export async function generateStaticParams() {
@@ -60,13 +61,18 @@ export default async function PrixGuidePage({ params }) {
       position: i + 1,
       name: p.name,
       url: `${SITE_URL}/products/${p.slug || p._id}`,
-      ...(p.price ? {
+      ...(Number(p.price) > 0 ? {
         offers: {
           '@type': 'Offer',
           price: p.price,
           priceCurrency: 'XOF',
           priceSpecification: { '@type': 'UnitPriceSpecification', price: p.price, priceCurrency: 'XOF' },
           availability: p.stock > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+          url: `${SITE_URL}/products/${p.slug || p._id}`,
+          // Livraison + retour reels : requis pour que l'offre soit valide
+          // cote merchant listing (meme politique que les fiches produit).
+          shippingDetails: buildShippingDetails(Number(p.price)),
+          hasMerchantReturnPolicy: buildReturnPolicy(),
         },
       } : {}),
     })),

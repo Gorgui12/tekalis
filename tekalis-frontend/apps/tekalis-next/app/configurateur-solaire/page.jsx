@@ -32,7 +32,9 @@ export default async function SolarConfiguratorPage() {
     '@type': 'WebApplication',
     name: 'Configurateur de kit solaire Tekalis',
     applicationCategory: 'UtilityApplication',
-    offers: { '@type': 'Offer', price: '0', priceCurrency: 'XOF' },
+    // Pas de bloc `offers` : le configurateur est gratuit et ne vend rien.
+    // Un `Offer` a `price: 0` laissait croire a un produit et polluait
+    // l'analyse des offres marchandes (aucune donnee inventee).
     operatingSystem: 'Web',
     inLanguage: 'fr',
   };
