@@ -63,7 +63,14 @@ const resolveUniqueSlug = async (baseSlug, excludeId = null) => {
     if (!(await query(candidate))) return candidate;
   }
   // Repli : on ne bloque jamais la création sur un slug exotique.
-  return `${base}-${Date.now()}`;
+  // Fallback incremental deterministe (évite les doublons produits par Date.now())
+  let fallback = 201;
+  while (fallback <= 9999) {
+    const candidate = `${base}-${fallback}`;
+    if (!(await query(candidate))) return candidate;
+    fallback += 1;
+  }
+  throw new Error(`Impossible de générer un slug unique pour ${base}`);
 };
 
 // ===============================================
