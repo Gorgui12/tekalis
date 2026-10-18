@@ -11,6 +11,13 @@ export default function PrixGuide({ guide, products }) {
   const minPrice = prices.length ? Math.min(...prices) : null;
   const maxPrice = prices.length ? Math.max(...prices) : null;
 
+  // Certains modeles sont des imports « Venant » (etat parfois non neuf) :
+  // on ne peut donc pas affirmer que toute la liste est neuve et scellee.
+  const hasImport = products.some((p) => {
+    const signal = `${p?.slug || ''} ${p?.name || ''}`.toLowerCase();
+    return signal.includes('venant') || (p?.condition && p.condition !== 'new');
+  });
+
   const otherGuides = PRIX_GUIDES.filter((g) => g.slug !== guide.slug).slice(0, 4);
 
   const priceSummary = minPrice && maxPrice
@@ -76,8 +83,10 @@ export default function PrixGuide({ guide, products }) {
               ))}
             </div>
             <p className="text-sm text-surface-500 dark:text-surface-400 mt-4 px-1">
-              Prix du moment, vérifiés chaque jour. Tous les articles de cette liste sont neufs,
-              scellés et disponibles à Dakar avec expédition dans tout le Sénégal.
+              Prix du moment, vérifiés chaque jour.{' '}
+              {hasImport
+                ? "Certains modèles de cette liste sont des imports « Venant » : l'état exact de chaque article est indiqué sur sa fiche. Disponibles à Dakar avec expédition dans tout le Sénégal."
+                : 'Tous les articles de cette liste sont neufs, scellés et disponibles à Dakar avec expédition dans tout le Sénégal.'}
             </p>
           </>
         ) : (

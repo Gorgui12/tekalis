@@ -138,4 +138,10 @@ Verifie sur `next start -p 3117` : `/products/airpods-pro-originale` (sans image
 - `tekalis-backend/scripts/maj-prix-plus30.js`
 - `tekalis-backend/scripts/verifier-blog.js`
 - `seo-audit-report.txt`
-Ces fichiers restent non suivis (untracked) et ne seront pas commits.
+Ces fichiers restent non suivis (untracked) et ne seront pas commits.## [2026-10-18] T4 : Titres/metas + guides prix (honnêteté + couverture)
+
+- PrixGuide.jsx : détection des imports « Venant »/condition ? 'new' ; remplacement de l'affirmation « Tous nos articles sont neufs, scellés... » par un libellé conditionnel (neufs vs imports « Venant » avec état sur fiche).
+- lib/utils/prixGuides.js : correction de l'intro/FAQs de iphone-12-prix-dakar (plus d'affirmation universelle « neufs, scellés ») ; ajout des guides :
+  - iphone-xr-prix-dakar, iphone-11-pro-max-prix-dakar, samsung-galaxy-a14-prix-fcfa, samsung-galaxy-a15-prix-fcfa, samsung-galaxy-a24-prix-fcfa, samsung-galaxy-a54-prix-fcfa, samsung-galaxy-s20-fe-prix-fcfa, samsung-galaxy-s10-prix-fcfa (avec intros honnêtes : modèles « Venant » identifiés).
+- Vérification : nouvelles pages prix générées ; titres/metas dans bornes raisonnables ; aucun faux avis/reviews ; seo-check OK. seo:content conserve 18 écarts pré-existants (hors périmètre).
+
