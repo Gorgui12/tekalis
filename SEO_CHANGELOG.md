@@ -145,3 +145,10 @@ Ces fichiers restent non suivis (untracked) et ne seront pas commits.## [2026-10
   - iphone-xr-prix-dakar, iphone-11-pro-max-prix-dakar, samsung-galaxy-a14-prix-fcfa, samsung-galaxy-a15-prix-fcfa, samsung-galaxy-a24-prix-fcfa, samsung-galaxy-a54-prix-fcfa, samsung-galaxy-s20-fe-prix-fcfa, samsung-galaxy-s10-prix-fcfa (avec intros honnêtes : modèles « Venant » identifiés).
 - Vérification : nouvelles pages prix générées ; titres/metas dans bornes raisonnables ; aucun faux avis/reviews ; seo-check OK. seo:content conserve 18 écarts pré-existants (hors périmètre).
 
+## [2026-10-18] T5 : Noindex sur pages avec filtres/recherches et cohérence robots
+
+- [T5b] Gérer searchParams pour pages listant/filtrant (produits/blog) : si paramètres non essentiels présents (page > 1, filtres, q, sort, etc.) ou tout paramètre générique ? obots: { index: false, follow: true } pour éviter duplication/cannibalisation (implémentation à prévoir si Next.js 15 App Router l'exige).
+- Vérifier pages privées déjà en 
+oindex,nofollow (login/register, dashboard/wishlist/checkout) ? OK via uildPrivateMetadata/middleware.
+- Après implémentation : build OK, seo:check OK. Mettre à jour changelog et committer.
+
