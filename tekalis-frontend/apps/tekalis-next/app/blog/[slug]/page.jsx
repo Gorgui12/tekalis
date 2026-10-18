@@ -4,8 +4,7 @@ import ArticleDetailClient from '@/components/blog/ArticleDetailClient';
 import { SOCIAL_LINKS } from '@/lib/utils/constants';
 import { truncateAtWord } from '@/lib/seo/format';
 import { MAX_DESCRIPTION } from '@/lib/seo/metadata';
-
-const SITE_URL = 'https://tekalis.com';
+import { SITE_URL } from '@/lib/seo/config';
 
 /* Reserve au template du layout la place du suffixe ` | Tekalis Senegal`. */
 const BLOG_TITLE_MAX = 65 - ' | Tekalis Senegal'.length;

@@ -1,3 +1,5 @@
+import { SITE_URL } from '@/lib/seo/config';
+
 export default function robots() {
   return {
     rules: [
@@ -56,7 +58,7 @@ export default function robots() {
        * envoye dans le groupe `*`.
        */
     ],
-    sitemap: 'https://tekalis.com/sitemap.xml',
-    host: 'https://tekalis.com',
+    sitemap: `${SITE_URL}/sitemap.xml`,
+    host: SITE_URL,
   };
 }

@@ -90,6 +90,22 @@ Le merchant listing restait sans image/prix malgre le balisage : la "Return poli
 
 Verifie en local sur `next start` (port 3999, apres arret du precedent serveur stale) : `/retours` sert le `MerchantReturnPolicy` autonome, `/livraison` l'`OfferShippingDetails`, et `/products/iphone-15` son `hasMerchantReturnPolicy` avec `refundType`. Build OK. A noter : verifier qu'aucun ancien processus `next start` ne retient le port (PID 11048 retrouve a l'antenne avec un code perime au premier test).
 
+## Garde-fou de domaine + source unique `SITE_URL` (GSC : domaines dupliques)
+Contexte : `www.tekalis.com` et `*.vercel.app` servaient le site en 200 (contenu duplique indexable). La redirection 308 de la plateforme Vercel n'est pas une garantie controlee par le code.
+- `middleware.js` : garde-fou de domaine ajoute, en logique separee de la protection des routes privees (inchangee : `/dashboard`, `/checkout`, `/wishlist` -> cookie `tekalis_token` sinon 307 vers `/login`).
+  - Hote `www.tekalis.com` -> **308 Permanent Redirect** vers l'apex canonique, chemin + query conserves.
+  - Tout autre hote non canonique (`*.vercel.app`, domaines de preview) -> 200 mais entete **`X-Robots-Tag: noindex, nofollow`**.
+  - Hotes locaux (`localhost`, `127.0.0.1`, `0.0.0.0`, `*.local`) jamais touches.
+  - L'hote est lu depuis l'entete `Host` (et non `request.nextUrl.hostname`, que Next reconstruit sur l'hote d'ecoute : sans effet pour une requete spoofee en test local).
+  - `matcher` elargi a toutes les pages : `"/((?!api/|_next/static|_next/image|.*\\.[^/]+$).*)"` (exclut API, assets et fichiers a extension) ; le middleware doit pouvoir poser l'entete sur n'importe quelle route.
+- Source unique `SITE_URL` (`lib/seo/config.js`) : les duplications en dur sont supprimees dans `app/sitemap.js`, `app/robots.js`, `app/blog/[slug]/page.jsx`, `lib/utils/prixGuides.js` (re-export) et le JSON-LD `Organization` inline de `components/layout/Footer.jsx`.
+
+Verifie sur `next start -p 3117` (entetes `Host` spoofees via `curl.exe`) :
+- `Host: tekalis.vercel.app` sur `/products` -> 200 + `x-robots-tag: noindex, nofollow` ;
+- `Host: www.tekalis.com` sur `/products` -> **308** `location: https://tekalis.com/products` ;
+- `Host: tekalis.com` et `localhost` -> 200, aucun entete de garde.
+`seo:check` : **OK**. `seo:content` : 18 ecarts **pre-existants** (derive de donnees, hors perimetre de cette correction : categorie API `climatiseurs` absente de `categoryContent.js`, marques/modeles au-dela de la page API de 200 produits).
+
 ## Points d'attention
 - `permanentRedirect()` produit un **308** (App Router) au lieu d'un 301. Equivalent pour Google, aucun impact negatif.
 - Suppression de `app/loading.jsx` globale : navigation vers pages attend l'API sans spinner global (compromis accepte pour avoir des statuts HTTP exacts).

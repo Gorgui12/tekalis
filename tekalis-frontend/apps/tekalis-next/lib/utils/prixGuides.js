@@ -6,7 +6,9 @@
 // pour que chaque guide affiche les prix du jour (fraîcheur + CTR).
 // ─────────────────────────────────────────────────────────────────────────────
 
-export const SITE_URL = 'https://tekalis.com';
+import { SITE_URL } from '@/lib/seo/config';
+
+export { SITE_URL };
 
 export const PRIX_GUIDES = [
   {

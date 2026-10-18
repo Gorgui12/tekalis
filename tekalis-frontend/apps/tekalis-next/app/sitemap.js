@@ -1,8 +1,6 @@
 import { PRIX_GUIDES } from '@/lib/utils/prixGuides';
-import { KNOWN_CATEGORY_SLUGS, categoryPath, productPath, articlePath } from '@/lib/seo/config';
+import { KNOWN_CATEGORY_SLUGS, SITE_URL, categoryPath, productPath, articlePath } from '@/lib/seo/config';
 import { kitPresetSlugs } from '@/lib/solar/presets';
-
-const SITE_URL = 'https://tekalis.com';
 
 const STATIC_PAGES = [
   { url: '/', priority: 1.0, changeFrequency: 'daily' },

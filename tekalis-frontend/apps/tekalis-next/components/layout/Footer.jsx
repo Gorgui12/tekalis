@@ -7,6 +7,7 @@ import {
   FaArrowUp, FaHeart, FaShieldAlt, FaTruck
 } from "react-icons/fa";
 import { SOCIAL_LINKS } from "@/lib/utils/constants";
+import { SITE_URL } from "@/lib/seo/config";
 import { openConsentBanner } from "@/lib/analytics";
 import NewsletterForm from "../shared/NewsletterForm";
 
@@ -263,8 +264,8 @@ const Footer = () => {
           "@context": "https://schema.org",
           "@type": "Organization",
           "name": "Tekalis",
-          "url": "https://tekalis.com",
-          "logo": "https://tekalis.com/og-image.png",
+          "url": SITE_URL,
+          "logo": `${SITE_URL}/og-image.png`,
           "description": "Boutique en ligne au Sénégal - Produits de qualité, livraison rapide",
           "address": {
             "@type": "PostalAddress",
