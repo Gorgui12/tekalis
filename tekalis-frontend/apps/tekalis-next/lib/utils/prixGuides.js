@@ -469,6 +469,7 @@ export const PRIX_GUIDES = [
     summary: "Le prix du Samsung Galaxy S10 en FCFA au Sénégal, modèles en stock.",
     query: ['samsung s10 prix en fcfa', 'samsung galaxy s10 prix senegal', 'galaxy s10 prix dakar'],
     search: 'Galaxy S10',
+    excludeTerms: ['S10+'],
     categorySlug: 'smartphones',
     keywords: [
       'samsung s10 prix en fcfa', 'samsung galaxy s10 prix senegal',
@@ -489,8 +490,573 @@ export const PRIX_GUIDES = [
       },
     ],
   },
+  {
+    slug: 'iphone-11-prix-dakar',
+    title: 'Prix iPhone 11 à Dakar en FCFA — Tekalis Sénégal',
+    metaDescription:
+      "Prix de l'iPhone 11 simple à Dakar en FCFA : modèles 64 et 128 Go en stock chez Tekalis, état indiqué sur chaque fiche, livraison 24-48h au Sénégal.",
+    h1: "Prix de l'iPhone 11 à Dakar et au Sénégal en FCFA",
+    intro:
+      "Ce guide couvre l'iPhone 11 simple, en 64 Go et 128 Go, dans ses versions neuves et importées « Venant » disponibles chez Tekalis. Les iPhone 11 Pro et iPhone 11 Pro Max ne sont pas inclus ici : ils disposent de leur propre guide de prix. Pour chaque appareil, l'état exact est indiqué sur la fiche produit.",
+    summary: "Le prix de l'iPhone 11 simple à Dakar, modèles 64 et 128 Go en stock.",
+    query: ['iphone 11 simple prix en fcfa', 'prix iphone 11 sénégal', 'prix iphone 11 dakar'],
+    search: 'iPhone 11',
+    excludeTerms: ['Pro'],
+    categorySlug: 'smartphones',
+    keywords: [
+      'iphone 11 simple prix en fcfa', 'prix iphone 11 sénégal', 'prix iphone 11 dakar',
+      'iphone 11 64 go prix', 'iphone 11 128 go prix',
+    ],
+    seeAlso: [{ slug: 'iphone-11-pro-max-prix-dakar', label: "l'iPhone 11 Pro Max" }],
+    related: ['iphone-12-prix-dakar', 'iphone-xr-prix-dakar', 'iphone-11-pro-max-prix-dakar'],
+    faqs: [
+      {
+        q: "Quel est le prix de l'iPhone 11 simple à Dakar en FCFA ?",
+        a: "Le prix de l'iPhone 11 simple dépend de la capacité (64 Go ou 128 Go) et de la version (neuve ou import « Venant »). Les modèles disponibles et leurs prix du jour sont affichés ci-dessous en FCFA.",
+      },
+      {
+        q: "Quelles capacités d'iPhone 11 sont disponibles chez Tekalis ?",
+        a: "Le catalogue propose des iPhone 11 en 64 Go et en 128 Go. Les capacités réellement en stock apparaissent sur chaque fiche produit, avec le prix correspondant en FCFA.",
+      },
+      {
+        q: "Les iPhone 11 « Venant » sont-ils neufs ?",
+        a: "Les modèles listés avec la mention « Venant » sont des imports. L'état réel de chaque appareil est indiqué sur sa fiche produit ; Tekalis n'affiche aucune mention « neuf » pour ces modèles.",
+      },
+      {
+        q: "Peut-on payer l'iPhone 11 à la livraison à Dakar ?",
+        a: "Oui. Tekalis accepte le paiement à la livraison, Wave, Orange Money et Free Money. La livraison à Dakar est offerte dès 50 000 FCFA d'achat.",
+      },
+      {
+        q: "Livrez-vous l'iPhone 11 en dehors de Dakar ?",
+        a: "Oui, la livraison est assurée en 24-48h à Dakar et dans les régions du Sénégal. Les délais et frais exacts sont rappelés sur la page Livraison.",
+      },
+    ],
+  },
+  {
+    slug: 'iphone-15-prix-dakar',
+    title: 'Prix iPhone 15 à Dakar en FCFA — Tekalis Sénégal',
+    metaDescription:
+      "Prix de l'iPhone 15 simple à Dakar en FCFA : modèles 128 et 256 Go en stock. Pour l'iPhone 15 Pro et Pro Max, voir le guide dédié au Sénégal.",
+    h1: "Prix de l'iPhone 15 à Dakar et au Sénégal en FCFA",
+    intro:
+      "Ce guide présente l'iPhone 15 simple et l'iPhone 15 Plus disponibles chez Tekalis, avec leurs prix en FCFA et leurs capacités réelles. L'iPhone 15 Pro et l'iPhone 15 Pro Max sont traités séparément pour éviter de mélanger les modèles : consultez le guide des prix iPhone 15 Pro. L'état et la garantie de chaque appareil sont ceux indiqués sur sa fiche produit.",
+    summary: "Le prix de l'iPhone 15 simple et du 15 Plus à Dakar, modèles en stock.",
+    query: ['iphone 15 simple prix en fcfa', 'iphone 15 prix sénégal', 'prix iphone 15 dakar'],
+    search: 'iPhone 15',
+    excludeTerms: ['Pro'],
+    categorySlug: 'smartphones',
+    keywords: [
+      'iphone 15 simple prix en fcfa', 'iphone 15 prix sénégal', 'prix iphone 15 dakar',
+      'iphone 15 128 go prix', 'iphone 15 256 go prix',
+    ],
+    seeAlso: [{ slug: 'iphone-15-pro-prix-dakar', label: "l'iPhone 15 Pro et Pro Max" }],
+    related: ['iphone-15-pro-prix-dakar', 'iphone-14-plus-prix-dakar', 'iphone-16-prix-dakar'],
+    faqs: [
+      {
+        q: "Quel est le prix de l'iPhone 15 simple à Dakar en FCFA ?",
+        a: "Le prix de l'iPhone 15 simple varie selon la capacité (128 Go ou 256 Go). Les modèles en stock et leurs prix du jour en FCFA sont listés ci-dessous.",
+      },
+      {
+        q: "Quelles capacités d'iPhone 15 sont proposées ?",
+        a: "Le catalogue contient des iPhone 15 en 128 Go et 256 Go, ainsi qu'un iPhone 15 Plus en 128 Go eSIM. Vérifiez la capacité exacte sur chaque fiche produit avant de commander.",
+      },
+      {
+        q: "Quelle différence entre l'iPhone 15 et l'iPhone 15 Pro ?",
+        a: "L'iPhone 15 simple et le 15 Plus figurent dans ce guide, tandis que l'iPhone 15 Pro et le 15 Pro Max ont leur propre guide de prix. Comparez les fiches produit pour les caractéristiques et le prix de chaque version.",
+      },
+      {
+        q: "Peut-on payer l'iPhone 15 avec Wave ou Orange Money ?",
+        a: "Oui. Le paiement à la livraison, Wave, Orange Money et Free Money sont acceptés. La livraison à Dakar est offerte dès 50 000 FCFA d'achat.",
+      },
+      {
+        q: "L'iPhone 15 est-il livré partout au Sénégal ?",
+        a: "Oui, Tekalis livre à Dakar en 24-48h et dans les autres régions du Sénégal. Les modalités et frais sont détaillés sur la page Livraison.",
+      },
+    ],
+  },
+  {
+    slug: 'iphone-15-pro-prix-dakar',
+    title: 'Prix iPhone 15 Pro à Dakar en FCFA — Tekalis Sénégal',
+    metaDescription:
+      "Prix de l'iPhone 15 Pro et Pro Max à Dakar en FCFA : modèles Pro et Pro Max en stock chez Tekalis, dont 256 Go. Livraison 24-48h au Sénégal.",
+    h1: "Prix de l'iPhone 15 Pro à Dakar et au Sénégal en FCFA",
+    intro:
+      "Ce guide regroupe uniquement l'iPhone 15 Pro et l'iPhone 15 Pro Max disponibles chez Tekalis, avec leurs prix en FCFA. L'iPhone 15 simple et l'iPhone 15 Plus sont présentés dans le guide des prix iPhone 15, pour que chaque recherche trouve le bon modèle. Les capacités et l'état exact de chaque appareil sont indiqués sur sa fiche produit.",
+    summary: "Le prix de l'iPhone 15 Pro et du 15 Pro Max à Dakar, modèles en stock.",
+    query: ['iphone 15 pro prix sénégal', 'iphone 15 pro max prix', 'prix iphone 15 pro dakar'],
+    search: 'iPhone 15 Pro',
+    categorySlug: 'smartphones',
+    keywords: [
+      'iphone 15 pro prix sénégal', 'iphone 15 pro max prix', 'prix iphone 15 pro dakar',
+      'iphone 15 pro 256 go prix', 'iphone 15 pro max 256 go prix',
+    ],
+    seeAlso: [{ slug: 'iphone-15-prix-dakar', label: "l'iPhone 15 simple et le 15 Plus" }],
+    related: ['iphone-15-prix-dakar', 'iphone-16-prix-dakar', 'iphone-14-plus-prix-dakar'],
+    faqs: [
+      {
+        q: "Quel est le prix de l'iPhone 15 Pro à Dakar en FCFA ?",
+        a: "Le prix de l'iPhone 15 Pro dépend de la version et de la capacité. Les iPhone 15 Pro et Pro Max en stock sont affichés ci-dessous avec leur prix du jour en FCFA.",
+      },
+      {
+        q: "Quelle différence entre l'iPhone 15 Pro et l'iPhone 15 Pro Max ?",
+        a: "Les deux modèles sont listés séparément dans ce guide, avec leurs propres capacités et prix. Comparez les fiches produit pour choisir la version qui correspond à votre budget.",
+      },
+      {
+        q: "Le guide couvre-t-il aussi l'iPhone 15 simple ?",
+        a: "Non. L'iPhone 15 simple et l'iPhone 15 Plus sont couverts par le guide des prix iPhone 15. Ce guide se concentre sur les versions Pro et Pro Max.",
+      },
+      {
+        q: "Peut-on payer l'iPhone 15 Pro à la livraison ?",
+        a: "Oui, le paiement à la livraison est disponible à Dakar. Tekalis accepte aussi Wave, Orange Money et Free Money, avec livraison offerte dès 50 000 FCFA d'achat.",
+      },
+      {
+        q: "Livrez-vous l'iPhone 15 Pro Max au Sénégal ?",
+        a: "Oui, la livraison est assurée en 24-48h à Dakar et dans les autres régions du Sénégal. Consultez la page Livraison pour les délais et frais de votre zone.",
+      },
+    ],
+  },
+  {
+    slug: 'iphone-16-prix-dakar',
+    title: 'Prix iPhone 16 à Dakar en FCFA — Tekalis Sénégal',
+    metaDescription:
+      "Prix de l'iPhone 16 à Dakar en FCFA : modèles 128 Go et 256 Go en stock chez Tekalis. Livraison 24-48h à Dakar et au Sénégal, paiement à la livraison.",
+    h1: "Prix de l'iPhone 16 à Dakar et au Sénégal en FCFA",
+    intro:
+      "Ce guide rassemble les iPhone 16 en 128 Go et 256 Go actuellement proposés par Tekalis, avec leurs prix en FCFA. Pour comparer avec le modèle précédent, consultez le guide des prix iPhone 15. Les caractéristiques, l'état et la garantie de chaque appareil sont ceux de sa fiche produit.",
+    summary: "Le prix de l'iPhone 16 à Dakar, modèles 128 Go et 256 Go en stock.",
+    query: ['iphone 16 256 go prix sénégal', 'prix iphone 16 dakar', 'iphone 16 prix fcfa'],
+    search: 'iPhone 16',
+    categorySlug: 'smartphones',
+    keywords: [
+      'iphone 16 256 go prix sénégal', 'prix iphone 16 dakar', 'iphone 16 prix fcfa',
+      'iphone 16 128 go prix', 'acheter iphone 16 sénégal',
+    ],
+    seeAlso: [{ slug: 'iphone-15-prix-dakar', label: "l'iPhone 15" }],
+    related: ['iphone-15-prix-dakar', 'iphone-15-pro-prix-dakar', 'iphone-14-plus-prix-dakar'],
+    faqs: [
+      {
+        q: "Quel est le prix de l'iPhone 16 à Dakar en FCFA ?",
+        a: "Le prix de l'iPhone 16 dépend de la capacité choisie. Les modèles 128 Go et 256 Go en stock sont affichés ci-dessous avec leur prix du jour en FCFA.",
+      },
+      {
+        q: "Combien coûte l'iPhone 16 256 Go au Sénégal ?",
+        a: "L'iPhone 16 256 Go figure dans la liste ci-dessous avec son prix actualisé en FCFA. Le prix peut évoluer selon le stock : consultez la fiche produit pour le montant exact.",
+      },
+      {
+        q: "Quelle différence entre l'iPhone 16 et l'iPhone 15 ?",
+        a: "Les deux modèles ont des fiches produit distinctes. Pour comparer les capacités et les prix, ouvrez le guide des prix iPhone 15 puis les fiches de chaque modèle.",
+      },
+      {
+        q: "Peut-on payer l'iPhone 16 à la livraison à Dakar ?",
+        a: "Oui. Tekalis accepte le paiement à la livraison, Wave, Orange Money et Free Money. La livraison à Dakar est offerte dès 50 000 FCFA d'achat.",
+      },
+      {
+        q: "Livrez-vous l'iPhone 16 dans les régions du Sénégal ?",
+        a: "Oui, la livraison est assurée à Dakar en 24-48h et dans les autres régions du Sénégal. Les délais et frais sont détaillés sur la page Livraison.",
+      },
+    ],
+  },
+  {
+    slug: 'iphone-12-mini-prix-dakar',
+    title: 'Prix iPhone 12 mini à Dakar en FCFA — Tekalis Sénégal',
+    metaDescription:
+      "Prix de l'iPhone 12 Mini à Dakar en FCFA : modèle compact 64 Go en stock chez Tekalis, état indiqué sur la fiche. Livraison 24-48h au Sénégal.",
+    h1: "Prix de l'iPhone 12 Mini à Dakar et au Sénégal en FCFA",
+    intro:
+      "Ce guide est consacré à l'iPhone 12 Mini, le format compact de la gamme iPhone 12, avec les modèles en stock chez Tekalis et leurs prix en FCFA. L'iPhone 12 standard est couvert par un autre guide de prix. Pour le Mini comme pour le standard, l'état exact de chaque appareil est indiqué sur sa fiche produit.",
+    summary: "Le prix de l'iPhone 12 Mini à Dakar, modèle compact en stock.",
+    query: ['iphone 12 mini prix en fcfa', 'iphone 12 mini prix sénégal', 'prix iphone 12 mini dakar'],
+    search: 'iPhone 12 mini',
+    categorySlug: 'smartphones',
+    keywords: [
+      'iphone 12 mini prix en fcfa', 'iphone 12 mini prix sénégal', 'prix iphone 12 mini dakar',
+      'iphone 12 mini 64 go prix', 'acheter iphone 12 mini sénégal',
+    ],
+    seeAlso: [{ slug: 'iphone-12-prix-dakar', label: "l'iPhone 12 standard" }],
+    related: ['iphone-12-prix-dakar', 'iphone-13-prix-dakar', 'iphone-11-prix-dakar'],
+    faqs: [
+      {
+        q: "Quel est le prix de l'iPhone 12 Mini à Dakar en FCFA ?",
+        a: "Le prix de l'iPhone 12 Mini dépend de la capacité et de la version disponible. Les modèles en stock et leurs prix du jour en FCFA sont affichés ci-dessous.",
+      },
+      {
+        q: "Quelle différence entre l'iPhone 12 Mini et l'iPhone 12 standard ?",
+        a: "L'iPhone 12 Mini est le format compact de la gamme ; l'iPhone 12 standard a son propre guide de prix. Comparez les fiches produit pour la taille, la capacité et le prix.",
+      },
+      {
+        q: "L'iPhone 12 Mini « Venant » est-il neuf ?",
+        a: "Le modèle listé avec la mention « Venant » est un import. L'état réel de l'appareil est indiqué sur sa fiche produit ; Tekalis n'affiche aucune mention « neuf » pour ce modèle.",
+      },
+      {
+        q: "Peut-on payer l'iPhone 12 Mini à la livraison ?",
+        a: "Oui. Le paiement à la livraison, Wave, Orange Money et Free Money sont acceptés. La livraison à Dakar est offerte dès 50 000 FCFA d'achat.",
+      },
+      {
+        q: "Livrez-vous l'iPhone 12 Mini partout au Sénégal ?",
+        a: "Oui, Tekalis livre à Dakar en 24-48h et dans les autres régions du Sénégal. Les délais et frais sont rappelés sur la page Livraison.",
+      },
+    ],
+  },
+  {
+    slug: 'iphone-8-plus-prix-dakar',
+    title: 'Prix iPhone 8 et 8 Plus en FCFA à Dakar — Tekalis Sénégal',
+    metaDescription:
+      "Prix de l'iPhone 8 et 8 Plus à Dakar en FCFA : modèles 64 Go importés « Venant » en stock chez Tekalis, état indiqué sur la fiche. Livraison 24-48h au Sénégal.",
+    h1: "Prix de l'iPhone 8 et 8 Plus à Dakar et au Sénégal en FCFA",
+    intro:
+      "Ce guide réunit l'iPhone 8 et l'iPhone 8 Plus en 64 Go disponibles chez Tekalis, avec leurs prix en FCFA. Les modèles listés sont des imports « Venant » : l'état exact de chaque appareil est indiqué sur sa fiche. Pour un modèle plus récent, consultez le guide des prix iPhone XR.",
+    summary: "Le prix de l'iPhone 8 et 8 Plus à Dakar, modèles 64 Go en stock.",
+    query: ['iphone 8 plus prix en fcfa', 'iphone 8 prix dakar', 'iphone 8 plus prix sénégal'],
+    search: 'iPhone 8',
+    excludeTerms: ['Chargeur', 'Câble', 'Adaptateur'],
+    categorySlug: 'smartphones',
+    keywords: [
+      'iphone 8 plus prix en fcfa', 'iphone 8 prix dakar', 'iphone 8 plus prix sénégal',
+      'iphone 8 64 go prix', 'acheter iphone 8 plus dakar',
+    ],
+    seeAlso: [{ slug: 'iphone-xr-prix-dakar', label: "l'iPhone XR" }],
+    related: ['iphone-xr-prix-dakar', 'iphone-11-prix-dakar', 'iphone-11-pro-max-prix-dakar'],
+    faqs: [
+      {
+        q: "Quel est le prix de l'iPhone 8 et de l'iPhone 8 Plus à Dakar ?",
+        a: "Les iPhone 8 et iPhone 8 Plus en 64 Go sont affichés ci-dessous avec leur prix du jour en FCFA. Le prix dépend du modèle et de l'état indiqué sur la fiche.",
+      },
+      {
+        q: "Quelle différence entre l'iPhone 8 et l'iPhone 8 Plus ?",
+        a: "Les deux modèles sont listés séparément dans ce guide, avec leurs propres fiches produit. Comparez-les pour la taille, le prix et l'état avant de choisir.",
+      },
+      {
+        q: "Les iPhone 8 et 8 Plus proposés sont-ils neufs ?",
+        a: "Les modèles listés portent la mention « Venant » (import). L'état réel de chaque appareil est indiqué sur sa fiche produit ; Tekalis n'affiche aucune mention « neuf » pour ces modèles.",
+      },
+      {
+        q: "Peut-on payer un iPhone 8 à la livraison à Dakar ?",
+        a: "Oui. Tekalis accepte le paiement à la livraison, Wave, Orange Money et Free Money. La livraison à Dakar est offerte dès 50 000 FCFA d'achat.",
+      },
+      {
+        q: "Livrez-vous l'iPhone 8 Plus en dehors de Dakar ?",
+        a: "Oui, la livraison est assurée en 24-48h à Dakar et dans les régions du Sénégal. Les délais et frais sont détaillés sur la page Livraison.",
+      },
+    ],
+  },
+  {
+    slug: 'iphone-17-pro-max-prix-dakar',
+    title: 'Prix iPhone 17 Pro Max à Dakar en FCFA — Tekalis Sénégal',
+    metaDescription:
+      "Prix de l'iPhone 17 Pro et Pro Max à Dakar en FCFA : modèle 256 Go eSIM en stock chez Tekalis. Livraison 24-48h au Sénégal, paiement à la livraison.",
+    h1: "Prix de l'iPhone 17 Pro Max à Dakar et au Sénégal en FCFA",
+    intro:
+      "Ce guide suit l'iPhone 17 Pro et l'iPhone 17 Pro Max proposés par Tekalis, avec leur prix en FCFA et la capacité réellement disponible. Le modèle en stock est une version 256 Go eSIM. Pour comparer avec la génération précédente, consultez le guide des prix iPhone 16.",
+    summary: "Le prix de l'iPhone 17 Pro Max à Dakar, modèle 256 Go eSIM en stock.",
+    query: ['iphone 17 pro max prix en fcfa', 'iphone 17 prix sénégal', 'prix iphone 17 dakar'],
+    search: 'iPhone 17',
+    categorySlug: 'smartphones',
+    keywords: [
+      'iphone 17 pro max prix en fcfa', 'iphone 17 prix sénégal', 'prix iphone 17 dakar',
+      'iphone 17 pro prix', 'iphone 17 pro max 256 go',
+    ],
+    seeAlso: [{ slug: 'iphone-16-prix-dakar', label: "l'iPhone 16" }],
+    related: ['iphone-16-prix-dakar', 'iphone-15-pro-prix-dakar', 'iphone-15-prix-dakar'],
+    faqs: [
+      {
+        q: "Quel est le prix de l'iPhone 17 Pro Max à Dakar en FCFA ?",
+        a: "Le prix de l'iPhone 17 Pro Max est affiché ci-dessous en FCFA pour le modèle en stock. Consultez la fiche produit pour le montant exact et la disponibilité du jour.",
+      },
+      {
+        q: "Quelle version de l'iPhone 17 est disponible chez Tekalis ?",
+        a: "Le catalogue propose un iPhone 17 Pro / Pro Max en 256 Go eSIM. La fiche produit précise la version et la capacité exactes de l'appareil.",
+      },
+      {
+        q: "Quelle différence entre l'iPhone 17 Pro et l'iPhone 17 Pro Max ?",
+        a: "Les deux versions sont regroupées dans ce guide. Ouvrez la fiche produit correspondante pour comparer le format, la capacité et le prix avant de commander.",
+      },
+      {
+        q: "Peut-on payer l'iPhone 17 Pro Max à la livraison ?",
+        a: "Oui. Tekalis accepte le paiement à la livraison à Dakar, ainsi que Wave, Orange Money et Free Money. La livraison est offerte dès 50 000 FCFA d'achat.",
+      },
+      {
+        q: "Livrez-vous l'iPhone 17 Pro Max au Sénégal ?",
+        a: "Oui, la livraison est assurée en 24-48h à Dakar et dans les autres régions du Sénégal. Consultez la page Livraison pour les délais et frais.",
+      },
+    ],
+  },
+  {
+    slug: 'samsung-galaxy-s21-prix-fcfa',
+    title: 'Prix Samsung Galaxy S21 en FCFA — Tekalis Sénégal',
+    metaDescription:
+      "Prix du Samsung Galaxy S21 5G à Dakar en FCFA : modèle 128 Go importé « Venant » en stock, état indiqué sur la fiche. Livraison 24-48h au Sénégal.",
+    h1: 'Prix du Samsung Galaxy S21 en FCFA au Sénégal',
+    intro:
+      "Ce guide présente le Samsung Galaxy S21 5G en 128 Go disponible chez Tekalis, avec son prix en FCFA. Il s'agit d'un import « Venant » : l'état exact est indiqué sur sa fiche produit. Pour les générations précédentes, consultez le guide des prix Galaxy S10 et S10+.",
+    summary: "Le prix du Samsung Galaxy S21 5G en FCFA au Sénégal, modèle en stock.",
+    query: ['samsung s21 prix en fcfa', 'galaxy s21 prix sénégal', 'samsung s21 prix dakar'],
+    search: 'Galaxy S21',
+    categorySlug: 'smartphones',
+    keywords: [
+      'samsung s21 prix en fcfa', 'galaxy s21 prix sénégal', 'samsung s21 prix dakar',
+      'galaxy s21 128 go prix', 'samsung galaxy s21 5g prix',
+    ],
+    seeAlso: [{ slug: 'samsung-galaxy-s10-prix-fcfa', label: 'le Galaxy S10 et S10+' }],
+    related: ['samsung-galaxy-s20-fe-prix-fcfa', 'samsung-galaxy-s10-prix-fcfa', 'samsung-galaxy-s10-plus-prix-fcfa'],
+    faqs: [
+      {
+        q: "Quel est le prix du Samsung Galaxy S21 en FCFA ?",
+        a: "Le prix du Galaxy S21 5G en stock est affiché ci-dessous en FCFA. Il s'agit d'un import « Venant » : consultez la fiche pour le prix du jour et l'état exact.",
+      },
+      {
+        q: "Le Galaxy S21 proposé est-il neuf ou d'occasion ?",
+        a: "Le modèle listé porte la mention « Venant » (import). L'état réel est indiqué sur sa fiche produit ; Tekalis n'affiche aucune mention « neuf » pour ce modèle.",
+      },
+      {
+        q: "Quelle capacité de stockage pour le Galaxy S21 ?",
+        a: "Le modèle disponible chez Tekalis est un Galaxy S21 5G en 128 Go. La capacité est rappelée sur la fiche produit avec le prix en FCFA.",
+      },
+      {
+        q: "Le Galaxy S21 est-il compatible 5G au Sénégal ?",
+        a: "Le modèle en stock est identifié comme Samsung Galaxy S21 5G. Vérifiez les caractéristiques réseau détaillées sur la fiche produit avant de commander.",
+      },
+      {
+        q: "Peut-on payer le Galaxy S21 à la livraison à Dakar ?",
+        a: "Oui. Tekalis accepte le paiement à la livraison, Wave, Orange Money et Free Money. La livraison à Dakar est offerte dès 50 000 FCFA d'achat.",
+      },
+    ],
+  },
+  {
+    slug: 'samsung-galaxy-s10-plus-prix-fcfa',
+    title: 'Prix Samsung Galaxy S10+ en FCFA — Tekalis Sénégal',
+    metaDescription:
+      "Prix du Samsung Galaxy S10+ à Dakar en FCFA : modèle 128 Go importé « Venant » en stock, état indiqué sur la fiche. Livraison 24-48h au Sénégal.",
+    h1: 'Prix du Samsung Galaxy S10+ en FCFA au Sénégal',
+    intro:
+      "Ce guide est dédié au Samsung Galaxy S10+ en 128 Go, avec son prix en FCFA chez Tekalis. Le modèle listé est un import « Venant » : l'état exact est indiqué sur sa fiche produit. Le Galaxy S10 standard est présenté dans le guide des prix Galaxy S10.",
+    summary: "Le prix du Samsung Galaxy S10+ en FCFA au Sénégal, modèle en stock.",
+    query: ['samsung s10 plus prix sénégal', 'samsung galaxy s10 plus prix fcfa', 'galaxy s10+ prix dakar'],
+    search: 'S10+',
+    categorySlug: 'smartphones',
+    keywords: [
+      'samsung s10 plus prix sénégal', 'samsung galaxy s10 plus prix fcfa',
+      'galaxy s10+ prix dakar', 'galaxy s10 plus 128 go prix',
+    ],
+    seeAlso: [{ slug: 'samsung-galaxy-s10-prix-fcfa', label: 'le Galaxy S10 standard' }],
+    related: ['samsung-galaxy-s10-prix-fcfa', 'samsung-galaxy-s21-prix-fcfa', 'samsung-galaxy-s20-fe-prix-fcfa'],
+    faqs: [
+      {
+        q: "Quel est le prix du Samsung Galaxy S10+ en FCFA ?",
+        a: "Le prix du Galaxy S10+ en 128 Go est affiché ci-dessous en FCFA. Il s'agit d'un import « Venant » : consultez la fiche pour le prix du jour et l'état exact.",
+      },
+      {
+        q: "Quelle différence entre le Galaxy S10 et le Galaxy S10+ ?",
+        a: "Le Galaxy S10+ a son propre guide et sa fiche produit ; le Galaxy S10 standard est présenté dans un guide séparé. Comparez les deux fiches pour le format, la capacité et le prix.",
+      },
+      {
+        q: "Le Galaxy S10+ proposé est-il neuf ou d'occasion ?",
+        a: "Le modèle listé porte la mention « Venant » (import). L'état réel est indiqué sur sa fiche produit ; Tekalis n'affiche aucune mention « neuf » pour ce modèle.",
+      },
+      {
+        q: "Peut-on payer le Galaxy S10+ à la livraison à Dakar ?",
+        a: "Oui. Tekalis accepte le paiement à la livraison, Wave, Orange Money et Free Money. La livraison à Dakar est offerte dès 50 000 FCFA d'achat.",
+      },
+      {
+        q: "Livrez-vous le Galaxy S10+ partout au Sénégal ?",
+        a: "Oui, la livraison est assurée en 24-48h à Dakar et dans les régions du Sénégal. Les délais et frais sont détaillés sur la page Livraison.",
+      },
+    ],
+  },
+  {
+    slug: 'samsung-galaxy-a34-prix-fcfa',
+    title: 'Prix Samsung Galaxy A34 en FCFA — Tekalis Sénégal',
+    metaDescription:
+      "Prix du Samsung Galaxy A34 5G à Dakar en FCFA : modèle 128 Go / 8 Go en stock chez Tekalis. Livraison 24-48h au Sénégal, paiement à la livraison.",
+    h1: 'Prix du Samsung Galaxy A34 en FCFA au Sénégal',
+    intro:
+      "Ce guide présente le Samsung Galaxy A34 5G en 128 Go de stockage et 8 Go de RAM disponible chez Tekalis, avec son prix en FCFA. Pour comparer avec les autres Galaxy A, consultez les guides des prix Galaxy A24 et Galaxy A54. Les caractéristiques exactes sont rappelées sur la fiche produit.",
+    summary: "Le prix du Samsung Galaxy A34 5G en FCFA au Sénégal, modèle en stock.",
+    query: ['samsung a34 prix sénégal', 'galaxy a34 prix fcfa', 'samsung a34 prix dakar'],
+    search: 'A34',
+    categorySlug: 'smartphones',
+    keywords: [
+      'samsung a34 prix sénégal', 'galaxy a34 prix fcfa', 'samsung a34 prix dakar',
+      'samsung galaxy a34 5g prix', 'galaxy a34 128 go prix',
+    ],
+    seeAlso: [
+      { slug: 'samsung-galaxy-a24-prix-fcfa', label: 'le Galaxy A24' },
+      { slug: 'samsung-galaxy-a54-prix-fcfa', label: 'le Galaxy A54' },
+    ],
+    related: ['samsung-galaxy-a24-prix-fcfa', 'samsung-galaxy-a54-prix-fcfa', 'samsung-galaxy-a14-prix-fcfa'],
+    faqs: [
+      {
+        q: "Quel est le prix du Samsung Galaxy A34 en FCFA ?",
+        a: "Le prix du Galaxy A34 5G en stock est affiché ci-dessous en FCFA. Consultez la fiche produit pour le montant exact et la disponibilité du jour.",
+      },
+      {
+        q: "Quelle version du Galaxy A34 est disponible ?",
+        a: "Le catalogue propose un Samsung Galaxy A34 5G avec 128 Go de stockage et 8 Go de RAM. La fiche produit rappelle la configuration exacte.",
+      },
+      {
+        q: "Quelle différence entre le Galaxy A34, le A24 et le A54 ?",
+        a: "Chaque modèle a sa propre fiche et son guide de prix. Comparez les caractéristiques et les prix sur les fiches produit pour choisir selon votre budget.",
+      },
+      {
+        q: "Le Galaxy A34 est-il compatible 5G ?",
+        a: "Le modèle en stock est identifié comme Samsung Galaxy A34 5G. Vérifiez les caractéristiques réseau détaillées sur la fiche produit avant de commander.",
+      },
+      {
+        q: "Peut-on payer le Galaxy A34 à la livraison à Dakar ?",
+        a: "Oui. Tekalis accepte le paiement à la livraison, Wave, Orange Money et Free Money. La livraison à Dakar est offerte dès 50 000 FCFA d'achat.",
+      },
+    ],
+  },
+  {
+    slug: 'iphone-14-plus-prix-dakar',
+    title: 'Prix iPhone 14 Plus à Dakar en FCFA — Tekalis Sénégal',
+    metaDescription:
+      "Prix de l'iPhone 14 et 14 Plus à Dakar en FCFA : modèles 128 Go et 256 Go en stock chez Tekalis. Livraison 24-48h au Sénégal, paiement à la livraison.",
+    h1: "Prix de l'iPhone 14 Plus à Dakar et au Sénégal en FCFA",
+    intro:
+      "Ce guide couvre la famille iPhone 14 disponible chez Tekalis, avec un focus sur l'iPhone 14 Plus, et affiche les prix en FCFA de chaque modèle en stock. Pour situer le 14 Plus entre deux générations, consultez les guides des prix iPhone 13 et iPhone 15. L'état et la capacité exacts de chaque appareil sont indiqués sur sa fiche produit.",
+    summary: "Le prix de l'iPhone 14 Plus à Dakar, modèles 14 et 14 Plus en stock.",
+    query: ['iphone 14 plus prix', 'iphone 14 prix sénégal', 'prix iphone 14 dakar'],
+    search: 'iPhone 14',
+    categorySlug: 'smartphones',
+    keywords: [
+      'iphone 14 plus prix', 'iphone 14 prix sénégal', 'prix iphone 14 dakar',
+      'iphone 14 plus 128 go prix', 'acheter iphone 14 plus sénégal',
+    ],
+    seeAlso: [
+      { slug: 'iphone-13-prix-dakar', label: "l'iPhone 13" },
+      { slug: 'iphone-15-prix-dakar', label: "l'iPhone 15" },
+    ],
+    related: ['iphone-13-prix-dakar', 'iphone-15-prix-dakar', 'iphone-15-pro-prix-dakar'],
+    faqs: [
+      {
+        q: "Quel est le prix de l'iPhone 14 Plus à Dakar en FCFA ?",
+        a: "Le prix de l'iPhone 14 Plus est affiché ci-dessous en FCFA, avec les autres modèles iPhone 14 en stock. Consultez la fiche produit pour le montant exact.",
+      },
+      {
+        q: "Quelle différence entre l'iPhone 14 et l'iPhone 14 Plus ?",
+        a: "Les deux modèles sont listés séparément dans ce guide, avec leurs propres fiches produit. Comparez le format, la capacité et le prix avant de choisir.",
+      },
+      {
+        q: "Quelles capacités d'iPhone 14 sont disponibles ?",
+        a: "Le catalogue inclut des versions 128 Go et 256 Go selon les modèles de la gamme iPhone 14. La capacité exacte de chaque appareil est indiquée sur sa fiche produit.",
+      },
+      {
+        q: "Peut-on payer l'iPhone 14 Plus à la livraison à Dakar ?",
+        a: "Oui. Tekalis accepte le paiement à la livraison, Wave, Orange Money et Free Money. La livraison à Dakar est offerte dès 50 000 FCFA d'achat.",
+      },
+      {
+        q: "Livrez-vous l'iPhone 14 Plus dans les régions du Sénégal ?",
+        a: "Oui, la livraison est assurée en 24-48h à Dakar et dans les autres régions du Sénégal. Les délais et frais sont détaillés sur la page Livraison.",
+      },
+    ],
+  },
 ];
 
 export function getPrixGuide(slug) {
   return PRIX_GUIDES.find((guide) => guide.slug === slug) || null;
 }
+
+/** Marque d'un guide, deduite du slug quand elle n'est pas explicite. */
+export function guideBrand(guide) {
+  if (!guide) return 'Autres';
+  if (guide.brand) return guide.brand;
+  const slug = String(guide.slug || '').toLowerCase();
+  if (slug.startsWith('iphone')) return 'Apple';
+  if (slug.startsWith('samsung')) return 'Samsung';
+  return 'Autres';
+}
+
+/**
+ * Guides regroupes par marque, dans l'ordre de PRIX_GUIDES.
+ * Utilise par /prix pour afficher les liens groupes par marque.
+ */
+export function guidesByBrand() {
+  const groups = new Map();
+  for (const guide of PRIX_GUIDES) {
+    const brand = guideBrand(guide);
+    if (!groups.has(brand)) groups.set(brand, []);
+    groups.get(brand).push(guide);
+  }
+  return [...groups.entries()].map(([brand, guides]) => ({
+    brand,
+    label: brand === 'Apple' ? 'iPhone (Apple)' : brand,
+    guides,
+  }));
+}
+
+/**
+ * Guides voisins d'un guide : liens explicites (`related`) si presents,
+ * sinon meme marque (modele precedent / suivant), sans jamais inventer de slug.
+ */
+export function getRelatedGuides(guide, limit = 3) {
+  if (!guide) return [];
+
+  const explicit = (guide.related || [])
+    .map((slug) => getPrixGuide(slug))
+    .filter(Boolean);
+  if (explicit.length > 0) {
+    return explicit.filter((g) => g.slug !== guide.slug).slice(0, limit);
+  }
+
+  const brand = guideBrand(guide);
+  const brandGuides = PRIX_GUIDES.filter((g) => guideBrand(g) === brand);
+  const position = brandGuides.findIndex((g) => g.slug === guide.slug);
+  if (position === -1) return [];
+
+  const neighbors = [];
+  for (let offset = 1; offset < brandGuides.length && neighbors.length < limit; offset += 1) {
+    const previous = brandGuides[position - offset];
+    const next = brandGuides[position + offset];
+    if (previous && previous.slug !== guide.slug) neighbors.push(previous);
+    if (next && next.slug !== guide.slug && neighbors.length < limit) neighbors.push(next);
+  }
+  return neighbors.slice(0, limit);
+}
+
+/**
+ * Guide de prix correspondant a un produit de l'API.
+ * On retient la correspondance la plus specifique (search le plus long) et on
+ * respecte les exclusions du guide (ex. iPhone 11 simple vs iPhone 11 Pro).
+ */
+export function findPrixGuideForProduct(product) {
+  const name = String(product?.name || '').toLowerCase();
+  if (!name) return null;
+
+  return (
+    PRIX_GUIDES
+      .filter((guide) => guide.search)
+      .filter((guide) => name.includes(guide.search.toLowerCase()))
+      .filter((guide) =>
+        (guide.excludeTerms || []).every(
+          (term) => !name.includes(String(term).toLowerCase())
+        )
+      )
+      .sort((a, b) => b.search.length - a.search.length)[0] || null
+  );
+}
+
+/** Fil d'Ariane commun (visible + BreadcrumbList) : Accueil > Prix > modele. */
+export function prixGuideBreadcrumb(guide) {
+  if (!guide) return [];
+  return [
+    { name: 'Accueil', path: '/' },
+    { name: 'Prix', path: '/prix' },
+    { name: guide.h1, path: `/prix/${guide.slug}` },
+  ];
+}
+
+/**
+ * Les 8 guides a mettre en avant sur l'accueil.
+ * Les trois premiers sont ceux qui totalisent le plus d'impressions dans GSC ;
+ * les suivants correspondent aux modeles recherches sans guide avant ce lot.
+ */
+export const TOP_PRIX_GUIDE_SLUGS = [
+  'iphone-13-prix-dakar',
+  'iphone-xr-prix-dakar',
+  'iphone-12-prix-dakar',
+  'iphone-11-prix-dakar',
+  'iphone-15-prix-dakar',
+  'iphone-15-pro-prix-dakar',
+  'iphone-16-prix-dakar',
+  'iphone-12-mini-prix-dakar',
+];

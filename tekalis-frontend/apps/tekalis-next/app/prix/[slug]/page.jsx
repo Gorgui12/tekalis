@@ -1,8 +1,13 @@
 import { notFound } from 'next/navigation';
 import { serverFetch } from '@/lib/serverFetch';
 import PrixGuide from '@/components/product/PrixGuide';
-import { buildShippingDetails, buildReturnPolicy } from '@/lib/seo/jsonld';
-import { PRIX_GUIDES, SITE_URL, getPrixGuide } from '@/lib/utils/prixGuides';
+import { buildBreadcrumbSchema, buildShippingDetails, buildReturnPolicy } from '@/lib/seo/jsonld';
+import {
+  PRIX_GUIDES,
+  SITE_URL,
+  getPrixGuide,
+  prixGuideBreadcrumb,
+} from '@/lib/utils/prixGuides';
 
 export async function generateStaticParams() {
   return PRIX_GUIDES.map((guide) => ({ slug: guide.slug }));
@@ -14,7 +19,7 @@ export async function generateMetadata({ params }) {
   if (!guide) return { title: 'Guide des prix | Tekalis Sénégal' };
 
   return {
-    title: guide.title,
+    title: { absolute: guide.title },
     description: guide.metaDescription,
     alternates: { canonical: `${SITE_URL}/prix/${guide.slug}` },
     openGraph: {
@@ -37,7 +42,16 @@ async function fetchGuideProducts(guide) {
     if (guide.brand) url += `&brand=${encodeURIComponent(guide.brand)}`;
     if (guide.maxPrice) url += `&maxPrice=${guide.maxPrice}`;
     const res = await serverFetch(url);
-    return res?.data || res?.products || (Array.isArray(res) ? res : []);
+    const items = res?.data || res?.products || (Array.isArray(res) ? res : []);
+    if (!Array.isArray(items)) return [];
+    // Ex. guide « iPhone 11 » : on retire les 11 Pro / Pro Max, qui ont leur
+    // propre guide, sans changer la source des prix (toujours l'API produits).
+    const excluded = (guide.excludeTerms || []).map((term) => String(term).toLowerCase());
+    if (excluded.length === 0) return items;
+    return items.filter((product) => {
+      const name = String(product?.name || '').toLowerCase();
+      return excluded.every((term) => !name.includes(term));
+    });
   } catch {
     return [];
   }
@@ -88,9 +102,15 @@ export default async function PrixGuidePage({ params }) {
     })),
   };
 
+  // Meme source que le fil d'Ariane visible (components/product/PrixGuide.jsx).
+  const breadcrumbSchema = buildBreadcrumbSchema(prixGuideBreadcrumb(guide));
+
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }} />
+      {breadcrumbSchema && (
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      )}
       {guide.faqs.length > 0 && (
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       )}
