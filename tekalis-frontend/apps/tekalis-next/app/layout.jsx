@@ -1,5 +1,5 @@
 import './globals.css';
-import { Space_Grotesk, DM_Sans } from 'next/font/google';
+import localFont from 'next/font/local';
 import Providers from '@/components/shared/Providers';
 import AnalyticsProvider from '@/components/shared/AnalyticsProvider';
 import Navbar from '@/components/layout/Navbar';
@@ -22,18 +22,22 @@ import {
 } from '@/lib/seo/config';
 import { buildOrganizationSchema, buildWebSiteSchema } from '@/lib/seo/jsonld';
 
-const fontDisplay = Space_Grotesk({
-  subsets: ['latin'],
+// Polices auto-hebergees (fichiers variables complets) pour ne plus dependre
+// de Google Fonts au build : le loader `next/font/google` de Next 15.5 plantait
+// de facon intermittente quand Google renvoyait des URLs sans extension
+// (`TypeError: Cannot read properties of null (reading '1')`).
+const fontDisplay = localFont({
+  src: './fonts/SpaceGrotesk-Variable.ttf',
   variable: '--font-display',
   display: 'swap',
-  weight: ['400', '500', '600', '700'],
+  weight: '300 700',
 });
 
-const fontBody = DM_Sans({
-  subsets: ['latin'],
+const fontBody = localFont({
+  src: './fonts/DMSans-Variable.ttf',
   variable: '--font-body',
   display: 'swap',
-  weight: ['400', '500', '600', '700'],
+  weight: '100 1000',
 });
 
 export const metadata = {
