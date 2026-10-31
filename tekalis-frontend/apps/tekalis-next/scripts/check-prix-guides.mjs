@@ -63,6 +63,13 @@ const NEW_SLUGS = new Set([
   'iphone-14-plus-prix-dakar',
 ]);
 
+// Guides existants dont le title et la meta ont ete retravailles dans ce lot.
+const IMPROVED_SLUGS = new Set([
+  'iphone-13-prix-dakar',
+  'iphone-xr-prix-dakar',
+  'iphone-12-prix-dakar',
+]);
+
 const errors = [];
 const warnings = [];
 const seenSlugs = new Map();
@@ -97,10 +104,13 @@ for (const guide of PRIX_GUIDES) {
     }
     const length = guide.metaDescription.length;
     if (length < 140 || length > 160) {
-      // Regle imposee pour les guides crees dans ce lot ; les guides plus
-      // anciens sont seulement signales pour ne pas elargir le perimetre.
-      if (NEW_SLUGS.has(guide.slug)) fail(slug, 'meta', `${length} car. (140-160)`);
-      else warn(slug, 'meta', `${length} car. (hors 140-160)`);
+      // Regle imposee pour les guides crees ou retravailles dans ce lot ; les
+      // autres guides anciens sont seulement signales.
+      if (NEW_SLUGS.has(guide.slug) || IMPROVED_SLUGS.has(guide.slug)) {
+        fail(slug, 'meta', `${length} car. (140-160)`);
+      } else {
+        warn(slug, 'meta', `${length} car. (hors 140-160)`);
+      }
     }
   }
 

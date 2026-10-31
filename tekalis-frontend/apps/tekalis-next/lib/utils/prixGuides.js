@@ -13,10 +13,10 @@ export { SITE_URL };
 export const PRIX_GUIDES = [
   {
     slug: 'iphone-12-prix-dakar',
-    title: 'Prix iPhone 12 à Dakar en FCFA — Tekalis Sénégal',
+    title: 'Prix iPhone 12 simple en FCFA à Dakar — Tekalis Sénégal',
     metaDescription:
-      "Prix de l'iPhone 12 à Dakar et au Sénégal mis à jour. iPhone 12 neuf garanti 12 mois, livré en 24-48h. Paiement à la livraison, Wave, Orange Money.",
-    h1: "Prix de l'iPhone 12 à Dakar et au Sénégal en FCFA",
+      "Prix de l'iPhone 12 simple à Dakar en FCFA : modèles 64 Go et 128 Go en stock chez Tekalis, neufs ou « Venant ». Livraison 24-48h au Sénégal.",
+    h1: "Prix de l'iPhone 12 simple à Dakar et au Sénégal en FCFA",
     intro:
       "Vous cherchez le prix de l'iPhone 12 à Dakar ? Voici les modèles d'iPhone 12 disponibles en stock chez Tekalis avec leurs prix en FCFA. Certains modèles sont neufs, d'autres sont des imports « Venant » : l'état exact et le prix de chaque appareil sont indiqués sur sa fiche.",
     summary: "Le prix de l'iPhone 12 à Dakar, modèles en stock et livraison partout au Sénégal.",
@@ -52,10 +52,10 @@ export const PRIX_GUIDES = [
   },
   {
     slug: 'iphone-13-prix-dakar',
-    title: 'Prix iPhone 13 à Dakar en FCFA — Tekalis Sénégal',
+    title: 'Prix iPhone 13 simple en FCFA à Dakar — Tekalis Sénégal',
     metaDescription:
-      "Prix de l'iPhone 13 à Dakar et au Sénégal mis à jour. iPhone 13 neuf garanti, livré en 24-48h partout au Sénégal. Paiement à la livraison, Wave, Orange Money.",
-    h1: "Prix de l'iPhone 13 à Dakar et au Sénégal en FCFA",
+      "Prix de l'iPhone 13 simple à Dakar en FCFA : modèle 128 Go ou 256 Go en stock chez Tekalis. Livraison 24-48h au Sénégal, paiement à la livraison.",
+    h1: "Prix de l'iPhone 13 simple à Dakar et au Sénégal en FCFA",
     intro:
       "Besoin du prix de l'iPhone 13 à Dakar ? Retrouvez les modèles d'iPhone 13 en stock chez Tekalis avec leurs prix en FCFA. Appareils neufs, scellés, garantis 12 mois, livrés sous 24-48h à Dakar et partout au Sénégal.",
     summary: "Le prix de l'iPhone 13 à Dakar, modèles en stock et livraison au Sénégal.",
@@ -243,9 +243,9 @@ export const PRIX_GUIDES = [
   },
   {
     slug: 'iphone-xr-prix-dakar',
-    title: 'Prix iPhone XR à Dakar en FCFA — Tekalis Sénégal',
+    title: 'Prix iPhone XR 128 Go — xr prix Sénégal | Tekalis',
     metaDescription:
-      "Prix de l'iPhone XR à Dakar et au Sénégal, mis à jour. Modèles importés « Venant » en stock, livrés en 24-48h. Paiement à la livraison, Wave, Orange Money.",
+      "Prix de l'iPhone XR 128 Go à Dakar en FCFA : xr prix Sénégal, modèle importé « Venant » en stock, état sur la fiche. Livraison 24-48h au Sénégal.",
     h1: "Prix de l'iPhone XR à Dakar et au Sénégal en FCFA",
     intro:
       "Vous cherchez le prix de l'iPhone XR à Dakar ? Voici les modèles d'iPhone XR disponibles chez Tekalis avec leurs prix en FCFA. Il s'agit de modèles importés « Venant » : l'état exact de chaque appareil est indiqué sur sa fiche. Livraison 24-48h à Dakar et partout au Sénégal.",
