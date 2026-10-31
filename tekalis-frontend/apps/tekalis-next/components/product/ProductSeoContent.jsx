@@ -9,6 +9,7 @@ import {
   WARRANTY_CLAIM,
 } from '@/lib/seo/config';
 import { buildProductIntro } from '@/lib/seo/productContent';
+import { findPrixGuideForProduct } from '@/lib/utils/prixGuides';
 
 const SPEC_LABELS = {
   processor: 'Processeur',
@@ -108,6 +109,7 @@ export default function ProductSeoContent({ product, related = [], category }) {
   const inStock = availability === 'En stock';
   const specs = collectSpecs(product.specs);
   const intro = buildProductIntro(product, { price, availability });
+  const prixGuide = findPrixGuideForProduct(product);
 
   const relatedItems = (Array.isArray(related) ? related : [])
     .filter((item) => item && (item.slug || item._id))
@@ -200,6 +202,18 @@ export default function ProductSeoContent({ product, related = [], category }) {
             </li>
           )}
         </ul>
+        {prixGuide && (
+          <p className="mt-4 text-sm text-surface-600 dark:text-surface-400">
+            Comparez les modèles et les prix du jour dans le guide{' '}
+            <Link
+              href={`/prix/${prixGuide.slug}`}
+              className="font-semibold text-brand-600 dark:text-brand-400 hover:underline"
+            >
+              prix {prixGuide.search} à Dakar en FCFA
+            </Link>
+            .
+          </p>
+        )}
       </div>
 
       <div className="mt-8 grid gap-8 lg:grid-cols-2">

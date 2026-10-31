@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { PRIX_GUIDES, SITE_URL } from '@/lib/utils/prixGuides';
+import { guidesByBrand, SITE_URL } from '@/lib/utils/prixGuides';
 
 export const metadata = {
   title: {
@@ -17,6 +17,23 @@ alternates: { canonical: `${SITE_URL}/prix` },
     locale: 'fr_SN',
   },
 };
+
+function GuideCard({ guide }) {
+  return (
+    <Link
+      href={`/prix/${guide.slug}`}
+      className="group bg-white dark:bg-surface-800 rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-300 p-6 border border-surface-100 dark:border-surface-700 flex flex-col"
+    >
+      <h3 className="text-lg font-bold font-display text-surface-900 dark:text-white mb-2 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition">
+        {guide.h1}
+      </h3>
+      <p className="text-sm text-surface-600 dark:text-surface-400 flex-grow">{guide.summary}</p>
+      <span className="mt-4 text-sm font-semibold text-brand-600 dark:text-brand-400">
+        Voir les prix en FCFA →
+      </span>
+    </Link>
+  );
+}
 
 export default function PrixIndexPage() {
   const schema = {
@@ -48,22 +65,22 @@ export default function PrixIndexPage() {
           </p>
         </div>
 
-        {/* Liste des guides */}
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {PRIX_GUIDES.map((guide) => (
-            <Link
-              key={guide.slug}
-              href={`/prix/${guide.slug}`}
-              className="group bg-white dark:bg-surface-800 rounded-2xl shadow-card hover:shadow-card-hover transition-all duration-300 p-6 border border-surface-100 dark:border-surface-700 flex flex-col"
-            >
-              <h2 className="text-lg font-bold font-display text-surface-900 dark:text-white mb-2 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition">
-                {guide.h1}
+        {/* Liste des guides, groupee par marque */}
+        <div className="space-y-10">
+          {guidesByBrand().map((group) => (
+            <section key={group.brand} aria-labelledby={`guides-${group.brand.toLowerCase()}`}>
+              <h2
+                id={`guides-${group.brand.toLowerCase()}`}
+                className="text-xl md:text-2xl font-bold font-display text-surface-900 dark:text-white mb-4"
+              >
+                Guides de prix {group.label}
               </h2>
-              <p className="text-sm text-surface-600 dark:text-surface-400 flex-grow">{guide.summary}</p>
-              <span className="mt-4 text-sm font-semibold text-brand-600 dark:text-brand-400">
-                Voir les prix en FCFA →
-              </span>
-            </Link>
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {group.guides.map((guide) => (
+                  <GuideCard key={guide.slug} guide={guide} />
+                ))}
+              </div>
+            </section>
           ))}
         </div>
 

@@ -152,3 +152,31 @@ Ces fichiers restent non suivis (untracked) et ne seront pas commits.## [2026-10
 oindex,nofollow (login/register, dashboard/wishlist/checkout) ? OK via uildPrivateMetadata/middleware.
 - Apr�s impl�mentation : build OK, seo:check OK. Mettre � jour changelog et committer.
 
+
+## [2026-10-31] Guides de prix iPhone/Samsung + maillage interne
+
+### 11 nouveaux guides
+- `iphone-11-prix-dakar`, `iphone-15-prix-dakar`, `iphone-15-pro-prix-dakar`, `iphone-16-prix-dakar`, `iphone-12-mini-prix-dakar`, `iphone-8-plus-prix-dakar`, `iphone-17-pro-max-prix-dakar`, `samsung-galaxy-s21-prix-fcfa`, `samsung-galaxy-s10-plus-prix-fcfa`, `samsung-galaxy-a34-prix-fcfa`, `iphone-14-plus-prix-dakar`.
+- Chaque guide a une intro et des FAQ propres, au moins 4 FAQ, et des prix servis par l'API (aucun prix, etat ou garantie invente).
+- `excludeTerms` pour eviter les variantes couvertes ailleurs : iPhone 11/15 sans Pro, iPhone 8 sans chargeur, iPhone 14 sans Pro, Galaxy S10 sans S10+.
+
+### Titles/metas retravailles
+- iPhone 13 : requete « iphone 13 simple prix en fcfa » integree au title, au h1 et a la meta.
+- iPhone XR : « iphone xr 128 go » et « xr prix senegal » integres au title et a la meta.
+- iPhone 12 : « iphone 12 simple » et « en fcfa » integres au title, au h1 et a la meta.
+
+### Maillage interne et JSON-LD
+- `app/prix/page.jsx` : index groupe par marque via `guidesByBrand()` (Apple / Samsung).
+- `components/home/HomeSeoContent.jsx` : bloc « Prix des telephones les plus recherches » avec 8 guides.
+- `components/product/PrixGuide.jsx` : fil d'Ariane `Accueil > Prix > modele`, renvois `seeAlso` et 3 guides voisins via `getRelatedGuides()`.
+- `components/product/ProductSeoContent.jsx` : lien contextuel vers le guide correspondant via `findPrixGuideForProduct()`.
+- `app/prix/[slug]/page.jsx` : `BreadcrumbList` et filtrage `excludeTerms`.
+- `scripts/check-prix-guides.mjs` : doublons, longueurs, FAQ, liens, mapping produit et fil d'Ariane.
+
+### Verification
+- `node scripts/check-prix-guides.mjs` : OK, 26 guides, 1 avertissement pre-existant (meta Galaxy S10 a 163 car.).
+- `npm run build` : OK.
+- `node scripts/seo-check.mjs` : 78/78 pages conformes, sondes 404/308 OK.
+- 11 nouvelles pages : HTTP 200, 1 H1, canonical self, `BreadcrumbList`, toutes presentes dans `sitemap.xml`.
+- `node scripts/check-seo-content.mjs` : 18 ecarts pre-existants sur `categoryContent.js` (hors perimetre).
+- Commits : `61e989f` (guides), `c1a552a` (titres iPhone 13/XR/12), present commit (maillage + changelog).

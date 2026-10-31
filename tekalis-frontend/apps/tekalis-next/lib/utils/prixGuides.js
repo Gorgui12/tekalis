@@ -917,6 +917,7 @@ export const PRIX_GUIDES = [
     summary: "Le prix de l'iPhone 14 Plus à Dakar, modèles 14 et 14 Plus en stock.",
     query: ['iphone 14 plus prix', 'iphone 14 prix sénégal', 'prix iphone 14 dakar'],
     search: 'iPhone 14',
+    excludeTerms: ['Pro'],
     categorySlug: 'smartphones',
     keywords: [
       'iphone 14 plus prix', 'iphone 14 prix sénégal', 'prix iphone 14 dakar',

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { FaMapMarkerAlt, FaPhone, FaEnvelope, FaClock } from "react-icons/fa";
+import { getPrixGuide, TOP_PRIX_GUIDE_SLUGS } from "@/lib/utils/prixGuides";
 
 // FAQ courte — alimente le schéma FAQPage (extraits enrichis Google)
 const FAQ_ITEMS = [
@@ -30,6 +31,10 @@ const faqSchema = {
     acceptedAnswer: { '@type': 'Answer', text: item.answer },
   })),
 };
+
+const TOP_PRIX_GUIDES = TOP_PRIX_GUIDE_SLUGS
+  .map((slug) => getPrixGuide(slug))
+  .filter(Boolean);
 
 const CATEGORY_LINKS = [
   { name: 'Smartphones, iPhone et Samsung à Dakar', path: '/category/smartphones' },
@@ -84,6 +89,31 @@ export default function HomeSeoContent() {
             </li>
           ))}
         </ul>
+
+        {/* Prix des modèles les plus recherchés — maillage vers les guides */}
+        <h3 className="text-xl font-bold font-display text-surface-900 dark:text-white mb-3">
+          Prix des téléphones les plus recherchés
+        </h3>
+        <ul className="grid sm:grid-cols-2 gap-2 mb-6 list-none">
+          {TOP_PRIX_GUIDES.map((guide) => (
+            <li key={guide.slug}>
+              <Link
+                href={`/prix/${guide.slug}`}
+                className="inline-flex items-center gap-2 text-sm font-medium text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 transition"
+              >
+                <span aria-hidden="true" className="text-brand-500">›</span>
+                Prix {guide.search}
+              </Link>
+            </li>
+          ))}
+        </ul>
+        <p className="text-sm text-surface-600 dark:text-surface-400 mb-6">
+          Comparez tous les modèles sur la page{" "}
+          <Link href="/prix" className="text-brand-600 dark:text-brand-400 hover:underline">
+            prix des téléphones au Sénégal
+          </Link>
+          .
+        </p>
 
         {/* Confiance — paragraphes scannables */}
         <h3 className="text-xl font-bold font-display text-surface-900 dark:text-white mb-3">

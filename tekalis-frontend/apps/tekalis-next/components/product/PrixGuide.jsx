@@ -1,7 +1,11 @@
 import Link from 'next/link';
 import { Breadcrumb } from '@/components/seo/Breadcrumb';
 import ProductCard from '@/components/product/ProductCard';
-import { PRIX_GUIDES } from '@/lib/utils/prixGuides';
+import {
+  getPrixGuide,
+  getRelatedGuides,
+  prixGuideBreadcrumb,
+} from '@/lib/utils/prixGuides';
 import { FaTruck, FaShieldAlt, FaWhatsapp } from 'react-icons/fa';
 
 const formatFCFA = (value) => (value || 0).toLocaleString('fr-FR');
@@ -18,7 +22,17 @@ export default function PrixGuide({ guide, products }) {
     return signal.includes('venant') || (p?.condition && p.condition !== 'new');
   });
 
-  const otherGuides = PRIX_GUIDES.filter((g) => g.slug !== guide.slug).slice(0, 4);
+  // Guides voisins : liens explicites du guide, sinon meme marque.
+  const otherGuides = getRelatedGuides(guide, 3);
+
+  // Renvois editoriaux vers le guide du modele voisin (ex. iPhone 15 Pro),
+  // uniquement si le guide cible existe reellement.
+  const seeAlso = (guide.seeAlso || [])
+    .map((item) => {
+      const target = getPrixGuide(item.slug);
+      return target ? { ...target, label: item.label || target.h1 } : null;
+    })
+    .filter(Boolean);
 
   const priceSummary = minPrice && maxPrice
     ? ` entre ${formatFCFA(minPrice)} et ${formatFCFA(maxPrice)} FCFA`
@@ -27,12 +41,7 @@ export default function PrixGuide({ guide, products }) {
   return (
     <div className="min-h-screen bg-surface-50 mt-4 md:mt-8 pb-8">
       <div className="container mx-auto px-4">
-        <Breadcrumb
-          items={[
-            { name: 'Guides de prix', path: '/prix' },
-            { name: guide.h1, path: `/prix/${guide.slug}` },
-          ]}
-        />
+        <Breadcrumb items={prixGuideBreadcrumb(guide)} />
 
         {/* ── Héro indexable ─────────────────────────────────────────────── */}
         <div className="bg-white dark:bg-surface-800 rounded-2xl shadow-card p-6 md:p-10 mb-8 border border-surface-100">
@@ -43,6 +52,24 @@ export default function PrixGuide({ guide, products }) {
           <p className="text-surface-600 dark:text-surface-300 leading-relaxed max-w-3xl">
             {guide.intro}
           </p>
+
+          {seeAlso.length > 0 && (
+            <p className="mt-3 text-sm text-surface-600 dark:text-surface-400 max-w-3xl">
+              Guide voisin :{' '}
+              {seeAlso.map((target, index) => (
+                <span key={target.slug}>
+                  {index > 0 ? ' · ' : ''}
+                  <Link
+                    href={`/prix/${target.slug}`}
+                    className="font-semibold text-brand-600 dark:text-brand-400 hover:underline"
+                  >
+                    voir le guide {target.label}
+                  </Link>
+                </span>
+              ))}
+              .
+            </p>
+          )}
 
           {/* Badges de confiance */}
           <div className="flex flex-wrap gap-3 mt-5 pt-5 border-t border-surface-100">
@@ -123,9 +150,9 @@ export default function PrixGuide({ guide, products }) {
         {otherGuides.length > 0 && (
           <div className="mt-10 mb-6">
             <h2 className="text-xl md:text-2xl font-bold font-display text-surface-900 dark:text-white mb-4">
-              Autres prix de téléphones au Sénégal
+              Guides de prix voisins
             </h2>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {otherGuides.map((g) => (
                 <Link
                   key={g.slug}
