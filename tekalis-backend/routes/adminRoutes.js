@@ -643,7 +643,9 @@ router.get("/analytics", async (req, res) => {
       .map(c => ({ name: c.name, value: c.value, revenue: Math.round(c.revenue) }));
 
     // ── Clients nouveaux vs récurrents par jour
-    const orderUsers = await Order.find({ createdAt: { $gte: start } })
+    // Graphique clients : uniquement les commandes rattachées à un compte.
+    // Les commandes invité (user null) n'ont pas d'identité client à suivre.
+    const orderUsers = await Order.find({ createdAt: { $gte: start }, user: { $ne: null } })
       .select("user createdAt")
       .lean();
     const uids = [...new Set(orderUsers.map(o => o.user.toString()))];

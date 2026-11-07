@@ -40,11 +40,14 @@ const EMPTY_ADDRESS = {
   label: "Adresse de livraison",
   fullName: "",
   phone: "",
+  email: "",
   city: "Dakar",
   region: "Dakar",
   address: "",
   isDefault: false
 };
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const DeliveryForm = ({ onNext, savedAddresses = [], loading = false }) => {
   const { user } = useSelector(state => state.auth);
@@ -69,6 +72,9 @@ const DeliveryForm = ({ onNext, savedAddresses = [], loading = false }) => {
     if (!newAddress.fullName?.trim()) errors.fullName = "Nom requis";
     if (!newAddress.phone?.trim()) errors.phone = "Téléphone requis";
     if (!newAddress.address?.trim()) errors.address = "Adresse requise";
+    if (newAddress.email?.trim() && !EMAIL_REGEX.test(newAddress.email.trim())) {
+      errors.email = "Email invalide";
+    }
     return errors;
   };
 
@@ -150,6 +156,37 @@ const DeliveryForm = ({ onNext, savedAddresses = [], loading = false }) => {
               showLabel={false}
               showDefaultCheckbox={false}
             />
+
+            {/* Commande sans compte : email facultatif pour la confirmation.
+                Un client connecté n'en a pas besoin (le compte en fournit un). */}
+            {!user && (
+              <div className="mt-4">
+                <label className="block text-sm font-semibold text-surface-900 dark:text-white mb-2">
+                  Email <span className="text-surface-400 font-normal">(optionnel)</span>
+                </label>
+                <input
+                  type="email"
+                  value={newAddress.email || ""}
+                  onChange={(e) => setNewAddress({ ...newAddress, email: e.target.value })}
+                  placeholder="vous@exemple.com"
+                  className={`w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 transition bg-white dark:bg-surface-800 ${
+                    addressErrors.email
+                      ? "border-red-500 focus:ring-red-500 bg-red-50"
+                      : "border-surface-300 dark:border-surface-600 focus:ring-brand-500"
+                  }`}
+                  aria-invalid={!!addressErrors.email}
+                />
+                {addressErrors.email ? (
+                  <p className="mt-1 text-sm text-red-600" role="alert">
+                    {addressErrors.email}
+                  </p>
+                ) : (
+                  <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
+                    Pour recevoir la confirmation et le suivi de votre commande.
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         )}
       </div>

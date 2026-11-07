@@ -48,7 +48,8 @@ const COOKIE_NAME = "tekalis_token";
 const CANONICAL_HOST = new URL(SITE_URL).hostname;
 
 // Routes qui exigent une session (cookie httpOnly `tekalis_token`).
-const PROTECTED_PREFIXES = ["/dashboard", "/checkout", "/wishlist"];
+// /checkout est volontairement public : la commande peut se faire sans compte.
+const PROTECTED_PREFIXES = ["/dashboard", "/wishlist"];
 
 function isProtected(pathname) {
   return PROTECTED_PREFIXES.some(

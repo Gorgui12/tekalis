@@ -122,6 +122,13 @@ const orderValidation = {
       .trim().notEmpty().withMessage("Nom de livraison requis"),
     body("deliveryPhone")
       .trim().notEmpty().withMessage("Téléphone requis"),
+    // Email facultatif : sert uniquement à envoyer la confirmation à un
+    // client qui commande sans compte.
+    body("deliveryEmail")
+      .optional({ checkFalsy: true })
+      .trim()
+      .isEmail().withMessage("Email invalide")
+      .normalizeEmail(),
     body("deliveryAddress")
       .trim().notEmpty().withMessage("Adresse de livraison requise"),
     body("paymentMethod")

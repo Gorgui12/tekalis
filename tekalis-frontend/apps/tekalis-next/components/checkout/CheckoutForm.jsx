@@ -88,6 +88,7 @@ const CheckoutForm = () => {
         // Adresse aplatie
         deliveryName:    deliveryData.address.fullName,
         deliveryPhone:   deliveryData.address.phone,
+        deliveryEmail:   deliveryData.address.email || undefined,
         deliveryAddress: deliveryData.address.address,
         deliveryCity:    deliveryData.address.city    || "Dakar",
         deliveryRegion:  deliveryData.address.region  || "Dakar",
@@ -121,6 +122,7 @@ const CheckoutForm = () => {
         response.data?.order?._id ||
         response.data?._id        ||
         response.data?.orderId;
+      const guestToken = response.data?.guestAccessToken;
 
       // Conversion : commande confirmée (paiement à la livraison)
       trackPurchase({
@@ -130,10 +132,19 @@ const CheckoutForm = () => {
         currency: "XOF",
       });
 
-      navigate(
-        orderId ? `/dashboard/orders/${orderId}` : "/dashboard/orders",
-        { replace: true }
-      );
+      // Client connecté → espace commandes. Invité → page de confirmation
+      // publique accessible via le jeton remis par l'API. On se fie au jeton
+      // plutôt qu'à `user` : une session expirée côté API ne doit pas envoyer
+      // un invité vers /dashboard (protégé).
+      if (orderId && guestToken) {
+        router.replace(
+          `/commande/${orderId}?token=${encodeURIComponent(guestToken)}`
+        );
+      } else {
+        router.replace(
+          orderId ? `/dashboard/orders/${orderId}` : "/dashboard/orders"
+        );
+      }
     } catch (error) {
       const msg =
         error.response?.data?.message ||

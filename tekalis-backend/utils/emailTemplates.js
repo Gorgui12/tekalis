@@ -40,7 +40,12 @@ const NEWSLETTER_CONFIRM_TTL_HOURS = 24;
 // routes qui n'ont jamais existé. Les boutons « Suivre ma commande » et « Voir ma
 // demande » menaient donc à des 404. Les vraies pages sont sous /dashboard.
 const routes = {
-  orderDetail: (id) => `${frontendUrl}/dashboard/orders/${id}`,
+  // Commande invité : le jeton opaque permet de consulter la commande sans
+  // compte, sinon le lien renverrait vers /login.
+  orderDetail: (id, guestToken) =>
+    guestToken
+      ? `${frontendUrl}/commande/${id}?token=${encodeURIComponent(guestToken)}`
+      : `${frontendUrl}/dashboard/orders/${id}`,
   rmaList: `${frontendUrl}/dashboard/rma`,
   warranties: `${frontendUrl}/dashboard/warranties`,
   adminOrderDetail: (id) => `${adminUrl}/orders/${id}`,
@@ -235,7 +240,7 @@ const orderConfirmation = (order, user) => {
         🛡️ Tous vos produits sont couverts par la garantie ${esc(siteName)}.
       </p>
 
-      ${button(routes.orderDetail(order._id), "Suivre ma commande")}
+      ${button(routes.orderDetail(order._id, order.guestAccessToken), "Suivre ma commande")}
     `
   );
 };
@@ -266,7 +271,7 @@ const orderStatusUpdate = (order, user, newStatus) => {
       <p style="font-size:14px;color:#475569;margin:0 0 4px"><strong>Paiement</strong> : ${paymentLabel(order.paymentMethod)}</p>
       <p style="font-size:14px;color:#475569;margin:0"><strong>Total</strong> : ${formatFCFA(order.totalPrice)} FCFA</p>
 
-      ${button(routes.orderDetail(order._id), "Voir ma commande")}
+      ${button(routes.orderDetail(order._id, order.guestAccessToken), "Voir ma commande")}
 
       <p style="font-size:13px;color:#64748B;margin-top:18px">
         Une question sur votre livraison ? Écrivez-nous : <a href="mailto:${esc(contactEmail)}" style="color:#1E40AF">${esc(contactEmail)}</a>

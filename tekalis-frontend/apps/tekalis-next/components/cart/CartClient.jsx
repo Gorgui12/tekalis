@@ -9,7 +9,6 @@ import {
   clearCart,
 } from "@/store/slices/cartSlice";
 import { trackRemoveFromCart } from "@/lib/analytics";
-import AuthPromptCard from "@/components/auth/AuthPromptCard";
 import { FaTrash, FaMinus, FaPlus, FaShieldAlt, FaTruck, FaLock, FaShoppingCart } from "react-icons/fa";
 
 const Cart = () => {
@@ -206,15 +205,6 @@ const Cart = () => {
                 </p>
               </div>
             </div>
-
-            {/*
-              La commande exige un compte (le middleware protège /checkout).
-              On propose donc le bouton Google juste au-dessus du bouton
-              « Commander », là où la décision se prend — sans quitter la
-              page et sans obliger le visiteur à deviner qu'il va devoir
-              s'inscrire.
-            */}
-            <AuthPromptCard reason="cart" source="cart" />
 
             {/* Bouton commander */}
             <button

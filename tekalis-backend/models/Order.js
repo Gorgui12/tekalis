@@ -3,10 +3,13 @@ const crypto = require("crypto");
 
 // models/Order.js
 const orderSchema = new mongoose.Schema({
+  // Commande passée sans compte : `user` reste null et les coordonnées du
+  // client sont conservées dans customerInfo / delivery*.
   user: { 
     type: mongoose.Schema.Types.ObjectId, 
     ref: "User", 
-    required: true 
+    required: false,
+    default: null
   },
   
   products: [
@@ -74,6 +77,13 @@ const orderSchema = new mongoose.Schema({
     name: String,
     phone: String,
     email: String
+  },
+
+  // Jeton opaque remis au client invité après la commande. Il lui permet de
+  // consulter sa commande sans compte via /commande/:id?token=...
+  guestAccessToken: {
+    type: String,
+    index: true
   },
   
   status: { 

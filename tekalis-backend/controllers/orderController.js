@@ -4,6 +4,7 @@
 //    plus de nodemailer direct dans ce controller
 // ✅ FIX : createWarranty appelé après création commande
 // ===============================================
+const crypto = require("crypto");
 const Order = require("../models/Order");
 const Product = require("../models/Product");
 const Cart = require("../models/Cart");
@@ -24,6 +25,7 @@ exports.createOrder = async (req, res) => {
       paymentMethod,
       deliveryName,
       deliveryPhone,
+      deliveryEmail,
       deliveryAddress,
       deliveryCity,
       deliveryRegion,
@@ -33,6 +35,10 @@ exports.createOrder = async (req, res) => {
     if (!products || products.length === 0) {
       return res.status(400).json({ message: "Aucun produit dans la commande" });
     }
+
+    // Commande invité : `req.user` est absent (middleware optionalAuth).
+    const userId = req.user?._id || null;
+    const isGuest = !userId;
 
     // ─── Vérification et décrément du stock ───────────────────────────────────
     const productIds = products.map(p => p.product);
@@ -75,15 +81,21 @@ exports.createOrder = async (req, res) => {
     const pricing = await PricingService.calculateOrderTotal(
       validProducts,
       promoCode,
-      req.user._id
+      userId
     );
     if (pricing.promoError) {
       return res.status(400).json({ message: pricing.promoError });
     }
 
     // ─── Créer la commande ────────────────────────────────────────────────────
+    // Un jeton aléatoire est remis au client invité : c'est la seule preuve
+    // d'accès à sa commande, l'ObjectId seul étant devinable.
+    const guestAccessToken = isGuest
+      ? crypto.randomBytes(24).toString("hex")
+      : undefined;
+
     const newOrder = new Order({
-      user: req.user._id,
+      user: userId,
       products: validProducts,
       totalPrice: pricing.total,
       shippingCost: pricing.shippingCost,
@@ -92,7 +104,17 @@ exports.createOrder = async (req, res) => {
       deliveryPhone,
       deliveryAddress,
       deliveryCity: deliveryCity || "Dakar",
-      deliveryRegion: deliveryRegion || "Dakar"
+      deliveryRegion: deliveryRegion || "Dakar",
+      ...(isGuest
+        ? {
+            customerInfo: {
+              name: deliveryName,
+              phone: deliveryPhone,
+              email: deliveryEmail || undefined
+            },
+            guestAccessToken
+          }
+        : {})
     });
 
     await newOrder.save();
@@ -111,29 +133,33 @@ exports.createOrder = async (req, res) => {
     // ─── Incrémenter l'usage du code promo ───────────────────────────────────
     if (promoCode) {
       try {
+        const promoUpdate = { $inc: { usageCount: 1 } };
+        // usedBy est un tableau d'utilisateurs : un invité n'y a pas sa place.
+        if (userId) {
+          promoUpdate.$push = {
+            usedBy: {
+              user: userId,
+              usedAt: new Date(),
+              orderAmount: pricing.total
+            }
+          };
+        }
         await PromoCode.findOneAndUpdate(
           { code: promoCode.trim().toUpperCase(), isActive: true },
-          {
-            $inc: { usageCount: 1 },
-            $push: {
-              usedBy: {
-                user: req.user._id,
-                usedAt: new Date(),
-                orderAmount: pricing.total
-              }
-            }
-          }
+          promoUpdate
         );
       } catch (promoErr) {
         console.error("⚠️ Erreur mise à jour code promo:", promoErr.message);
       }
     }
 
-    // ─── Vider le panier ──────────────────────────────────────────────────────
-    await Cart.findOneAndUpdate(
-      { user: req.user._id },
-      { $set: { items: [], subtotal: 0, discount: 0, total: 0, promoCode: undefined } }
-    );
+    // ─── Vider le panier (le panier invité vit côté client) ──────────────────
+    if (userId) {
+      await Cart.findOneAndUpdate(
+        { user: userId },
+        { $set: { items: [], subtotal: 0, discount: 0, total: 0, promoCode: undefined } }
+      );
+    }
 
     // ─── Répondre immédiatement ───────────────────────────────────────────────
     res.status(201).json({ success: true, ...newOrder.toObject() });
@@ -142,23 +168,32 @@ exports.createOrder = async (req, res) => {
 
     // ✅ FIX : Créer les garanties pour chaque produit de la commande
     // warrantyController.createWarranty n'était jamais appelé avant
-    warrantyController.createWarranty({
-      _id: newOrder._id,
-      user: req.user._id,
-      products: newOrder.products
-    }).catch(err => console.error("⚠️ Erreur création garanties:", err.message));
+    // (une garantie est rattachée à un compte : rien à créer pour un invité).
+    if (userId) {
+      warrantyController.createWarranty({
+        _id: newOrder._id,
+        user: userId,
+        products: newOrder.products
+      }).catch(err => console.error("⚠️ Erreur création garanties:", err.message));
+    }
 
     // ✅ FIX : Email via EmailService (consolidation — plus de nodemailer direct)
     const populatedOrder = await Order.findById(newOrder._id)
       .populate("products.product", "name price images");
 
-    const customer = { name: req.user.name, email: req.user.email };
+    const customer = {
+      name: req.user?.name || deliveryName,
+      email: req.user?.email || deliveryEmail || null
+    };
 
-    // Email de confirmation au client (non bloquant)
-    EmailService.sendOrderConfirmation(
-      populatedOrder.toObject(),
-      customer
-    ).catch(err => console.error("⚠️ Email confirmation commande non envoyé:", err.message));
+    // Email de confirmation au client (non bloquant). Un invité sans email
+    // n'en reçoit simplement pas : la commande reste valable.
+    if (customer.email) {
+      EmailService.sendOrderConfirmation(
+        populatedOrder.toObject(),
+        customer
+      ).catch(err => console.error("⚠️ Email confirmation commande non envoyé:", err.message));
+    }
 
     EmailService.notifyAdminNewOrder(
       { ...populatedOrder.toObject(), promoCode },
@@ -250,10 +285,50 @@ exports.getOrderById = async (req, res) => {
       return res.status(404).json({ message: "Commande introuvable" });
     }
 
-    if (
-      order.user._id.toString() !== req.user._id.toString() &&
-      !req.user.isAdmin
-    ) {
+    const isOwner =
+      order.user && order.user._id.toString() === req.user._id.toString();
+    // Un admin doit pouvoir consulter une commande invité (order.user null).
+    if (!isOwner && !req.user.isAdmin) {
+      return res.status(403).json({ message: "Accès refusé" });
+    }
+
+    res.status(200).json({ success: true, order });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// ===============================================
+// GET /api/v1/orders/guest/:id?token=... — Commande invité
+// ===============================================
+// Route publique : le jeton opaque généré à la création (guestAccessToken)
+// fait office de preuve d'accès. On ne renvoie aucune donnée de compte.
+exports.getGuestOrder = async (req, res) => {
+  try {
+    const { token } = req.query;
+
+    if (!token || typeof token !== "string") {
+      return res.status(403).json({ message: "Accès refusé" });
+    }
+
+    const order = await Order.findById(req.params.id)
+      .populate("products.product", "name price images");
+
+    if (!order) {
+      return res.status(404).json({ message: "Commande introuvable" });
+    }
+
+    const expected = order.guestAccessToken;
+    if (!expected) {
+      return res.status(403).json({ message: "Accès refusé" });
+    }
+
+    // Comparaison à temps constant (mêmes longueurs sinon timingSafeEqual jette).
+    const a = Buffer.from(token);
+    const b = Buffer.from(expected);
+    const valid = a.length === b.length && crypto.timingSafeEqual(a, b);
+
+    if (!valid) {
       return res.status(403).json({ message: "Accès refusé" });
     }
 
@@ -274,11 +349,11 @@ exports.cancelOrder = async (req, res) => {
       return res.status(404).json({ message: "Commande introuvable" });
     }
 
-    // Seul le propriétaire (ou un admin) peut annuler
-    if (
-      order.user.toString() !== req.user._id.toString() &&
-      !req.user.isAdmin
-    ) {
+    // Seul le propriétaire (ou un admin) peut annuler. Une commande invité
+    // n'a pas de propriétaire connecté : annulation réservée au service client.
+    const isOwner =
+      order.user && order.user.toString() === req.user._id.toString();
+    if (!isOwner && !req.user.isAdmin) {
       return res.status(403).json({ message: "Accès refusé" });
     }
 
@@ -354,9 +429,16 @@ exports.updateOrderStatus = async (req, res) => {
 
     res.status(200).json({ success: true, order });
 
-    // Email de mise à jour de statut au client (non bloquant)
-    if (order.user && order.user.email) {
-      EmailService.sendOrderStatusUpdate(order, order.user, status)
+    // Email de mise à jour de statut au client (non bloquant).
+    // Commande invité : les coordonnées viennent de customerInfo.
+    const recipient = order.user?.email
+      ? order.user
+      : order.customerInfo?.email
+        ? { name: order.customerInfo.name || order.deliveryName, email: order.customerInfo.email }
+        : null;
+
+    if (recipient) {
+      EmailService.sendOrderStatusUpdate(order, recipient, status)
         .catch(err => console.error("⚠️ Email statut non envoyé:", err.message));
     }
   } catch (error) {

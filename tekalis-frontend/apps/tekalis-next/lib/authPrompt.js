@@ -3,15 +3,14 @@
 //
 // Pourquoi ce module ?
 //   Google ne propose son bouton que sur /login et /register, deux
-//   pages que le visiteur n'atteint qu'en fin de parcours. Sur une
-//   boutique, le compte est obligatoire pour commander (le middleware
-//   protège /checkout), donc l'invite doit apparaître AVANT le rebond :
-//   au panier, sur les favoris, après une commande, ou à un moment
-//   d'engagement fort.
+//   pages que le visiteur n'atteint qu'en fin de parcours. Le compte
+//   reste utile (suivi, garanties, SAV) sans être obligatoire pour
+//   commander : l'invite apparaît donc à un moment d'engagement fort —
+//   panier, favoris, après une commande ou sur une fiche produit.
 //
 // Règles anti-agacement (le but est de convertir, pas d'énerver) :
-//   1. jamais sur les pages d'auth ni celles déjà protégées (/checkout,
-//      /dashboard…) : l'utilisateur y est déjà en train de s'authentifier ;
+//   1. jamais sur les pages d'auth, le checkout ni les pages privées
+//      (/dashboard…) : l'utilisateur y est déjà dans une démarche précise ;
 //   2. une seule invitation automatique par session ;
 //   3. sept jours minimum entre deux invitations automatiques ;
 //   4. aucune invitation automatique si le visiteur n'a montré aucun
@@ -54,9 +53,9 @@ export const LANDING_DELAY_MS = 6000;
 export const PROMPT_REASONS = {
   cart: {
     icon: "cart",
-    title: "Plus qu'un clic pour commander",
+    title: "Gardez la trace de votre commande",
     subtitle:
-      "Votre panier est prêt. Créez votre compte en un clic pour finaliser la commande.",
+      "Vous pouvez commander sans compte. Un compte gratuit vous donne le suivi, les factures et les garanties.",
     bullets: [
       { icon: "bolt",   text: "Commande enregistrée avec vos produits favoris" },
       { icon: "truck",  text: "Suivi de livraison et historique de commandes" },

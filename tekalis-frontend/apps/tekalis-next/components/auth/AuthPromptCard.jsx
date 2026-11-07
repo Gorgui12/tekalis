@@ -6,11 +6,10 @@
  * Carte d'invitation à créer un compte, affichée EN DANS le parcours :
  * panier, favoris, confirmation de commande, CTA de l'accueil.
  *
- * Pourquoi une carte et pas une modale : le compte est obligatoire pour
- * commander sur Tekalis (le middleware protège /checkout), donc le
- * visiteur va forcément être invité à s'authentifier. Autant le faire
- * au moment où son panier contient des articles, avec le bouton Google
- * en premier — il est alors le chemin le plus court vers la commande.
+ * Pourquoi une carte et pas une modale : le compte n'est pas obligatoire
+ * pour commander, mais il simplifie le suivi (commandes, garanties, SAV).
+ * Cette carte propose donc le bouton Google à un moment d'engagement
+ * fort, sans bloquer le parcours d'achat.
  *
  * La carte disparaît complètement si le visiteur est déjà connecté ou si
  * Google n'est pas configuré : aucun module vide ne doit subsister.
