@@ -43,9 +43,9 @@ const sections = [
     icon: <FaServer />,
     content: (
       <p>
-        Le site est hébergé par Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723,
-        États-Unis — <span className="text-blue-600">vercel.com</span>. Les données
-        transitent via une connexion chiffrée (HTTPS).
+        Le site est hébergé par Cloudflare, Inc., 101 Townsend St, San Francisco,
+        CA 94107, États-Unis — <span className="text-blue-600">cloudflare.com</span>.
+        Les données transitent via une connexion chiffrée (HTTPS).
       </p>
     ),
   },
@@ -135,7 +135,7 @@ export default function MentionsLegalesPage() {
             Informations légales relatives au site tekalis.com
           </p>
           <p className="mt-3 text-sm text-gray-400">
-            Dernière mise à jour : 22 septembre 2026
+            Dernière mise à jour : 13 novembre 2026
           </p>
         </div>
 

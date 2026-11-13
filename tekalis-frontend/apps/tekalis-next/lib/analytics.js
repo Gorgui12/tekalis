@@ -462,20 +462,52 @@ export function trackAddPaymentInfo({ items = [], value = 0, currency = "XOF" } 
 }
 
 export function trackPurchase({ orderId, value = 0, currency = "XOF", items = [] } = {}) {
+  if (typeof window === "undefined") return;
+
+  // Un achat ne doit être compté qu'une fois par commande : la page de
+  // confirmation (ou un simple rafraîchissement) peut être rechargée. Meta
+  // déduplique via event_id, mais GA4 non — d'où ce garde-fou local.
+  const transactionId = orderId ? String(orderId) : "";
+  if (transactionId) {
+    try {
+      const key = `tekalis_purchase_${transactionId}`;
+      if (window.localStorage.getItem(key)) return;
+      window.localStorage.setItem(key, "1");
+    } catch {
+      /* localStorage indisponible : on émet quand même l'événement */
+    }
+  }
+
   const contents = items
     .map((it) => ({ id: it?._id || it?.id || it?.product?._id, quantity: it?.quantity || 1, price: it?.price }))
     .filter((it) => it.id);
+
+  // GA4 attend `items` (item_id, item_name, price, quantity) pour alimenter
+  // ses rapports e-commerce ; Meta attend `contents`. On envoie les deux.
+  const gaItems = items
+    .map((it) => {
+      const product = it?.product || {};
+      return {
+        item_id: String(it?._id || it?.id || product?._id || ""),
+        item_name: it?.name || product?.name || undefined,
+        price: Number(it?.price ?? product?.price) || 0,
+        quantity: it?.quantity || 1,
+      };
+    })
+    .filter((it) => it.item_id);
+
   trackEvent(
     "Purchase",
     {
       value,
       currency,
-      transaction_id: orderId,
+      transaction_id: transactionId || undefined,
       contents,
       content_ids: contents.map((c) => c.id),
       num_items: contents.reduce((s, c) => s + c.quantity, 0),
+      items: gaItems,
     },
-    { eventId: orderId }
+    { eventId: transactionId || undefined }
   );
 }
 
@@ -506,6 +538,49 @@ export function trackProductImpressions(products = []) {
     content_ids: ids,
     contents: ids.map((id) => ({ id, quantity: 1 })),
   });
+}
+
+// ── WhatsApp : conversion principale ────────────────────────
+// Google Ads importe l'événement GA4 `whatsapp_click` comme conversion.
+// Le numéro est le +221 78 634 69 46 ; tous les liens passent par wa.me.
+export function trackWhatsAppClick({ linkText = "", linkUrl = "" } = {}) {
+  if (typeof window === "undefined") return;
+  trackEvent("whatsapp_click", {
+    link_text: linkText.slice(0, 100),
+    link_url: linkUrl,
+    page_location: window.location.href,
+    page_path: window.location.pathname,
+  });
+}
+
+// Un seul listener délégué au niveau du document couvre TOUS les liens
+// WhatsApp — header, fiche produit, footer, configurateur solaire, guides
+// de prix… — y compris ceux rendus côté serveur. C'est plus fiable que
+// d'instrumenter chaque composant, et les futurs liens sont couverts.
+let whatsappListenerAttached = false;
+
+export function initWhatsAppTracking() {
+  if (typeof document === "undefined" || whatsappListenerAttached) return;
+  whatsappListenerAttached = true;
+
+  document.addEventListener(
+    "click",
+    (event) => {
+      const target = event.target;
+      if (!target || typeof target.closest !== "function") return;
+      const anchor = target.closest(
+        'a[href*="wa.me/"], a[href^="whatsapp://"]'
+      );
+      if (!anchor) return;
+      trackWhatsAppClick({
+        linkText: (anchor.getAttribute("aria-label") || anchor.textContent || "")
+          .replace(/\s+/g, " ")
+          .trim(),
+        linkUrl: anchor.getAttribute("href") || "",
+      });
+    },
+    { capture: true, passive: true }
+  );
 }
 
 export const analytics = {

@@ -1,7 +1,7 @@
-import DOMPurify from "isomorphic-dompurify";
+import sanitizeHtml from "sanitize-html";
 
 // ===============================================
-// lib/sanitizeHtml.js — 2026-09-03
+// lib/sanitizeHtml.js — 2026-11-13
 // Le contenu des articles de blog est écrit en HTML riche depuis le
 // back-office et rendu tel quel côté public via dangerouslySetInnerHTML
 // (voir components/blog/ArticleDetailClient.jsx). Ni le backend ni le
@@ -13,6 +13,9 @@ import DOMPurify from "isomorphic-dompurify";
 //
 // Cette fonction est le seul point d'entrée pour du HTML de confiance
 // partielle dans l'app : tout __html doit passer par ici.
+//
+// 2026-11-13 : remplacement de isomorphic-dompurify (jsdom) par
+// sanitize-html, compatible Workers et navigateur, sans dépendance Node.
 // ===============================================
 
 const ALLOWED_TAGS = [
@@ -38,10 +41,18 @@ const ALLOWED_ATTR = [
 
 export function sanitizeArticleHtml(html) {
   if (!html || typeof html !== "string") return "";
-  return DOMPurify.sanitize(html, {
-    ALLOWED_TAGS,
-    ALLOWED_ATTR,
-    // Empêche javascript:, data: etc. dans href/src
-    ALLOW_UNKNOWN_PROTOCOLS: false
+  return sanitizeHtml(html, {
+    allowedTags: ALLOWED_TAGS,
+    allowedAttributes: {
+      "*": ALLOWED_ATTR,
+    },
+    // Empêche javascript:, data:, etc. dans href/src (data: toléré pour img)
+    allowedSchemes: ["http", "https", "mailto", "tel"],
+    allowedSchemesByTag: {
+      img: ["http", "https", "data"],
+    },
+    allowedSchemesAppliedToAttributes: ["href", "src"],
+    allowProtocolRelative: false,
+    disallowedTagsMode: "discard",
   });
 }

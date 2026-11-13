@@ -2,9 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { Analytics } from "@vercel/analytics/next";
 import ConsentBanner from "./ConsentBanner";
-import { initAnalytics, trackPageView, trackPageVisit } from "@/lib/analytics";
+import {
+  initAnalytics,
+  initWhatsAppTracking,
+  trackPageView,
+  trackPageVisit,
+} from "@/lib/analytics";
 
 /**
  * AnalyticsProvider — charge les trackers admissibles au montage
@@ -16,19 +20,17 @@ import { initAnalytics, trackPageView, trackPageVisit } from "@/lib/analytics";
  *      chargement des scripts si consentement déjà accordé, puis une
  *      seule page_view pour la route initiale ;
  *   2. à chaque changement de route : trackPageView() + trackPageVisit()
- *      (comptage des sessions pour l'admin analytics) ;
- *   3. Vercel Analytics (<Analytics/>) est monté SANS condition : il est
- *      cookieless et n'utilise aucun identifiant persistant, donc aucun
- *      consentement n'est requis. Le monter derrière le consentement
- *      biaisait le taux de rebond : Vercel ne mesurait que les visiteurs
- *      ayant accepté, et faisait démarrer leur « session » à l'acceptation
- *      (=> surpondération des sessions à une seule page).
+ *      (comptage des sessions pour l'admin analytics).
+ *
+ * La mesure d'audience Cloudflare (Web Analytics) est injectée au niveau
+ * de l'hébergeur, elle ne nécessite aucun composant côté application.
  */
 const AnalyticsProvider = ({ children }) => {
   const pathname = usePathname();
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
+    initWhatsAppTracking();
     let cancelled = false;
     (async () => {
       await initAnalytics();
@@ -51,7 +53,6 @@ const AnalyticsProvider = ({ children }) => {
 
   return (
     <>
-      <Analytics />
       {children}
       <ConsentBanner />
     </>

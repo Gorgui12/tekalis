@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  outputFileTracingRoot: __dirname,
+
   // ── Images autorisées (Unsplash + votre API) ──────────────────────────────
   images: {
     remotePatterns: [
