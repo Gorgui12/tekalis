@@ -9,6 +9,7 @@ const Order = require("../models/Order");
 const Product = require("../models/Product");
 const Cart = require("../models/Cart");
 const PromoCode = require("../models/PromoCode");
+const User = require("../models/User");
 const { escapeRegex } = require("../utils/regexEscape");
 const { getInactiveCategoryIds, isProductInInactiveCategory } = require("../utils/categoryVisibility");
 const EmailService = require("../services/emailService");
@@ -202,6 +203,203 @@ exports.createOrder = async (req, res) => {
 
   } catch (error) {
     console.error("❌ Erreur createOrder:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// ===============================================
+// POST /api/v1/admin/orders — Créer une commande manuellement (Admin)
+// Permet à l'admin de saisir une commande au nom d'un client existant
+// (userId) ou d'un client invité (coordonnées saisies à la main).
+// Le prix est recalculé côté serveur, comme pour une commande client.
+// ===============================================
+exports.createManualOrder = async (req, res) => {
+  try {
+    const {
+      userId = null,
+      deliveryName,
+      deliveryPhone,
+      deliveryEmail,
+      deliveryAddress,
+      deliveryCity,
+      deliveryRegion,
+      paymentMethod = "cash",
+      promoCode,
+      status = "pending",
+      isPaid = false,
+      products
+    } = req.body;
+
+    if (!Array.isArray(products) || products.length === 0) {
+      return res.status(400).json({ message: "Aucun produit dans la commande" });
+    }
+
+    const validStatuses = ["pending", "processing", "shipped", "delivered", "cancelled"];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({ message: "Statut invalide" });
+    }
+
+    const validPaymentMethods = ["cash", "online", "wave", "om", "free", "card"];
+    if (!validPaymentMethods.includes(paymentMethod)) {
+      return res.status(400).json({ message: "Mode de paiement invalide" });
+    }
+
+    // ─── Client existant ou commande invité ─────────────────────────────────
+    let user = null;
+    if (userId) {
+      user = await User.findById(userId).select("name email phone");
+      if (!user) {
+        return res.status(404).json({ message: "Client introuvable" });
+      }
+    }
+
+    const name = String(deliveryName || user?.name || "").trim();
+    const phone = String(deliveryPhone || user?.phone || "").trim();
+    const email = String(deliveryEmail || user?.email || "").trim();
+    const address = String(deliveryAddress || "").trim();
+
+    if (!name || !phone || !address) {
+      return res.status(400).json({
+        message: "Le nom, le téléphone et l'adresse de livraison sont requis"
+      });
+    }
+
+    // ─── Normalisation et vérification du stock ─────────────────────────────
+    const normalized = products.map(item => ({
+      product: item.product || item.productId,
+      quantity: Math.max(1, parseInt(item.quantity, 10) || 1)
+    }));
+
+    const productIds = normalized.map(p => p.product);
+    const dbProducts = await Product.find({ _id: { $in: productIds } });
+    const productMap = {};
+    dbProducts.forEach(p => { productMap[p._id.toString()] = p; });
+
+    const stockErrors = [];
+    for (const item of normalized) {
+      const dbProduct = productMap[item.product];
+      if (!dbProduct) {
+        stockErrors.push(`Produit ${item.product} introuvable`);
+        continue;
+      }
+      if (dbProduct.stock < item.quantity) {
+        stockErrors.push(
+          `Stock insuffisant pour "${dbProduct.name}" (disponible: ${dbProduct.stock})`
+        );
+      }
+    }
+    if (stockErrors.length > 0) {
+      return res.status(400).json({ message: "Problème de stock", errors: stockErrors });
+    }
+
+    // ─── Recalcul du prix côté serveur ──────────────────────────────────────
+    const validProducts = normalized.map(item => ({
+      product: item.product,
+      quantity: item.quantity,
+      price: productMap[item.product].price
+    }));
+
+    const pricing = await PricingService.calculateOrderTotal(
+      validProducts,
+      promoCode,
+      user?._id || null
+    );
+    if (pricing.promoError) {
+      return res.status(400).json({ message: pricing.promoError });
+    }
+
+    const newOrder = new Order({
+      user: user?._id || null,
+      products: validProducts,
+      totalPrice: pricing.total,
+      shippingCost: pricing.shippingCost,
+      paymentMethod,
+      paymentStatus: isPaid ? "paid" : "pending",
+      isPaid: !!isPaid,
+      paidAt: isPaid ? new Date() : undefined,
+      status,
+      deliveryName: name,
+      deliveryPhone: phone,
+      deliveryAddress: address,
+      deliveryCity: deliveryCity || "Dakar",
+      deliveryRegion: deliveryRegion || "Dakar",
+      ...(user
+        ? {}
+        : {
+            customerInfo: {
+              name,
+              phone,
+              email: email || undefined
+            }
+          })
+    });
+
+    await newOrder.save();
+
+    // ─── Décrémenter le stock (sauf commande déjà annulée) ──────────────────
+    if (status !== "cancelled") {
+      const bulkOps = normalized.map(item => ({
+        updateOne: {
+          filter: { _id: item.product },
+          update: { $inc: { stock: -item.quantity, salesCount: item.quantity } }
+        }
+      }));
+      await Product.bulkWrite(bulkOps);
+    }
+
+    // ─── Incrémenter l'usage du code promo ──────────────────────────────────
+    if (promoCode && status !== "cancelled") {
+      try {
+        const promoUpdate = { $inc: { usageCount: 1 } };
+        if (user) {
+          promoUpdate.$push = {
+            usedBy: {
+              user: user._id,
+              usedAt: new Date(),
+              orderAmount: pricing.total
+            }
+          };
+        }
+        await PromoCode.findOneAndUpdate(
+          { code: promoCode.trim().toUpperCase(), isActive: true },
+          promoUpdate
+        );
+      } catch (promoErr) {
+        console.error("⚠️ Erreur mise à jour code promo:", promoErr.message);
+      }
+    }
+
+    // ─── Vider le panier du client s'il en a un ─────────────────────────────
+    if (user) {
+      await Cart.findOneAndUpdate(
+        { user: user._id },
+        { $set: { items: [], subtotal: 0, discount: 0, total: 0, promoCode: undefined } }
+      );
+    }
+
+    const populatedOrder = await Order.findById(newOrder._id)
+      .populate("user", "name email phone")
+      .populate("products.product", "name price images");
+
+    res.status(201).json({ success: true, order: populatedOrder });
+
+    // ─── Tâches en arrière-plan ──────────────────────────────────────────────
+    if (user && status !== "cancelled") {
+      warrantyController.createWarranty({
+        _id: newOrder._id,
+        user: user._id,
+        products: newOrder.products
+      }).catch(err => console.error("⚠️ Erreur création garanties:", err.message));
+    }
+
+    if (email) {
+      EmailService.sendOrderConfirmation(
+        populatedOrder.toObject(),
+        { name, email }
+      ).catch(err => console.error("⚠️ Email confirmation commande non envoyé:", err.message));
+    }
+  } catch (error) {
+    console.error("❌ Erreur createManualOrder:", error);
     res.status(500).json({ message: error.message });
   }
 };

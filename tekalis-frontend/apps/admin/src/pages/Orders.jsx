@@ -7,7 +7,8 @@ import {
   FaEdit,
   FaDownload,
   FaTimes,
-  FaCheck
+  FaCheck,
+  FaPlus
 } from "react-icons/fa";
 import api from "@shared/api/api";
 import { generateInvoicePdf } from "../utils/invoice";
@@ -158,12 +159,22 @@ const AdminOrders = () => {
           >
             ← Retour au dashboard
           </Link>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            📦 Gestion des commandes
-          </h1>
-          <p className="text-gray-600">
-            {filteredOrders.length} commande(s) trouvée(s)
-          </p>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">
+                📦 Gestion des commandes
+              </h1>
+              <p className="text-gray-600">
+                {filteredOrders.length} commande(s) trouvée(s)
+              </p>
+            </div>
+            <Link
+              to="/orders/new"
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold inline-flex items-center gap-2 self-start"
+            >
+              <FaPlus /> Nouvelle commande
+            </Link>
+          </div>
         </div>
 
         {/* Stats */}

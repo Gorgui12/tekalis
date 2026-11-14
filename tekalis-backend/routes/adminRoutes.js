@@ -130,6 +130,7 @@ router.put("/rma/:id/status", rmaController.updateRMAStatus);
 
 // ── Commandes (/api/v1/admin/orders) ─────────────────────────────────────────
 router.get("/orders", orderController.getAllOrders);
+router.post("/orders", orderController.createManualOrder);
 router.get("/orders/:id", orderController.getOrderById);
 router.put("/orders/:id/status", orderController.updateOrderStatus);
 router.put("/orders/:id/pay", orderController.markAsPaid);
