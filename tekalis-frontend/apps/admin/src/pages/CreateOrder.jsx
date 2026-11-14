@@ -64,23 +64,34 @@ const CreateOrder = () => {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
+    const fetchAll = async (url, limit, extract) => {
+      const all = [];
+      let page = 1;
+      let totalPages = 1;
+
+      do {
+        const { data } = await api.get(url, { params: { limit, page } });
+        all.push(...extract(data));
+        totalPages = data.pagination?.totalPages || 1;
+        page += 1;
+      } while (page <= totalPages && page <= 20);
+
+      return all;
+    };
+
     const loadData = async () => {
       try {
-        const [usersRes, productsRes] = await Promise.all([
-          api.get("/admin/users", { params: { limit: 100 } }),
-          api.get("/admin/products", { params: { limit: 200 } })
+        const [usersList, productsList] = await Promise.all([
+          fetchAll("/admin/users", 100, (data) =>
+            Array.isArray(data) ? data : data.users || []
+          ),
+          fetchAll("/admin/products", 200, (data) =>
+            Array.isArray(data) ? data : data.data || data.products || []
+          )
         ]);
 
-        setUsers(
-          Array.isArray(usersRes.data)
-            ? usersRes.data
-            : usersRes.data.users || []
-        );
-        setCatalog(
-          Array.isArray(productsRes.data)
-            ? productsRes.data
-            : productsRes.data.data || productsRes.data.products || []
-        );
+        setUsers(usersList);
+        setCatalog(productsList);
       } catch (error) {
         console.error("Erreur chargement données:", error);
         toast.error("Erreur lors du chargement des clients et produits");
@@ -114,27 +125,27 @@ const CreateOrder = () => {
 
   const filteredUsers = useMemo(() => {
     const term = userSearch.trim().toLowerCase();
-    if (!term) return users.slice(0, 8);
+    if (!term) return users.slice(0, 20);
     return users
       .filter(
         (user) =>
           user.name?.toLowerCase().includes(term) ||
           user.email?.toLowerCase().includes(term)
       )
-      .slice(0, 8);
+      .slice(0, 20);
   }, [users, userSearch]);
 
   const filteredCatalog = useMemo(() => {
     const term = productSearch.trim().toLowerCase();
-    const source = term
-      ? catalog.filter(
-          (product) =>
-            product.name?.toLowerCase().includes(term) ||
-            product.brand?.toLowerCase().includes(term)
-        )
-      : catalog;
-    return source.slice(0, 12);
+    if (!term) return catalog;
+    return catalog.filter(
+      (product) =>
+        product.name?.toLowerCase().includes(term) ||
+        product.brand?.toLowerCase().includes(term)
+    );
   }, [catalog, productSearch]);
+
+  const displayedCatalog = filteredCatalog.slice(0, 50);
 
   const addProduct = (product) => {
     if (product.stock <= 0) {
@@ -425,13 +436,20 @@ const CreateOrder = () => {
                 />
               </div>
 
+              <p className="text-xs text-gray-500 mb-2">
+                {filteredCatalog.length} produit(s) trouvé(s)
+                {filteredCatalog.length > displayedCatalog.length
+                  ? ` — ${displayedCatalog.length} premiers affichés, précisez la recherche`
+                  : ""}
+              </p>
+
               <div className="border rounded-lg divide-y max-h-64 overflow-y-auto mb-6">
                 {filteredCatalog.length === 0 ? (
                   <p className="px-4 py-3 text-sm text-gray-500">
                     Aucun produit trouvé
                   </p>
                 ) : (
-                  filteredCatalog.map((product) => {
+                  displayedCatalog.map((product) => {
                     const image = getImage(product);
                     const disabled = product.stock <= 0;
                     return (
