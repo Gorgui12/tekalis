@@ -98,7 +98,7 @@ const ConsentBanner = () => {
             </p>
             <p className="text-xs text-surface-600 dark:text-surface-300 leading-relaxed">
               Nous utilisons des cookies et outils de mesure d&apos;audience
-              (Meta Pixel, Google Analytics, Vercel Analytics) pour améliorer
+              (Meta Pixel, Google Analytics, Cloudflare Web Analytics) pour améliorer
               votre expérience et mesurer nos campagnes. Sans votre accord,
               aucun pixel publicitaire n&apos;est chargé.{" "}
               <Link href="/cookies" className="underline hover:text-brand-600">
