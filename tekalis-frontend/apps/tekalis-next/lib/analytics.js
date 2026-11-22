@@ -26,6 +26,22 @@ const API_BASE = (() => {
 
 const CONSENT_KEY = "tekalis_consent";
 const SESSION_KEY = "tekalis_session";
+const DEBUG_KEY = "tekalis_debug";
+
+let pendingMetaEvents = [];
+let pixelInitialized = false;
+let fbScriptLoaded = false;
+
+function debugLog(...args) {
+  if (typeof window === "undefined") return;
+  try {
+    if (window.localStorage.getItem(DEBUG_KEY) === "1") {
+      console.log("[tekalis:analytics]", ...args);
+    }
+  } catch {
+    return;
+  }
+}
 
 export const CONSENT = {
   PENDING: "pending",
@@ -47,6 +63,7 @@ const META_STANDARD_EVENTS = new Set([
   "Search",
   "AddToWishlist",
   "ViewCategory",
+  "Contact",
 ]);
 
 // ── IDs dynamiques (settings/public) ─────────────────────────
@@ -63,18 +80,21 @@ export async function ensureConfig() {
       const res = await fetch(`${API_BASE}/settings/public`, {
         cache: "no-store",
       });
-      if (res.ok) {
-        const json = await res.json();
-        const seo = json?.settings?.seo || {};
-        serverSettings = {
-          pixel: seo.facebookPixelId || PIXEL_ID,
-          ga: seo.googleAnalyticsId || GA_ID,
-        };
-      }
-    } catch {
-      /* backend indisponible : on garde les valeurs d'environnement */
-    } finally {
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const json = await res.json();
+      const seo = json?.settings?.seo || {};
+      serverSettings = {
+        pixel: seo.facebookPixelId || PIXEL_ID,
+        ga: seo.googleAnalyticsId || GA_ID,
+      };
+      debugLog("IDs resolved", {
+        pixel: serverSettings.pixel,
+        ga: serverSettings.ga,
+        source: seo.facebookPixelId ? "settings/public" : "env",
+      });
+    } catch (err) {
       configLoad = null;
+      debugLog("settings/public unavailable", err.message);
     }
   })();
   return configLoad;
@@ -120,7 +140,9 @@ function getSessionId() {
 export function getConsent() {
   if (typeof window === "undefined") return CONSENT.PENDING;
   try {
-    return window.localStorage.getItem(CONSENT_KEY) || CONSENT.PENDING;
+    const value = window.localStorage.getItem(CONSENT_KEY) || CONSENT.PENDING;
+    debugLog("consent read", value);
+    return value;
   } catch {
     return CONSENT.PENDING;
   }
@@ -176,17 +198,34 @@ function primeGtag() {
 }
 
 // ── Chargement des scripts —─────────────────────────────────
-function loadScript(src, id, onLoad) {
+function loadScript(src, id, onLoad, onError) {
   if (typeof document === "undefined") return;
-  if (document.getElementById(id)) {
-    if (onLoad) onLoad();
+  const existing = document.getElementById(id);
+  if (existing) {
+    if (existing.dataset.loaded === "1") {
+      if (onLoad) onLoad();
+    } else {
+      existing.addEventListener("load", () => {
+        existing.dataset.loaded = "1";
+        if (onLoad) onLoad();
+      }, { once: true });
+      existing.addEventListener("error", () => {
+        if (onError) onError();
+      }, { once: true });
+    }
     return;
   }
   const s = document.createElement("script");
   s.id = id;
   s.src = src;
   s.async = true;
-  s.onload = () => onLoad && onLoad();
+  s.onload = () => {
+    s.dataset.loaded = "1";
+    if (onLoad) onLoad();
+  };
+  s.onerror = () => {
+    if (onError) onError();
+  };
   document.head.appendChild(s);
 }
 
@@ -201,22 +240,72 @@ function loadGtag() {
 }
 
 function loadMetaPixel() {
+  if (getConsent() !== CONSENT.ACCEPTED) return;
+  loadScript(
+    "https://connect.facebook.net/en_US/fbevents.js",
+    "tekalis-fb-pixel",
+    () => {
+      fbScriptLoaded = true;
+      debugLog("fbevents.js loaded");
+      initMetaPixel(getPixelId());
+      flushMetaQueue();
+    },
+    () => debugLog("fbevents.js load failed")
+  );
+}
+
+function initMetaPixel(pixelId) {
+  if (!pixelId || pixelInitialized) return;
+  const fbq = ensureFbq();
+  if (!fbq) return;
+  pixelInitialized = true;
+  debugLog("Meta pixel initialized", pixelId);
+  fbq("consent", "grant");
+  fbq("init", pixelId);
+  trackPageView();
+}
+
+function flushMetaQueue() {
+  if (!pixelInitialized || !fbScriptLoaded) return;
+  const fbq = ensureFbq();
+  if (!fbq) return;
+  const queued = pendingMetaEvents.splice(0);
+  for (const args of queued) fbq(...args);
+  if (queued.length) debugLog("queued Meta events flushed", queued.length);
+}
+
+async function ensurePixel() {
+  if (getConsent() !== CONSENT.ACCEPTED) return null;
+  await ensureConfig();
   const pixelId = getPixelId();
-  if (!pixelId) return;
-  loadScript("https://connect.facebook.net/en_US/fbevents.js", "tekalis-fb-pixel", () => {
-    if (window.fbq) {
-      window.fbq("consent", "grant");
-      window.fbq("init", pixelId);
-      trackPageView();
-    }
-  });
+  if (!pixelId) {
+    debugLog("Meta pixel waiting for ID");
+    return null;
+  }
+  ensureFbq();
+  loadMetaPixel();
+  initMetaPixel(pixelId);
+  flushMetaQueue();
+  return window.fbq || null;
+}
+
+function sendMetaEvent(eventName, params, options = {}) {
+  if (!isConsentGranted()) return;
+  const fbq = ensureFbq();
+  if (!fbq) return;
+  const args = META_STANDARD_EVENTS.has(eventName)
+    ? ["track", eventName, params, options]
+    : ["trackCustom", eventName, params, options];
+  if (pixelInitialized && fbScriptLoaded) fbq(...args);
+  else pendingMetaEvents.push(args);
+  debugLog("Meta event", eventName, options.eventID);
+  ensurePixel();
 }
 
 // ⚠️ fbq doit exister dès le chargement du script d'init — on le définit
 // même si le script fbevents.js n'est pas encore arrivé.
 function ensureFbq() {
   if (typeof window === "undefined") return null;
-  if (!getPixelId()) return null;
   if (!window.fbq) {
     window.fbq = function fbq(...args) {
       window.fbq.callMethod
@@ -238,8 +327,9 @@ function ensureFbq() {
 // conserver l'attribution cross-device. Fire-and-forget : jamais
 // bloquant pour l'interface.
 function relayEvent(eventName, eventId, customData) {
-  if (!getPixelId()) return;
+  if (!isConsentGranted()) return;
   try {
+    debugLog("CAPI relay", eventName, String(eventId));
     fetch("/api/v1/tracking/event", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -247,6 +337,7 @@ function relayEvent(eventName, eventId, customData) {
         event_name: eventName,
         event_id: String(eventId),
         url: window.location.href,
+        consent: true,
         fbc: getCookie("_fbc") || undefined,
         fbp: getCookie("_fbp") || undefined,
         custom_data: customData || {},
@@ -264,8 +355,7 @@ export async function grantConsent() {
   await ensureConfig();
   primeGtag();
   loadGtag();
-  ensureFbq();
-  loadMetaPixel();
+  await ensurePixel();
   notifyConsentChanged();
 }
 
@@ -313,8 +403,7 @@ export async function initAnalytics() {
   primeGtag();
   loadGtag();
   if (getConsent() === CONSENT.ACCEPTED) {
-    ensureFbq();
-    loadMetaPixel();
+    await ensurePixel();
   }
 }
 
@@ -323,7 +412,7 @@ export function trackEvent(eventName, params = {}, options = {}) {
   if (typeof window === "undefined") return;
 
   // event_id unique systématique → déduplication browser/CAPI et GA4.
-  const { eventId } = options;
+  const { eventId, metaEventName, relay = true } = options;
   const resolvedId = eventId != null ? String(eventId) : newEventId();
 
   try {
@@ -335,23 +424,15 @@ export function trackEvent(eventName, params = {}, options = {}) {
         ...params,
         event_id: resolvedId,
       });
+      debugLog("GA4 event", eventName, resolvedId);
     }
 
     // Meta (Pixel + relais CAPI) : uniquement après consentement explicite,
     // car ces signaux sont publicitaires.
     if (isConsentGranted()) {
-      const fbq = ensureFbq();
-      if (fbq) {
-        const metaParams = { ...params };
-        const opts = { eventID: resolvedId };
-        if (META_STANDARD_EVENTS.has(eventName)) {
-          fbq("track", eventName, metaParams, opts);
-        } else {
-          fbq("trackCustom", eventName, metaParams, opts);
-        }
-      }
-
-      relayEvent(eventName, resolvedId, params);
+      const metaName = metaEventName || eventName;
+      sendMetaEvent(metaName, { ...params }, { eventID: resolvedId });
+      if (relay) relayEvent(metaName, resolvedId, params);
     }
   } catch {
     /* le tracking ne doit jamais casser l'UI */
@@ -378,11 +459,13 @@ export function trackPageView() {
       window.gtag("event", "page_view", { page_location: url });
     }
     // Meta : uniquement après consentement explicite.
-    if (isConsentGranted()) {
+    if (isConsentGranted() && url !== lastFbqUrl) {
       const fbq = ensureFbq();
-      if (fbq && url !== lastFbqUrl) {
+      if (fbq) {
         lastFbqUrl = url;
-        fbq("track", "PageView");
+        if (pixelInitialized && fbScriptLoaded) fbq("track", "PageView");
+        else pendingMetaEvents.push(["track", "PageView"]);
+        debugLog("Meta event", "PageView", "-");
       }
     }
   } catch {
@@ -468,7 +551,10 @@ export function trackPurchase({ orderId, value = 0, currency = "XOF", items = []
   // confirmation (ou un simple rafraîchissement) peut être rechargée. Meta
   // déduplique via event_id, mais GA4 non — d'où ce garde-fou local.
   const transactionId = orderId ? String(orderId) : "";
-  if (transactionId) {
+  if (!isConsentGranted() && transactionId) {
+    debugLog("Purchase dedupe skipped (no consent)", transactionId);
+  }
+  if (transactionId && isConsentGranted()) {
     try {
       const key = `tekalis_purchase_${transactionId}`;
       if (window.localStorage.getItem(key)) return;
@@ -501,6 +587,7 @@ export function trackPurchase({ orderId, value = 0, currency = "XOF", items = []
     {
       value,
       currency,
+      content_type: "product",
       transaction_id: transactionId || undefined,
       contents,
       content_ids: contents.map((c) => c.id),
@@ -545,12 +632,16 @@ export function trackProductImpressions(products = []) {
 // Le numéro est le +221 78 634 69 46 ; tous les liens passent par wa.me.
 export function trackWhatsAppClick({ linkText = "", linkUrl = "" } = {}) {
   if (typeof window === "undefined") return;
-  trackEvent("whatsapp_click", {
-    link_text: linkText.slice(0, 100),
-    link_url: linkUrl,
-    page_location: window.location.href,
-    page_path: window.location.pathname,
-  });
+  trackEvent(
+    "whatsapp_click",
+    {
+      link_text: linkText.slice(0, 100),
+      link_url: linkUrl,
+      page_location: window.location.href,
+      page_path: window.location.pathname,
+    },
+    { eventId: newEventId(), metaEventName: "Contact" }
+  );
 }
 
 // Un seul listener délégué au niveau du document couvre TOUS les liens
