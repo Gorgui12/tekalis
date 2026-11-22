@@ -80,11 +80,6 @@ app.use("/api/v1", productFeedRouter);
 const metaCatalogRouter = require("./routes/metaCatalogFeed");
 app.use("/api/v1", metaCatalogRouter);
 
-// Tracking (hors rate-limiter global : voir routes/trackingRoutes.js —
-// un limiter dédié est appliqué à l'intérieur)
-const trackingRouter = require("./routes/trackingRoutes");
-app.use("/api/v1/tracking", trackingRouter);
-
 // ─── Connexion MongoDB ────────────────────────────────────────────────────────
 connectDB().catch((err) => {
   console.error("❌ Erreur fatale de connexion MongoDB:", err.message);
@@ -128,6 +123,12 @@ app.use(express.json({
 }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 app.use(mongoSanitize({ allowDots: true }));
+
+// Tracking (hors rate-limiter global : voir routes/trackingRoutes.js —
+// un limiter dédié est appliqué à l'intérieur). Monté après CORS, helmet et
+// le body parsing pour que les réponses /tracking/* portent les bons headers.
+const trackingRouter = require("./routes/trackingRoutes");
+app.use("/api/v1/tracking", trackingRouter);
 
 if (isDev) {
   app.use(morgan("dev"));

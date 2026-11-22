@@ -54,6 +54,7 @@ const ALLOWED_EVENTS = new Set([
   "ViewCategory",
   "ProductImpressions",
   "InitiateCheckoutAbandoned",
+  "Contact",
 ]);
 
 // ── POST /tracking/visit ─────────────────────────────────────────────────────
@@ -88,6 +89,7 @@ router.post("/event", async (req, res) => {
       url = "",
       fbc = "",
       fbp = "",
+      consent,
       custom_data: customData,
     } = req.body || {};
 
@@ -95,13 +97,28 @@ router.post("/event", async (req, res) => {
       return res.status(400).json({ success: false, message: "Événement non autorisé" });
     }
 
+    if (consent !== true) {
+      return res.json({ success: true, skipped: "consent" });
+    }
+
+    const forwardedFor = String(req.headers["x-forwarded-for"] || "");
+    const clientIp = String(
+      req.headers["cf-connecting-ip"] || forwardedFor.split(",")[0] || req.ip || ""
+    ).trim().slice(0, 45);
+    const userAgent = String(req.headers["user-agent"] || "").slice(0, 500);
+
     // Fire-and-forget : on répond immédiatement au navigateur, l'envoi
     // vers Meta se fait en arrière-plan (jamais bloquant pour l'UI).
     MetaCapi.sendEvent({
       eventName,
       eventId: eventId ? String(eventId).slice(0, 100) : undefined,
       actionSource: "website",
-      userData: { fbc: fbc || undefined, fbp: fbp || undefined },
+      userData: {
+        fbc: fbc || undefined,
+        fbp: fbp || undefined,
+        clientIp: clientIp || undefined,
+        userAgent: userAgent || undefined,
+      },
       customData: {
         url: String(url || "").slice(0, 500),
         ...(customData && typeof customData === "object" ? customData : {}),

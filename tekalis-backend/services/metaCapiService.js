@@ -33,7 +33,7 @@ const hashField = (value) => {
   return crypto.createHash("sha256").update(v).digest("hex");
 };
 
-const buildUserData = ({ email, phone, fbc, fbp } = {}) => {
+const buildUserData = ({ email, phone, fbc, fbp, clientIp, userAgent } = {}) => {
   const data = { country: "SN", city: "Dakar" };
   const em = hashField(email);
   const ph = hashField(normalizePhone(phone));
@@ -41,6 +41,8 @@ const buildUserData = ({ email, phone, fbc, fbp } = {}) => {
   if (ph) data.ph = [ph];
   if (fbc) data.fbc = fbc;
   if (fbp) data.fbp = fbp;
+  if (clientIp) data.client_ip = clientIp;
+  if (userAgent) data.user_agent = userAgent;
   return data;
 };
 
