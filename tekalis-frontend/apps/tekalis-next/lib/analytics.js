@@ -240,7 +240,7 @@ function ensureFbq() {
 function relayEvent(eventName, eventId, customData) {
   if (!getPixelId()) return;
   try {
-    fetch(`${API_BASE}/tracking/event`, {
+    fetch("/api/v1/tracking/event", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -395,7 +395,7 @@ export function trackPageVisit() {
   if (typeof window === "undefined") return;
   if (!isConsentGranted()) return;
   try {
-    fetch(`${API_BASE}/tracking/visit`, {
+    fetch("/api/v1/tracking/visit", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
