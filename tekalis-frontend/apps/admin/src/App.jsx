@@ -18,6 +18,8 @@ const Trends = lazy(() => import("./pages/Trends"));
 const AdminOrders = lazy(() => import("./pages/Orders"));
 const CreateOrder = lazy(() => import("./pages/CreateOrder"));
 const AdminOrderDetails = lazy(() => import("./pages/OrderDetails"));
+const Quotes = lazy(() => import("./pages/Quotes"));
+const QuoteDetails = lazy(() => import("./pages/QuoteDetails"));
 const Payments = lazy(() => import("./pages/Payments"));
 
 // Produits
@@ -92,6 +94,8 @@ function App() {
             <Route path="/orders" element={<AdminOrders />} />
             <Route path="/orders/new" element={<CreateOrder />} />
             <Route path="/orders/:id" element={<AdminOrderDetails />} />
+            <Route path="/quotes" element={<Quotes />} />
+            <Route path="/quotes/:id" element={<QuoteDetails />} />
             <Route path="/payments" element={<Payments />} />
 
             {/* Produits */}

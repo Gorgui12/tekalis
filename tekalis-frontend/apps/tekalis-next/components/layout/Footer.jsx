@@ -87,6 +87,7 @@ const Footer = () => {
                 { name: "Électroménager", path: "/category/electromenager" },
                 { name: "Climatiseurs", path: "/category/climatiseurs" },
                 { name: "☀️ Configurateur solaire", path: "/configurateur-solaire" },
+                { name: "📄 Demander un devis", path: "/devis" },
                 { name: "Kits solaires", path: "/kit-solaire/kit-solaire-foyer" },
                 { name: "Outils & calculateurs", path: "/outils/calculateur-consommation-electrique" },
                 { name: "💰 Guides de prix", path: "/prix" },

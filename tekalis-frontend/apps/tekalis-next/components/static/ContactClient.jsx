@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 // Helmet supprime - utiliser metadata export de Next.js
 import {
   FaPhone, FaEnvelope, FaMapMarkerAlt, FaClock,
@@ -237,6 +238,14 @@ const ContactForm = () => {
           {errors.subject && (
             <p className="mt-1 text-sm text-red-600 flex items-center gap-1">
               <FaExclamationCircle size={12} /> {errors.subject}
+            </p>
+          )}
+          {formData.subject === "Demande de devis" && (
+            <p className="mt-2 text-xs text-surface-500 dark:text-surface-400">
+              Pour un devis chiffré avec PDF, utilisez notre formulaire dédié :{" "}
+              <Link href="/devis" className="text-brand-600 dark:text-brand-400 hover:underline font-semibold">
+                Demander un devis →
+              </Link>
             </p>
           )}
         </div>

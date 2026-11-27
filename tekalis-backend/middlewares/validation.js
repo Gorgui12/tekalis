@@ -185,6 +185,74 @@ const newsletterValidation = {
   ]
 };
 
+const quoteValidation = {
+  create: [
+    body("company")
+      .trim()
+      .notEmpty().withMessage("La société est requise")
+      .isLength({ min: 2, max: 120 }).withMessage("La société doit faire entre 2 et 120 caractères"),
+    body("name")
+      .trim()
+      .notEmpty().withMessage("Le nom est requis")
+      .isLength({ min: 2, max: 120 }).withMessage("Le nom doit faire entre 2 et 120 caractères"),
+    body("email")
+      .trim()
+      .notEmpty().withMessage("L'email est requis")
+      .isEmail().withMessage("Email invalide")
+      .normalizeEmail(),
+    body("phone")
+      .optional({ checkFalsy: true })
+      .trim()
+      .isLength({ max: 30 }).withMessage("Le téléphone est trop long"),
+    body("message")
+      .optional({ checkFalsy: true })
+      .trim()
+      .isLength({ max: 2000 }).withMessage("Le message est trop long"),
+    body("items").customSanitizer((value) => {
+      if (typeof value !== "string") return value;
+      try {
+        return JSON.parse(value);
+      } catch {
+        return value;
+      }
+    }),
+    body("items").custom((value) => {
+      if (value === undefined || value === null) return true;
+      if (!Array.isArray(value)) throw new Error("Le champ items doit être un tableau JSON");
+      if (value.length > 30) throw new Error("30 lignes maximum");
+      return true;
+    }),
+    body("items.*.product")
+      .if((value, { req }) => Array.isArray(req.body.items))
+      .isMongoId().withMessage("ID produit invalide"),
+    body("items.*.quantity")
+      .if((value, { req }) => Array.isArray(req.body.items))
+      .isInt({ min: 1, max: 1000 }).withMessage("Quantité invalide"),
+    body("source")
+      .optional({ checkFalsy: true })
+      .isIn(["web", "solar"]).withMessage("Source invalide"),
+    body("solarSummary")
+      .optional({ checkFalsy: true })
+      .trim()
+      .isLength({ max: 4000 }).withMessage("Le résumé solaire est trop long"),
+    body("items").custom((value, { req }) => {
+      const items = Array.isArray(value) ? value : [];
+      const message = typeof req.body.message === "string" ? req.body.message.trim() : "";
+      if (!items.length && message.length < 20) {
+        throw new Error("Au moins un article ou un message de 20 caractères est requis");
+      }
+      return true;
+    }),
+    validate
+  ],
+  status: [
+    body("status")
+      .isIn(["pending", "sent", "accepted", "rejected", "converted", "cancelled"])
+      .withMessage("Statut invalide"),
+    validate
+  ]
+};
+
 module.exports = {
   validate,
   authValidation,
@@ -192,5 +260,6 @@ module.exports = {
   orderValidation,
   reviewValidation,
   cartValidation,
-  newsletterValidation
+  newsletterValidation,
+  quoteValidation
 };

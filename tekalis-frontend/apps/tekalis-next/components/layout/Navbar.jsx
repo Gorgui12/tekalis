@@ -12,7 +12,7 @@ import {
   FaChevronDown, FaChevronRight, FaHome, FaNewspaper, FaEnvelope,
   FaTachometerAlt, FaMobileAlt, FaLaptop, FaGamepad, FaTv,
   FaThermometerHalf, FaHeadphones, FaWrench, FaSun, FaTag,
-  FaChevronUp
+  FaChevronUp, FaFileInvoiceDollar
 } from "react-icons/fa";
 import { useToast } from "@/components/shared/ToastProvider";
 import { ThemeToggle } from "@/components/shared/ThemeProvider";
@@ -158,6 +158,7 @@ const Navbar = () => {
               <Link href="/blog"    className="flex items-center gap-1.5 text-surface-700 dark:text-surface-300 hover:text-brand-600 dark:hover:text-brand-400 transition font-medium text-sm"><FaNewspaper size={14} /> Blog</Link>
               <Link href="/apropos" className="text-surface-700 dark:text-surface-300 hover:text-brand-600 dark:hover:text-brand-400 transition font-medium text-sm">A propos</Link>
               <Link href="/contact" className="flex items-center gap-1.5 text-surface-700 dark:text-surface-300 hover:text-brand-600 dark:hover:text-brand-400 transition font-medium text-sm"><FaEnvelope size={14} /> Contact</Link>
+              <Link href="/devis" className="flex items-center gap-1.5 text-surface-700 dark:text-surface-300 hover:text-brand-600 dark:hover:text-brand-400 transition font-medium text-sm"><FaFileInvoiceDollar size={14} /> Devis</Link>
             </div>
 
             {/* Actions utilisateur */}
@@ -286,6 +287,7 @@ const Navbar = () => {
             <Link href="/blog"         className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-surface-700 dark:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-800 transition font-medium text-sm"><FaNewspaper className="text-brand-600 w-4" /> Blog & Guides</Link>
             <Link href="/apropos"      className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-surface-700 dark:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-800 transition font-medium text-sm"><FaHome className="text-brand-500 w-4" /> A propos</Link>
             <Link href="/contact"      className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-surface-700 dark:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-800 transition font-medium text-sm"><FaEnvelope className="text-brand-500 w-4" /> Contact</Link>
+            <Link href="/devis"        className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-surface-700 dark:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-800 transition font-medium text-sm"><FaFileInvoiceDollar className="text-brand-500 w-4" /> Devis</Link>
           </nav>
 
           <div className="border-t border-surface-200 dark:border-surface-700 pt-3 mt-1">

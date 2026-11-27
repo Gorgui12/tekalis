@@ -13,6 +13,7 @@
 const mailer = require("./mailer");
 const emailQueue = require("./emailQueue");
 const emailTemplates = require("../utils/emailTemplates");
+const { quotePdfFilename } = require("./quotePdfService");
 
 // ── Classe EmailService ───────────────────────────────────────────────────────
 class EmailService {
@@ -204,6 +205,30 @@ class EmailService {
       process.env.ADMIN_EMAIL,
       `🛍️ Nouvelle commande #${order.orderNumber}`,
       html
+    );
+  }
+
+  static async sendQuoteRequestConfirmation(quote, pdfBuffer, validUntil) {
+    const html = emailTemplates.quoteCustomerNotification(quote, validUntil);
+    return this.sendEmail(
+      quote.email,
+      `📄 Votre devis ${quote.quoteNumber} — Tekalis`,
+      html,
+      { attachments: [{ filename: quotePdfFilename(quote), content: pdfBuffer }] }
+    );
+  }
+
+  static async notifyAdminNewQuote(quote, attachments = []) {
+    if (!process.env.ADMIN_EMAIL) {
+      console.warn("⚠️  ADMIN_EMAIL non défini — notification admin ignorée pour le devis", quote.quoteNumber);
+      return { success: false, error: "ADMIN_EMAIL non configuré" };
+    }
+    const html = emailTemplates.quoteAdminNotification(quote);
+    return this.sendEmail(
+      process.env.ADMIN_EMAIL,
+      `🧾 Nouvelle demande de devis ${quote.quoteNumber}`,
+      html,
+      { attachments }
     );
   }
 }

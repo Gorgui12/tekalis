@@ -17,6 +17,7 @@ const STATIC_PAGES = [
   { url: '/blog/onduleur-hybride-ou-off-grid', priority: 0.7, changeFrequency: 'monthly' },
   { url: '/apropos', priority: 0.6, changeFrequency: 'monthly' },
   { url: '/contact', priority: 0.6, changeFrequency: 'monthly' },
+  { url: '/devis', priority: 0.7, changeFrequency: 'monthly' },
   { url: '/faq', priority: 0.6, changeFrequency: 'monthly' },
   { url: '/livraison', priority: 0.6, changeFrequency: 'monthly' },
   { url: '/retours', priority: 0.5, changeFrequency: 'monthly' },

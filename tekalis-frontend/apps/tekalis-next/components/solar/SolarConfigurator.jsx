@@ -15,6 +15,7 @@ import { buildNeed, tierNeed, findMatchingKits } from '@/lib/solar/matching';
 import { formatFcfa } from '@/lib/seo/format';
 import { SOCIAL_LINKS } from '@/lib/utils/constants';
 import useCart from '@/lib/hooks/useCart';
+import api from '@/lib/api';
 import { SOLAR_EVENTS, trackSolarEvent } from '@/lib/solar/tracking';
 
 const APPLIANCE_BY_ID = Object.fromEntries(APPLIANCES.map((a) => [a.id, a]));
@@ -85,6 +86,11 @@ export default function SolarConfigurator({ products = [] }) {
   const [cartFeedback, setCartFeedback] = useState('');
   const [copied, setCopied] = useState(false);
   const [hydrated, setHydrated] = useState(false);
+  const [quoteFormOpen, setQuoteFormOpen] = useState(false);
+  const [quoteForm, setQuoteForm] = useState({ company: '', name: '', email: '' });
+  const [quoteSending, setQuoteSending] = useState(false);
+  const [quoteResult, setQuoteResult] = useState(null);
+  const [quoteError, setQuoteError] = useState('');
 
   // Suivi des etapes : un evenement solar_step_complete par avancement,
   // solar_complete la premiere fois que le devis (etape 4) est atteint.
@@ -225,7 +231,7 @@ export default function SolarConfigurator({ products = [] }) {
 
   const itemCountLabel = items.reduce((s, i) => s + i.qty, 0);
 
-  const buildWhatsAppMessage = () => {
+  const buildQuoteMessage = () => {
     const lines = activeProfile?.lines || [];
     const appareils = items
       .map((i) => `${i.qty}x ${APPLIANCE_BY_ID[i.id]?.label} (${i.hours}h/j)`)
@@ -243,7 +249,47 @@ export default function SolarConfigurator({ products = [] }) {
       WARNINGS.indicative,
       `Configuration : ${typeof window !== 'undefined' ? window.location.href : ''}`,
     ].filter(Boolean);
-    return `https://wa.me/${SOCIAL_LINKS.whatsapp.replace('https://wa.me/', '')}?text=${encodeURIComponent(parts.join('\n'))}`;
+    return parts.join('\n');
+  };
+
+  const buildWhatsAppMessage = () =>
+    `https://wa.me/${SOCIAL_LINKS.whatsapp.replace('https://wa.me/', '')}?text=${encodeURIComponent(buildQuoteMessage())}`;
+
+  const submitQuoteEmail = async (e) => {
+    e.preventDefault();
+    setQuoteError('');
+    setQuoteResult(null);
+    setQuoteSending(true);
+    try {
+      const message = buildQuoteMessage();
+      const fd = new FormData();
+      fd.append('company', quoteForm.company.trim());
+      fd.append('name', quoteForm.name.trim());
+      fd.append('email', quoteForm.email.trim());
+      fd.append('source', 'solar');
+      fd.append('message', message);
+      fd.append('solarSummary', message);
+      if (activeProfile?.complete) {
+        fd.append('items', JSON.stringify(
+          activeProfile.lines.map((l) => ({ product: l.product._id || l.product.id, quantity: l.units }))
+        ));
+      }
+      const { data } = await api.post('/quotes', fd, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
+      setQuoteResult(data?.quote?.quoteNumber || '');
+      trackSolarEvent(SOLAR_EVENTS.QUOTE_EMAIL, {
+        tier,
+        profile: profileId,
+        mode,
+        value: activeProfile?.total || 0,
+        currency: 'XOF',
+      });
+    } catch (err) {
+      setQuoteError(err.response?.data?.message || "Erreur lors de l'envoi du devis. Réessayez.");
+    } finally {
+      setQuoteSending(false);
+    }
   };
 
   const addToCart = () => {
@@ -630,6 +676,18 @@ export default function SolarConfigurator({ products = [] }) {
             </a>
             <button
               type="button"
+              onClick={() => {
+                setQuoteError('');
+                setQuoteResult(null);
+                setQuoteFormOpen(true);
+              }}
+              disabled={!activeProfile?.complete}
+              className="flex-1 px-5 py-3 rounded-lg bg-indigo-600 text-white font-semibold disabled:opacity-40 hover:bg-indigo-700"
+            >
+              Recevoir le devis par email
+            </button>
+            <button
+              type="button"
               onClick={addToCart}
               disabled={!activeProfile?.complete}
               className="flex-1 px-5 py-3 rounded-lg bg-blue-600 text-white font-semibold disabled:opacity-40"
@@ -638,6 +696,62 @@ export default function SolarConfigurator({ products = [] }) {
             </button>
           </div>
           {cartFeedback && <p className="text-sm text-green-700 mb-4">{cartFeedback}</p>}
+
+          {quoteFormOpen && quoteResult === null && (
+            <form
+              onSubmit={submitQuoteEmail}
+              className="bg-white border border-gray-200 rounded-lg p-4 mb-5 grid grid-cols-1 sm:grid-cols-4 gap-3 items-end"
+            >
+              <label className="text-xs font-semibold text-gray-700">
+                Société *
+                <input
+                  type="text"
+                  required
+                  value={quoteForm.company}
+                  onChange={(e) => setQuoteForm((prev) => ({ ...prev, company: e.target.value }))}
+                  className="mt-1 w-full border border-gray-300 rounded px-2 py-1.5 text-sm"
+                />
+              </label>
+              <label className="text-xs font-semibold text-gray-700">
+                Nom *
+                <input
+                  type="text"
+                  required
+                  value={quoteForm.name}
+                  onChange={(e) => setQuoteForm((prev) => ({ ...prev, name: e.target.value }))}
+                  className="mt-1 w-full border border-gray-300 rounded px-2 py-1.5 text-sm"
+                />
+              </label>
+              <label className="text-xs font-semibold text-gray-700">
+                Email *
+                <input
+                  type="email"
+                  required
+                  value={quoteForm.email}
+                  onChange={(e) => setQuoteForm((prev) => ({ ...prev, email: e.target.value }))}
+                  className="mt-1 w-full border border-gray-300 rounded px-2 py-1.5 text-sm"
+                />
+              </label>
+              <button
+                type="submit"
+                disabled={quoteSending}
+                className="px-4 py-2 rounded-lg bg-indigo-600 text-white text-sm font-semibold disabled:opacity-40"
+              >
+                {quoteSending ? 'Envoi en cours...' : 'Envoyer ma demande'}
+              </button>
+            </form>
+          )}
+          {quoteError && (
+            <p role="alert" className="text-sm text-red-700 bg-red-50 border border-red-200 p-3 rounded-lg mb-5">
+              {quoteError}
+            </p>
+          )}
+          {quoteResult !== null && (
+            <div className="text-sm text-green-700 bg-green-50 border border-green-200 p-3 rounded-lg mb-5">
+              <p className="font-semibold">Votre devis PDF arrive par email.</p>
+              {quoteResult && <p>Référence : {quoteResult}</p>}
+            </div>
+          )}
 
           <div className="flex flex-wrap gap-3 mb-6">
             <button type="button" onClick={() => window.print()} className="px-4 py-2 rounded-lg border border-gray-300 text-sm font-semibold">

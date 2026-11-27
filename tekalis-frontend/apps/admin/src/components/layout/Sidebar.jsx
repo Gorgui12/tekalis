@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { label: 'Dashboard',     icon: LayoutDashboard, to: '/dashboard' },
   { label: 'Hero Slides', icon: Image, to: '/hero-slides' },
   { label: 'Commandes',     icon: ShoppingCart,    to: '/orders' },
+  { label: 'Devis', icon: FileText, to: '/quotes' },
   {
     label: 'Produits', icon: Package, to: '/products',
     children: [

@@ -253,6 +253,17 @@ const newsletterLimiter = createLimiter({
   legacyHeaders: false
 });
 
+const quoteLimiter = createLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: parseInt(process.env.RATE_LIMIT_QUOTE_MAX) || 5,
+  message: {
+    success: false,
+    message: "Trop de demandes de devis. Réessayez dans quelques minutes."
+  },
+  standardHeaders: true,
+  legacyHeaders: false
+});
+
 app.use(API_PREFIX, apiLimiter);
 app.use(`${API_PREFIX}/auth/login`, authLimiter);
 app.use(`${API_PREFIX}/auth/register`, authLimiter);
@@ -264,6 +275,7 @@ app.use(`${API_PREFIX}/auth/reset-password`, passwordResetLimiter);
 app.use(`${API_PREFIX}/auth/resend-verification`, passwordResetLimiter);
 app.use(`${API_PREFIX}/newsletter`, newsletterLimiter);
 app.use(`${API_PREFIX}/admin`, adminLimiter);
+app.post(`${API_PREFIX}/quotes`, quoteLimiter);
 
 // ─── Health Check ─────────────────────────────────────────────────────────────
 app.get("/health", (req, res) => {
@@ -304,6 +316,7 @@ loadRoute(`${API_PREFIX}/users`, "./routes/userRoutes");
 loadRoute(`${API_PREFIX}/cart`, "./routes/cartRoutes");
 loadRoute(`${API_PREFIX}/promo`, "./routes/promoRoutes");
 loadRoute(`${API_PREFIX}/orders`, "./routes/orderRoutes");
+loadRoute(`${API_PREFIX}/quotes`, "./routes/quoteRoutes");
 loadRoute(`${API_PREFIX}/reviews`, "./routes/reviewRoutes");
 loadRoute(`${API_PREFIX}/warranties`, "./routes/warrantyRoutes");
 loadRoute(`${API_PREFIX}/rma`, "./routes/rmaRoutes");

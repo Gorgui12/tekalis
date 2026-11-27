@@ -49,6 +49,7 @@ const routes = {
   rmaList: `${frontendUrl}/dashboard/rma`,
   warranties: `${frontendUrl}/dashboard/warranties`,
   adminOrderDetail: (id) => `${adminUrl}/orders/${id}`,
+  adminQuoteDetail: (id) => `${adminUrl}/quotes/${id}`,
 };
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
@@ -562,6 +563,76 @@ const landingPage = (title, message, { linkText, linkUrl } = {}) => {
 </html>`;
 };
 
+const formatQuoteDate = (value) => {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? "-" : date.toLocaleDateString("fr-FR");
+};
+
+const quoteViewItems = (quote) => (quote.items || []).map((item) => ({
+  product: { name: item.name || "Produit" },
+  quantity: item.quantity,
+  price: item.price,
+  lineTotal: item.lineTotal
+}));
+
+const quoteTotalsBlock = (quote) => ({
+  products: quoteViewItems(quote),
+  shippingCost: quote.shippingCost,
+  totalPrice: quote.total
+});
+
+const quoteCustomerNotification = (quote, validUntil) => layout(
+  "Votre demande de devis",
+  `
+    <p style="margin:0 0 10px;font-size:15px">Bonjour <strong>${esc(quote.name || "Client")}</strong>,</p>
+    <p style="margin:0 0 16px;font-size:15px">Nous avons bien reçu votre demande de devis <strong>${esc(quote.quoteNumber)}</strong>. Le PDF est joint à cet email.</p>
+
+    ${infoBlock([
+      `<strong>Référence</strong> : ${esc(quote.quoteNumber)}`,
+      `<strong>Société</strong> : ${esc(quote.company)}`,
+      `<strong>Date d'émission</strong> : ${esc(formatQuoteDate(quote.createdAt || Date.now()))}`,
+      `<strong>Date de validité</strong> : ${esc(formatQuoteDate(validUntil || quote.validUntil))}`
+    ])}
+
+    ${productTable(quoteViewItems(quote))}
+    ${totalsBlock(quoteTotalsBlock(quote))}
+
+    ${quote.message ? `<p style="margin:16px 0;font-size:14px;line-height:1.7"><strong>Votre message</strong> : ${esc(quote.message).replace(/\n/g, "<br>")}</p>` : ""}
+
+    <p style="font-size:13px;color:#64748B;margin-top:20px">
+      Estimation indicative non contractuelle. Prix susceptibles d'être ajustés après validation par notre équipe.
+    </p>
+    <p style="font-size:13px;color:#64748B;margin-top:12px">
+      Une question ? Écrivez-nous : <a href="mailto:${esc(contactEmail)}" style="color:#1E40AF">${esc(contactEmail)}</a>
+    </p>
+  `
+);
+
+const quoteAdminNotification = (quote) => layout(
+  "Nouvelle demande de devis",
+  `
+    <h3 style="margin:0 0 14px;color:#1E40AF;font-size:18px">🧾 Devis ${esc(quote.quoteNumber)}</h3>
+
+    ${infoBlock([
+      `<strong>Société</strong> : ${esc(quote.company)}`,
+      `<strong>Contact</strong> : ${esc(quote.name)}`,
+      `<strong>Email</strong> : ${esc(quote.email)}`,
+      `<strong>Téléphone</strong> : ${esc(quote.phone || "—")}`,
+      `<strong>Source</strong> : ${esc(quote.source || "web")}`,
+      `<strong>Validité</strong> : ${esc(formatQuoteDate(quote.validUntil))}`,
+      `<strong>Montant</strong> : <span style="color:#1E40AF;font-weight:bold">${formatFCFA(quote.total)} FCFA</span>`
+    ])}
+
+    ${quote.message ? infoBlock([`<strong>Message client</strong> : ${esc(quote.message).replace(/\n/g, "<br>")}`]) : ""}
+    ${quote.solarSummary ? infoBlock([`<strong>Résumé solaire</strong> : ${esc(quote.solarSummary).replace(/\n/g, "<br>")}`]) : ""}
+
+    ${productTable(quoteViewItems(quote))}
+    ${totalsBlock(quoteTotalsBlock(quote))}
+
+    ${button(routes.adminQuoteDetail(quote._id), "Voir la demande (Admin)")}
+  `
+);
+
 module.exports = {
   // Exportées pour que les pages HTML servies par l'API échappent elles aussi
   // ce qu'elles injectent, et pour réutiliser le convertisseur texte.
@@ -578,6 +649,8 @@ module.exports = {
   warrantyExpiring,
   adminOrderNotification,
   emailVerification,
+  quoteCustomerNotification,
+  quoteAdminNotification,
   // Exportée pour que le contrôleur newsletter applique exactement la même
   // durée que celle annoncée dans l'email.
   NEWSLETTER_CONFIRM_TTL_HOURS,

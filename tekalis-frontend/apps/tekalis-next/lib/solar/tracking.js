@@ -11,6 +11,7 @@ export const SOLAR_EVENTS = {
   STEP_COMPLETE: 'solar_step_complete',
   TIER_SELECT: 'solar_tier_select',
   QUOTE_WHATSAPP: 'solar_quote_whatsapp',
+  QUOTE_EMAIL: 'solar_quote_email',
   ADD_TO_CART: 'solar_add_to_cart',
   COMPLETE: 'solar_complete',
 };
