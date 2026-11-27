@@ -87,6 +87,7 @@ router.post("/event", async (req, res) => {
       event_name: eventName,
       event_id: eventId,
       url = "",
+      event_source_url: eventSourceUrl = "",
       fbc = "",
       fbp = "",
       consent,
@@ -101,6 +102,8 @@ router.post("/event", async (req, res) => {
       return res.json({ success: true, skipped: "consent" });
     }
 
+    const resolvedEventSourceUrl = String(eventSourceUrl || url || "").slice(0, 2000);
+
     const forwardedFor = String(req.headers["x-forwarded-for"] || "");
     const clientIp = String(
       req.headers["cf-connecting-ip"] || forwardedFor.split(",")[0] || req.ip || ""
@@ -113,6 +116,7 @@ router.post("/event", async (req, res) => {
       eventName,
       eventId: eventId ? String(eventId).slice(0, 100) : undefined,
       actionSource: "website",
+      eventSourceUrl: resolvedEventSourceUrl,
       userData: {
         fbc: fbc || undefined,
         fbp: fbp || undefined,

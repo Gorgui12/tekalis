@@ -111,6 +111,10 @@ function newEventId() {
   return `evt_${Date.now()}_${Math.random().toString(36).slice(2, 12)}`;
 }
 
+function currentPageUrl() {
+  return typeof window === "undefined" ? "" : window.location.href;
+}
+
 function getCookie(name) {
   if (typeof document === "undefined") return "";
   const m = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
@@ -270,7 +274,7 @@ function flushMetaQueue() {
   const fbq = ensureFbq();
   if (!fbq) return;
   const queued = pendingMetaEvents.splice(0);
-  for (const args of queued) fbq(...args);
+  for (const buildArgs of queued) fbq(...buildArgs());
   if (queued.length) debugLog("queued Meta events flushed", queued.length);
 }
 
@@ -293,11 +297,14 @@ function sendMetaEvent(eventName, params, options = {}) {
   if (!isConsentGranted()) return;
   const fbq = ensureFbq();
   if (!fbq) return;
-  const args = META_STANDARD_EVENTS.has(eventName)
-    ? ["track", eventName, params, options]
-    : ["trackCustom", eventName, params, options];
-  if (pixelInitialized && fbScriptLoaded) fbq(...args);
-  else pendingMetaEvents.push(args);
+  const buildArgs = () => {
+    const eventParams = { ...params, event_source_url: currentPageUrl() };
+    return META_STANDARD_EVENTS.has(eventName)
+      ? ["track", eventName, eventParams, options]
+      : ["trackCustom", eventName, eventParams, options];
+  };
+  if (pixelInitialized && fbScriptLoaded) fbq(...buildArgs());
+  else pendingMetaEvents.push(buildArgs);
   debugLog("Meta event", eventName, options.eventID);
   ensurePixel();
 }
@@ -328,6 +335,7 @@ function ensureFbq() {
 // bloquant pour l'interface.
 function relayEvent(eventName, eventId, customData) {
   if (!isConsentGranted()) return;
+  const eventSourceUrl = currentPageUrl();
   try {
     debugLog("CAPI relay", eventName, String(eventId));
     fetch("/api/v1/tracking/event", {
@@ -336,7 +344,8 @@ function relayEvent(eventName, eventId, customData) {
       body: JSON.stringify({
         event_name: eventName,
         event_id: String(eventId),
-        url: window.location.href,
+        url: eventSourceUrl,
+        event_source_url: eventSourceUrl,
         consent: true,
         fbc: getCookie("_fbc") || undefined,
         fbp: getCookie("_fbp") || undefined,
@@ -447,7 +456,7 @@ let lastFbqUrl = "";
 
 export function trackPageView() {
   if (typeof window === "undefined") return;
-  const url = window.location.href;
+  const url = currentPageUrl();
   try {
     // GA4 : émis dans tous les cas. En Consent Mode v2, un consentement
     // "denied" transforme l'événement en ping anonyme (sans cookie) : Google
@@ -463,8 +472,9 @@ export function trackPageView() {
       const fbq = ensureFbq();
       if (fbq) {
         lastFbqUrl = url;
-        if (pixelInitialized && fbScriptLoaded) fbq("track", "PageView");
-        else pendingMetaEvents.push(["track", "PageView"]);
+        const buildArgs = () => ["track", "PageView", { event_source_url: currentPageUrl() }];
+        if (pixelInitialized && fbScriptLoaded) fbq(...buildArgs());
+        else pendingMetaEvents.push(buildArgs);
         debugLog("Meta event", "PageView", "-");
       }
     }
@@ -637,7 +647,7 @@ export function trackWhatsAppClick({ linkText = "", linkUrl = "" } = {}) {
     {
       link_text: linkText.slice(0, 100),
       link_url: linkUrl,
-      page_location: window.location.href,
+      page_location: currentPageUrl(),
       page_path: window.location.pathname,
     },
     { eventId: newEventId(), metaEventName: "Contact" }
