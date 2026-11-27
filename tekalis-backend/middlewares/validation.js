@@ -219,7 +219,6 @@ const quoteValidation = {
     body("items").custom((value) => {
       if (value === undefined || value === null) return true;
       if (!Array.isArray(value)) throw new Error("Le champ items doit être un tableau JSON");
-      if (value.length > 30) throw new Error("30 lignes maximum");
       return true;
     }),
     body("items.*.product")

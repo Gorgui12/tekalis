@@ -93,6 +93,7 @@ exports.createQuote = async (req, res) => {
     }));
 
     const quote = new QuoteRequest({
+      quoteNumber: QuoteRequest.generateQuoteNumber(),
       company: String(req.body.company || "").trim(),
       name: String(req.body.name || "").trim(),
       email: String(req.body.email || "").trim().toLowerCase(),
@@ -238,7 +239,7 @@ exports.updateQuoteStatus = async (req, res) => {
         $set: { status },
         $push: { statusHistory: { status, updatedAt: new Date() } }
       },
-      { new: true, runValidators: true }
+      { new: true }
     ).populate("user", "name email");
 
     if (!quote) {

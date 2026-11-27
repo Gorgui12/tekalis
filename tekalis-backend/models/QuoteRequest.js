@@ -143,14 +143,18 @@ const quoteRequestSchema = new mongoose.Schema({
   }]
 }, { timestamps: true });
 
-quoteRequestSchema.pre("save", function(next) {
-  if (!this.quoteNumber) {
-    const date = new Date();
-    const year = date.getFullYear().toString().slice(-2);
-    const month = String(date.getMonth() + 1).padStart(2, "0");
-    const randomSuffix = crypto.randomBytes(4).toString("hex").toUpperCase();
-    this.quoteNumber = `DEV-${year}-${month}-${randomSuffix}`;
-  }
+const generateQuoteNumber = () => {
+  const date = new Date();
+  const year = date.getFullYear().toString().slice(-2);
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const randomSuffix = crypto.randomBytes(4).toString("hex").toUpperCase();
+  return `DEV-${year}-${month}-${randomSuffix}`;
+};
+
+quoteRequestSchema.statics.generateQuoteNumber = generateQuoteNumber;
+
+quoteRequestSchema.pre("validate", function(next) {
+  if (!this.quoteNumber) this.quoteNumber = generateQuoteNumber();
   if (!this.statusHistory.length) {
     this.statusHistory.push({ status: this.status, updatedAt: new Date() });
   }

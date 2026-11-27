@@ -8,6 +8,7 @@ const {
   quotePdfFilename
 } = require("../services/quotePdfService");
 const { quoteValidation } = require("../middlewares/validation");
+const QuoteRequest = require("../models/QuoteRequest");
 
 const decodePdfStreams = (pdf) => {
   const raw = pdf.toString("latin1");
@@ -140,4 +141,23 @@ test("quoteValidation borne la quantité à 1000", async () => {
 test("quoteValidation refuse une source inconnue", async () => {
   const errors = await runChain(quoteValidation.create, { ...baseBody, source: "autre" });
   assert.ok(errors.some((error) => error.path === "source"), JSON.stringify(errors));
+});
+
+test("quoteValidation accepte autant d'articles que le catalogue", async () => {
+  const items = Array.from({ length: 40 }, (_, index) => ({
+    product: `507f1f77bcf86cd799439${String(index).padStart(3, "0")}`,
+    quantity: 1
+  }));
+  const errors = await runChain(quoteValidation.create, { ...baseBody, items });
+  assert.equal(errors.length, 0, JSON.stringify(errors));
+});
+
+test("quoteNumber est généré avant la validation du devis", async () => {
+  const quote = new QuoteRequest({
+    company: "Tekalis SARL",
+    name: "Awa Diop",
+    email: "awa@example.com"
+  });
+  await quote.validate();
+  assert.match(quote.quoteNumber, /^DEV-\d{2}-\d{2}-[A-F0-9]{8}$/);
 });

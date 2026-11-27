@@ -50,15 +50,30 @@ export default function QuoteRequestClient() {
   useEffect(() => {
     let active = true;
 
-    api
-      .get("/products?limit=100&fields=_id,name,slug,price,brand,images")
-      .then((res) => {
-        if (!active) return;
-        const products = Array.isArray(res.data?.products)
-          ? res.data.products
-          : Array.isArray(res.data?.data)
-            ? res.data.data
+    const loadCatalog = async () => {
+      const all = [];
+      let page = 1;
+
+      while (page <= 100) {
+        const res = await api.get(
+          `/products?page=${page}&limit=200&fields=_id,name,slug,price,brand,images`
+        );
+        const products = Array.isArray(res.data?.data)
+          ? res.data.data
+          : Array.isArray(res.data?.products)
+            ? res.data.products
             : [];
+        all.push(...products);
+        if (!res.data?.pagination?.hasNext || products.length === 0) break;
+        page += 1;
+      }
+
+      return all;
+    };
+
+    loadCatalog()
+      .then((products) => {
+        if (!active) return;
         setCatalog(products);
         setCatalogError(products.length === 0);
       })
