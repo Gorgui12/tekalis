@@ -8,12 +8,15 @@ import {
   FaDownload,
   FaTimes,
   FaCheck,
-  FaPlus
+  FaPlus,
+  FaTrash
 } from "react-icons/fa";
 import api from "@shared/api/api";
 import { generateInvoicePdf } from "../utils/invoice";
+import { useToast } from "@shared/context/ToastContext";
 
 const AdminOrders = () => {
+  const toast = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -22,6 +25,7 @@ const AdminOrders = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [selectedOrders, setSelectedOrders] = useState([]);
   const [settings, setSettings] = useState({});
+  const [deletingId, setDeletingId] = useState(null);
 
   useEffect(() => {
     fetchOrders();
@@ -75,6 +79,22 @@ const AdminOrders = () => {
       alert("Statut mis à jour avec succès");
     } catch (error) {
       alert("Erreur lors de la mise à jour");
+    }
+  };
+
+  const deleteOrder = async (order) => {
+    if (!window.confirm(`Êtes-vous sûr de vouloir supprimer la commande ${order.orderNumber || order._id} ?`)) return;
+
+    setDeletingId(order._id);
+    try {
+      await api.delete(`/admin/orders/${order._id}`);
+      setOrders(prev => prev.filter(o => o._id !== order._id));
+      setSelectedOrders(prev => prev.filter(id => id !== order._id));
+      toast.success("Commande supprimée avec succès");
+    } catch {
+      toast.error("Erreur lors de la suppression de la commande");
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -346,6 +366,14 @@ const AdminOrders = () => {
                             title="Télécharger facture"
                           >
                             <FaDownload />
+                          </button>
+                          <button
+                            onClick={() => deleteOrder(order)}
+                            disabled={deletingId === order._id}
+                            className="text-red-600 hover:text-red-700 p-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            title="Supprimer la commande"
+                          >
+                            <FaTrash />
                           </button>
                         </div>
                       </td>
