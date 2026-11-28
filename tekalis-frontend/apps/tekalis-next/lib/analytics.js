@@ -338,7 +338,7 @@ function relayEvent(eventName, eventId, customData) {
   const eventSourceUrl = currentPageUrl();
   try {
     debugLog("CAPI relay", eventName, String(eventId));
-    fetch("/api/v1/tracking/event", {
+    fetch(`${API_BASE}/tracking/event`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -488,7 +488,7 @@ export function trackPageVisit() {
   if (typeof window === "undefined") return;
   if (!isConsentGranted()) return;
   try {
-    fetch("/api/v1/tracking/visit", {
+    fetch(`${API_BASE}/tracking/visit`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

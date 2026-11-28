@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
 import {
   ShoppingCart,
   Package,
@@ -31,14 +30,20 @@ const Statistiques = () => {
       try {
         setLoading(true);
         // ✅ Fix : utiliser `api` partagé au lieu de axios.get('http://localhost:5000/...')
-        const [statsRes, revenueRes, productsRes] = await Promise.all([
+        const [statsRes, revenueRes, productsRes, ordersRes] = await Promise.all([
           api.get('/admin/stats'),
           api.get('/admin/stats/revenue'),
           api.get('/admin/stats/top-products'),
+          api.get('/admin/stats/recent-orders'),
         ]);
         setStats(statsRes.data);
         setRevenue(revenueRes.data?.data ?? []);
         setTopProducts(productsRes.data?.products ?? []);
+        setActivities((ordersRes.data?.orders ?? []).map((order) => ({
+          type: 'order',
+          message: `Nouvelle commande ${order.orderNumber || `#${String(order._id).slice(-6)}`}`,
+          time: new Date(order.createdAt).toLocaleDateString('fr-FR'),
+        })));
       } catch (err) {
         setError(err.response?.data?.message || 'Erreur lors du chargement des statistiques');
         console.error('Erreur stats:', err);

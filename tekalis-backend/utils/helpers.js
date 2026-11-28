@@ -2,6 +2,16 @@
 // 18. utils/helpers.js
 // ===============================================
 
+// Clé de jour "YYYY-MM-DD" dans le fuseau local du serveur.
+// Utilisée par le tracking et les analytics pour éviter tout décalage UTC.
+const dateKey = (date = new Date()) => {
+  const d = new Date(date);
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
 // Générer un slug à partir d'un texte
 const generateSlug = (text) => {
   return text
@@ -156,6 +166,7 @@ const maskPhone = (phone) => {
 };
 
 module.exports = {
+  dateKey,
   generateSlug,
   generateOrderNumber,
   formatPrice,

@@ -17,6 +17,7 @@ const router = express.Router();
 
 const { verifyToken, isAdmin } = require("../middlewares/authMiddleware");
 const { escapeRegex } = require("../utils/regexEscape");
+const { dateKey } = require("../utils/helpers");
 
 router.use(verifyToken, isAdmin);
 
@@ -496,61 +497,84 @@ router.delete("/promo-codes/:id", async (req, res) => {
 });
 
 // ── Analytics (/api/v1/admin/analytics) ──────────────────────────────────────
-// Agrégations réelles sur ventes payées, produits, catégories et clients.
-// Périodes acceptées : 7days, 30days, 90days, year.
+// Toutes les métriques financières portent sur les commandes PAYÉES.
+// Les visiteurs uniques sont dédupliqués par sessionId sur toute la période,
+// tandis que `sessions` compte les paires (jour, session) et `views` les pages.
+// Périodes acceptées : 7days, 30days, 90days, year (365 jours glissants).
 router.get("/analytics", async (req, res) => {
   try {
     const { period = "30days" } = req.query;
     const periodDays = { "7days": 7, "30days": 30, "90days": 90, "year": 365 }[period] || 30;
 
+    const end = new Date();
     const start = new Date();
     start.setHours(0, 0, 0, 0);
     if (period === "year") start.setFullYear(start.getFullYear() - 1);
     else start.setDate(start.getDate() - periodDays);
 
-    const prevStart = new Date(start.getTime() - (period === "year" ? 365 : periodDays) * 24 * 60 * 60 * 1000);
+    const prevStart = new Date(start.getTime() - periodDays * 24 * 60 * 60 * 1000);
+    const currentDayStart = dateKey(start);
+    const currentDayEnd = dateKey(end);
+    const prevDayStart = dateKey(prevStart);
 
-    // Bornes "jour" (les visites sont stockées au format YYYY-MM-DD)
-    const dStr = (d) => d.toISOString().split("T")[0];
-    const currentDayStart = dStr(start);
-    const prevDayStart = dStr(prevStart);
+    const paidNow = { isPaid: true, createdAt: { $gte: start } };
+    const paidPrev = { isPaid: true, createdAt: { $gte: prevStart, $lt: start } };
+    const visitsNow = { date: { $gte: currentDayStart, $lte: currentDayEnd } };
+    const visitsPrev = { date: { $gte: prevDayStart, $lt: currentDayStart } };
 
-    // ── Stats globales (vs période précédente)
-    const [currentRev, prevRev, currentOrders, prevOrders, newCustomers, prevCustomers, currentVisits, prevVisits] = await Promise.all([
+    const [
+      currentRev, prevRev, currentOrders, prevOrders, allOrders,
+      newCustomers, prevCustomers,
+      currentVisits, prevVisits, currentUnique, prevUnique
+    ] = await Promise.all([
       Order.aggregate([
-        { $match: { isPaid: true, createdAt: { $gte: start } } },
-        { $group: { _id: null, total: { $sum: "$totalPrice" }, count: { $sum: 1 } } }
-      ]),
-      Order.aggregate([
-        { $match: { isPaid: true, createdAt: { $gte: prevStart, $lt: start } } },
+        { $match: paidNow },
         { $group: { _id: null, total: { $sum: "$totalPrice" } } }
       ]),
+      Order.aggregate([
+        { $match: paidPrev },
+        { $group: { _id: null, total: { $sum: "$totalPrice" } } }
+      ]),
+      Order.countDocuments(paidNow),
+      Order.countDocuments(paidPrev),
       Order.countDocuments({ createdAt: { $gte: start } }),
-      Order.countDocuments({ createdAt: { $gte: prevStart, $lt: start } }),
       User.countDocuments({ createdAt: { $gte: start } }),
       User.countDocuments({ createdAt: { $gte: prevStart, $lt: start } }),
       Visit.aggregate([
-        { $match: { date: { $gte: currentDayStart } } },
+        { $match: visitsNow },
         { $group: { _id: null, sessions: { $sum: 1 }, views: { $sum: "$visits" } } }
       ]),
       Visit.aggregate([
-        { $match: { date: { $gte: prevDayStart, $lt: currentDayStart } } },
-        { $group: { _id: null, sessions: { $sum: 1 }, views: { $sum: "$visits" } } }
+        { $match: visitsPrev },
+        { $group: { _id: null, sessions: { $sum: 1 } } }
+      ]),
+      Visit.aggregate([
+        { $match: visitsNow },
+        { $group: { _id: "$sessionId" } },
+        { $count: "count" }
+      ]),
+      Visit.aggregate([
+        { $match: visitsPrev },
+        { $group: { _id: "$sessionId" } },
+        { $count: "count" }
       ])
     ]);
 
     const totalRevenue = currentRev[0]?.total || 0;
+    const prevRevenue = prevRev[0]?.total || 0;
     const totalOrders = currentOrders;
     const avgOrderValue = totalOrders > 0 ? totalRevenue / totalOrders : 0;
-    const prevRevenue = prevRev[0]?.total || 0;
+    const prevAvgOrderValue = prevOrders > 0 ? prevRevenue / prevOrders : 0;
 
     const sessions = currentVisits[0]?.sessions || 0;
     const views = currentVisits[0]?.views || 0;
     const prevSessions = prevVisits[0]?.sessions || 0;
+    const visitors = currentUnique[0]?.count || 0;
+    const prevVisitors = prevUnique[0]?.count || 0;
 
-    // Taux de conversion = commandes payées / sessions (visiteurs uniques/jour)
-    const prevRate = prevSessions > 0 ? (prevOrders / prevSessions) * 100 : 0;
-    const conversionRate = sessions > 0 ? (totalOrders / sessions) * 100 : 0;
+    // Le taux de conversion rapporte les commandes payées aux visiteurs uniques.
+    const conversionRate = visitors > 0 ? (totalOrders / visitors) * 100 : 0;
+    const prevRate = prevVisitors > 0 ? (prevOrders / prevVisitors) * 100 : 0;
 
     const pct = (a, b) => b > 0 ? Math.round(((a - b) / b) * 1000) / 10 : 0;
 
@@ -558,11 +582,14 @@ router.get("/analytics", async (req, res) => {
       totalRevenue: Math.round(totalRevenue),
       revenueChange: pct(totalRevenue, prevRevenue),
       totalOrders,
+      allOrders,
       ordersChange: pct(totalOrders, prevOrders),
       avgOrderValue: Math.round(avgOrderValue),
-      avgOrderChange: pct(avgOrderValue, prevOrders > 0 ? prevRevenue / prevOrders : 0),
+      avgOrderChange: pct(avgOrderValue, prevAvgOrderValue),
       newCustomers,
       customersChange: pct(newCustomers, prevCustomers),
+      visitors,
+      visitorsChange: pct(visitors, prevVisitors),
       sessions,
       sessionsChange: pct(sessions, prevSessions),
       views,
@@ -570,23 +597,32 @@ router.get("/analytics", async (req, res) => {
       conversionChange: pct(conversionRate, prevRate)
     };
 
-    // ── Série revenu par jour
+    // ── Série revenu par jour, avec comblement des jours sans vente
     const revenueAgg = await Order.aggregate([
-      { $match: { isPaid: true, createdAt: { $gte: start } } },
+      { $match: paidNow },
       {
         $group: {
           _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
           revenue: { $sum: "$totalPrice" },
           orders: { $sum: 1 }
         }
-      },
-      { $sort: { _id: 1 } }
+      }
     ]);
-    const revenue = revenueAgg.map(d => ({ date: d._id, revenue: Math.round(d.revenue), orders: d.orders }));
+    const revenueByDay = new Map(revenueAgg.map(d => [d._id, d]));
+    const revenue = [];
+    for (let cursor = new Date(start); cursor <= end; cursor.setDate(cursor.getDate() + 1)) {
+      const key = dateKey(cursor);
+      const row = revenueByDay.get(key);
+      revenue.push({
+        date: key,
+        revenue: row ? Math.round(row.revenue) : 0,
+        orders: row?.orders || 0
+      });
+    }
 
-    // ── Top produits vendus
+    // ── Ventes produits : prix historique de la commande, tout le catalogue
     const productSales = await Order.aggregate([
-      { $match: { isPaid: true, createdAt: { $gte: start } } },
+      { $match: paidNow },
       { $unwind: "$products" },
       {
         $group: {
@@ -595,81 +631,100 @@ router.get("/analytics", async (req, res) => {
           revenue: { $sum: { $multiply: ["$products.price", "$products.quantity"] } }
         }
       },
-      { $sort: { revenue: -1 } },
-      { $limit: 10 }
+      { $sort: { revenue: -1 } }
     ]);
     const productIds = productSales.map(p => p._id);
     const productDocs = productIds.length
       ? await Product.find({ _id: { $in: productIds } })
-          .select("name images category")
+          .select("name sku images category rating")
           .populate("category", "name")
           .lean()
       : [];
-    const productMap = productDocs.reduce((acc, p) => {
-      acc[p._id.toString()] = p;
-      return acc;
-    }, {});
+    const productMap = new Map(productDocs.map(p => [p._id.toString(), p]));
 
-    const topProducts = productSales
-      .filter(p => productMap[p._id.toString()])
-      .slice(0, 5)
-      .map(p => {
-        const doc = productMap[p._id.toString()];
-        return {
-          _id: p._id,
-          name: doc.name,
-          sales: p.sales,
-          revenue: Math.round(p.revenue),
-          image: doc.images?.[0]?.url || doc.images?.[0] || null
-        };
-      });
+    const topProducts = productSales.slice(0, 5).map(p => {
+      const doc = productMap.get(p._id.toString()) || {};
+      return {
+        _id: p._id,
+        id: p._id,
+        name: doc.name || "Produit supprimé",
+        sku: doc.sku || null,
+        sales: p.sales,
+        revenue: Math.round(p.revenue),
+        category: doc.category?.[0]?.name || null,
+        rating: doc.rating?.average || null,
+        image: doc.images?.[0]?.url || doc.images?.[0] || null
+      };
+    });
 
-    // ── Ventes par catégorie
+    // ── Ventes par catégorie : `value` et `revenue` sont le CA en FCFA,
+    // `sales` reste le nombre d'unités (cohérence avec le camembert).
     const catAgg = new Map();
-    for (const doc of productDocs) {
-      const sale = productSales.find(p => p._id.toString() === doc._id.toString());
-      if (!sale) continue;
-      const names = (doc.category || [])
+    for (const sale of productSales) {
+      const doc = productMap.get(sale._id.toString());
+      const names = (doc?.category || [])
         .map(c => c?.name)
         .filter(Boolean);
       (names.length ? names : ["Non catégorisé"]).forEach(name => {
-        const entry = catAgg.get(name) || { name, value: 0, revenue: 0 };
-        entry.value += sale.sales;
+        const entry = catAgg.get(name) || { name, sales: 0, revenue: 0, products: 0 };
+        entry.sales += sale.sales;
         entry.revenue += sale.revenue;
+        entry.products += 1;
         catAgg.set(name, entry);
       });
     }
     const categories = [...catAgg.values()]
-      .sort((a, b) => b.value - a.value)
-      .map(c => ({ name: c.name, value: c.value, revenue: Math.round(c.revenue) }));
+      .sort((a, b) => b.revenue - a.revenue)
+      .map(c => ({
+        name: c.name,
+        sales: c.sales,
+        products: c.products,
+        revenue: Math.round(c.revenue),
+        value: Math.round(c.revenue)
+      }));
 
-    // ── Clients nouveaux vs récurrents par jour
-    // Graphique clients : uniquement les commandes rattachées à un compte.
-    // Les commandes invité (user null) n'ont pas d'identité client à suivre.
-    const orderUsers = await Order.find({ createdAt: { $gte: start }, user: { $ne: null } })
+    // ── Clients nouveaux vs récurrents par jour (commandes payées uniquement).
+    // Les commandes invitées n'ont pas d'identité client suivable.
+    const orderUsers = await Order.find({
+      createdAt: { $gte: start },
+      isPaid: true,
+      user: { $ne: null }
+    })
       .select("user createdAt")
       .lean();
     const uids = [...new Set(orderUsers.map(o => o.user.toString()))];
     const userDocs = uids.length
       ? await User.find({ _id: { $in: uids } }).select("createdAt").lean()
       : [];
-    const createdMap = new Map(userDocs.map(u => [u._id.toString(), new Date(u.createdAt)]));
+    const createdMap = new Map(userDocs.map(u => [u._id.toString(), dateKey(u.createdAt)]));
 
     const bucket = new Map();
-    const dayKey = d => d.toISOString().split("T")[0];
     for (const o of orderUsers) {
-      const created = createdMap.get(o.user.toString());
-      const key = dayKey(new Date(o.createdAt));
+      const key = dateKey(o.createdAt);
+      const createdKey = createdMap.get(o.user.toString());
       const entry = bucket.get(key) || { date: key, new: 0, returning: 0 };
-      const createdAt = created ? created.setHours(0, 0, 0, 0) : 0;
-      const orderDay = new Date(o.createdAt).setHours(0, 0, 0, 0);
-      if (createdAt >= orderDay) entry.new += 1;
+      if (createdKey && createdKey >= key) entry.new += 1;
       else entry.returning += 1;
       bucket.set(key, entry);
     }
-    const customers = [...bucket.values()].sort((a, b) => a.date.localeCompare(b.date));
+    const customers = [];
+    for (let cursor = new Date(start); cursor <= end; cursor.setDate(cursor.getDate() + 1)) {
+      const key = dateKey(cursor);
+      customers.push(bucket.get(key) || { date: key, new: 0, returning: 0 });
+    }
 
-    res.json({ success: true, period, stats, revenue, categories, topProducts, customers });
+    res.json({
+      success: true,
+      period,
+      periodDays,
+      start: currentDayStart,
+      end: currentDayEnd,
+      stats,
+      revenue,
+      categories,
+      topProducts,
+      customers
+    });
   } catch (e) {
     console.error("❌ Erreur admin/analytics:", e);
     res.status(500).json({ success: false, message: e.message });

@@ -24,6 +24,7 @@ const rateLimit = require("express-rate-limit");
 const router = express.Router();
 const Visit = require("../models/Visit");
 const MetaCapi = require("../services/metaCapiService");
+const { dateKey } = require("../utils/helpers");
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -65,7 +66,7 @@ router.post("/visit", async (req, res) => {
 
     if (!sessionId) return res.status(400).json({ success: false, message: "sessionId manquant" });
 
-    const today = new Date().toISOString().split("T")[0];
+    const today = dateKey();
 
     await Visit.updateOne(
       { date: today, sessionId },

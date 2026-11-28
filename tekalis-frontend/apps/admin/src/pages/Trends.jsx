@@ -6,6 +6,8 @@ import {
 } from "react-icons/fa";
 import api from "@shared/api/api";
 
+const SITE_URL = (import.meta.env.VITE_CLIENT_URL || "https://tekalis.com").replace(/\/$/, "");
+
 const formatDate = (d) => {
   if (!d) return "—";
   const date = new Date(d);
@@ -267,7 +269,7 @@ const AdminTrends = () => {
                       <div className="flex gap-2">
                         {s.hasGuide && s.guideSlug && (
                           <a
-                            href={`https://tekalis.com/prix/${s.guideSlug}`}
+                            href={`${SITE_URL}/prix/${s.guideSlug}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-1 text-xs bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 px-2 py-1 rounded-lg font-semibold transition"
@@ -277,7 +279,7 @@ const AdminTrends = () => {
                         )}
                         {s.hasProduct && s.productSlug && (
                           <a
-                            href={`https://tekalis.com/products/${s.productSlug}`}
+                            href={`${SITE_URL}/products/${s.productSlug}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-1 text-xs bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 px-2 py-1 rounded-lg font-semibold transition"

@@ -9,6 +9,7 @@ const User = require("../models/User");
 const Review = require("../models/Review");
 const RMA = require("../models/RMA");
 const { verifyToken, isAdmin } = require("../middlewares/authMiddleware");
+const { dateKey } = require("../utils/helpers");
 
 // Middleware: toutes les routes nécessitent admin
 router.use(verifyToken);
@@ -52,7 +53,7 @@ router.get("/revenue", async (req, res) => {
     today.setHours(0, 0, 0, 0);
 
     while (current <= today) {
-      const dateStr = current.toISOString().split("T")[0];
+      const dateStr = dateKey(current);
       const day = salesData.find(d => d._id === dateStr);
       filledData.push({
         date: dateStr,
@@ -141,15 +142,22 @@ router.get("/", async (req, res) => {
       : 0;
 
     // 🛒 Statistiques des commandes
+    // Cohérent avec `revenue` : seules les commandes payées comptent dans le CA.
     const totalOrders = await Order.countDocuments({
+      isPaid: true,
       createdAt: { $gte: startDate }
     });
 
     const previousOrders = await Order.countDocuments({
-      createdAt: { 
+      isPaid: true,
+      createdAt: {
         $gte: previousStartDate,
         $lt: startDate
       }
+    });
+
+    const allOrders = await Order.countDocuments({
+      createdAt: { $gte: startDate }
     });
 
     const ordersChange = previousOrders > 0 
@@ -227,6 +235,7 @@ router.get("/", async (req, res) => {
         },
         orders: {
           total: totalOrders,
+          all: allOrders,
           change: Math.round(ordersChange * 10) / 10,
           pending: pendingOrders,
           byStatus: ordersByStatus.reduce((acc, item) => {
@@ -301,7 +310,7 @@ router.get("/sales-chart", async (req, res) => {
     const endDate = new Date();
 
     while (currentDate <= endDate) {
-      const dateStr = currentDate.toISOString().split('T')[0];
+      const dateStr = dateKey(currentDate);
       const dayData = salesData.find(d => d._id === dateStr);
       
       filledData.push({
@@ -465,38 +474,71 @@ router.get("/alerts", async (req, res) => {
 router.get("/growth", async (req, res) => {
   try {
     const { months = 6 } = req.query;
+    const monthCount = Math.min(24, Math.max(1, Number(months) || 6));
 
     const startDate = new Date();
-    startDate.setMonth(startDate.getMonth() - Number(months));
+    startDate.setMonth(startDate.getMonth() - (monthCount - 1));
     startDate.setDate(1);
     startDate.setHours(0, 0, 0, 0);
 
-    // Croissance par mois
-    const monthlyGrowth = await Order.aggregate([
-      {
-        $match: {
-          createdAt: { $gte: startDate },
-          isPaid: true
+    const [monthlyRevenue, monthlyUsers] = await Promise.all([
+      Order.aggregate([
+        {
+          $match: {
+            createdAt: { $gte: startDate },
+            isPaid: true
+          }
+        },
+        {
+          $group: {
+            _id: {
+              year: { $year: "$createdAt" },
+              month: { $month: "$createdAt" }
+            },
+            revenue: { $sum: "$totalPrice" },
+            orders: { $sum: 1 }
+          }
         }
-      },
-      {
-        $group: {
-          _id: {
-            year: { $year: "$createdAt" },
-            month: { $month: "$createdAt" }
-          },
-          revenue: { $sum: "$totalPrice" },
-          orders: { $sum: 1 }
+      ]),
+      User.aggregate([
+        {
+          $match: { createdAt: { $gte: startDate } }
+        },
+        {
+          $group: {
+            _id: {
+              year: { $year: "$createdAt" },
+              month: { $month: "$createdAt" }
+            },
+            users: { $sum: 1 }
+          }
         }
-      },
-      { $sort: { "_id.year": 1, "_id.month": 1 } }
+      ])
     ]);
 
-    const formattedGrowth = monthlyGrowth.map(item => ({
-      month: `${item._id.year}-${String(item._id.month).padStart(2, '0')}`,
-      revenue: item.revenue,
-      orders: item.orders
-    }));
+    const monthKey = (year, month) => `${year}-${String(month).padStart(2, "0")}`;
+    const revenueByMonth = new Map(
+      monthlyRevenue.map(item => [monthKey(item._id.year, item._id.month), item])
+    );
+    const usersByMonth = new Map(
+      monthlyUsers.map(item => [monthKey(item._id.year, item._id.month), item.users])
+    );
+
+    // Mois sans activité inclus pour garder une série continue.
+    const formattedGrowth = [];
+    const cursor = new Date(startDate);
+    const now = new Date();
+    while (cursor <= now) {
+      const key = monthKey(cursor.getFullYear(), cursor.getMonth() + 1);
+      const revenue = revenueByMonth.get(key);
+      formattedGrowth.push({
+        month: key,
+        revenue: Math.round(revenue?.revenue || 0),
+        orders: revenue?.orders || 0,
+        users: usersByMonth.get(key) || 0
+      });
+      cursor.setMonth(cursor.getMonth() + 1);
+    }
 
     res.status(200).json({
       success: true,
@@ -516,11 +558,14 @@ router.get("/growth", async (req, res) => {
 // ===============================================
 router.get("/geography", async (req, res) => {
   try {
-    // Analyse des adresses de livraison
+    // Analyse des VILLES de livraison (et non de l'adresse complète).
     const locationData = await Order.aggregate([
       {
+        $match: { isPaid: true }
+      },
+      {
         $group: {
-          _id: "$deliveryAddress",
+          _id: { $ifNull: ["$deliveryCity", "Non renseigné"] },
           orders: { $sum: 1 },
           revenue: { $sum: "$totalPrice" }
         }
@@ -532,9 +577,9 @@ router.get("/geography", async (req, res) => {
     res.status(200).json({
       success: true,
       locations: locationData.map(loc => ({
-        address: loc._id,
+        city: loc._id,
         orders: loc.orders,
-        revenue: loc.revenue
+        revenue: Math.round(loc.revenue)
       }))
     });
   } catch (error) {

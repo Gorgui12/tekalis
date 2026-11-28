@@ -42,7 +42,9 @@ const RevenueChart = ({ data = [], loading = false }) => {
       <div className="flex items-center justify-between mb-6">
         <div>
           <h3 className="text-sm font-semibold text-white">Revenus</h3>
-          <p className="text-xs text-gray-500 mt-0.5">12 derniers mois</p>
+          <p className="text-xs text-gray-500 mt-0.5">
+            {data.length > 0 ? `${data.length} derniers jours` : "Aucune donnée"}
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <span className="w-2 h-2 bg-blue-500 rounded-full" />
@@ -60,7 +62,7 @@ const RevenueChart = ({ data = [], loading = false }) => {
           </defs>
           <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.04)" vertical={false} />
           <XAxis
-            dataKey="month"
+            dataKey="date"
             tick={{ fontSize: 11, fill: '#6b7280' }}
             axisLine={false}
             tickLine={false}

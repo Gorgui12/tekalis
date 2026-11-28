@@ -4,7 +4,10 @@ import { formatCompactPrice } from '@shared/outils/formatters';
 import { IMAGE } from '@shared/outils/constants';
 
 const TopProducts = ({ products = [], loading = false }) => {
-  const items = products;
+  const items = products.map((product) => ({
+    ...product,
+    units: product.salesCount ?? product.sales ?? product.sold ?? 0,
+  }));
 
   return (
     <div className="bg-gray-900 border border-white/5 rounded-2xl p-5">
@@ -54,13 +57,13 @@ const TopProducts = ({ products = [], loading = false }) => {
               {/* Infos */}
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-white truncate">{product.name}</p>
-                <p className="text-xs text-gray-500">{product.sold ?? 0} vendus</p>
+                <p className="text-xs text-gray-500">{product.units} vendus</p>
               </div>
 
               {/* CA */}
               <div className="text-right flex-shrink-0">
                 <p className="text-sm font-semibold text-white">
-                  {formatCompactPrice(product.revenue ?? product.price * (product.sold ?? 0))}
+                  {formatCompactPrice(product.revenue ?? (product.price ?? 0) * product.units)}
                 </p>
               </div>
             </div>

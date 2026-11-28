@@ -3,9 +3,7 @@ import { Link } from "react-router-dom";
 import { 
   FaArrowUp, 
   FaArrowDown,
-  FaCalendarAlt,
-  FaDownload,
-  FaFilter
+  FaDownload
 } from "react-icons/fa";
 import { 
   LineChart, 
@@ -23,52 +21,61 @@ import {
   ResponsiveContainer 
 } from "recharts";
 import api from "@shared/api/api";
+import { formatCompactPrice } from "@shared/outils/formatters";
+
+const EMPTY_ANALYTICS = {
+  stats: {},
+  revenue: [],
+  categories: [],
+  topProducts: [],
+  customers: []
+};
 
 const AdminAnalytics = () => {
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [period, setPeriod] = useState("30days"); // 7days, 30days, 90days, year
-  const [analyticsData, setAnalyticsData] = useState({
-    revenue: [],
-    orders: [],
-    products: [],
-    customers: [],
-    categories: [],
-    stats: {}
-  });
-
-  const emptyAnalytics = {
-    stats: {},
-    revenue: [],
-    categories: [],
-    topProducts: [],
-    customers: []
-  };
+  const [analyticsData, setAnalyticsData] = useState(EMPTY_ANALYTICS);
 
   useEffect(() => {
-    fetchAnalytics();
-  }, [period]);
+    const controller = new AbortController();
+    let active = true;
 
-  const fetchAnalytics = async () => {
-    try {
-      const { data } = await api.get(`/admin/analytics?period=${period}`);
-      setAnalyticsData({
-        ...emptyAnalytics,
-        ...data,
-        stats: { ...(data?.stats || {}) }
-      });
-    } catch (error) {
-      console.error("Erreur chargement analytics:", error);
-      setAnalyticsData(emptyAnalytics);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const fetchAnalytics = async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const { data } = await api.get(`/admin/analytics?period=${period}`, {
+          signal: controller.signal
+        });
+        if (!active) return;
+        setAnalyticsData({
+          ...EMPTY_ANALYTICS,
+          ...data,
+          stats: { ...(data?.stats || {}) }
+        });
+      } catch (err) {
+        if (!active || controller.signal.aborted) return;
+        console.error("Erreur chargement analytics:", err);
+        setAnalyticsData(EMPTY_ANALYTICS);
+        setError(err.response?.data?.message || "Impossible de charger les analytics");
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+
+    fetchAnalytics();
+    return () => {
+      active = false;
+      controller.abort();
+    };
+  }, [period]);
 
   // Colors for charts
   const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"];
 
   const periodLabel = (p) =>
-    p === "7days" ? "7 jours" : p === "30days" ? "30 jours" : p === "90days" ? "90 jours" : "l'année";
+    p === "7days" ? "7 jours" : p === "30days" ? "30 jours" : p === "90days" ? "90 jours" : "12 derniers mois";
 
   const toCSV = (rows) => {
     const header = Object.keys(rows[0] || {});
@@ -109,7 +116,7 @@ const AdminAnalytics = () => {
     sections.push("=== Top produits ===");
     sections.push(toCSV(topProducts.map((p) => ({ name: p.name, sales: p.sales, revenue: p.revenue }))));
     sections.push("=== Ventes par catégorie ===");
-    sections.push(toCSV(categories.map((c) => ({ name: c.name, value: c.value, revenue: c.revenue }))));
+    sections.push(toCSV(categories.map((c) => ({ name: c.name, sales: c.sales, revenue: c.revenue }))));
     sections.push("=== Clients ===");
     sections.push(toCSV(customers));
     download(`analytics-${period}-${new Date().toISOString().split("T")[0]}.csv`, sections.join("\n\n"));
@@ -117,8 +124,8 @@ const AdminAnalytics = () => {
 
   // StatCard Component
   const StatCard = ({ title, value, change, icon, color, subtitle }) => {
-    const changeVal = change ?? 0;
-    const isPositive = changeVal >= 0;
+    const hasChange = typeof change === "number" && Number.isFinite(change);
+    const isPositive = hasChange && change >= 0;
     
     return (
       <div className="bg-white rounded-lg shadow-md p-6 border-l-4" style={{ borderColor: color }}>
@@ -127,10 +134,10 @@ const AdminAnalytics = () => {
             <div style={{ color }} className="text-2xl">{icon}</div>
           </div>
           <span className={`flex items-center gap-1 text-sm font-semibold ${
-            isPositive ? "text-green-600" : "text-red-600"
+            !hasChange ? "text-gray-400" : isPositive ? "text-green-600" : "text-red-600"
           }`}>
-            {isPositive ? <FaArrowUp /> : <FaArrowDown />}
-            {Math.abs(changeVal)}%
+            {hasChange && (isPositive ? <FaArrowUp /> : <FaArrowDown />)}
+            {hasChange ? `${Math.abs(change)}%` : "—"}
           </span>
         </div>
         <h3 className="text-gray-600 text-sm font-medium mb-1">{title}</h3>
@@ -148,7 +155,7 @@ const AdminAnalytics = () => {
           <p className="font-semibold text-gray-900 mb-2">{label}</p>
           {payload.map((entry, index) => (
             <p key={index} style={{ color: entry.color }} className="text-sm">
-              {entry.name}: {entry.value.toLocaleString()} {entry.name.includes("Revenue") ? "FCFA" : ""}
+              {entry.name}: {Number(entry.value ?? 0).toLocaleString("fr-FR")} {entry.name.includes("Revenue") ? "FCFA" : ""}
             </p>
           ))}
         </div>
@@ -197,7 +204,7 @@ const AdminAnalytics = () => {
                 <option value="7days">7 derniers jours</option>
                 <option value="30days">30 derniers jours</option>
                 <option value="90days">90 derniers jours</option>
-                <option value="year">Cette année</option>
+                <option value="year">12 derniers mois</option>
               </select>
 
               {/* Export Button */}
@@ -211,59 +218,66 @@ const AdminAnalytics = () => {
           </div>
         </div>
 
+        {error && (
+          <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {error}
+          </div>
+        )}
+
         {/* Stats Grid */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
           <StatCard
             title="Revenu total"
-            value={`${((analyticsData.stats.totalRevenue ?? 0) / 1000000).toFixed(1)}M`}
+            value={formatCompactPrice(analyticsData.stats.totalRevenue ?? 0)}
             change={analyticsData.stats.revenueChange}
             icon="💰"
             color="#10b981"
-            subtitle="FCFA"
+            subtitle={`Commandes payées · ${periodLabel(period)}`}
           />
           
           <StatCard
-            title="Commandes"
-            value={(analyticsData.stats.totalOrders ?? 0).toLocaleString()}
+            title="Commandes payées"
+            value={(analyticsData.stats.totalOrders ?? 0).toLocaleString("fr-FR")}
             change={analyticsData.stats.ordersChange}
             icon="🛒"
             color="#3b82f6"
-            subtitle={periodLabel(period)}
+            subtitle={`${analyticsData.stats.allOrders ?? 0} commandes au total`}
           />
           
           <StatCard
             title="Panier moyen"
-            value={`${Math.round((analyticsData.stats.avgOrderValue ?? 0) / 1000)}K`}
+            value={formatCompactPrice(analyticsData.stats.avgOrderValue ?? 0)}
             change={analyticsData.stats.avgOrderChange}
             icon="📈"
             color="#f59e0b"
-            subtitle="FCFA"
+            subtitle="Sur commandes payées"
           />
           
           <StatCard
             title="Nouveaux clients"
-            value={analyticsData.stats.newCustomers ?? 0}
+            value={(analyticsData.stats.newCustomers ?? 0).toLocaleString("fr-FR")}
             change={analyticsData.stats.customersChange}
             icon="👥"
             color="#8b5cf6"
+            subtitle="Inscriptions sur la période"
           />
 
           <StatCard
-            title="Visiteurs (sessions)"
-            value={analyticsData.stats.sessions?.toLocaleString() ?? "—"}
-            change={analyticsData.stats.sessionsChange ?? 0}
+            title="Visiteurs uniques"
+            value={(analyticsData.stats.visitors ?? 0).toLocaleString("fr-FR")}
+            change={analyticsData.stats.visitorsChange}
             icon="🌐"
             color="#06b6d4"
-            subtitle={`${analyticsData.stats.views || 0} pages vues`}
+            subtitle={`${analyticsData.stats.sessions ?? 0} sessions · ${analyticsData.stats.views ?? 0} pages vues`}
           />
 
           <StatCard
             title="Taux conversion"
-            value={`${analyticsData.stats.conversionRate ?? "0"}%`}
-            change={analyticsData.stats.conversionChange ?? 0}
+            value={`${(analyticsData.stats.conversionRate ?? 0).toLocaleString("fr-FR")}%`}
+            change={analyticsData.stats.conversionChange}
             icon="✨"
             color="#ef4444"
-            subtitle="Commandes / visites"
+            subtitle="Commandes payées / visiteurs uniques"
           />
         </div>
 
@@ -396,29 +410,25 @@ const AdminAnalytics = () => {
             <div className="border-l-4 border-blue-600 pl-4">
               <p className="text-sm text-gray-600 mb-1">Chiffre d'affaires</p>
               <p className="text-2xl font-bold text-gray-900">
-                {analyticsData.stats.totalRevenue
-                  ? `${(analyticsData.stats.totalRevenue / 1000000).toFixed(1)}M FCFA`
-                  : "—"}
+                {formatCompactPrice(analyticsData.stats.totalRevenue ?? 0)}
               </p>
             </div>
 
             <div className="border-l-4 border-green-600 pl-4">
               <p className="text-sm text-gray-600 mb-1">Panier moyen</p>
               <p className="text-2xl font-bold text-gray-900">
-                {analyticsData.stats.avgOrderValue
-                  ? `${analyticsData.stats.avgOrderValue.toLocaleString()} FCFA`
-                  : "—"}
+                {formatCompactPrice(analyticsData.stats.avgOrderValue ?? 0)}
               </p>
             </div>
 
             <div className="border-l-4 border-purple-600 pl-4">
               <p className="text-sm text-gray-600 mb-1">Taux de conversion</p>
               <p className="text-2xl font-bold text-gray-900">
-                {analyticsData.stats.conversionRate ?? "0"}%
+                {(analyticsData.stats.conversionRate ?? 0).toLocaleString("fr-FR")}%
               </p>
               <p className="text-xs text-gray-500 mt-1">
-                Contrairement à Meta/GA4, l'admin ne compte que les visites
-                après acceptation des cookies
+                Commandes payées ÷ visiteurs uniques. Le comptage des visites
+                nécessite le consentement, contrairement aux pings anonymes GA4.
               </p>
             </div>
           </div>

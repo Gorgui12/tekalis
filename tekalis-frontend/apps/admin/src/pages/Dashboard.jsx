@@ -150,7 +150,7 @@ const AdminDashboard = () => {
             change={stats.revenue.change}
             icon={<FaDollarSign className="text-2xl" />}
             color="#10b981"
-            subtitle="Ce mois"
+            subtitle="30 derniers jours"
           />
           
           <StatCard
@@ -176,7 +176,7 @@ const AdminDashboard = () => {
             change={stats.users.change}
             icon={<FaUsers className="text-2xl" />}
             color="#8b5cf6"
-            subtitle={`+${stats.users.newThisMonth} ce mois`}
+            subtitle={`+${stats.users.newThisMonth} sur 30 jours`}
           />
         </div>
 
